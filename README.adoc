@@ -1,0 +1,7 @@
+= BibXML APIs
+
+For an overview, see https://github.com/ietf-ribose/bibxml-project.
+
+This project uses Docker, Django and PostgreSQL.
+
+To run the service, execute `docker-compose up` from within repository root.
