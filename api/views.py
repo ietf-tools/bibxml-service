@@ -6,13 +6,13 @@ def index(request):
 
 def search(request):
     # TODO: 
-    # implement pasing json request for search fields
+    # implement parsing and validate json request for search fields
     # implement search
 
     if request.method == 'POST':
         return JsonResponse({
             "results":  []
-        })        
+        })
     else:
         return JsonResponse({
                 "error": "Bad HTTP method"
