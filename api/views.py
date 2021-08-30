@@ -1,5 +1,8 @@
 from django.http import HttpResponse, JsonResponse
 
+from doi2ietf import process_doi_list
+import requests_cache
+
 
 def index(request):
     return HttpResponse("API v1 index, use search or ref")
@@ -25,7 +28,27 @@ def get_ref(request, lib, ref):
     # implement getting referense from lib by lib, ref
     # implement convertation 
 
-    return JsonResponse({
-        "library": lib,
-        "ref": ref
-    })
+    if lib == "doi":
+        result = get_doi_refs(ref)
+
+        if result:
+            result = result[0]['a'] # TODO: ask about enumerating
+
+            return JsonResponse({
+                "data": result
+            })
+
+        else:
+            return JsonResponse({
+                "error": "Unable to get DOI %s" % ref
+            }, status=404)
+
+    else:
+        return JsonResponse({
+            "error": "%s Is Not Implemented" % lib.upper()
+        }, status=404)
+
+
+def get_doi_refs(ref):
+    with requests_cache.enabled():
+        return process_doi_list([ref], 'DICT')
