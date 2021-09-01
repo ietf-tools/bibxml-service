@@ -2,6 +2,35 @@
 
 For an overview, see https://github.com/ietf-ribose/bibxml-project.
 
-This project uses Docker, Django and PostgreSQL.
+This project uses Docker, Django and PostgreSQL, and now can run only with
+[bibxml-indexer](https://github.com/ietf-ribose/bibxml-indexer) because it using DB placed at `bibxml-indexer`.
 
-To run the service, execute `docker-compose up` from within repository root.
+In production usage would be better to use dedicated standalone PostgreSQL instance tuned up by DBA specialist.
+
+To run this project get `bibxml-indexer` first. Then add docker network named `bibxml_network`:
+
+`docker network create --driver bridge bibxml_network`
+
+Then go to `bibxml-indexer` root and execute command:
+
+`docker-compose build`
+
+Now you can run `bibxml-indexer`:
+
+`docker-compose up`
+
+To make DB migrations run command (while container running):
+
+`docker-compose exec web python manage.py migrate`
+
+Then return to this repo (`bibxml-service`) root and execute:
+
+`docker-compose build`
+
+So, if `bibxml-indexer` builded and running successfully, you can run this project by executing command:
+
+`docker-compose up`
+
+`bibxml-indexer` Django runs at port 8001
+
+`bibxml-service` Django runs at port 8000

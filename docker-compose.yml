@@ -1,22 +1,18 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+    hostname: web-service
     ports:
       - "8000:8000"
-    depends_on:
-      - db
     env_file:
       - ./.env.dev
+
+networks:
+  default:
+    external: true
+    name: bibxml_network
