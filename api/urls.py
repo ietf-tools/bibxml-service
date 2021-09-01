@@ -3,7 +3,8 @@ from django.urls import include, path, re_path
 
 from . import views
 
-_libs = ["rfc", "id", "std", "bcp", "fyi", "doi"]
+
+_libs = ["rfc", "id", "std", "bcp", "fyi", "doi", "nist"]
 re_libs = f'(?P<lib>{"|".join(_libs)})'
 
 urlpatterns = [
