@@ -2,8 +2,8 @@
 
 For an overview, see https://github.com/ietf-ribose/bibxml-project.
 
-This project uses Docker, Django and PostgreSQL, and now can run only with
-[bibxml-indexer](https://github.com/ietf-ribose/bibxml-indexer) because it using DB placed at `bibxml-indexer`.
+This project uses Docker, Django and PostgreSQL, and now can run only with 
+https://github.com/ietf-ribose/bibxml-indexer[bibxml-indexer] because it using DB placed at `bibxml-indexer`.
 
 In production usage would be better to use dedicated standalone PostgreSQL instance tuned up by DBA specialist.
 
