@@ -1,0 +1,175 @@
+openapi: 3.0.1
+
+info:
+  title: BibXML service 
+  description: This is BibXML API
+  contact:
+    email: open.source@ribose.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 0.0.1
+
+servers:
+- url: http://localhost:8000/api/v1
+
+paths:
+  /ref/{dataset}/{ref_id}:
+    get:
+      summary: Get citation by referense ID from dataset
+      description: Get citation by referense ID from dataset
+      operationId: getCitationByReferenceId
+      parameters:
+      - name: dataset
+        in: path
+        description: Name of dataset
+        required: true
+        schema:
+          $ref: '#/components/schemas/AvailableDatasets'
+      - name: ref_id
+        in: path
+        description: Reference ID
+        required: true
+        schema:
+          type: string
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessCitationResponse'
+
+        404:
+          description: Unknown dataset or reference ID
+          content: {}
+
+        500:
+          description: operation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorCitationResponse'
+
+components:
+
+  schemas:
+
+    AvailableDatasets:
+      type: string
+      enum:
+      - doi
+      - ecma
+      - nist
+      - ietf
+      - itu-r
+      - calconnect
+      - cie
+      - iso
+      - bipm
+      - iho
+
+    SuccessCitationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          # $ref: '#/components/schemas/CitationObject'
+
+    ErrorCitationResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              description: Code for automatic error processing
+            message:
+              type: string
+              description: Human readable error message
+
+    # TODO:
+    # need to verify structure
+    CitationObject:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: object
+          properties:
+            type:
+              type: string
+            value:
+              type: string
+          required:
+          - type
+          - value
+        link:
+          type: object
+          properties:
+            type:
+              type: string
+            content:
+              type: string
+          required:
+          - type
+          - content
+        type:
+          type: string
+        docid:
+          type: array
+          items:
+            type: object
+        place:
+          type: string
+        title:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              format:
+                type: string
+              script:
+                type: string
+              content:
+                type: string
+              language:
+                type: string
+            required:
+            - type
+            - format
+            - script
+            - content
+            - language
+        script:
+          type: string
+        doctype:
+          type: string
+        revdate:
+          type: string
+        contributor:
+          type: object
+          properties:
+            role:
+              type: string
+            organization:
+              type: object
+              properties:
+                name:
+                  type: string
+                abbreviation:
+                  type: string
+              required:
+              - name
+              - abbreviation
+          required:
+          - role
+          - organization
+      required:
+      - id
+      - date
