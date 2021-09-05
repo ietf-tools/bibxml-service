@@ -3,11 +3,14 @@ from django.http import HttpResponse, JsonResponse
 from doi2ietf import process_doi_list
 import requests_cache
 
-from .models import BibData
+from .models import RefData
+
+from django.conf import settings
 
 
 def index(request):
     return HttpResponse("API v1 index, use search or ref")
+
 
 def search(request):
     # TODO: 
@@ -30,8 +33,6 @@ def get_ref(request, lib, ref):
     # implement getting referense from lib by lib, ref
     # implement convertation 
 
-    print( lib, ref)
-
     if lib == "doi":
         result = get_doi_refs(ref)
 
@@ -47,14 +48,14 @@ def get_ref(request, lib, ref):
                 "error": "Unable to get DOI %s" % ref
             }, status=404)
 
-    elif lib in ['nist']:
+    elif lib in settings.INDEXABLE_DATASETS:
         try:
-            result = BibData.objects.get(bib_id=ref, bib_type=lib)
+            result = RefData.objects.get(ref_id=ref, dataset=lib)
             return JsonResponse({
                 "data": result.body
             })
 
-        except BibData.DoesNotExist:
+        except RefData.DoesNotExist:
             return JsonResponse({
                 "error": "Not Found Ref.: %s at Lib: %s" % (ref, lib.upper())
             }, status=404)
