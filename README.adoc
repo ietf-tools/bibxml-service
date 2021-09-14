@@ -1,36 +1,73 @@
-= BibXML APIs
+= BibXML Service APIs
+
+== Purpose
 
 For an overview, see https://github.com/ietf-ribose/bibxml-project.
 
+== Prerequisites
+
 This project uses Docker, Django and PostgreSQL, and now can run only with 
-https://github.com/ietf-ribose/bibxml-indexer[bibxml-indexer] because it using DB placed at `bibxml-indexer`.
+https://github.com/ietf-ribose/bibxml-indexer[bibxml-indexer] because it is using a database placed at `bibxml-indexer`.
 
-In production usage would be better to use dedicated standalone PostgreSQL instance tuned up by DBA specialist.
+== Usage
 
-To run this project get `bibxml-indexer` first. Then add docker network named `bibxml_network`:
+=== Production
 
-`docker network create --driver bridge bibxml_network`
+In production, usage would be better to use dedicated standalone
+PostgreSQL instance tuned up by DBA specialist.
+
+=== Locally
+
+To run this project you must have already setup `bibxml-indexer`.
+
+Then add docker network named `bibxml_network`:
+
+[source,sh]
+----
+$ docker network create --driver bridge bibxml_network
+----
 
 Then go to `bibxml-indexer` root and execute command:
 
-`docker-compose build`
+[source,sh]
+----
+$ docker-compose build`
+----
 
 Now you can run `bibxml-indexer`:
 
-`docker-compose up`
+[source,sh]
+----
+$ docker-compose up
+----
 
-To make DB migrations run command (while container running):
+To perform DB migrations, run command (while container running):
 
-`docker-compose exec web python manage.py migrate`
+[source,sh]
+----
+docker-compose exec web python manage.py migrate
+----
 
 Then return to this repo (`bibxml-service`) root and execute:
 
-`docker-compose build`
+[source,sh]
+----
+docker-compose build`
+----
 
 So, if `bibxml-indexer` builded and running successfully, you can run this project by executing command:
 
-`docker-compose up`
+[source,sh]
+----
+docker-compose up
+----
 
-`bibxml-indexer` Django runs at port 8001
+Then:
 
-`bibxml-service` Django runs at port 8000
+* `bibxml-indexer` Django runs at port 8001
+* `bibxml-service` Django runs at port 8000
+
+
+== Credits
+
+Authored by Ribose as produced under the IETF BibXML SOW.
