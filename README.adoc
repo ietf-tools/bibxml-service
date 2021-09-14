@@ -31,7 +31,7 @@ Then go to `bibxml-indexer` root and execute command:
 
 [source,sh]
 ----
-$ docker-compose build`
+$ docker-compose build
 ----
 
 Now you can run `bibxml-indexer`:
