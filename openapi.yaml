@@ -1,10 +1,10 @@
 openapi: 3.0.1
 
 info:
-  title: BibXML service 
-  description: This is BibXML API
+  title: IETF BibXML service
+  description: The IETF BibXML service provides an open and public API for its users to fetch references from.
   contact:
-    email: open.source@ribose.com
+    email: ietf-ribose@ribose.com
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
@@ -16,8 +16,8 @@ servers:
 paths:
   /ref/{dataset}/{ref_id}:
     get:
-      summary: Get citation by referense ID from dataset
-      description: Get citation by referense ID from dataset
+      summary: Get citation by reference ID from dataset
+      description: Get citation by reference ID from dataset
       operationId: getCitationByReferenceId
       parameters:
       - name: dataset
@@ -93,15 +93,13 @@ components:
       type: string
       enum:
       - doi
-      - ecma
       - nist
       - ietf
-      - itu-r
-      - calconnect
-      - cie
-      - iso
-      - bipm
-      - iho
+      - iana
+      - 3gpp
+      - w3c
+      - rfc
+      - misc
 
     SuccessCitationResponse:
       type: object
