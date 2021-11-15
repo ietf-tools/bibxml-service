@@ -52,7 +52,7 @@ Then return to this repo (`bibxml-service`) root and execute:
 
 [source,sh]
 ----
-docker-compose build`
+docker-compose build
 ----
 
 So, if `bibxml-indexer` builded and running successfully, you can run this project by executing command:
