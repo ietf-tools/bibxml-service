@@ -56,7 +56,7 @@ def search(request):
                     RefData.objects.filter(
                         body__contains=fields_values, dataset=dataset
                     )
-                    .order_by("ref_id")[start:end]
+                    .order_by("ref")[start:end]
                     .values()
                 )
 
@@ -72,7 +72,7 @@ def search(request):
 
                 result = list(
                     RefData.objects.filter(body__contains=fields_values)
-                    .order_by("ref_id")[start:end]
+                    .order_by("ref")[start:end]
                     .values()
                 )
 
@@ -115,7 +115,7 @@ def get_ref(request, lib, ref):
 
     elif lib in settings.INDEXABLE_DATASETS:
         try:
-            result = RefData.objects.get(ref_id=ref, dataset=lib)
+            result = RefData.objects.get(ref=ref, dataset=lib)
             return JsonResponse({"data": result.body})
 
         except RefData.DoesNotExist:
