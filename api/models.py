@@ -17,6 +17,9 @@ class RefData(models.Model):
     # Contains canonical Relaton representation
     body = models.JSONField()
 
+    # Contains a mapping of { format: string }, where format is e.g. bibxml
+    representations = models.JSONField()
+
     class Meta:
         db_table = 'api_ref_data'
 
