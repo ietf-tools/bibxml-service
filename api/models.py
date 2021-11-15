@@ -14,6 +14,7 @@ class RefData(models.Model):
     # Matches ID in settings.RELATON_DATASETS
     dataset = models.CharField(max_length=24)
 
+    # Contains canonical Relaton representation
     body = models.JSONField()
 
     class Meta:
