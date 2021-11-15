@@ -14,7 +14,7 @@ class RefData(models.Model):
     # Matches ID in settings.RELATON_DATASETS
     dataset = models.CharField(max_length=24)
 
-    body = models.JSONField('body')
+    body = models.JSONField()
 
     class Meta:
         db_table = 'api_ref_data'
