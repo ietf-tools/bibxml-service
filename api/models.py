@@ -4,7 +4,10 @@ from django.db import models
 class RefData(models.Model):
     ref_id = models.CharField(max_length=64)
     ref_type = models.CharField(max_length=24)
+
+    # Matches ID in settings.RELATON_DATASETS
     dataset = models.CharField(max_length=24)
+
     body = models.JSONField('body')
 
     class Meta:
