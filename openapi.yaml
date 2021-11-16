@@ -74,10 +74,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/FoundCitationsResponse'
 
-        404:
-          description: Unknown dataset
-          content: {}
-
         500:
           description: operation failed
           content:
