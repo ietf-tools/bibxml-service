@@ -390,15 +390,22 @@ components:
 
     AvailableDatasets:
       type: string
+      # TODO: Auto-generate this list at deployment time?
       enum:
+      - rfcs
+      - ids
+      - rfcsubseries
+      - misc
+      - w3c
+      - 3gpp
+      - ieee
+      - iana
       - doi
       - nist
-      - ietf
-      - iana
-      - 3gpp
-      - w3c
-      - rfc
-      - misc
+      description: |
+        For up-to-date list of available datasets,
+        see bibxml-data-* repositories under ietf-ribose GitHub organization.
+        See also bibxml-indexer service README.
 
     SuccessCitationResponse:
       type: object
