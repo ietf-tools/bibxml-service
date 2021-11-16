@@ -30,8 +30,8 @@ paths:
         type: string
 
     get:
-      summary: Get citation by reference ID from dataset
-      description: Get citation by reference ID from dataset
+      summary: Get citation
+      description: Retrieve citation from given dataset by reference.
       operationId: getCitationByReferenceId
 
       responses:
@@ -40,10 +40,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessCitationResponse'
+                $ref: '#/components/schemas/CitationDetailsResponse'
 
         404:
-          description: Unknown dataset or reference ID
+          description: reference not found in given dataset
           content: {}
 
         500:
@@ -51,16 +51,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorCitationResponse'
-
+                $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/search:
     post:
-      summary: Search citations by query
-      description: Search citations by query
+      summary: Search citations
+      description: Search citations across datasets.
       operationId: searchCitations
       requestBody:
         required: true
+        description: Search query
         content:
           application/json:
             schema:
@@ -72,14 +72,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoundCitationsResponse'
+                $ref: '#/components/schemas/CitationSearchResultResponse'
 
         500:
           description: operation failed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorCitationResponse'
+                $ref: '#/components/schemas/ErrorResponse'
 
   # LEGACY RESOURCES
   
@@ -404,14 +404,14 @@ components:
         see bibxml-data-* repositories under ietf-ribose GitHub organization.
         See also bibxml-indexer service README.
 
-    SuccessCitationResponse:
+    CitationDetailsResponse:
       type: object
       properties:
         data:
           type: object
           # $ref: '#/components/schemas/CitationObject'
 
-    ErrorCitationResponse:
+    ErrorResponse:
       type: object
       properties:
         error:
@@ -424,7 +424,7 @@ components:
               type: string
               description: Human readable error message
 
-    FoundCitationsResponse:
+    CitationSearchResultResponse:
       type: object
       properties:
         data:
