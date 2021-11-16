@@ -2,3 +2,4 @@ Django>=3.0,<4.0
 psycopg2-binary>=2.8
 requests_cache>=0.7.4,<1.0
 doi2ietf>=0.1.2
+flake8
