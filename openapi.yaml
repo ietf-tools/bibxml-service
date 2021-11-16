@@ -15,23 +15,24 @@ servers:
 
 paths:
   /api/v1/ref/{dataset}/{ref_id}:
+    parameters:
+    - name: dataset
+      in: path
+      description: Dataset ID
+      required: true
+      schema:
+        $ref: '#/components/schemas/AvailableDatasets'
+    - name: ref_id
+      in: path
+      description: Standard reference
+      required: true
+      schema:
+        type: string
+
     get:
       summary: Get citation by reference ID from dataset
       description: Get citation by reference ID from dataset
       operationId: getCitationByReferenceId
-      parameters:
-      - name: dataset
-        in: path
-        description: Name of dataset
-        required: true
-        schema:
-          $ref: '#/components/schemas/AvailableDatasets'
-      - name: ref_id
-        in: path
-        description: Reference ID
-        required: true
-        schema:
-          type: string
 
       responses:
         200:
