@@ -409,7 +409,7 @@ components:
       properties:
         data:
           type: object
-          # $ref: '#/components/schemas/CitationObject'
+          $ref: '#/components/schemas/CitationObject'
 
     ErrorResponse:
       type: object
