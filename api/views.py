@@ -122,39 +122,30 @@ def search(request):
 
 
 @require_GET
-def get_ref(request, lib, ref):
-    # TODO:
-    # implement getting referense from lib by lib, ref
-    # implement convertation
-
-    if lib == "doi":
+def get_ref(request, dataset_name, ref):
+    if dataset_name == "doi":
         result = get_doi_refs(ref)
 
         if result:
-            result = result[0]["a"]  # TODO: ask about enumerating
-
+            result = result[0]["a"]  # Why?
             return JsonResponse({"data": result})
 
         else:
-            return JsonResponse(
-                {"error": "Unable to get DOI %s" % ref}, status=404
-            )
+            return JsonResponse({
+                "error": "Unable to find ref {} in dataset DOI".format(ref),
+            }, status=404)
 
-    elif lib in settings.INDEXABLE_DATASETS:
+    else:
         try:
-            result = RefData.objects.get(ref=ref, dataset=lib)
+            result = RefData.objects.get(ref=ref, dataset=dataset_name)
             return JsonResponse({"data": result.body})
 
         except RefData.DoesNotExist:
-            return JsonResponse(
-                {"error": "Not Found Ref.: %s at Lib: %s" % (ref, lib.upper())},
-                status=404,
-            )
-
-    else:
-        return JsonResponse(
-            {"error": "%s Is Not Implemented" % lib.upper()}, status=404
-        )
+            return JsonResponse({
+                "error":
+                    "Unable to find ref {} in dataset {}".
+                    format(ref, dataset_name),
+            }, status=404)
 
 
 def get_doi_refs(ref):
