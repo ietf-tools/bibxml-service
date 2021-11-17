@@ -54,6 +54,7 @@ Invoking Django management commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
+
     % docker compose exec web bash
 
 
