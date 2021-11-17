@@ -4,7 +4,8 @@ from django.db import models
 class RefData(models.Model):
     ref = models.CharField(
         max_length=128,
-        help_text="Reference (or ID). Corresponds to source dataset filename without extension.")
+        help_text="Reference (or ID). "
+                  "Corresponds to source dataset filename without extension.")
 
     ref_id = models.CharField(max_length=64)
     """DEPRECATED: Use ref"""
