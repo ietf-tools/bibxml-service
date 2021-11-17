@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-from os import environ
+from os import environ, path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,14 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = environ.get("DJANGO_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(environ.get("DJANGO_DEBUG", default=0))
+DEBUG = int(environ.get("DEBUG", default=0)) == 1
 
-# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
-# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = [
+    environ.get("PRIMARY_HOSTNAME"),
+]
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -58,7 +59,7 @@ ROOT_URLCONF = 'bibxml.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,11 +86,11 @@ WSGI_APPLICATION = 'bibxml.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': environ.get('DJANGO_DATABASE'),
-        'USER': environ.get('DJANGO_DATABASE_USER'),
-        'PASSWORD': environ.get('DJANGO_DATABASE_PASSWORD'),
-        'HOST': environ.get('DJANGO_DATABASE_HOST'),
-        'PORT': int(environ.get("DJANGO_DATABASE_PORT", default=5432)),
+        'NAME': environ.get('DB_NAME'),
+        'USER': environ.get('DB_USER'),
+        'PASSWORD': environ.get('DB_SECRET'),
+        'HOST': environ.get('DB_HOST'),
+        'PORT': int(environ.get('DB_PORT')),
     }
 }
 
@@ -132,14 +133,32 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+
+STATIC_ROOT = BASE_DIR / 'build' / 'static'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# List of supported datasets
-# Need to be matched with Indexer service
-# (maybe set this value from ENV or substitute on deploy?)
+LEGACY_DATASETS = {
+    'bibxml': 'rfcs',
+    'bibxml2': 'misc',
+    'bibxml3': 'ids',
+    'bibxml4': 'w3c',
+    'bibxml5': '3gpp',
+    'bibxml6': 'ieee',
+    'bibxml7': 'doi',
+    'bibxml8': 'iana',
+    'bibxml9': 'rfcsubseries',
+}
+"""Maps legacy dataset root as it appears under /public/rfc/
+to available dataset ID(s)."""
 
 INDEXABLE_DATASETS = [
     "ecma",
@@ -152,6 +171,13 @@ INDEXABLE_DATASETS = [
     "bipm",
     "iho"
 ]
+"""
+DEPRECATED.
+
+List of supported datasets
+Need to be matched with Indexer service
+(maybe set this value from ENV or substitute on deploy?)
+"""
 
 # Limit results in /search/ per request:
 

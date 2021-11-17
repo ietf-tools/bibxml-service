@@ -1,4 +1,6 @@
 /data
+/build
 /env
+.env
 *.pyc
 http_cache.sqlite

@@ -3,16 +3,33 @@ version: "3.9"
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command:
+      - /bin/sh
+      - -c
+      - |
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        python manage.py check --deploy &&
+        daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
     volumes:
       - .:/code
     hostname: web-service
+    networks:
+      - default
+      - bibxml_indexer_db_net
     ports:
-      - "8000:8000"
-    env_file:
-      - ./.env.dev
+      - "${PORT:?missing port to expose web service under}:8000"
+    environment:
+      PRIMARY_HOSTNAME: ${HOST:?please specify main hostname (e.g., localhost for development)}
+      DEBUG: ${DEBUG:-0}
+      DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_NAME:?err}
+      DB_NAME: ${DB_NAME:?err}
+      DB_SECRET: "${DB_SECRET:?err}"
 
 networks:
-  default:
+  bibxml_indexer_db_net:
+    name: bibxml_indexer_db_net
     external: true
-    name: bibxml_network
