@@ -2,6 +2,18 @@ from django.db import models
 
 
 class RefData(models.Model):
+    """
+    .. important::
+
+       This model is defined as non-managed by Django.
+       There is no need to migrate this model.
+       It is developer’s responsibility to keep field definition in sync
+       with the model in bibxml-indexer.
+
+       The model in bibxml-indexer is managed,
+       and changes to that model require migrations to be applied.
+    """
+
     ref = models.CharField(
         max_length=128,
         help_text="Reference (or ID). "
@@ -32,3 +44,4 @@ class RefData(models.Model):
                 fields=['ref_id', 'dataset'],
                 name='unique_dataset_id')
         ]
+        managed = False
