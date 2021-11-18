@@ -122,43 +122,87 @@ def search(request):
 
 @require_GET
 def get_ref(request, dataset_name, ref):
+    format = request.GET.get('format', 'relaton')
     try:
-        result = RefData.objects.get(ref=ref, dataset=dataset_name)
-        return JsonResponse({"data": result.body})
-
+        result = _get_static_ref(dataset_name, ref, format)
     except RefData.DoesNotExist:
         return JsonResponse({
             "error":
                 "Unable to find ref {} in dataset {}".
                 format(ref, dataset_name),
         }, status=404)
+    else:
+        return JsonResponse({"data": result})
 
 
 @require_GET
 def get_doi_ref(request, ref):
+    format = request.GET.get('format', 'relaton')
     try:
-        result = _get_doi_ref(ref)
-    except DOINotFoundError:
+        result = _get_doi_ref(ref, format)
+    except RefNotFoundError:
         return JsonResponse({
             "error": "Unable to find DOI ref {}".format(ref),
         }, status=404)
     else:
-        return JsonResponse({
-            "data": result
-        })
+        return JsonResponse({"data": result})
 
 
-def _get_doi_ref(ref):
+def _get_static_ref(dataset_id, ref, format='relaton'):
+    """Retrieves citation from static indexed dataset.
+
+    :param format string: "bibxml" or "relaton"
+    :returns object: if format is "relaton", a dict.
+    :returns string: if format is "bibxml", an XML string.
+    :raises RefNotFoundError: either reference or requested format not found
+    """
+
+    if format not in ['relaton', 'bibxml']:
+        raise ValueError("Unknown citation format requested")
+
+    try:
+        result = RefData.objects.get(ref=ref, dataset=dataset_id)
+    except RefData.DoesNotExist:
+        raise RefNotFoundError(
+            "Cannot find requested reference in given dataset",
+            ref)
+
+    if format == 'relaton':
+        return result.body
+
+    else:
+        bibxml_repr = result.representations.get('bibxml', None)
+        if bibxml_repr:
+            return bibxml_repr
+        else:
+            raise RefNotFoundError(
+                "BibXML representation not found for requested reference",
+                ref)
+
+
+def _get_doi_ref(ref, format='relaton'):
     """Uses ``doi2ietf`` library to obtain DOI results matching given reference.
-    :returns key "a" in the first result found."""
+
+    :param format string: "bibxml" or "relaton"
+    :returns object: if format is "relaton", the first DOI result as dict.
+    :returns string: if format is "bibxml", the first DOI result as XML string.
+    :raises RefNotFoundError: reference not found.
+    """
+
+    if format not in ['relaton', 'bibxml']:
+        raise ValueError("Unknown format requested for DOI ref")
 
     with requests_cache.enabled():
-        doi_list = process_doi_list([ref], "DICT")
+        doi_format = 'DICT' if format == 'relaton' else 'XML'
+        doi_list = process_doi_list([ref], doi_format)
         if len(doi_list) > 0:
             # TODO: What to do with multiple DOI results for a reference?
-            return doi_list[0]["a"]
+            if format == 'relaton':
+                return doi_list[0]["a"]
+            else:
+                return doi_list[0]
         else:
-            raise DOINotFoundError(
+            raise RefNotFoundError(
                 "Reference not found: got empty list from DOI",
                 ref)
 
@@ -186,14 +230,14 @@ def _get_end(total_records, limit):
         return limit
 
 
-class DOINotFoundError(RuntimeError):
-    """DOI reference not found.
+class RefNotFoundError(RuntimeError):
+    """Standard reference not found.
 
-    :param doi_ref string: DOI reference that was not found."""
+    :param ref string: DOI reference that was not found."""
 
-    def __init__(self, message, doi_ref):
+    def __init__(self, message, ref):
         super().__init__(message)
-        self.doi_ref = doi_ref
+        self.ref = ref
 
 
 @require_GET

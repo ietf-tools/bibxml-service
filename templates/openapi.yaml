@@ -32,6 +32,17 @@ paths:
         type: string
 
     get:
+      parameters:
+      - name: format
+        in: query
+        description: |
+          Format to return citation in.
+          NOTE: if `bibxml` is requested, application/json response will still be returned;
+          the JSON object will provide a JSON-escaped BibXML string (see response spec).
+        schema:
+          type: string
+          default: relaton
+          enum: [bibxml, relaton]
       summary: Get citation
       description: >
         Retrieve citation from given dataset by reference.
@@ -44,7 +55,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CitationDetailsResponse'
+                oneOf:
+                - $ref: '#/components/schemas/CitationDetailsResponse'
+                - description: BibXML-formatted citation
+                  type: object
+                  properties:
+                    data:
+                      description: JSON-escaped BibXML string.
+                      type: string
 
         404:
           description: reference not found in given dataset
