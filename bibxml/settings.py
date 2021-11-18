@@ -157,6 +157,7 @@ LEGACY_DATASETS = {
     'bibxml7': 'doi',
     'bibxml8': 'iana',
     'bibxml9': 'rfcsubseries',
+    'bibxml-rfcsubseries': 'rfcsubseries',
     'bibxml-nist': 'nist',
 }
 """Maps legacy dataset root as it appears under /public/rfc/
