@@ -1,13 +1,12 @@
+import json
+import requests_cache
+from doi2ietf import process_doi_list
+
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST, require_GET
-
-from doi2ietf import process_doi_list
-import requests_cache
+from django.conf import settings
 
 from .models import RefData
-
-from django.conf import settings
-import json
 
 
 @require_GET
