@@ -158,7 +158,9 @@ def _get_doi_ref(ref):
             # TODO: What to do with multiple DOI results for a reference?
             return doi_list[0]["a"]
         else:
-            raise DOINotFoundError("Reference not found: got empty list from DOI", ref)
+            raise DOINotFoundError(
+                "Reference not found: got empty list from DOI",
+                ref)
 
 
 def _get_start(total_records, offset):
