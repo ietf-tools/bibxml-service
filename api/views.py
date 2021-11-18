@@ -123,34 +123,39 @@ def search(request):
 
 @require_GET
 def get_ref(request, dataset_name, ref):
-    if dataset_name == "doi":
-        result = get_doi_refs(ref)
+    try:
+        result = RefData.objects.get(ref=ref, dataset=dataset_name)
+        return JsonResponse({"data": result.body})
 
-        if result:
-            result = result[0]["a"]  # Why?
-            return JsonResponse({"data": result})
+    except RefData.DoesNotExist:
+        return JsonResponse({
+            "error":
+                "Unable to find ref {} in dataset {}".
+                format(ref, dataset_name),
+        }, status=404)
 
-        else:
-            return JsonResponse({
-                "error": "Unable to find ref {} in dataset DOI".format(ref),
-            }, status=404)
 
+@require_GET
+def get_doi_ref(request, ref):
+    try:
+        result = _get_doi_ref(ref)
+    except DOINotFoundError:
+        return JsonResponse({
+            "error": "Unable to find DOI ref {}".format(ref),
+        }, status=404)
     else:
-        try:
-            result = RefData.objects.get(ref=ref, dataset=dataset_name)
-            return JsonResponse({"data": result.body})
-
-        except RefData.DoesNotExist:
-            return JsonResponse({
-                "error":
-                    "Unable to find ref {} in dataset {}".
-                    format(ref, dataset_name),
-            }, status=404)
+        return JsonResponse({
+            "data": result
+        })
 
 
-def get_doi_refs(ref):
+def _get_doi_ref(ref):
     with requests_cache.enabled():
-        return process_doi_list([ref], "DICT")
+        doi_list = process_doi_list([ref], "DICT")
+        if len(doi_list) > 0:
+            return doi_list[0]["a"]  # TODO: What is this key “a”?
+        else:
+            raise DOINotFoundError("Reference not found: got empty list from DOI", ref)
 
 
 def _get_start(total_records, offset):
@@ -174,6 +179,16 @@ def _get_end(total_records, limit):
         return total_records
     else:
         return limit
+
+
+class DOINotFoundError(RuntimeError):
+    """DOI reference not found.
+    
+    :param doi_ref string: DOI reference that was not found."""
+
+    def __init__(self, message, doi_ref):
+        super().__init__(message)
+        self.doi_ref = doi_ref
 
 
 @require_GET
