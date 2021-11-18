@@ -48,7 +48,10 @@ paths:
 
         404:
           description: reference not found in given dataset
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
         500:
           description: operation failed
@@ -112,7 +115,10 @@ paths:
 
         404:
           description: reference not found, or legacy dataset is not known
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 components:
