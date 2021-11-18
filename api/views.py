@@ -152,7 +152,8 @@ def _get_doi_ref(ref):
     with requests_cache.enabled():
         doi_list = process_doi_list([ref], "DICT")
         if len(doi_list) > 0:
-            return doi_list[0]["a"]  # TODO: What is this key “a”?
+            # TODO: What to do with multiple DOI results for a reference?
+            return doi_list[0]["a"]
         else:
             raise DOINotFoundError("Reference not found: got empty list from DOI", ref)
 
