@@ -183,7 +183,7 @@ def _get_end(total_records, limit):
 
 class DOINotFoundError(RuntimeError):
     """DOI reference not found.
-    
+
     :param doi_ref string: DOI reference that was not found."""
 
     def __init__(self, message, doi_ref):
