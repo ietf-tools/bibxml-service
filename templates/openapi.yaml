@@ -179,9 +179,9 @@ components:
       type: object
       properties:
         data:
-            type: array
-            items:
-              $ref: '#/components/schemas/CitationObject'
+          type: array
+          items:
+            $ref: '#/components/schemas/CitationObject'
 
     # TODO:
     # need to verify structure
