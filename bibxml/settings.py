@@ -150,6 +150,7 @@ LEGACY_DATASETS = {
     'bibxml': 'rfcs',
     'bibxml2': 'misc',
     'bibxml3': 'ids',
+    'bibxml-id': 'ids',
     'bibxml4': 'w3c',
     'bibxml5': '3gpp',
     'bibxml6': 'ieee',
