@@ -33,7 +33,9 @@ paths:
 
     get:
       summary: Get citation
-      description: Retrieve citation from given dataset by reference.
+      description: >
+        Retrieve citation from given dataset by reference.
+        For external dataset (currently, `doi`), this incurs an additional network request and hence may be slow.
       operationId: getCitationByReferenceId
 
       responses:
