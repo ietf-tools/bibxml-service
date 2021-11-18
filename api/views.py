@@ -174,3 +174,42 @@ def _get_end(total_records, limit):
         return total_records
     else:
         return limit
+
+
+@require_GET
+def get_legacy_ref(request, legacy_dataset_name, legacy_ref):
+    dataset_id = settings.LEGACY_DATASETS.get(legacy_dataset_name, None)
+
+    if dataset_id:
+        try:
+            result = RefData.objects.get(ref=legacy_ref, dataset=dataset_id)
+            bibxml_repr = result.representations.get('bibxml', None)
+
+            if bibxml_repr is not None:
+                return HttpResponse(
+                    bibxml_repr,
+                    content_type="application/xml",
+                    charset="utf-8")
+
+            else:
+                return JsonResponse({
+                    "error":
+                        "Missing BibXML representation for ref {} "
+                        "in legacy dataset {} (dataset {})".
+                        format(legacy_ref, legacy_dataset_name, dataset_id),
+                }, status=404)
+
+        except RefData.DoesNotExist:
+            return JsonResponse({
+                "error":
+                    "Unable to find ref {} "
+                    "in legacy dataset {} (dataset {})".
+                    format(legacy_ref, legacy_dataset_name, dataset_id),
+            }, status=404)
+    else:
+        return JsonResponse({
+            "error":
+                "Unable to find ref {}: "
+                "legacy dataset {} is unknown".
+                format(legacy_ref, legacy_dataset_name),
+        }, status=404)
