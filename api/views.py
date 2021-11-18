@@ -149,6 +149,9 @@ def get_doi_ref(request, ref):
 
 
 def _get_doi_ref(ref):
+    """Uses ``doi2ietf`` library to obtain DOI results matching given reference.
+    :returns key "a" in the first result found."""
+
     with requests_cache.enabled():
         doi_list = process_doi_list([ref], "DICT")
         if len(doi_list) > 0:
