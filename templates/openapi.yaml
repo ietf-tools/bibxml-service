@@ -389,7 +389,7 @@ components:
 
     AvailableDatasets:
       type: string
-      # TODO: Auto-generate this list at deployment time?
+      # TODO: Auto-generate available dataset list at deployment time?
       enum:
       - rfcs
       - ids
