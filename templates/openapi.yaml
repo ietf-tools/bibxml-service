@@ -83,305 +83,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  # LEGACY RESOURCES
-  
-  # IETF (bibxml) 
-  # RFCs:
-  /public/rfc/bibxml/reference.RFC.{rfc_num}.xml:
+  /public/rfc/{legacy_dataset}/reference.{ref_id}.xml:
+    parameters:
+    - name: legacy_dataset
+      in: path
+      description: Legacy dataset ID
+      required: true
+      schema:
+        $ref: '#/components/schemas/AvailableLegacyDatasets'
+    - name: ref_id
+      in: path
+      description: Standard reference
+      required: true
+      schema:
+        type: string
     get:
-      summary: Get IETF RFC in bibxml format by number
-      parameters:
-      - name: rfc_num
-        in: path
-        description: RFC number
-        required: true
-        schema:
-          type: string
+      summary: Get citation by XML2RFC tools path
+      description: Returned citation is always in BibXML format. This endpoint returns raw XML response.
       responses:
         200:
           description: successful operation
           content:
-            text/xml:
+            application/xml:
               schema:
                 type: string
-                format: binary
 
-  # IETF (bibxml3) 
-  # Internet-Drafts:
-  /public/rfc/{bibxml3}/reference.I-D.{draft_name}.xml:
-    get:
-      summary: Get IETF RFC draft in bibxml format by name
-      parameters:
-      - name: draft_name
-        in: path
-        description: RFC draft name
-        required: true
-        schema:
-          type: string
-      - name: bibxml3
-        in: path
-        description: bibxml3 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml3
-          - bibxml-ids
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-    
+        404:
+          description: reference not found, or legacy dataset is not known
+          content: {}
 
-  # IETF (bibxml9)
-  # BCP, FYI, STD:
-  /public/rfc/{bibxml9}/reference.{type}.{rfc_num}.xml:
-    get:
-      summary: Get IETF RFC draft in bibxml format by name
-      parameters:
-      - name: rfc_num
-        in: path
-        description: RFC number
-        required: true
-        schema:
-          type: string
-      - name: type
-        in: path
-        description: RFC type
-        required: true
-        schema:
-          type: string
-          enum:
-          - BCP
-          - FYI
-          - STD
-      - name: bibxml9
-        in: path
-        description: bibxml9 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml9
-          - bibxml-rfcsubseries
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  /public/rfc/{bibxml2}/reference.{dataset_name}.{document_name}.xml:
-    get:
-      summary: Get Non-IETF reference in bibxml format by name
-      parameters:
-      - name: document_name
-        in: path
-        description: RFC number
-        required: true
-        schema:
-          type: string
-      - name: dataset_name
-        in: path
-        description: RFC number
-        required: true
-        schema:
-          type: string
-          enum:
-          - W3C
-          - ISO 
-          - ITU
-          - ANSI 
-          - FIPS
-          - CCITT
-          - IEEE 
-          - OASIS
-          - PKCS
-      - name: bibxml2
-        in: path
-        description: bibxml2 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml2
-          #- bibxml-w3c  # (!) conflict with bibxml4 ?
-          - bibxml-iso
-          - bibxml-itu
-          - bibxml-ansi
-          - bibxml-fips
-          - bibxml-ccitt
-          #- bibxml-ieee # (!) conflict with bibxml6 ?
-          - bibxml-oasis
-          - bibxml-pkcs
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  # W3C (bibxml4):
-  /public/rfc/{bibxml4}/reference.w3c.{document_name}.xml:
-    get:
-      summary: Get W3C reference in bibxml format by name
-      parameters:
-      - name: document_name
-        in: path
-        description: RFC name
-        required: true
-        schema:
-          type: string
-      - name: bibxml4
-        in: path
-        description: bibxml4 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml4
-          - bibxml-w3c  # (!) conflict with bibxml2?
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  # 3GPP (bibxml5):
-  /public/rfc/{bibxml5}/reference.{type}.{document_name}.xml:
-    get:
-      summary: Get 3GPP reference in bibxml format by name
-      parameters:
-      - name: document_name
-        in: path
-        description: RFC name
-        required: true
-        schema:
-          type: string
-      - name: type
-        in: path
-        description: RFC type
-        required: true
-        schema:
-          type: string
-          enum:
-          - 3gpp
-          - sdo-3gpp
-      - name: bibxml5
-        in: path
-        description: bibxml5 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml5
-          - bibxml-3gpp
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  # IEEE (bibxml6):
-  /public/rfc/{bibxml6}/reference.IEEE.{document_name}.xml:
-    get:
-      summary: Get IEEE reference in bibxml format by name
-      parameters:
-      - name: document_name
-        in: path
-        description: RFC name
-        required: true
-        schema:
-          type: string
-      - name: bibxml6
-        in: path
-        description: bibxml6 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml6
-          - bibxml-ieee  # (!) conflict with bibxml2?
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  # IANA (bibxml8):
-  /public/rfc/{bibxml8}/reference.IANA.{document_name}.xml:
-    get:
-      summary: Get IANA reference in bibxml format by name
-      parameters:
-      - name: document_name
-        in: path
-        description: RFC name
-        required: true
-        schema:
-          type: string
-      - name: bibxml8
-        in: path
-        description: bibxml8 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml8
-          - bibxml-iana  # (!) conflict with bibxml2?
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
-
-  # DOI (bibxml7):
-  /public/rfc/{bibxml7}/reference.DOI.{doi_id}.xml:
-    get:
-      summary: Get DOI reference in bibxml format by ID
-      parameters:
-      - name: doi_id
-        in: path
-        description: DOI ID
-        required: true
-        schema:
-          type: string
-      - name: bibxml7
-        in: path
-        description: bibxml8 aliases
-        required: true
-        schema:
-          type: string
-          enum:
-          - bibxml7
-          - bibxml-doi
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/xml:
-              schema:
-                type: string
-                format: binary
 
 components:
 
@@ -401,6 +131,17 @@ components:
       - iana
       - doi
       - nist
+      description: |
+        For up-to-date list of available datasets,
+        see bibxml-data-* repositories under ietf-ribose GitHub organization.
+        See also bibxml-indexer service README.
+
+    AvailableLegacyDatasets:
+      type: string
+      enum:
+      {% for ds_id in legacy_dataset_ids %}
+      - {{ ds_id }}
+      {% endfor %}
       description: |
         For up-to-date list of available datasets,
         see bibxml-data-* repositories under ietf-ribose GitHub organization.
