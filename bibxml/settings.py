@@ -135,8 +135,8 @@ KNOWN_DATASETS = [
     '3gpp',
     'ieee',
     'iana',
-    'doi',
     'nist',
+    'doi',
 ]
 """A list of known dataset IDs. NOTE: Keep in sync with bibxml-indexer.
 """
