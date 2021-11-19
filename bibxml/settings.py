@@ -141,6 +141,21 @@ KNOWN_DATASETS = [
 """A list of known dataset IDs. NOTE: Keep in sync with bibxml-indexer.
 """
 
+EXTERNAL_DATASETS = [
+    'doi',
+]
+"""A list of external datasets that we don’t index or search,
+but support retrieval from.
+"""
+
+AUTHORITATIVE_DATASETS = [
+    'rfcs',
+    'ids',
+    'rfcsubseries',
+]
+"""A list of authoritative datasets.
+"""
+
 INDEXABLE_DATASETS = [
     "ecma",
     "nist",
