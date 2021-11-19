@@ -49,4 +49,8 @@
   </div>
 
   {% include "citation_dl.html" with dataset_id=dataset_id ref=ref %}
+
+  <p class="gray f7">
+    Available using API: {% url "api_get_ref" dataset_id ref %}
+  </p>
 {% endblock %}
