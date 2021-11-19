@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ block.super }} Citations{% endblock %}
+
+{% block content %}
+  <p class="f5 lh-copy">
+    Choose a dataset.
+  </p>
+  <div class="pv5">
+    <h2 class="f5">See also</h2>
+    <ul class="list pl0">
+      <li>
+        <a href="{% url "api_index" %}" target="_blank" class="link">
+          API reference &rarr;
+        </a>
+    </ul>
+  </div>
+{% endblock %}

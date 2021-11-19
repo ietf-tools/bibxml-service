@@ -1,6 +1,7 @@
 /data
 /build
 /env
+/bibxml-service
 .env
 *.pyc
 http_cache.sqlite
