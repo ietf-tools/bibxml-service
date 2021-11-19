@@ -3,7 +3,11 @@
 {% block title %}{{ block.super }} — Search: {{ query }}{% endblock %}
 
 {% block content %}
-  <h2 class="f4 dib br3">Searching for “{{ query }}”</h2>
+  <h2 class="f4 dib br3">
+    Searching for
+    &ensp;
+    <code class="f5 pa1 ph2 bg-light-gray">{{ query }}</code>
+  </h2>
 
   <nav class="flex items-center">
     {% if page_obj.has_previous %}
@@ -24,10 +28,9 @@
   <ul class="list pl0">
     {% for citation in object_list %}
       <li class="pv2 cf bb b--light-gray flex items-center">
-        <a class="f5 lh-copy link flex-auto" href="{% url "browse_citation" citation.dataset citation.ref %}">
-          {% include "doc_ids.html" with ids=citation.body.docid ref=citation.ref %}
-        </a>
-        {% include "citation_dl.html" with dataset_id=citation.dataset ref=citation.ref %}
+        <article>
+          {% include "citation_in_list.html" with data=citation.body dataset_id=citation.dataset ref=citation.ref %}
+        </article>
     {% endfor %}
   </ul>
 {% endblock %}

@@ -1,0 +1,13 @@
+{% load relaton %}
+
+{# Expects context: data, dataset_id, ref #}
+
+<p class="nowrap truncate flex-auto f6 mb2">
+  {% include "relaton/first_title.html" with title=data.title %}
+</p>
+<div class="flex items-center">
+  <a class="f5 lh-copy link flex-auto" href="{% url "browse_citation" dataset_id ref %}">
+    {% include "relaton/doc_ids.html" with ids=data.docid|as_list ref=ref %}
+  </a>
+  {% include "citation_dl.html" with dataset_id=dataset_id ref=ref %}
+</div>

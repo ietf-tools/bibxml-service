@@ -1,0 +1,3 @@
+{% with title.content as deftitle %}
+  {{ title.0.content|default:deftitle }}
+{% endwith %}

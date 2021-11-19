@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load relaton %}
+
 {% block title %}{{ block.super }} — {{ dataset_id }}{% endblock %}
 
 {% block content %}
@@ -12,7 +14,7 @@
     {% endif %}
 
     <span class="flex-auto tr">
-      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
     </span>
 
     {% if page_obj.has_next %}
@@ -23,11 +25,10 @@
 
   <ul class="list pl0">
     {% for citation in object_list %}
-      <li class="pv2 cf bb b--light-gray flex items-center">
-        <a class="f5 lh-copy link flex-auto" href="{% url "browse_citation" dataset_id citation.ref %}">
-          {% include "doc_ids.html" with ids=citation.body.docid ref=citation.ref %}
-        </a>
-        {% include "citation_dl.html" with dataset_id=dataset_id ref=citation.ref %}
+      <li class="pv2 cf bb b--light-gray">
+        <article>
+          {% include "citation_in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
+        </article>
     {% endfor %}
   </ul>
 {% endblock %}

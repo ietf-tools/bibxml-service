@@ -1,12 +1,12 @@
 <a
-    class="f6 link dim br3 pa2 ph3 mr3 dib ba white bg-dark-blue"
+    class="f6 link dim br3 pa2 ph3 mr3 dib ba white bg-dark-blue nowrap"
     download="{{ dataset_id }}-{{ ref }}.json"
     href="{% url "api_get_ref" dataset_id ref %}">
   Get in Relaton JSON
 </a>
 
 <a
-    class="f6 link dim br3 pa2 ph3 dib ba white bg-dark-blue"
+    class="f6 link dim br3 pa2 ph3 dib ba white bg-dark-blue nowrap"
     download="{{ dataset_id }}-{{ ref }}.xml"
     href="{% url "api_get_ref" dataset_id ref %}?format=bibxml">
   Get in BibXML
