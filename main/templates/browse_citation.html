@@ -4,8 +4,29 @@
 
 
 {% block content %}
-  <h2 class="f4 dib br3 ttu">{{ dataset_id }} / {{ ref }}</h2>
-  <div class="pre code pa3 bg-light-gray f7 lh-copy">
-    {{ citation | pprint }}
-  </div>
+  <h2>
+    {% include "doc_ids.html" with ids=data.docid ref=ref %}
+  </h2>
+
+  <dl class="lh-title pv2 mt0">
+    {% for title in data.title %}
+      {% include "meta_row.html" with key=title.type|stringformat:"s (title)" val=title.content %}
+    {% endfor %}
+    {% include "meta_row.html" with key="doctype" val=data.doctype %}
+    {% include "meta_row.html" with key="edition" val=data.edition %}
+    {% include "meta_row.html" with key="language" val=data.language %}
+    {% include "meta_row.html" with key="place" val=data.place %}
+    {% include "meta_row.html" with key="revdate" val=data.revdate %}
+    {% if data.date %}
+      {% include "meta_row.html" with key=data.date.type val=data.date.value %}
+    {% endif %}
+    {% include "meta_row.html" with key=data.link.type val=data.link.content %}
+    {% for c in data.contributor %}
+      {% with c.organization.name as org and c.person.name.surname.content as surname and c.person.name.forename.content as forename %}
+        {% include "meta_row.html" with key=c.role val=forename|default:surname|default:org %}
+      {% endwith %}
+    {% endfor %}
+  </dl>
+
+  {% include "citation_dl.html" with dataset_id=dataset_id ref=ref %}
 {% endblock %}

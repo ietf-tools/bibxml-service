@@ -1,0 +1,14 @@
+{% for docid in ids %}
+  <div class="flex items-center lh-copy">
+    <span class="f7 br3
+      {% if docid.type|lower == dataset_id|lower %}bg-dark-blue
+      {% else %}bg-gray
+      {% endif %} white ph2">{{ docid.type }}</span>
+    <span class="ph2
+      {% if docid.type|lower == dataset_id|lower %}dark-blue
+      {% else %}gray
+      {% endif %}">{{ docid.id }}</span>
+  </div>
+{% empty %}
+  {{ citation.ref }}
+{% endfor %}

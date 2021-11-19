@@ -21,7 +21,7 @@ def browse_citations(request, dataset_id=None, ref=None):
             return render(request, 'browse_citation.html', dict(
                 dataset_id=dataset_id,
                 ref=ref,
-                citation=get_indexed_ref(dataset_id, ref),
+                data=get_indexed_ref(dataset_id, ref),
                 **shared_context,
             ))
         return render(request, 'browse_dataset.html', dict(

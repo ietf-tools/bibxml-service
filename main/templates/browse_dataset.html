@@ -4,31 +4,30 @@
 
 {% block content %}
   <h2 class="f4 dib br3 ttu">{{ dataset_id }}</h2>
-  
+
+  <nav class="flex items-center">
+    {% if page_obj.has_previous %}
+      <a class="link" href="?page=1">&laquo; first</a>
+      <a class="link ph3" href="?page={{ page_obj.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="flex-auto tr">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+      <a class="link ph3" href="?page={{ page_obj.next_page_number }}">next</a>
+      <a class="link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </nav>
+
   <ul class="list pl0">
     {% for citation in object_list %}
-      <li class="pv1 cf">
-        <a class="link" href="{% url "browse_citation" dataset_id citation.ref %}">
-          {{ citation.ref }}
+      <li class="pv2 cf bb b--light-gray flex items-center">
+        <a class="f5 lh-copy link flex-auto" href="{% url "browse_citation" dataset_id citation.ref %}">
+          {% include "doc_ids.html" with ids=citation.body.docid ref=citation.ref %}
         </a>
+        {% include "citation_dl.html" with dataset_id=dataset_id ref=citation.ref %}
     {% endfor %}
   </ul>
-
-  <div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-  </div>
 {% endblock %}
