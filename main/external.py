@@ -19,13 +19,7 @@ def get_doi_ref(ref, format='relaton'):
     with requests_cache.enabled():
         doi_format = 'DICT' if format == 'relaton' else 'XML'
 
-        try:
-            doi_list = process_doi_list([ref], doi_format)
-        except AttributeError:
-            # Presume ref was not found.
-            raise RefNotFoundError(
-                "Reference not found (AttributeError)",
-                ref)
+        doi_list = process_doi_list([ref], doi_format)
 
         if len(doi_list) > 0:
             # TODO: What to do with multiple DOI results for a reference?
