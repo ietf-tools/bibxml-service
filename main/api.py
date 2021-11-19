@@ -82,7 +82,7 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, ref):
     if dataset_id:
         try:
             if dataset_id == 'doi':
-                bibxml_repr = get_doi_ref(ref, 'bibxml')
+                bibxml_repr = _get_doi_ref(ref, 'bibxml')
             else:
                 bibxml_repr = get_indexed_ref(dataset_id, ref, 'bibxml')
 
