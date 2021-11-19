@@ -16,7 +16,7 @@ servers:
 - url: /
 
 paths:
-  /api/v1/ref/{dataset}/{ref_id}:
+  /api/v1/ref/{dataset}/{ref_id}/:
     parameters:
     - name: dataset
       in: path
