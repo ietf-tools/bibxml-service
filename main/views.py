@@ -1,9 +1,11 @@
 """View functions for citation browse GUI."""
 
 from django.db.models.query import QuerySet
+from django.http.response import HttpResponseNotFound
 from django.shortcuts import render
 from django.conf import settings
 from django.views.generic.list import ListView
+from main.exceptions import RefNotFoundError
 
 from main.models import RefData
 
@@ -18,12 +20,17 @@ shared_context = dict(
 def browse_citations(request, dataset_id=None, ref=None):
     if dataset_id is not None:
         if ref is not None:
-            return render(request, 'browse_citation.html', dict(
-                dataset_id=dataset_id,
-                ref=ref,
-                data=get_indexed_ref(dataset_id, ref),
-                **shared_context,
-            ))
+            try:
+                data = get_indexed_ref(dataset_id, ref)
+            except RefNotFoundError:
+                return HttpResponseNotFound("Requested reference not found")
+            else:
+                return render(request, 'browse_citation.html', dict(
+                    dataset_id=dataset_id,
+                    ref=ref,
+                    data=data,
+                    **shared_context,
+                ))
         return render(request, 'browse_dataset.html', dict(
             dataset_id=dataset_id,
             citations=list_refs(dataset_id),
