@@ -49,7 +49,7 @@ with contents like this::
 
 Then, run ``docker compose up`` from repository root.
 
-To check successful deployment, check http://127.0.0.1:8000/api/v1/.
+To check successful deployment, check http://localhost:8000/api/v1/.
 
 Monitoring logs
 ~~~~~~~~~~~~~~~
