@@ -66,10 +66,11 @@ def get_ref(request, dataset_name, ref):
 def get_doi_ref(request, ref):
     format = request.GET.get('format', 'relaton')
     try:
-        result = _get_doi_ref(ref, format)
+        parsed_ref = unquote_plus(ref)
+        result = _get_doi_ref(parsed_ref, format)
     except RefNotFoundError:
         return JsonResponse({
-            "error": "Unable to find DOI ref {}".format(ref),
+            "error": "Unable to find DOI ref {}".format(parsed_ref),
         }, status=404)
     else:
         return JsonResponse({"data": result})
