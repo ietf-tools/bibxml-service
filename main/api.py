@@ -1,5 +1,6 @@
 """View functions for API endpoints."""
 
+from urllib.parse import unquote_plus
 import json
 
 from django.http import HttpResponse, JsonResponse
@@ -80,18 +81,19 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, ref):
         None)
 
     if dataset_id:
+        parsed_ref = unquote_plus(ref)
         try:
             if dataset_id == 'doi':
-                bibxml_repr = _get_doi_ref(ref, 'bibxml')
+                bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
             else:
-                bibxml_repr = get_indexed_ref(dataset_id, ref, 'bibxml')
+                bibxml_repr = get_indexed_ref(dataset_id, parsed_ref, 'bibxml')
 
         except RefNotFoundError:
             return JsonResponse({
                 "error":
                     "Unable to find BibXML ref {} "
                     "in legacy dataset {} (dataset {})".
-                    format(ref, legacy_dataset_name, dataset_id),
+                    format(parsed_ref, legacy_dataset_name, dataset_id),
             }, status=404)
 
         else:
