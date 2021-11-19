@@ -10,7 +10,7 @@ from django.views.generic.list import ListView
 
 from .exceptions import RefNotFoundError
 from .models import RefData
-from .indexed import get_indexed_ref, list_refs, search_refs
+from .indexed import get_indexed_ref, list_refs, search_refs, RefDataManager
 from .external import get_doi_ref
 
 
@@ -73,7 +73,7 @@ class CitationSearchResultListView(ListView):
         if query:
             return search_refs(unquote_plus(query))
         else:
-            return HttpResponseBadRequest("No search query specified.")
+            return RefDataManager.all()
 
     def get_context_data(self, **kwargs):
         return dict(
