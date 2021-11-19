@@ -21,7 +21,7 @@ Running locally using Docker Desktop and Compose
 Ensure you are already running bibxml-indexer service (see respective README).
 When you use Docker Compose, bibxml-indexer sets up a network
 that will be joined by bibxml-service. That network ensures bibxml-service
-has access to 
+has access to static citation dataset indices.
 
 Ensure requisite environment variables are configured in the environment.
 For convenience, you can place in repository root a file `.env`
@@ -36,16 +36,20 @@ with contents like this::
 
 .. important::
 
-   ``DB_NAME``, ``DB_SECRET`` values depend on bibxml-indexer environment.
+   * ``DB_NAME``, ``DB_SECRET`` values depend on bibxml-indexer runtime environment.
    
-   In the basic case, they must match the ones provided in bibxml-indexer environment.
-   However, this is not ideal:
-   bibxml-indexer must have write access to shared database,
-   while bibxml-service only reads from it.
+     In the basic case, they can match the ones provided in bibxml-indexer environment
+     for things to work.
+     (This is not ideal:
+     bibxml-indexer must have write access to the shared index database,
+     while bibxml-service only needs to read from it.
+     A separate PostgreSQL user for bibxml-service with read-only access
+     would make more sense, but is not currently accommodated
+     by Compose configuration.)
 
-   DJANGO_SECRET must be unique.
+   * DJANGO_SECRET must be unique.
 
-   DEBUG must not be set to 1 in production.
+   * DEBUG must not be set to 1 in production.
 
 Then, run ``docker compose up`` from repository root.
 
