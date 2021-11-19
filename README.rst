@@ -19,9 +19,11 @@ Running locally using Docker Desktop and Compose
 ------------------------------------------------
 
 Ensure you are already running bibxml-indexer service (see respective README).
-When you use Docker Compose, bibxml-indexer sets up a network
-that will be joined by bibxml-service. That network ensures bibxml-service
-has access to static citation dataset indices.
+
+When using Docker Compose, you run bibxml-indexer configuration first,
+and it sets up a network that will be joined by bibxml-service
+when you run it as the second step. That shared network gives bibxml-service
+access to static citation dataset index DB host.
 
 Ensure requisite environment variables are configured in the environment.
 For convenience, you can place in repository root a file `.env`
