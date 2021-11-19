@@ -18,8 +18,10 @@ urlpatterns = [
             path('',
                  require_safe(api.index),
                  name='api_index'),
-            path('search/',
-                 csrf_exempt(require_POST(api.search)),
+            path('search/<query>/',
+                 csrf_exempt(require_safe(
+                     api.CitationSearchResultListView.as_view())
+                 ),
                  name='api_search'),
             path('ref/', include([
                 path('doi/<ref>/', api.get_doi_ref, name='api_get_doi_ref'),

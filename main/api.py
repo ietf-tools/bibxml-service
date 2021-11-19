@@ -1,13 +1,15 @@
 """View functions for API endpoints."""
 
 from urllib.parse import unquote_plus
-import json
 
 from django.http import HttpResponse, JsonResponse
+from django.db.models.query import QuerySet
 from django.conf import settings
+from django.views.generic.list import BaseListView
+
 from main.exceptions import RefNotFoundError
 
-from .indexed import get_indexed_ref
+from .indexed import get_indexed_ref, search_refs
 from .external import get_doi_ref as _get_doi_ref
 from .models import RefData
 
@@ -112,102 +114,33 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, ref):
         }, status=404)
 
 
-def search(request):
-    # TODO:
-    # implement parsing and validate json request for search fields
-    # implement search
+class CitationSearchResultListView(BaseListView):
+    model = RefData
+    paginate_by = 20
 
-    try:
-        json_data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "JSON decode error"}, status=500)
-
-    fields_values = json_data.get("fields", None)
-    dataset = json_data.get("dataset", None)
-
-    offset = json_data.get("offset", "0")
-    limit = json_data.get("limit", str(settings.MAX_RECORDS_PER_RESPONSE))
-
-    if isinstance(offset, str) and offset.isdigit():
-        offset = int(offset)
-    else:
-        offset = 0
-
-    if isinstance(limit, str) and limit.isdigit():
-        limit = int(limit)
-    else:
-        limit = settings.MAX_RECORDS_PER_RESPONSE
-
-    if isinstance(fields_values, dict):
-
-        if dataset:
-            dataset = dataset.lower()
-            total_records = RefData.objects.filter(
-                body__contains=fields_values, dataset=dataset
-            ).count()
-
-            start = _get_start(total_records, offset)
-            end = _get_end(total_records, start + limit)
-
-            result = list(
-                RefData.objects.filter(
-                    body__contains=fields_values, dataset=dataset
-                )
-                .order_by("ref")[start:end]
-                .values()
-            )
-
+    def get_queryset(self) -> QuerySet[RefData]:
+        query = self.kwargs.get('query', None)
+        if query:
+            return search_refs(unquote_plus(query))
         else:
-            dataset = None
+            return RefData.objects.none()
 
-            total_records = RefData.objects.filter(
-                body__contains=fields_values
-            ).count()
+    def render_to_response(self, context):
+        meta = dict(total_records=self.object_list.count())
 
-            start = _get_start(total_records, offset)
-            end = _get_end(total_records, start + limit)
+        page_obj = context['page_obj']
+        if page_obj:
+            base_url = self.request.build_absolute_uri(self.request.path)
+            if page_obj.has_next():
+                meta['next'] = "{}?page={}".format(
+                    base_url,
+                    page_obj.next_page_number())
+            if page_obj.has_previous():
+                meta['prev'] = "{}?page={}".format(
+                    base_url,
+                    page_obj.previous_page_number())
 
-            result = list(
-                RefData.objects.filter(body__contains=fields_values)
-                .order_by("ref")[start:end]
-                .values()
-            )
-
-    else:
-        result = []
-        total_records = 0
-
-    return JsonResponse(
-        {
-            "results": {
-                "total_records": total_records,
-                "records": len(result),
-                "offset": offset,
-                "limit": limit,
-            },
-            "data": result,
-        }
-    )
-
-
-def _get_start(total_records, offset):
-
-    if total_records > settings.MAX_RECORDS_PER_RESPONSE:
-
-        if offset <= (total_records - settings.MAX_RECORDS_PER_RESPONSE):
-            return offset
-        else:
-            return total_records - offset
-
-    else:
-        if offset < total_records:
-            return offset
-        else:
-            return total_records
-
-
-def _get_end(total_records, limit):
-    if limit > total_records:
-        return total_records
-    else:
-        return limit
+        return JsonResponse({
+            "meta": meta,
+            "data": [obj.body for obj in context['object_list']],
+        })

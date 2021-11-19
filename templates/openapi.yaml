@@ -75,18 +75,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/search:
-    post:
+  /api/v1/search/{query}/:
+    parameters:
+    - name: query
+      in: path
+      schema:
+        type: string
+        example: |
+          %2Bnist+%22metropolitan+area%22+-%22wind+damage%22
+      description: |
+        Search query string.
+        Some typical Web search operators are supported.
+        Special characters, such as forward slashes, must be URL-escaped.
+    get:
       summary: Search citations
-      description: Search citations across datasets.
+      description: |
+        Find citations across indexed (non-external) datasets that match given query.
+        Note: currently match is performed against entire JSON representations of citations.
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+        description: Page number, for cases with many matches.
       operationId: searchCitations
-      requestBody:
-        required: true
-        description: Search query
-        content:
-          application/json:
-            schema:
-              type: object
 
       responses:
         200:
@@ -113,7 +125,7 @@ paths:
         $ref: '#/components/schemas/AvailableLegacyDatasets'
     - name: ref_id
       in: path
-      description: Standard reference
+      description: Standard reference. Special characters, such as forward slashes, must be URL-escaped.
       required: true
       schema:
         type: string
@@ -193,6 +205,20 @@ components:
     CitationSearchResultResponse:
       type: object
       properties:
+        meta:
+          type: object
+          required:
+            - total
+          properties:
+            total:
+              type: integer
+              description: Total number of citations found for this query.
+            next:
+              type: string
+              description: Domain-relative URL to next batch of search results, if any.
+            prev:
+              type: string
+              description: Domain-relative URL to previous batch of search results, if any.
         data:
           type: array
           items:
