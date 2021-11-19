@@ -20,7 +20,7 @@ paths:
     parameters:
     - name: dataset
       in: path
-      description: Dataset ID
+      description: Dataset ID.
       required: true
       schema:
         $ref: '#/components/schemas/AvailableDatasets'
@@ -46,7 +46,7 @@ paths:
       summary: Get citation
       description: >
         Retrieve citation from given dataset by reference.
-        For external dataset (currently, `doi`), this incurs an additional network request and hence may be slow.
+        For external datasets (currently, `doi`), this incurs an additional network request.
       operationId: getCitationByReferenceId
 
       responses:
