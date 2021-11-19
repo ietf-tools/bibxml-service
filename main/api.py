@@ -53,7 +53,13 @@ def get_ref(request, dataset_name, ref):
                 format(ref, dataset_name),
         }, status=404)
     else:
-        return JsonResponse({"data": result})
+        if format == 'bibxml':
+            return HttpResponse(
+                result,
+                content_type="application/xml",
+                charset="utf-8")
+        else:
+            return JsonResponse({"data": result})
 
 
 def get_doi_ref(request, ref):
