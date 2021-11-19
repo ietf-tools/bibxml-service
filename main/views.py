@@ -27,7 +27,7 @@ def browse_external_citation(request, dataset_id):
     if dataset_id == 'doi':
         ref = request.GET.get('ref')
         if not ref:
-            raise HttpResponseBadRequest("No ref is given")
+            return HttpResponseBadRequest("No ref is given")
         return redirect('browse_citation', dataset_id, quote_plus(ref))
     else:
         raise HttpResponseBadRequest("Unsupported external dataset")
