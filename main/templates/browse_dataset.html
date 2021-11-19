@@ -7,28 +7,49 @@
 {% block content %}
   <h2 class="f4 dib br3 ttu">{{ dataset_id }}</h2>
 
-  <nav class="flex items-center">
-    {% if page_obj.has_previous %}
-      <a class="link" href="?page=1">&laquo; first</a>
-      <a class="link ph3" href="?page={{ page_obj.previous_page_number }}">previous</a>
-    {% endif %}
+  {% if dataset_id in external_datasets %}
+    <form class="black-80" method="GET" action="{% url "browse_external_citation" dataset_id %}">
+      <div class="">
+        <input
+          id="ref"
+          name="ref"
+          type="text"
+          placeholder="Enter reference…"
+          class="input-reset dib ba b--black-20 br3 br--left pa2 db"
+          aria-describedby="ref-desc" />
+        <input type="submit"
+            class="dim br3 br--right pa2 ph3 dib ba bg-dark-blue white"
+            value="Request" />
+        <div id="ref-desc" class="f6 black-60 db mb2 measure lh-copy">
+          <p>This is an external dataset, so we don’t maintain index and only support retrieval by exact reference.
+        </div>
+      </div>
+    </form>
 
-    <span class="flex-auto tr">
-      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-    </span>
+  {% else %}
+    <nav class="flex items-center">
+      {% if page_obj.has_previous %}
+        <a class="link" href="?page=1">&laquo; first</a>
+        <a class="link ph3" href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
 
-    {% if page_obj.has_next %}
-      <a class="link ph3" href="?page={{ page_obj.next_page_number }}">next</a>
-      <a class="link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-    {% endif %}
-  </nav>
+      <span class="flex-auto tr">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
 
-  <ul class="list pl0">
-    {% for citation in object_list %}
-      <li class="pv2 cf bb b--light-gray">
-        <article>
-          {% include "citation_in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
-        </article>
-    {% endfor %}
-  </ul>
+      {% if page_obj.has_next %}
+        <a class="link ph3" href="?page={{ page_obj.next_page_number }}">next</a>
+        <a class="link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+    </nav>
+
+    <ul class="list pl0">
+      {% for citation in object_list %}
+        <li class="pv2 cf bb b--light-gray">
+          <article>
+            {% include "citation_in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
+          </article>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}

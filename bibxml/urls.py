@@ -41,6 +41,9 @@ urlpatterns = [
         path('search/',
              require_safe(views.CitationSearchResultListView.as_view()),
              name='search_citations'),
+        path('external/<dataset_id>/',
+             require_safe(views.browse_external_citation),
+             name='browse_external_citation'),
         path('<dataset_id>/', include([
             path('',
                  require_safe(views.CitationListView.as_view()),
