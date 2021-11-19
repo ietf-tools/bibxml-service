@@ -1,7 +1,9 @@
 """View functions for citation browse GUI."""
 
+from urllib.parse import unquote_plus
+
 from django.db.models.query import QuerySet
-from django.http.response import HttpResponseNotFound
+from django.http.response import HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import render
 from django.conf import settings
 from django.views.generic.list import ListView
@@ -46,7 +48,11 @@ class CitationSearchResultListView(ListView):
     template_name = 'search_citations.html'
 
     def get_queryset(self) -> QuerySet[RefData]:
-        return search_refs(self.request.GET.get('query'))
+        query = self.request.GET.get('query', None)
+        if query:
+            return search_refs(unquote_plus(query))
+        else:
+            return HttpResponseBadRequest("No search query specified.")
 
     def get_context_data(self, **kwargs):
         return dict(
