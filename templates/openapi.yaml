@@ -26,7 +26,7 @@ paths:
         $ref: '#/components/schemas/AvailableDatasets'
     - name: ref_id
       in: path
-      description: Standard reference
+      description: Standard reference. Special characters, such as forward slashes, must be URL-escaped.
       required: true
       schema:
         type: string
@@ -37,8 +37,8 @@ paths:
         in: query
         description: |
           Format to return citation in.
-          NOTE: if `bibxml` is requested, application/json response will still be returned;
-          the JSON object will provide a JSON-escaped BibXML string (see response spec).
+          If `bibxml` is requested, returns an application/xml response;
+          otherwise application/json response with Relaton structure under `data` key.
         schema:
           type: string
           default: relaton
