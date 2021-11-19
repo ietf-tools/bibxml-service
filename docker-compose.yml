@@ -10,7 +10,11 @@ services:
         python manage.py migrate &&
         python manage.py collectstatic --noinput &&
         python manage.py check --deploy &&
-        daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
+        if [ "$DEBUG" = "1" ]; then
+          python manage.py runserver 0.0.0.0:8000
+        else
+          daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
+        fi
     volumes:
       - .:/code
     hostname: web-service
