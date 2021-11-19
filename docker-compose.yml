@@ -24,7 +24,7 @@ services:
     ports:
       - "${PORT:?missing port to expose web service under}:8000"
     environment:
-      PRIMARY_HOSTNAME: ${HOST:?please specify main hostname (e.g., localhost for development)}
+      PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
       DB_HOST: db
