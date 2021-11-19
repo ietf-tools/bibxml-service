@@ -38,6 +38,9 @@ urlpatterns = [
         path('',
              require_safe(views.browse_citations),
              name='browse'),
+        path('search/',
+             require_safe(views.CitationSearchResultListView.as_view()),
+             name='search_citations'),
         path('<dataset_id>/', include([
             path('',
                  require_safe(views.CitationListView.as_view()),

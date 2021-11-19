@@ -1,3 +1,8 @@
+from django.contrib.postgres.search import SearchVector
+from django.db.models.query import QuerySet
+from django.db.models import TextField
+from django.db.models.functions import Cast
+
 from .exceptions import RefNotFoundError
 from .models import RefData
 
@@ -5,8 +10,15 @@ from .models import RefData
 RefDataManager = RefData.objects.db_manager('index')
 
 
-def list_refs(dataset_id):
+def list_refs(dataset_id) -> QuerySet[RefData]:
     return RefDataManager.filter(dataset__iexact=dataset_id)
+
+
+def search_refs(text) -> QuerySet[RefData]:
+    return (
+        RefDataManager.
+        annotate(search=SearchVector(Cast('body', TextField()))).
+        filter(search__icontains=text))
 
 
 def get_indexed_ref(dataset_id, ref, format='relaton'):

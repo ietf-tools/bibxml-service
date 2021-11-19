@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 
 from main.models import RefData
 
-from .indexed import RefDataManager, get_indexed_ref, list_refs
+from .indexed import get_indexed_ref, list_refs, search_refs
 
 
 shared_context = dict(
@@ -34,21 +34,33 @@ def browse_citations(request, dataset_id=None, ref=None):
     ))
 
 
+class CitationSearchResultListView(ListView):
+    model = RefData
+    paginate_by = 20
+    template_name = 'search_citations.html'
+
+    def get_queryset(self) -> QuerySet[RefData]:
+        return search_refs(self.request.GET.get('query'))
+
+    def get_context_data(self, **kwargs):
+        return dict(
+            **super().get_context_data(**kwargs),
+            query=self.request.GET.get('query'),
+            **shared_context,
+        )
+
+
 class CitationListView(ListView):
     model = RefData
     paginate_by = 20
     template_name = 'browse_dataset.html'
 
     def get_queryset(self) -> QuerySet[RefData]:
-        return RefDataManager.filter(
-            dataset=self.kwargs['dataset_id'],
-        )
+        return list_refs(self.kwargs['dataset_id'])
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['dataset_id'] = self.kwargs['dataset_id']
-
         return dict(
-            **context,
+            **super().get_context_data(**kwargs),
+            dataset_id=self.kwargs['dataset_id'],
             **shared_context,
         )
