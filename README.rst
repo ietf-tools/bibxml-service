@@ -24,7 +24,8 @@ that will be joined by bibxml-service. That network ensures bibxml-service
 has access to 
 
 Ensure requisite environment variables are configured in the environment.
-For convenience, you can put a file .env with contents like this::
+For convenience, you can place in repository root a file `.env`
+with contents like this::
 
     PORT=8000
     DEBUG=1
