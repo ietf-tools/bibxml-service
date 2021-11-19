@@ -5,10 +5,9 @@ from django.http.response import HttpResponseNotFound
 from django.shortcuts import render
 from django.conf import settings
 from django.views.generic.list import ListView
-from main.exceptions import RefNotFoundError
 
-from main.models import RefData
-
+from .exceptions import RefNotFoundError
+from .models import RefData
 from .indexed import get_indexed_ref, list_refs, search_refs
 
 
