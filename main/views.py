@@ -15,6 +15,8 @@ from .indexed import get_indexed_ref, list_refs, search_refs
 
 shared_context = dict(
     known_datasets=settings.KNOWN_DATASETS,
+    external_datasets=settings.EXTERNAL_DATASETS,
+    authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
 )
 
 
