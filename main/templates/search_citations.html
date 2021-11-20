@@ -15,8 +15,8 @@
 
   <nav class="flex items-center">
     {% if page_obj.has_previous %}
-      <a class="link" href="?page=1">&laquo; first</a>
-      <a class="link ph3" href="?page={{ page_obj.previous_page_number }}">previous</a>
+      <a class="link" href="?query={{ request.GET.query }}&page=1">&laquo; first</a>
+      <a class="link ph3" href="?query={{ request.GET.query }}&page={{ page_obj.previous_page_number }}">previous</a>
     {% endif %}
 
     <span class="flex-auto tr">
@@ -24,8 +24,8 @@
     </span>
 
     {% if page_obj.has_next %}
-      <a class="link ph3" href="?page={{ page_obj.next_page_number }}">next</a>
-      <a class="link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+      <a class="link ph3" href="?query={{ request.GET.query }}&page={{ page_obj.next_page_number }}">next</a>
+      <a class="link" href="?query={{ request.GET.query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
     {% endif %}
   </nav>
 
