@@ -108,7 +108,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Version
 
-SNAPSHOT = environ.get('SNAPSHOT', None)
+SNAPSHOT = {
+    'hash': environ.get('SNAPSHOT_HASH', None),
+    'time': environ.get('SNAPSHOT_TIME', None),
+}
 
 
 # BibXML-specific
