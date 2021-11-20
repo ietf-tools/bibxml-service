@@ -31,7 +31,7 @@
 
   <ul class="list pl0">
     {% for citation in object_list %}
-      <li class="pv2 cf bt b--light-gray">
+      <li class="pv2 cf bt {% if forloop.last %}bb{% endif %} b--light-gray">
         <article>
           {% include "citation_in_list.html" with data=citation.body dataset_id=citation.dataset ref=citation.ref %}
         </article>
