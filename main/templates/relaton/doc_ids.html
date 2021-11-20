@@ -1,11 +1,11 @@
-<div class="flex items-center lh-copy">
+<div class="flex-ns mb1 mb0-ns items-center lh-copy">
   {% for docid in ids %}
-    <span class="nowrap f5 flex items-center mr2">
+    <span class="nowrap truncate f5 flex items-center mr2">
       <span class="f7 br3
         {% if docid.type|lower == dataset_id|lower %}bg-dark-blue
         {% else %}bg-gray
         {% endif %} white ph2">{{ docid.type }}</span>
-      <span class="ph2
+      <span class="ph2 truncate
         {% if docid.type|lower == dataset_id|lower %}dark-blue
         {% else %}gray
         {% endif %}">{{ docid.id }}</span>
