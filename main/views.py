@@ -18,6 +18,7 @@ shared_context = dict(
     known_datasets=settings.KNOWN_DATASETS,
     external_datasets=settings.EXTERNAL_DATASETS,
     authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
+    snapshot=settings.SNAPSHOT,
 )
 
 

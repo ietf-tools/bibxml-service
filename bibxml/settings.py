@@ -106,6 +106,11 @@ STATIC_ROOT = BASE_DIR / 'build' / 'static'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Version
+
+SNAPSHOT = environ.get('SNAPSHOT', None)
+
+
 # BibXML-specific
 
 LEGACY_DATASETS = {

@@ -24,6 +24,12 @@
 
   <body class="sans-serif">
 
+    {% if snapshot %}
+      <aside class="ph3 ph5-ns">
+        <span class="f7 black-20 nowrap code pre truncate" title="Code snapshot">{{ snapshot|slice:5 }}</span>
+      </aside>
+    {% endif %}
+
     <header>
       <nav class="ph3 ph5-ns pv3">
         <div class="nowrap overflow-x-auto">
