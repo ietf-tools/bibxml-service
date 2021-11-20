@@ -18,6 +18,9 @@ This project uses Docker, Django and PostgreSQL.
 Running locally using Docker Desktop and Compose
 ------------------------------------------------
 
+It is required to run Compose from repository root
+(.git directory must be present).
+
 Ensure you are already running bibxml-indexer service (see respective README).
 
 When using Docker Compose, you run bibxml-indexer configuration first,
