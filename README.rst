@@ -37,7 +37,7 @@ Setting up
 It is required to run Compose from repository root
 (.git directory must be present).
 
-Ensure requisite environment variables are configured in the environment.
+Ensure requisite environment variables are set.
 For convenience, you can place in repository root a file `.env`
 with contents like this::
 
