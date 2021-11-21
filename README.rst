@@ -6,6 +6,8 @@ For an overview, see https://github.com/ietf-ribose/bibxml-project.
 
 This project uses Docker, Django and PostgreSQL.
 
+.. contents::
+
 .. note::
 
    Django settings file makes heavy use of environment variables,
@@ -15,19 +17,25 @@ This project uses Docker, Django and PostgreSQL.
    (the old-style conventional way of running under a venv isn’t).
 
 
-Running locally using Docker Desktop and Compose
-------------------------------------------------
+Quick start with Docker Desktop and Compose
+-------------------------------------------
+
+Setting up
+~~~~~~~~~~
+
+.. note::
+
+   Ensure you are already running the bibxml-indexer service
+   (see its respective README).
+   
+   When using Docker Compose, you run bibxml-indexer configuration first,
+   and it sets up a network that will be joined by bibxml-service
+   when you run it as the second step. That shared network gives bibxml-service
+   access to static citation dataset index DB
+   (which is part of bibxml-indexer configuration).
 
 It is required to run Compose from repository root
 (.git directory must be present).
-
-Ensure you are already running bibxml-indexer service (see respective README).
-
-When using Docker Compose, you run bibxml-indexer configuration first,
-and it sets up a network that will be joined by bibxml-service
-when you run it as the second step. That shared network gives bibxml-service
-access to static citation dataset index DB
-(which is part of bibxml-indexer configuration).
 
 Ensure requisite environment variables are configured in the environment.
 For convenience, you can place in repository root a file `.env`
@@ -41,6 +49,8 @@ with contents like this::
     HOST=localhost
 
 .. important::
+
+   * Do not use this environment in production. Refer to corresponding operations document.
 
    * ``DB_NAME``, ``DB_SECRET`` values depend on bibxml-indexer runtime environment.
    
@@ -57,23 +67,34 @@ with contents like this::
 
    * DEBUG must not be set to 1 in production.
 
-Then, run ``docker compose up`` from repository root.
 
-To check successful deployment, check http://localhost:8000/api/v1/.
+Running
+~~~~~~~
+
+From repository root::
+
+    docker compose up
+
+Testing
+~~~~~~~
+
+See GUI at http://localhost:8000/.
+
+See API spec at http://localhost:8000/api/v1/.
 
 Monitoring logs
 ~~~~~~~~~~~~~~~
 
 ::
 
-    % docker compose logs -f -t
+    docker compose logs -f -t
 
 Invoking Django management commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-    % docker compose exec web bash
+    docker compose exec web bash
 
 After which you are in a shell where you can invoke any ``python manage.py <command>``.
 
