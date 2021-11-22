@@ -31,7 +31,7 @@ urlpatterns = [
     ])),
 
     path('public/rfc/', include([
-        path('<legacy_dataset_name>/reference.<ref>.xml/',
+        path('<legacy_dataset_name>/<legacy_reference>.xml',
              api.get_ref_by_legacy_path,
              name='api_get_ref_by_legacy_path'),
     ])),

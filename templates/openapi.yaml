@@ -115,7 +115,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /public/rfc/{legacy_dataset}/reference.{ref_id}.xml:
+  /public/rfc/{legacy_dataset}/{legacy_reference}.xml:
     parameters:
     - name: legacy_dataset
       in: path
@@ -123,11 +123,12 @@ paths:
       required: true
       schema:
         $ref: '#/components/schemas/AvailableLegacyDatasets'
-    - name: ref_id
+    - name: legacy_reference
       in: path
-      description: Standard reference. Special characters, such as forward slashes, must be URL-escaped.
+      description: Legacy standard reference. Special characters, such as forward slashes, must be URL-escaped.
       required: true
       schema:
+        example: reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102
         type: string
     get:
       summary: Get citation by XML2RFC tools path

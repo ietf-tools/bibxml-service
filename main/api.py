@@ -78,13 +78,21 @@ def get_doi_ref(request, ref):
         return JsonResponse({"data": result})
 
 
-def get_ref_by_legacy_path(request, legacy_dataset_name, ref):
-    dataset_id = settings.LEGACY_DATASETS.get(
+def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
+    legacy_ds_id_or_config = settings.LEGACY_DATASETS.get(
         legacy_dataset_name.lower(),
         None)
 
-    if dataset_id:
-        parsed_ref = unquote_plus(ref)
+    if legacy_ds_id_or_config:
+        if hasattr(legacy_ds_id_or_config, 'get'):
+            dataset_id = legacy_ds_id_or_config['dataset_id']
+            path_prefix = legacy_ds_id_or_config['path_prefix']
+        else:
+            dataset_id = legacy_ds_id_or_config
+            path_prefix = 'reference.'
+
+        parsed_ref = unquote_plus(legacy_reference[len(path_prefix):])
+
         try:
             if dataset_id == 'doi':
                 bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
@@ -110,7 +118,7 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, ref):
             "error":
                 "Unable to find ref {}: "
                 "legacy dataset {} is unknown".
-                format(ref, legacy_dataset_name),
+                format(legacy_reference, legacy_dataset_name),
         }, status=404)
 
 

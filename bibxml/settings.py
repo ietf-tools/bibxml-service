@@ -121,7 +121,10 @@ LEGACY_DATASETS = {
     'bibxml2': 'misc',
     'bibxml3': 'ids',
     'bibxml-id': 'ids',
-    'bibxml4': 'w3c',
+    'bibxml4': {
+        'dataset_id': 'w3c',
+        'path_prefix': 'reference.W3C.',
+    },
     'bibxml5': '3gpp',
     'bibxml6': 'ieee',
     'bibxml7': 'doi',
@@ -131,7 +134,7 @@ LEGACY_DATASETS = {
     'bibxml-nist': 'nist',
 }
 """Maps legacy dataset root as it appears under /public/rfc/
-to known dataset ID(s)."""
+to known dataset ID(s) and reference patterns."""
 
 # TODO: Extract KNOWN_DATASETS from environment
 KNOWN_DATASETS = [
