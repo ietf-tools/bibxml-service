@@ -125,7 +125,7 @@ paths:
         $ref: '#/components/schemas/AvailableLegacyDatasets'
     - name: legacy_reference
       in: path
-      description: Legacy standard reference. Special characters, such as forward slashes, must be URL-escaped.
+      description: Legacy standard reference. Format is dependent on legacy dataset, but typically starts with `reference.*.` Special characters, such as forward slashes, must be URL-escaped.
       required: true
       schema:
         example: reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102
