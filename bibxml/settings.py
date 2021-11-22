@@ -149,7 +149,7 @@ Dataset configuration, if provided, must be a dictionary like either::
 or::
 
     { 'dataset_id': '<known_dataset_id>',
-      'ref_formatter': '<lambda function>' }
+      'ref_formatter': <lambda function> }
 
 Where:
 
