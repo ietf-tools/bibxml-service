@@ -131,10 +131,43 @@ LEGACY_DATASETS = {
     'bibxml8': 'iana',
     'bibxml9': 'rfcsubseries',
     'bibxml-rfcsubseries': 'rfcsubseries',
-    'bibxml-nist': 'nist',
+    'bibxml-nist': {
+        'dataset_id': 'nist',
+        'ref_formatter':
+            lambda legacy_ref:
+                legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_')
+    },
 }
 """Maps legacy dataset root as it appears under /public/rfc/
-to known dataset ID(s) and reference patterns."""
+to known dataset ID(s) or configurations.
+
+Dataset configuration, if provided, must be either::
+
+    { 'dataset_id': '<known_dataset_id>',
+      'path_prefix': '<ref_prefix>' }
+
+or::
+
+    { 'dataset_id': '<known_dataset_id>',
+      'ref_formatter': '<lambda function>' }
+
+Where:
+
+- `ref_prefix` can be used for simple formatting cases.
+  The string would simply be cut off the start when obtaining the actual ref.
+
+  E.g. specifying `reference.W3C.` would mean
+  `/public/rfc/bibxml4/reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102.xml`
+  would work for dataset `w3c` and ref `WD-SWBP-SKOS-CORE-GUIDE-20051102`.
+
+- `ref_formatter` can be used for simple formatting cases.
+  The lambda would be called with legacy ref, and should return the actual ref.
+
+  E.g. specifying `lambda legacy_ref: legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_')`
+  would mean
+  `/public/rfc/bibxml-nist/reference.NIST.TN.1968.xml`
+  would work for dataset `nist` and ref `NIST_TN_1968`.
+"""
 
 # TODO: Extract KNOWN_DATASETS from environment
 KNOWN_DATASETS = [

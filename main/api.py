@@ -14,6 +14,9 @@ from .external import get_doi_ref as _get_doi_ref
 from .models import RefData
 
 
+DEFAULT_LEGACY_REF_PREFIX = 'reference.'
+
+
 def index(request):
     """Serves API index."""
 
@@ -84,14 +87,22 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
         None)
 
     if legacy_ds_id_or_config:
+
         if hasattr(legacy_ds_id_or_config, 'get'):
             dataset_id = legacy_ds_id_or_config['dataset_id']
-            path_prefix = legacy_ds_id_or_config['path_prefix']
+            path_prefix = legacy_ds_id_or_config.get(
+                'path_prefix',
+                DEFAULT_LEGACY_REF_PREFIX)
+            get_ref_from_legacy_ref = (
+                legacy_ds_id_or_config.get('ref_formatter', None) or
+                (lambda legacy_ref: legacy_reference[len(path_prefix):]))
         else:
             dataset_id = legacy_ds_id_or_config
-            path_prefix = 'reference.'
+            get_ref_from_legacy_ref = (
+                lambda legacy_ref:
+                    legacy_reference[len(DEFAULT_LEGACY_REF_PREFIX):])
 
-        parsed_ref = unquote_plus(legacy_reference[len(path_prefix):])
+        parsed_ref = unquote_plus(get_ref_from_legacy_ref(legacy_reference))
 
         try:
             if dataset_id == 'doi':
