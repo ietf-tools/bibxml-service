@@ -141,7 +141,7 @@ LEGACY_DATASETS = {
 """Maps legacy dataset root as it appears under /public/rfc/
 to known dataset ID(s) or configurations.
 
-Dataset configuration, if provided, must be either::
+Dataset configuration, if provided, must be a dictionary like either::
 
     { 'dataset_id': '<known_dataset_id>',
       'path_prefix': '<ref_prefix>' }
@@ -167,6 +167,10 @@ Where:
   would mean
   `/public/rfc/bibxml-nist/reference.NIST.TN.1968.xml`
   would work for dataset `nist` and ref `NIST_TN_1968`.
+
+If legacy dataset name is mapped to a string instead of a dictionary,
+the string is taken as known dataset ID, and configuration equivalent
+to `'path_prefix': 'reference.'` is in effect for this legacy dataset.
 """
 
 # TODO: Extract KNOWN_DATASETS from environment
