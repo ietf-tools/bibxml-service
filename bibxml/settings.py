@@ -163,26 +163,3 @@ AUTHORITATIVE_DATASETS = [
 ]
 """A list of authoritative datasets.
 """
-
-INDEXABLE_DATASETS = [
-    "ecma",
-    "nist",
-    "ietf",
-    "itu-r",
-    "calconnect",
-    "cie",
-    "iso",
-    "bipm",
-    "iho"
-]
-"""
-DEPRECATED.
-
-List of supported datasets
-Need to be matched with Indexer service
-(maybe set this value from ENV or substitute on deploy?)
-"""
-
-
-MAX_RECORDS_PER_RESPONSE = 100
-"""Limit results in /search/ per request."""

@@ -14,7 +14,7 @@ class RefDataModelTests(TestCase):
 
     def setUp(self):
         self.ref_id = "ref_01"
-        self.dataset_name = list(settings.INDEXABLE_DATASETS)[0]
+        self.dataset_name = 'nist'
         self.ref_type = "standart"
         self.ref_body = {
             "id": "ref_01",
