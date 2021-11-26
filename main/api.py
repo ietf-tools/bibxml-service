@@ -102,7 +102,8 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
                 lambda legacy_ref:
                     legacy_reference[len(DEFAULT_LEGACY_REF_PREFIX):])
 
-        parsed_ref = unquote_plus(get_ref_from_legacy_ref(legacy_reference))
+        parsed_legacy_ref = unquote_plus(legacy_reference)
+        parsed_ref = get_ref_from_legacy_ref(parsed_legacy_ref)
 
         try:
             if dataset_id == 'doi':
