@@ -103,9 +103,10 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
                     legacy_reference[len(DEFAULT_LEGACY_REF_PREFIX):])
 
         parsed_legacy_ref = unquote_plus(legacy_reference)
-        parsed_ref = get_ref_from_legacy_ref(parsed_legacy_ref)
 
         try:
+            parsed_ref = get_ref_from_legacy_ref(parsed_legacy_ref)
+
             if dataset_id == 'doi':
                 bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
             else:
