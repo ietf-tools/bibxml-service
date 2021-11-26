@@ -135,7 +135,7 @@ LEGACY_DATASETS = {
         'dataset_id': 'nist',
         'ref_formatter':
             lambda legacy_ref:
-                legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_')
+                legacy_ref.replace('reference.', '').replace('.', '_'),
     },
 }
 """Maps legacy dataset root as it appears under /public/rfc/
