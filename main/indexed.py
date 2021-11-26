@@ -15,6 +15,11 @@ def list_refs(dataset_id) -> QuerySet[RefData]:
 
 
 def search_refs(text) -> QuerySet[RefData]:
+    """Uses given string to search across serialized JSON representations
+    of Relaton citation data.
+
+    Supports typical websearch operators like quotes, plus, minus, OR, AND.
+    """
     return (
         RefDataManager.
         annotate(search=SearchVector(Cast('body', TextField()))).
