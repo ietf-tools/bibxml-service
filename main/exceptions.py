@@ -1,8 +1,8 @@
 class RefNotFoundError(RuntimeError):
-    """Standard reference not found.
+    """Citation (standard reference) could not be identified.
 
-    :param ref string: Reference that was not found."""
+    :param query string: Reference or query that did not yield a match."""
 
-    def __init__(self, message, ref):
+    def __init__(self, message, query):
         super().__init__(message)
-        self.ref = ref
+        self.query = query
