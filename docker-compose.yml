@@ -13,9 +13,9 @@ services:
         python manage.py collectstatic --noinput &&
         python manage.py check --deploy &&
         if [ "$DEBUG" = "1" ]; then
-          python manage.py runserver 0.0.0.0:8000
+          python manage.py runserver 0.0.0.0:8800
         else
-          daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
+          daphne bibxml.asgi:application -p 8800 -b 0.0.0.0
         fi
     volumes:
       - .:/code
@@ -24,7 +24,7 @@ services:
       - default
       - bibxml_indexer_db_net
     ports:
-      - "${PORT:?missing port to expose web service under}:8000"
+      - "${PORT:?missing port to expose web service under}:8800"
     environment:
       PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
       DEBUG: ${DEBUG:-0}

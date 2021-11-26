@@ -41,7 +41,7 @@ Ensure requisite environment variables are set.
 For convenience, you can place in repository root a file `.env`
 with contents like this::
 
-    PORT=8000
+    PORT=8800
     DEBUG=1
     DB_NAME=foo
     DB_SECRET="some-long-random-string"
@@ -78,9 +78,9 @@ From repository root::
 Testing
 ~~~~~~~
 
-See GUI at http://localhost:8000/.
+See GUI at http://localhost:8800/.
 
-See API spec at http://localhost:8000/api/v1/.
+See API spec at http://localhost:8800/api/v1/.
 
 Monitoring logs
 ~~~~~~~~~~~~~~~
