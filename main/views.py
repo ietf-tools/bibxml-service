@@ -6,12 +6,13 @@ from django.db.models.query import QuerySet
 from django.http.response import HttpResponseBadRequest, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.conf import settings
-from django.views.generic.list import ListView
+from django.views.generic.list import ListView, MultipleObjectTemplateResponseMixin
 
 from .exceptions import RefNotFoundError
 from .models import RefData
-from .indexed import get_indexed_ref, list_refs, search_refs, RefDataManager
+from .indexed import get_indexed_ref, list_refs
 from .external import get_doi_ref
+from .util import BaseCitationSearchView
 
 
 shared_context = dict(
@@ -64,17 +65,11 @@ def browse_citations(request, dataset_id=None, ref=None):
     ))
 
 
-class CitationSearchResultListView(ListView):
-    model = RefData
-    paginate_by = 20
-    template_name = 'search_citations.html'
+class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
+                                   BaseCitationSearchView):
 
-    def get_queryset(self) -> QuerySet[RefData]:
-        query = self.request.GET.get('query', None)
-        if query:
-            return search_refs(unquote_plus(query))
-        else:
-            return RefDataManager.all()
+    template_name = 'search_citations.html'
+    show_all_by_default = True
 
     def get_context_data(self, **kwargs):
         return dict(

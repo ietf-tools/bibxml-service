@@ -4,9 +4,14 @@
 
 {% block content %}
   <h2 class="f4 dib br3">
-    Searching for
+    {% if request.GET.query_format == "json_struct" %}
+      Search matching JSON structure
+      <br />
+    {% else %}
+      Searching for
+      &nbsp;
+    {% endif %}
     {% if query %}
-      &ensp;
       <code class="f5 pa1 ph2 bg-light-gray">{{ query }}</code>
     {% else %}
       empty string (showing all)

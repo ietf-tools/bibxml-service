@@ -1,3 +1,6 @@
+import json
+from typing import Union
+
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db.models.query import QuerySet
 from django.db.models import TextField
@@ -14,7 +17,7 @@ def list_refs(dataset_id) -> QuerySet[RefData]:
     return RefDataManager.filter(dataset__iexact=dataset_id)
 
 
-def search_refs(text) -> QuerySet[RefData]:
+def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
     """Uses given string to search across serialized JSON representations
     of Relaton citation data.
 
@@ -24,6 +27,20 @@ def search_refs(text) -> QuerySet[RefData]:
         RefDataManager.
         annotate(search=SearchVector(Cast('body', TextField()))).
         filter(search=SearchQuery(text, search_type='websearch')))
+
+
+def search_refs_relaton_struct(obj: Union[dict, list]) -> QuerySet[RefData]:
+    """Uses PostgreSQL’s JSON containment query.
+
+    Returns citations which Relaton structure contains ``obj``.
+
+    .. seealso:: PostgreSQL docs on ``@>`` operator.
+    """
+    return (
+        RefDataManager.
+        raw('''
+            SELECT * FROM api_ref_data WHERE body @> %s::jsonb
+            ''', [json.dumps(obj)]))
 
 
 def get_indexed_ref(dataset_id, ref, format='relaton'):

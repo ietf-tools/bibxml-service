@@ -3,15 +3,13 @@
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse, JsonResponse
-from django.db.models.query import QuerySet
 from django.conf import settings
-from django.views.generic.list import BaseListView
 
 from main.exceptions import RefNotFoundError
 
-from .indexed import get_indexed_ref, search_refs
+from .indexed import get_indexed_ref
 from .external import get_doi_ref as _get_doi_ref
-from .models import RefData
+from .util import BaseCitationSearchView
 
 
 DEFAULT_LEGACY_REF_PREFIX = 'reference.'
@@ -135,16 +133,9 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
         }, status=404)
 
 
-class CitationSearchResultListView(BaseListView):
-    model = RefData
-    paginate_by = 20
-
-    def get_queryset(self) -> QuerySet[RefData]:
-        query = self.kwargs.get('query', None)
-        if query:
-            return search_refs(unquote_plus(query))
-        else:
-            return RefData.objects.none()
+class CitationSearchResultListView(BaseCitationSearchView):
+    show_all_by_default = False
+    query_in_path = True
 
     def render_to_response(self, context):
         meta = dict(total_records=self.object_list.count())
@@ -152,14 +143,24 @@ class CitationSearchResultListView(BaseListView):
         page_obj = context['page_obj']
         if page_obj:
             base_url = self.request.build_absolute_uri(self.request.path)
+            params = self.request.GET.copy()
+            try:
+                params.pop('page')
+            except KeyError:
+                pass
+            params_encoded = params.urlencode(())
+
             if page_obj.has_next():
-                meta['next'] = "{}?page={}".format(
+                meta['next'] = "{}?page={}&{}".format(
                     base_url,
-                    page_obj.next_page_number())
+                    page_obj.next_page_number(),
+                    params_encoded)
+
             if page_obj.has_previous():
-                meta['prev'] = "{}?page={}".format(
+                meta['prev'] = "{}?page={}&{}".format(
                     base_url,
-                    page_obj.previous_page_number())
+                    page_obj.previous_page_number(),
+                    params_encoded)
 
         return JsonResponse({
             "meta": meta,

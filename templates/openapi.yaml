@@ -84,15 +84,26 @@ paths:
         example: |
           %2Bnist+%22metropolitan+area%22+-%22wind+damage%22
       description: |
-        Search query string.
-        Some typical Web search operators are supported.
+        Search query string. Format depends on `query_format` parameter.
         Special characters, such as forward slashes, must be URL-escaped.
     get:
       summary: Search citations
       description: |
         Find citations across indexed (non-external) datasets that match given query.
-        Note: currently match is performed against entire JSON representations of citations.
       parameters:
+      - name: query_format
+        in: query
+        schema:
+          type: string
+          enum: [json_repr, json_struct]
+          default: json_repr
+        description: |
+          How to match the query.
+          - If `json_repr`, query string is matched against raw JSON-serialized representation
+            of citation’s Relaton data. Some typical Web search operators are supported
+            (AND, OR, +, -, quotes).
+          - if `json_struct`, query string must be a valid JSON-serialized structure.
+            Citations which Relaton data contains that structure will match.
       - name: page
         in: query
         schema:
