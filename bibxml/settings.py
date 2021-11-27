@@ -141,7 +141,13 @@ LEGACY_DATASETS = {
 """Maps legacy dataset root as it appears under /public/rfc/
 to known dataset ID(s) or configurations.
 
-Dataset configuration, if provided, must be a dictionary like either::
+If legacy dataset name is mapped to a string,
+the string is taken as known dataset ID, and configuration equivalent
+of `'path_prefix': 'reference.'` from below
+is in effect for this legacy dataset.
+
+Dataset configuration, if provided,
+must be a dictionary in one of the following shapes::
 
     { 'dataset_id': '<known_dataset_id>',
       'path_prefix': '<ref_prefix>' }
@@ -149,28 +155,86 @@ Dataset configuration, if provided, must be a dictionary like either::
 or::
 
     { 'dataset_id': '<known_dataset_id>',
-      'ref_formatter': <lambda function> }
+      'ref_formatter': <function> }
+
+or *(statically indexed datasets only)*::
+
+    { 'dataset_id': '<known_dataset_id>',
+      'query_builder': <function> }
 
 Where:
 
-- `ref_prefix` can be used for simple formatting cases.
+- `path_prefix` can be used for simple formatting cases.
   The string would simply be cut off the start when obtaining the actual ref.
 
   E.g. specifying `reference.W3C.` would mean
   `/public/rfc/bibxml4/reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102.xml`
   would work for dataset `w3c` and ref `WD-SWBP-SKOS-CORE-GUIDE-20051102`.
 
-- `ref_formatter` can be used for simple formatting cases.
-  The lambda would be called with legacy ref, and should return the actual ref.
+- Alternatively, a `ref_formatter` or `query_builder` function
+  will be called on each request,
+  receiving an URL-unquoted legacy ref string (the part before `.xml`).
 
-  E.g. specifying `lambda legacy_ref: legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_')`
+  Either function must raise `RefNotFoundError`
+  for an invalid or unrecognized legacy ref,
+  which will result in HTTP 404.
+
+- `ref_formatter` must return the actual ref.
+
+  For example, specifying
+  `lambda legacy_ref: legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_')`
   would mean
   `/public/rfc/bibxml-nist/reference.NIST.TN.1968.xml`
   would work for dataset `nist` and ref `NIST_TN_1968`.
 
-If legacy dataset name is mapped to a string instead of a dictionary,
-the string is taken as known dataset ID, and configuration equivalent
-to `'path_prefix': 'reference.'` is in effect for this legacy dataset.
+  The preceding example is equivalent to following
+  `query_builder` configuration (see below)::
+
+      lambda legacy_ref: Q(
+          ref__iexact=
+            legacy_ref.replace('reference.NIST', 'NIST').replace('.', '_'))
+
+- `query_builder` must return a Django’s `Q` object,
+  which will be used to query `RefData`.
+
+  This option has no effect for external datasets.
+
+  - If a single citation matches given Q,
+    its full data is returned.
+  - If multiple citations match, HTTP 404 will be returned.
+  - If no citation matches, HTTP 404 will be returned.
+
+  The following example::
+
+      from django.db.models.query import Q
+
+      def build_id_query(legacy_ref):
+          parts = legacy_ref.split('-')
+          if len(parts) > 1:
+              rev = parts[-1]
+              name = '-'.join(parts[0, len(parts) - 1])
+              return Q(body__rev=rev) & Q(body__name=name)
+          else:
+              return Q(body__name=name)
+
+      LEGACY_DATASETS = {
+          'bibxml3': {
+              'dataset_id': 'ids',
+              'query_builder': build_id_query,
+          },
+      }
+
+  Would mean that for a request to
+  `/public/rfc/bibxml3/reference.SOME-NAME-123.xml`
+  the service would try to return a citation in dataset `ids`
+  where `body` contains key 'name' matching "SOME-NAME"
+  _and_ key 'rev' matching "123".
+
+.. note::
+
+   If no BibXML representation exists on discovered citation,
+   HTTP 404 is returned for given legacy path
+   as if that citation does not exist.
 """
 
 # TODO: Extract KNOWN_DATASETS from environment

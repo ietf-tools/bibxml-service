@@ -2,7 +2,7 @@ import json
 from typing import Union
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
-from django.db.models.query import QuerySet
+from django.db.models.query import QuerySet, Q
 from django.db.models import TextField
 from django.db.models.functions import Cast
 
@@ -52,17 +52,33 @@ def get_indexed_ref(dataset_id, ref, format='relaton'):
     :raises RefNotFoundError: either reference or requested format not found
     """
 
+    return get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref))
+
+
+def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
+    """Retrieves citation from static indexed dataset.
+
+    :param format string: "bibxml" or "relaton"
+    :returns object: if format is "relaton", a dict.
+    :returns string: if format is "bibxml", an XML string.
+    :raises RefNotFoundError: either reference or requested format not found
+    """
+
     if format not in ['relaton', 'bibxml']:
         raise ValueError("Unknown citation format requested")
 
     try:
         result = RefDataManager.get(
-            ref__iexact=ref,
-            dataset__iexact=dataset_id)
+            query &
+            Q(dataset__iexact=dataset_id))
     except RefData.DoesNotExist:
         raise RefNotFoundError(
-            "Cannot find requested reference in given dataset",
-            ref)
+            "Cannot find matching reference in given dataset",
+            repr(Q))
+    except RefData.MultipleObjectsReturned():
+        raise RefNotFoundError(
+            "Multiple references match query in given dataset",
+            repr(Q))
 
     if format == 'relaton':
         return result.body
@@ -74,4 +90,4 @@ def get_indexed_ref(dataset_id, ref, format='relaton'):
         else:
             raise RefNotFoundError(
                 "BibXML representation not found for requested reference",
-                ref)
+                repr(Q))

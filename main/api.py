@@ -3,16 +3,26 @@
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse, JsonResponse
+from django.db.models.query import Q
 from django.conf import settings
 
 from main.exceptions import RefNotFoundError
 
 from .indexed import get_indexed_ref
+from .indexed import get_indexed_ref_by_query
 from .external import get_doi_ref as _get_doi_ref
 from .util import BaseCitationSearchView
 
 
 DEFAULT_LEGACY_REF_PREFIX = 'reference.'
+
+DEFAULT_LEGACY_REF_FORMATTER = (
+    lambda legacy_ref:
+    legacy_ref[len(DEFAULT_LEGACY_REF_PREFIX):])
+
+DEFAULT_LEGACY_QUERY_BUILDER = (
+    lambda legacy_ref:
+    Q(ref__iexact=DEFAULT_LEGACY_REF_FORMATTER(legacy_ref)))
 
 
 def index(request):
@@ -91,24 +101,29 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
             path_prefix = legacy_ds_id_or_config.get(
                 'path_prefix',
                 DEFAULT_LEGACY_REF_PREFIX)
-            get_ref_from_legacy_ref = (
+            ref_formatter = (
                 legacy_ds_id_or_config.get('ref_formatter', None) or
                 (lambda legacy_ref: legacy_reference[len(path_prefix):]))
+            query_builder = (
+                legacy_ds_id_or_config.get('query_builder', None) or
+                (lambda legacy_ref:
+                    Q(ref__iexact=ref_formatter(legacy_ref))))
         else:
             dataset_id = legacy_ds_id_or_config
-            get_ref_from_legacy_ref = (
-                lambda legacy_ref:
-                    legacy_reference[len(DEFAULT_LEGACY_REF_PREFIX):])
+            ref_formatter = DEFAULT_LEGACY_REF_FORMATTER
+            query_builder = DEFAULT_LEGACY_QUERY_BUILDER
 
         parsed_legacy_ref = unquote_plus(legacy_reference)
 
         try:
-            parsed_ref = get_ref_from_legacy_ref(parsed_legacy_ref)
-
             if dataset_id == 'doi':
+                parsed_ref = ref_formatter(parsed_legacy_ref)
                 bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
             else:
-                bibxml_repr = get_indexed_ref(dataset_id, parsed_ref, 'bibxml')
+                bibxml_repr = get_indexed_ref_by_query(
+                    dataset_id,
+                    query_builder(parsed_legacy_ref),
+                    'bibxml')
 
         except RefNotFoundError:
             return JsonResponse({
