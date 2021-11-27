@@ -51,9 +51,6 @@
         {% for title in data.title|as_list %}
           {% include "meta_row.html" with key=title.type|stringformat:"s (title)" val=title.content %}
         {% endfor %}
-        {% if data.keyword %}
-          {% include "meta_row_list.html" with key="keywords" items=data.keyword|as_list %}
-        {% endif %}
       </dl>
     </div>
   </div>
@@ -63,4 +60,10 @@
   <p class="gray f7">
     Available using API: {% url "api_get_ref" dataset_id ref %}
   </p>
+
+  <dl class="lh-title pv2 mt2">
+    {% if data.keyword %}
+      {% include "meta_row_list.html" with key="keywords" items=data.keyword|as_list %}
+    {% endif %}
+  </dl>
 {% endblock %}
