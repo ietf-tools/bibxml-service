@@ -1,0 +1,16 @@
+<dt class="b nowrap mt1 f6 {% if inline %}dib{% endif %}">
+  {{ key }}{% if idx %} ({{ idx }}){% endif %}:
+</dt>
+<dd class="ml0 truncate {% if inline %}dib{% endif %}" title="{{ val }}">
+  <ul class="list pl4 ma0">
+    {% for val in items %}
+      <li>
+        {% if tmpl %}
+          {% include tmpl with key=forloop.counter val=val %}
+        {% else %}
+          {{ val }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</dd>

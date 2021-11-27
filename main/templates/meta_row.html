@@ -1,2 +1,12 @@
-<dt class="f6 b mt2">{{ key }}:</dt>
-<dd class="ml0 truncate" title="{{ val }}">{{ val }}</dd>
+{# NOTE: inline rendering isn’t well-tested #}
+
+<dt class="b nowrap mt1 f6 {% if inline %}dib{% endif %}">
+  {{ key }}{% if idx %} ({{ idx }}){% endif %}:
+</dt>
+<dd class="ml0 truncate {% if inline %}dib{% endif %}" title="{{ val }}">
+  {% if tmpl %}
+    {% include tmpl with val=val %}
+  {% else %}
+    {{ val }}
+  {% endif %}
+</dd>
