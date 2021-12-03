@@ -166,10 +166,13 @@ Where:
 
 - `path_prefix` can be used for simple formatting cases.
   The string would simply be cut off the start when obtaining the actual ref.
+  (“Actual ref” is a canonical standard reference
+  in one of the known bibxml-data datasets.)
 
-  E.g. specifying `reference.W3C.` would mean
+  E.g. specifying `reference.W3C.` for dataset ID `w3c` means
   `/public/rfc/bibxml4/reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102.xml`
-  would work for dataset `w3c` and ref `WD-SWBP-SKOS-CORE-GUIDE-20051102`.
+  would resolve to canonical ref `WD-SWBP-SKOS-CORE-GUIDE-20051102`
+  in dataset `w3c` (corresponding to Git repository `bibxml-data-w3c`).
 
 - Alternatively, a `ref_formatter` or `query_builder` function
   will be called on each request,
