@@ -71,7 +71,9 @@ with contents like this::
 Running
 ~~~~~~~
 
-This project is depends on bibxml-indexer.  Please refer to the README in bibxml-indexer.
+From repository root::
+
+    docker compose up
 
 Testing
 ~~~~~~~
@@ -79,6 +81,23 @@ Testing
 See GUI at http://localhost:8800/.
 
 See API spec at http://localhost:8800/api/v1/.
+
+Monitoring logs
+~~~~~~~~~~~~~~~
+
+::
+
+    docker compose logs -f -t
+
+Invoking Django management commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+    docker compose exec web bash
+
+After which you are in a shell where you can invoke any ``python manage.py <command>``.
+
 
 Credits
 -------
