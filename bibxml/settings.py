@@ -125,10 +125,17 @@ LEGACY_DATASETS = {
         'dataset_id': 'w3c',
         'path_prefix': 'reference.W3C.',
     },
+    'bibxml-w3c': {
+        'dataset_id': 'w3c',
+        'path_prefix': 'reference.W3C.',
+    },
     'bibxml5': '3gpp',
     'bibxml6': 'ieee',
+    'bibxml-ieee': 'ieee',
     'bibxml7': 'doi',
+    'bibxml-doi': 'doi',
     'bibxml8': 'iana',
+    'bibxml-iana': 'iana',
     'bibxml9': 'rfcsubseries',
     'bibxml-rfcsubseries': 'rfcsubseries',
     'bibxml-nist': {
