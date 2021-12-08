@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import path, include
-from django.views.decorators.http import require_POST, require_safe
+from django.views.decorators.http import require_safe
 
 from main import api, views
 
