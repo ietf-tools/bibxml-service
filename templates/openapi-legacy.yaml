@@ -1,0 +1,78 @@
+openapi: 3.1.0
+
+info:
+  title: IETF BibXML service — compatibility API
+  description: |
+    These are APIs for compatibility with existing third-party systems during the migration period.
+  contact:
+    email: ietf-ribose@ribose.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  version: 0.0.1
+
+servers:
+- url: /
+
+paths:
+
+  /public/rfc/{legacy_dataset}/{legacy_reference}.xml:
+    parameters:
+    - name: legacy_dataset
+      in: path
+      description: Legacy dataset ID
+      required: true
+      schema:
+        $ref: '#/components/schemas/AvailableLegacyDatasets'
+    - name: legacy_reference
+      in: path
+      description: Legacy standard reference. Format is dependent on legacy dataset, but typically starts with `reference.*.` Special characters, such as forward slashes, must be URL-escaped.
+      required: true
+      schema:
+        example: reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102
+        type: string
+
+    get:
+      summary: Get citation by XML2RFC tools path
+      description: Returned citation is always in BibXML format. This endpoint returns raw XML response.
+      responses:
+
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                type: string
+
+        404:
+          description: reference not found, or legacy dataset is not known
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+
+  schemas:
+
+    AvailableLegacyDatasets:
+      type: string
+      enum:
+      {% for ds_id in legacy_dataset_ids %}
+      - {{ ds_id }}
+      {% endfor %}
+      description: |
+        Available legacy dataset IDs. This list is generated at runtime.
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              description: Code for automatic error processing
+            message:
+              type: string
+              description: Human readable error message

@@ -1,3 +1,4 @@
+from typing import List
 from pathlib import Path
 from os import environ, path
 
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.app.Config',
+    'management.app.Config',
 ]
 
 MIDDLEWARE = [
@@ -72,14 +74,17 @@ DATABASES = {
         'USER': environ.get('DB_USER'),
         'PASSWORD': environ.get('DB_SECRET'),
         'HOST': environ.get('DB_HOST'),
-        'PORT': int(environ.get('DB_PORT')),
+        'PORT': int(environ.get('DB_PORT') or 5432),
     }
 }
+DATABASE_ROUTERS = (
+    'bibxml.dbrouters.IndexDBRouter',
+)
 
 
 # NOTE: This project isn’t intended to be used with conventional Django auth,
 # hence this setting is empty.
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS: List[str] = []
 
 
 # Internationalization
@@ -104,6 +109,27 @@ STATIC_ROOT = BASE_DIR / 'build' / 'static'
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Celery
+
+CELERY_BROKER_URL = environ.get('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = environ.get('CELERY_RESULT_BACKEND')
+
+CELERY_SEND_TASK_SENT_EVENT = True
+
+# TODO: Figure out correct identifier scope for the TRACK_STARTED Celery setting
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TRACK_STARTED = True
+
+CELERY_WORKER_CONCURRENCY = 1
+CELERY_TASK_RESULT_EXPIRES = 604800
+
+
+# Redis
+
+REDIS_HOST = environ.get('REDIS_HOST')
+REDIS_PORT = environ.get('REDIS_PORT')
 
 
 # Version
@@ -260,7 +286,7 @@ KNOWN_DATASETS = [
     'nist',
     'doi',
 ]
-"""A list of known dataset IDs. NOTE: Keep in sync with bibxml-indexer.
+"""A list of known dataset IDs.
 """
 
 EXTERNAL_DATASETS = [
@@ -276,4 +302,46 @@ AUTHORITATIVE_DATASETS = [
     'rfcsubseries',
 ]
 """A list of authoritative datasets.
+"""
+
+
+# Further, specific to BibXML indexer
+
+DATASET_SOURCE_OVERRIDES = {
+    'ieee': {
+        'relaton_data': {
+            'repo_url': 'git://github.com/ietf-ribose/relaton-data-ieee.git',
+        },
+    },
+}
+"""Overrides dataset bibxml and/or relaton source. Supports partial override."""
+
+API_USER = 'ietf'
+"""Username for HTTP Basic auth to access management GUI."""
+
+API_SECRET = environ.get('API_SECRET')
+"""Secret used to authenticate API requests and access to management GUI."""
+
+PATH_TO_DATA_DIR = environ.get('PATH_TO_DATA_DIR')
+"""Deprecated."""
+
+DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
+"""Where to keep fetched source data and data generated during indexing."""
+
+# TODO: Extract KNOWN_DATASETS from environment
+KNOWN_DATASETS = [
+    'rfcs',
+    'ids',
+    'rfcsubseries',
+    'misc',
+    'w3c',
+    '3gpp',
+    'ieee',
+    'iana',
+    'nist',
+]
+"""A list of known static dataset IDs.
+
+For up-to-date list of actually available datasets,
+see bibxml-data-* repositories under ietf-ribose GitHub organization.
 """

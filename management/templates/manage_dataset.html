@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ block.super }}
+  {{ dataset_id }}
+{% endblock %}
+
+{% block content %}
+  <div class="flex items-center">
+    <h2 class="f4 dib br3 ttu mr4">{{ dataset_id }}</h2>
+    {% url "api_run_indexer" dataset_id as reindex_url %}
+    {% include "api_button.html" with label="Queue reindex" endpoint=reindex_url method="POST" %}
+  </div>
+
+  <ul class="list pl0">
+    {% for task in history %}
+      <li class="pv3 cf">
+        <article>
+          {% include "indexing_task.html" with task=task %}
+        </article>
+    {% endfor %}
+  </ul>
+
+  <script>
+    (function () {
+      window.callIndexerAPI = async function (url, method) {
+        await fetch(url, {
+          method: method,
+          headers: {
+            'X-IETF-Token': '{{ api_secret }}',
+          },
+        });
+        document.location.reload();
+      }
+    })();
+  </script>
+{% endblock %}

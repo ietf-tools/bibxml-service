@@ -1,6 +1,12 @@
 daphne>=3.0,<4.0
 Django>=3.0,<4.0
 psycopg2
+celery>=4.0,<5.0
+redis>=3.0,<4.0
+types-redis
+pyyaml>=5.4
+types-PyYAML
+gitpython>=3.1,<4.0
 requests_cache>=0.7.4,<1.0
 doi2ietf>=0.1.2
 flake8

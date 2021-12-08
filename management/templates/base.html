@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}IETF BibXML indexer{% endblock %}</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      input {
+        padding: 0;
+        border: none;
+      }
+    </style>
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+  </head>
+
+  <body class="sans-serif">
+
+    {% if snapshot %}
+      <aside class="ph3 ph5-ns">
+        <span class="f7 black-20 nowrap code truncate" title="Running commit from {{ snapshot.time }}">
+          {{ snapshot.hash|slice:5 }}
+        </span>
+      </aside>
+    {% endif %}
+
+    <header>
+      <nav class="ph3 ph5-ns pv3">
+        <div class="nowrap overflow-x-auto">
+          <h1 class="f5 f4-ns dib mr3">
+            <a class="link dim" href="{% url "manage" %}">IETF BibXML indexer</a>
+          </h1>
+          {% for ds_id in known_datasets %}
+            <a class="
+                  link
+                  {% if dataset_id == ds_id %}underline{% endif %}
+                  dim
+                  {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+                  f5 f4-ns dib mr3
+                " href="{% url "manage_dataset" ds_id %}">
+              {{ ds_id }}
+            </a>
+          {% endfor %}
+        </div>
+      </nav>
+      {% block header %}{% endblock %}
+    </header>
+
+    <main class="ph3 ph5-ns">
+      {% block content %}{% endblock %}
+    </main>
+
+  </body>
+
+</html>

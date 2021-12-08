@@ -1,0 +1,135 @@
+version: "3.9"
+
+services:
+  # Single instance only.
+  redis:
+    image: redis
+
+  # Single instance only.
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    hostname: db
+    environment:
+      POSTGRES_DB: ${DB_NAME:?missing DB name}
+      POSTGRES_USER: ${DB_NAME:?err}
+      POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
+
+  # Must be run once, pre deploy.
+  # Built image is reused by "web" and "celery".
+  web-precheck:
+    restart: "on-failure:10" # Restart, typically if DB is not ready to accept connections yet
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/web-precheck:latest
+    command:
+      - /bin/sh
+      - -c
+      - |
+        python manage.py migrate &&
+        python manage.py migrate --database=index &&
+        python manage.py check --deploy
+    environment:
+      PRIMARY_HOSTNAME: ${HOST:?err}
+      DATASET_TMP_ROOT: "/code/datasets"
+      DEBUG: ${DEBUG:-0}
+      DJANGO_SECRET: "${DJANGO_SECRET:?err}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_NAME:?err}
+      DB_NAME: ${DB_NAME:?err}
+      DB_SECRET: ${DB_SECRET:?err}
+      CELERY_BROKER_URL: "redis://redis:6379"
+      CELERY_RESULT_BACKEND: "redis://redis:6379"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - db
+      - redis
+
+  # Can be run in multiple instances.
+  web:
+    image: local/web-precheck:latest
+    hostname: web
+    command:
+      - /bin/sh
+      - -c
+      - |
+        export SNAPSHOT_HASH=$$(git rev-parse HEAD) &&
+        export SNAPSHOT_TIME=$$(git log -1 --format=%cd) &&
+        ./wait-for-migrations.sh &&
+        python manage.py collectstatic --noinput &&
+        if [ "$DEBUG" = "1" ]; then
+          python manage.py runserver 0.0.0.0:8000
+        else
+          daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
+        fi
+    ports:
+      - "${PORT:?missing port to expose web service under}:8000"
+    environment:
+      PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
+      DEBUG: ${DEBUG:-0}
+      DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_NAME:?err}
+      DB_NAME: ${DB_NAME:?err}
+      DB_SECRET: "${DB_SECRET:?err}"
+      PYTHONUNBUFFERED: 1
+
+      # Indexer-specific
+      # TODO: Some environment variables could be removed from web container, and only made available to celery
+      API_SECRET: "${API_SECRET:?missing API secret}"
+      DATASET_TMP_ROOT: "/code/datasets"
+      CELERY_BROKER_URL: "redis://redis:6379"
+      CELERY_RESULT_BACKEND: "redis://redis:6379"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - web-precheck
+
+  # Single instance only.
+  celery:
+    image: local/web-precheck:latest
+    restart: always
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ./wait-for-migrations.sh &&
+        celery -A management worker -l info -c 1
+    volumes:
+      - ./data/datasets:/code/datasets
+    environment:
+      PRIMARY_HOSTNAME: ${HOST:?err}
+      DATASET_TMP_ROOT: "/code/datasets"
+      DEBUG: ${DEBUG:-0}
+      DJANGO_SECRET: "${DJANGO_SECRET:?err}"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_NAME:?err}
+      DB_NAME: ${DB_NAME:?err}
+      DB_SECRET: ${DB_SECRET:?err}
+      CELERY_BROKER_URL: "redis://redis:6379"
+      CELERY_RESULT_BACKEND: "redis://redis:6379"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - web-precheck
+
+  # Can be run in multiple instances, but no reason for that.
+  # May be deprecated.
+  flower:
+    image: mher/flower
+    hostname: flower
+    environment:
+      CELERY_BROKER_URL: "redis://redis:6379"
+      CELERY_RESULT_BACKEND: "redis://redis:6379"
+    depends_on:
+      - celery
+    ports:
+      - "5555:5555"

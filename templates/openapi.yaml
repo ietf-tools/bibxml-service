@@ -4,7 +4,9 @@ info:
   title: IETF BibXML service
   description: |
     IETF BibXML service provides an open and public API for its users to fetch references from.
-    NOTE: Not all 500 responses are currently provided per the spec, wrapped in JSON.
+
+    NOTE: Not all 500 responses are currently provided per the spec
+    (wrapped in JSON and with immutable error codes).
   contact:
     email: ietf-ribose@ribose.com
   license:
@@ -13,10 +15,11 @@ info:
   version: 0.0.1
 
 servers:
-- url: /
+- url: /api/v1
 
 paths:
-  /api/v1/ref/{dataset}/{ref_id}/:
+
+  /ref/{dataset}/{ref_id}/:
     parameters:
     - name: dataset
       in: path
@@ -75,7 +78,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /api/v1/search/{query}/:
+  /search/{query}/:
     parameters:
     - name: query
       in: path
@@ -90,6 +93,9 @@ paths:
       summary: Search citations
       description: |
         Find citations across indexed (non-external) datasets that match given query.
+
+        NOTE: as of now, this API may not return the latest and complete results at all times,
+        as various source indexes could be cleared and/or be mid-indexation.
       parameters:
       - name: query_format
         in: query
@@ -126,38 +132,146 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /public/rfc/{legacy_dataset}/{legacy_reference}.xml:
+  /management/datasets/{dataset}/reindex/:
     parameters:
-    - name: legacy_dataset
+    - name: dataset
       in: path
-      description: Legacy dataset ID
+      description: Dataset ID
       required: true
       schema:
-        $ref: '#/components/schemas/AvailableLegacyDatasets'
-    - name: legacy_reference
+        $ref: '#/components/schemas/IndexableDatasets'
+    post:
+      summary: (Re)index dataset
+      description: |
+        Indexing dataset sources is required to enable searching across citation metadata.
+        Currently, indexing is done manually.
+        A call to this endpoint reindexes either the entire dataset or specified refs
+        from dataset source(s).
+      operationId: indexDataset
+      consumes:
+      - application/x-www-form-urlencoded
+      requestBody:
+        description: Indexation options.
+        content:
+          'application/x-www-form-urlencoded':
+            schema:
+              type: object
+              properties:
+                refs:
+                  description: Comma-separated list of refs to index (if not provided, the entire dataset is reindexed)
+                  type: array
+                  items:
+                    type: string
+            encoding:
+              refs:
+                style: form
+                explode: false
+      responses:
+        200:
+          description: Indexing task had been queued (does not mean indexing completed without errors)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        500:
+          description: Queueing failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /management/datasets/{dataset}/reset-index/:
+    parameters:
+    - name: dataset
       in: path
-      description: Legacy standard reference. Format is dependent on legacy dataset, but typically starts with `reference.*.` Special characters, such as forward slashes, must be URL-escaped.
+      description: Dataset ID
       required: true
       schema:
-        example: reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102
-        type: string
-    get:
-      summary: Get citation by XML2RFC tools path
-      description: Returned citation is always in BibXML format. This endpoint returns raw XML response.
+        $ref: '#/components/schemas/IndexableDatasets'
+    post:
+      summary: Clear dataset index
+      description: Clears indexed data for given dataset; notably, does not abort any indexing tasks queued or progressing.
+      operationId: resetDatasetIndex
       responses:
         200:
           description: successful operation
           content:
-            application/xml:
+            application/json:
               schema:
-                type: string
-
-        404:
-          description: reference not found, or legacy dataset is not known
+                $ref: '#/components/schemas/SuccessMessage'
+        500:
+          description: operation failed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /management/datasets/{dataset}/get-index-status/:
+    parameters:
+    - name: dataset
+      in: path
+      description: Dataset ID
+      required: true
+      schema:
+        $ref: '#/components/schemas/IndexableDatasets'
+    get:
+      summary: Get dataset status
+      description: |
+        Returns a list of recent indexing tasks for given dataset, starting from most recently started task.
+      operationId: getDatasetTaskStatus
+      responses:
+        200:
+          description: successful operation, shows index current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexerStatus'
+
+  /management/tasks/{task_id}/stop/:
+    parameters:
+    - name: task_id
+      in: path
+      description: Task ID. Can be obtained from dataset status endpoint.
+      required: true
+      schema:
+        $ref: '#/components/schemas/IndexableDatasets'
+    post:
+      summary: Stop task 
+      description: Revokes given task, and attempts to terminate if running.
+      operationId: stopTask
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        500:
+          description: operation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /management/tasks/stop-all/:
+    post:
+      summary: Revoke all tasks
+      description: Revokes any pending tasks. Tries to terminate already running ones, but no guarantees.
+      operationId: stopAllTasks
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        500:
+          description: operation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
 
 
 components:
@@ -166,33 +280,12 @@ components:
 
     AvailableDatasets:
       type: string
-      # TODO: Auto-generate available dataset list at deployment time?
       enum:
-      - rfcs
-      - ids
-      - rfcsubseries
-      - misc
-      - w3c
-      - 3gpp
-      - ieee
-      - iana
-      - doi
-      - nist
-      description: |
-        For up-to-date list of available datasets,
-        see bibxml-data-* repositories under ietf-ribose GitHub organization.
-        See also bibxml-indexer service README.
-
-    AvailableLegacyDatasets:
-      type: string
-      enum:
-      {% for ds_id in legacy_dataset_ids %}
+      {% for ds_id in known_dataset_ids %}
       - {{ ds_id }}
       {% endfor %}
       description: |
-        For up-to-date list of available datasets,
-        see bibxml-data-* repositories under ietf-ribose GitHub organization.
-        See also bibxml-indexer service README.
+        Available legacy dataset IDs. This list is generated at runtime.
 
     CitationDetailsResponse:
       type: object
@@ -320,3 +413,111 @@ components:
       required:
       - docid
       - doctype
+
+    IndexableDatasets:
+      type: string
+      # TODO: Auto-generate this list at deployment time?
+      enum:
+      - rfcs
+      - ids
+      - rfcsubseries
+      - misc
+      - w3c
+      - 3gpp
+      - ieee
+      - iana
+      - doi
+      - nist
+      description: |
+        For up-to-date list of available datasets,
+        see bibxml-data-* repositories under ietf-ribose GitHub organization.
+        See also bibxml-indexer service README.
+
+    IndexerStatus:
+      type: object
+      description: Recent dataset indexing task history
+      properties:
+        tasks:
+          description: A list of most recent indexing tasks for given dataset
+          type: array
+          items:
+            type: object
+            description: Describes indexing task
+            required:
+              - task_id
+              - status
+            properties:
+              task_id:
+                format: string
+                description: Task ID; can be used to cancel this task using the tasks endpoint
+              status:
+                type: string
+                description: Short status keyword (e.g., STARTED, PROGRESS, FAILED or similar; not strictly normalized)
+
+              dataset_id:
+                format: string
+                description: Dataset ID
+              requested_refs:
+                type: array
+                description: Refs that were requested for indexing
+                items:
+                  type: string
+
+              started_at:
+                type: string
+                format: datetime
+
+              action:
+                type: string
+                description: For a task in progress, human-readable summary of what’s currently happening
+              progress:
+                description: For a task in progress, completion progress
+                type: object
+                required:
+                  - current
+                properties:
+                  total:
+                    description: Total, e.g. number of source files found
+                    type: integer
+                  current:
+                    description: Current item, e.g. number of indexed files so far
+                    type: integer
+
+              completed_at:
+                type: string
+                format: datetime
+                description: For a successful task, completion timestamp
+              outcome_summary:
+                type: string
+                description: For a successful task, human-readable description of the outcome
+
+              error:
+                type: object
+                description: For a failed task, error details
+                properties:
+                  type:
+                    type: string
+                  message:
+                    type: string
+
+    SuccessMessage:
+      type: object
+      description: Generic success response
+      properties:
+        message:
+          type: string
+          description: Human-readable success message
+
+    ErrorMessage:
+      type: object
+      description: Generic error response
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              description: Code for automatic error processing
+            message:
+              type: string
+              description: Human-readable error message

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <p class="f5 lh-copy">
+    Choose a dataset to manage.
+  </p>
+
+  <h2 class="f5">Running task(s)</h2>
+  {% if running_tasks %}
+    <ul class="list pl0">
+      {% for task in running_tasks %}
+        <li class="pv3 cf">
+          <article>
+            {% include "indexing_task.html" with task=task %}
+          </article>
+      {% endfor %}
+    </ul>
+  {% else %}
+    None.
+  {% endif %}
+
+  <div class="pv5">
+    <h2 class="f5">See also</h2>
+    <ul class="list pl0">
+      <li>
+        <a href="{% url "api_index" %}" target="_blank" class="link">
+          API reference &rarr;
+        </a>
+      <li>
+        <a href="//{{ task_monitor_host }}" target="_blank" class="link">
+          Worker dashboard at {{ task_monitor_host }} &rarr;
+        </a>
+    </ul>
+  </div>
+{% endblock %}

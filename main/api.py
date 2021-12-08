@@ -5,6 +5,7 @@ from urllib.parse import unquote_plus
 from django.http import HttpResponse, JsonResponse
 from django.db.models.query import Q
 from django.conf import settings
+from django.shortcuts import render
 
 from main.exceptions import RefNotFoundError
 
@@ -26,34 +27,17 @@ DEFAULT_LEGACY_QUERY_BUILDER = (
 
 
 def index(request):
-    """Serves API index."""
+    """Serves human-readable spec for main API."""
+    return render(request, "human_readable_openapi_spec.html", dict(
+        spec_url="/openapi.yaml",
+    ))
 
-    return HttpResponse("""
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>API documentation</title>
 
-            <meta charset="utf-8"/>
-            <meta name="viewport"
-                content="width=device-width,
-                initial-scale=1">
-
-            <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
-
-            <style>
-              body {
-                margin: 0;
-                padding: 0;
-              }
-            </style>
-          </head>
-          <body>
-            <redoc spec-url='/openapi.yaml'></redoc>
-            <script src="https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js"></script>
-          </body>
-        </html>
-    """)
+def index_legacy(request):
+    """Serves human-readable spec for compatibility/legacy API."""
+    return render(request, "human_readable_openapi_spec.html", dict(
+        spec_url="/openapi-legacy.yaml",
+    ))
 
 
 def get_ref(request, dataset_name, ref):
@@ -181,3 +165,6 @@ class CitationSearchResultListView(BaseCitationSearchView):
             "meta": meta,
             "data": [obj.body for obj in context['object_list']],
         })
+
+
+# Human-readable API spec
