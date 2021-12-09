@@ -166,6 +166,8 @@ paths:
               refs:
                 style: form
                 explode: false
+      security:
+      - APIKeyAuth: []
       responses:
         200:
           description: Indexing task had been queued (does not mean indexing completed without errors)
@@ -192,6 +194,8 @@ paths:
       summary: Clear dataset index
       description: Clears indexed data for given dataset; notably, does not abort any indexing tasks queued or progressing.
       operationId: resetDatasetIndex
+      security:
+      - APIKeyAuth: []
       responses:
         200:
           description: successful operation
@@ -239,7 +243,8 @@ paths:
       summary: Stop task 
       description: Revokes given task, and attempts to terminate if running.
       operationId: stopTask
-
+      security:
+      - APIKeyAuth: []
       responses:
         200:
           description: successful operation
@@ -259,6 +264,8 @@ paths:
       summary: Revoke all tasks
       description: Revokes any pending tasks. Tries to terminate already running ones, but no guarantees.
       operationId: stopAllTasks
+      security:
+      - APIKeyAuth: []
       responses:
         200:
           description: successful operation
@@ -521,3 +528,9 @@ components:
             message:
               type: string
               description: Human-readable error message
+
+  securitySchemes:
+    APIKeyAuth:
+      type: apiKey
+      in: header
+      name: X-IETF-Token
