@@ -52,7 +52,7 @@ def get_indexed_ref(dataset_id, ref, format='relaton'):
     :raises RefNotFoundError: either reference or requested format not found
     """
 
-    return get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref))
+    return get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref), format)
 
 
 def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
