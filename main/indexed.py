@@ -43,6 +43,25 @@ def search_refs_relaton_struct(obj: Union[dict, list]) -> QuerySet[RefData]:
             ''', [json.dumps(obj)]))
 
 
+def list_doctypes() -> list[str]:
+    """Lists all distinct ``docid[*].doctype`` values among citation data.
+    """
+    return (
+        RefDataManager.
+        raw('''
+            select distinct on (doctype) id, doctype
+            from (
+                select id, jsonb_array_elements_text(
+                    jsonb_path_query_array(
+                        body,
+                        '$.docid[*].type'
+                    )
+                ) as doctype
+                from api_ref_data
+            ) as item
+            '''))
+
+
 def get_indexed_ref(dataset_id, ref, format='relaton'):
     """Retrieves citation from static indexed dataset.
 
