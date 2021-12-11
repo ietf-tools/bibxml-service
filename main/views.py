@@ -174,7 +174,6 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
     def get_context_data(self, **kwargs):
         return dict(
             **super().get_context_data(**kwargs),
-            query=self.request.GET.get('query'),
             **shared_context,
         )
 

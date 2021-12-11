@@ -1,7 +1,8 @@
 import json
-from typing import Union, Callable
+from typing import Callable
 from urllib.parse import unquote_plus
 
+from django.http import HttpResponseBadRequest
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
 
@@ -16,54 +17,95 @@ class BaseCitationSearchView(BaseListView):
     query_in_path = False
     show_all_by_default = False
 
-    def get(self, request, *args, **kwargs):
-        if not self.query_in_path:
-            raw_query = request.GET.get('query', None)
-        else:
-            raw_query = kwargs.get('query')
+    supported_query_formats = (
+        'json_repr',
+        'json_struct',
+    )
 
-        self.query_func, self.query = self.parse_query(
-            raw_query,
-            request.GET.get('query_format', 'json_repr'))
+    def get(self, request, *args, **kwargs):
+        try:
+            self.dispatch_parse_query(request, **kwargs)
+        except UnsupportedQueryFormat:
+            return HttpResponseBadRequest("Unsupported query format")
+        except ValueError:
+            return HttpResponseBadRequest("Unable to parse query")
 
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet[RefData]:
-        if self.query_func is not None and self.query is not None:
-            return self.query_func(self.query)
+        if self.query is not None and self.query_format is not None:
+            return self.dispatch_do_query(self.query)
         else:
             if self.show_all_by_default:
                 return RefDataManager.all()
             else:
                 return RefDataManager.none()
 
-    def parse_query(
-        self, raw_query: Union[str, None],
-        mechanism: str) -> Union[tuple[Callable[[str],
-                                                QuerySet[RefData]],
-                                       str],
-                                 tuple[Callable[[Union[dict, list]],
-                                                QuerySet[RefData]],
-                                       Union[dict, list]],
-                                 tuple[None, None]]:
+    def get_context_data(self, **kwargs):
+        return dict(
+            **super().get_context_data(**kwargs),
+            query=self.query,
+        )
 
-        # Somebody help reign in flake8…
+    def dispatch_parse_query(self, request, **kwargs):
+        """Parses query and sets up necessary instance attributes
+        as a side effect. Guarantees self.query and self.query_format
+        will be present.
 
-        if mechanism not in ['json_repr', 'json_struct']:
-            raise ValueError("Invalid query mechanism")
+        Can throw exceptions due to bad input."""
+
+        if not self.query_in_path:
+            raw_query = request.GET.get('query', None)
+        else:
+            raw_query = kwargs.get('query')
+
+        query_format = request.GET.get('query_format', 'json_repr')
 
         if raw_query:
-            prepared_query = unquote_plus(raw_query).strip()
+            unquoted_query = unquote_plus(raw_query).strip()
 
-            if prepared_query:
-                if mechanism == 'json_repr':
-                    return (search_refs_json_repr_match, prepared_query)
-                else:
-                    try:
-                        struct = json.loads(prepared_query)
-                    except json.JSONDecodeError:
-                        raise ValueError("Invalid query format")
-                    else:
-                        return (search_refs_relaton_struct, struct)
+            if query_format.lower() in self.supported_query_formats:
+                parser = getattr(
+                    self,
+                    'parse_%s_query' % query_format.lower(),
+                    self.parse_unsupported_query)
+            else:
+                parser = self.parse_unsupported_query
 
-        return (None, None)
+            self.query = parser(unquoted_query)
+            self.query_format = query_format
+
+        else:
+            self.query = None
+            self.query_format = None
+
+    def dispatch_do_query(self, query):
+        """Handles query.
+        Should not throw exceptions arising from bad input."""
+
+        handler = getattr(self, 'handle_%s_query' % self.query_format)
+        return handler(query)
+
+    def parse_unsupported_query(self, query_format: str, query: str):
+        raise UnsupportedQueryFormat()
+
+    def parse_json_repr_query(self, query: str) -> str:
+        return query
+
+    def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
+        return search_refs_json_repr_match(query)
+
+    def parse_json_struct_query(self, query: str) -> dict:
+        try:
+            struct = json.loads(query)
+        except json.JSONDecodeError:
+            raise ValueError("Invalid query format")
+        else:
+            return struct
+
+    def handle_json_struct_query(self, query: dict) -> QuerySet[RefData]:
+        return search_refs_relaton_struct(query)
+
+
+class UnsupportedQueryFormat(ValueError):
+    pass
