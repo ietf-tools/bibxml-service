@@ -10,7 +10,8 @@ from .exceptions import RefNotFoundError
 from .models import RefData
 
 
-RefDataManager = RefData.objects.db_manager('index')
+# TODO: Obsolete, now that we gave up on multi-DB approach
+RefDataManager = RefData.objects
 
 
 def list_refs(dataset_id) -> QuerySet[RefData]:
