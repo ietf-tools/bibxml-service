@@ -65,10 +65,6 @@ WSGI_APPLICATION = 'bibxml.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'bibxml-service',
-    },
-    'index': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': environ.get('DB_NAME'),
         'USER': environ.get('DB_USER'),
@@ -77,9 +73,6 @@ DATABASES = {
         'PORT': int(environ.get('DB_PORT') or 5432),
     }
 }
-DATABASE_ROUTERS = (
-    'bibxml.dbrouters.IndexDBRouter',
-)
 
 
 # NOTE: This project isn’t intended to be used with conventional Django auth,

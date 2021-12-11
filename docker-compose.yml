@@ -29,7 +29,6 @@ services:
       - -c
       - |
         python manage.py migrate &&
-        python manage.py migrate --database=index &&
         python manage.py check --deploy
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
