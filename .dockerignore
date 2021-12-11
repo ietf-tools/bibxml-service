@@ -1,0 +1,5 @@
+env
+build
+data
+*.sqlite
+*.pyc
