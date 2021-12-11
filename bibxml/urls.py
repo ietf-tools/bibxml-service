@@ -97,6 +97,15 @@ urlpatterns = [
             ])),
         ])),
 
+        path('docid/', include([
+            path('', require_safe(
+                public_views.browse_citation_by_docid
+            ), name='browse_citation_by_docid_redirect'),
+            path('<doctype>/<path:docid>/', require_safe(
+                public_views.browse_citation_by_docid
+            ), name='browse_citation_by_docid'),
+        ])),
+
         path('search/', require_safe(
             public_views.CitationSearchResultListView.as_view()
         ), name='search_citations'),

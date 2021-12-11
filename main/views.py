@@ -15,7 +15,8 @@ from bibxml import error_views
 
 from .exceptions import RefNotFoundError
 from .models import RefData
-from .indexed import get_indexed_ref, list_refs
+from .indexed import get_indexed_ref, list_refs, list_doctypes
+from .indexed import search_refs_relaton_struct
 from .external import get_doi_ref
 from .util import BaseCitationSearchView
 
@@ -64,6 +65,57 @@ def browse_external_citation(request, dataset_id):
     return HttpResponseRedirect(origin)
 
 
+def browse_citation_by_docid(request, doctype=None, docid=None):
+    if doctype and docid:
+        citations = search_refs_relaton_struct({
+            'docid': [{
+                'type': doctype,
+                'id': docid,
+            }],
+        })
+        num_citations = len(citations)
+        if num_citations == 1:
+            citation = citations[0]
+            return render(request, 'browse/citation_details.html', dict(
+                dataset_id=citation.dataset,
+                ref=citation.ref,
+                data=citation.body,
+                **shared_context,
+            ))
+        elif num_citations == 0:
+            return HttpResponseNotFound(
+                "Citation with docid.type {} and docid.id {} "
+                "was not found in indexed sources".format(
+                    doctype,
+                    docid,
+                ))
+        else:
+            return HttpResponseNotFound(
+                "Multiple citations with docid.type {} and docid.id {} "
+                "were found in indexed sources".format(
+                    doctype,
+                    docid
+                ))
+    else:
+        # Faciliates searching by doctype via a regular HTML form.
+        doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+        citations = search_refs_relaton_struct({
+            'docid': [{
+                'type': doctype,
+                'id': docid,
+            }],
+        })
+        if len(citations) == 1:
+            return redirect('browse_citation_by_docid', doctype, docid)
+        else:
+            messages.error(
+                request,
+                "No reliable match for a citation "
+                "matching doctype “{}” and ID “{}” "
+                "among indexed datasets.".format(doctype, docid))
+            return HttpResponseRedirect(request.headers.get('referer', '/'))
+
+
 def browse_citations(request, dataset_id=None, ref=None):
     if dataset_id is not None:
         if ref is not None:
@@ -109,6 +161,7 @@ def browse_citations(request, dataset_id=None, ref=None):
     return render(request, 'browse/home.html', dict(
         **shared_context,
         browsable_datasets=browsable_datasets,
+        doctypes=list_doctypes(),
     ))
 
 
