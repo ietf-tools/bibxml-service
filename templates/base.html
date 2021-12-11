@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="{% block root_html_class %}{% endblock %}" {% block root_html_attrs %}{% endblock %}>
+  <head>
+    <title>{% block title %}IETF BibXML service{% endblock %}</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1">
+
+    <link rel="stylesheet" href="{% static "css/reset.css" %}" />
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
+
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body class="sans-serif">
+
+    {% if snapshot %}
+      <aside class="ph3 ph5-ns">
+        <span class="f7 black-20 nowrap code truncate" title="Running commit from {{ snapshot.time }}">
+          {{ snapshot.hash|slice:5 }}
+        </span>
+      </aside>
+    {% endif %}
+
+    <header>
+      <nav class="ph3 ph5-ns pv3">
+        <div class="nowrap overflow-x-auto">
+          <h1 class="f5 f4-ns dib mr3 relative">
+            <a class="link dim" href="{% block home_link %}{% url "browse" %}{% endblock %}">
+              IETF BibXML service
+            </a>
+          </h1>
+          {% block nav %}
+            {% for ds_id in known_datasets %}
+              <a class="
+                    link
+                    {% if dataset_id == ds_id %}underline{% endif %}
+                    dim
+                    {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+                    f5 f4-ns dib mr3
+                  " href="{% url "browse_dataset" ds_id %}">
+                {{ ds_id }}
+              </a>
+            {% endfor %}
+          {% endblock %}
+        </div>
+      </nav>
+      {% block header %}{% endblock %}
+    </header>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flex items-center pa2 ph3 ph4-ns mb3
+            {% if "error" in message.tags %}bg-washed-red dark-red
+            {% else %}bg-lightest-blue navy
+            {% endif %}">
+          <svg class="w1" data-icon="info" viewBox="0 0 32 32" style="fill: currentcolor">
+            <title>info icon</title>
+            <path d="M16 0 A16 16 0 0 1 16 32 A16 16 0 0 1 16 0 M19 15 L13 15 L13 26 L19 26 z M16 6 A3 3 0 0 0 16 12 A3 3 0 0 0 16 6"></path>
+          </svg>
+          <span class="lh-title ml3 w-75 lh-solid">{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <main class="ph3 ph5-ns">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+
+  </body>
+
+</html>

@@ -25,7 +25,7 @@
   {% endif %}
   {% if task.progress or task.action %}
     {% url "api_stop_task" task.task_id as stop_task_url %}
-    {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True %}
+    {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" %}
   {% endif %}
   {% if task.outcome_summary %}
     <p class="db f5 mb1">{{ task.outcome_summary }}</p>

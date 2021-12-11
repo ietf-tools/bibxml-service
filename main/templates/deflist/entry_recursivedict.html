@@ -5,7 +5,7 @@
   {% if val.items %}
     <dl class="pl4 ma0">
       {% for key, val in val.items %}
-        {% include "meta_row_recursivedict.html" with key=key val=val %}
+        {% include "deflist/entry_recursivedict.html" with key=key val=val %}
       {% endfor %}
     </dl>
   {% else %}

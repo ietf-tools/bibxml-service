@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  Management
+{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static "css/management.css" %}" />
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="{% static "js/api-button.js" %}"></script>
+{% endblock %}
+
+{% block root_html_attrs %}data-api-secret="{{ api_secret }}"{% endblock %}
+
+{% block root_html_class %}management{% endblock %}
+
+{% block home_link %}{% url "manage" %}{% endblock %}
+
+{% block nav %}
+  {% for ds_id in known_datasets %}
+    <a class="
+          link
+          {% if dataset_id == ds_id %}underline{% endif %}
+          dim
+          {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+          f5 f4-ns dib mr3
+        " href="{% url "manage_dataset" ds_id %}">
+      {{ ds_id }}
+    </a>
+  {% endfor %}
+{% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "browse/base.html" %}
 
 {% load relaton %}
 
@@ -47,7 +47,7 @@
       {% for citation in object_list %}
         <li class="pv2 cf bt {% if forloop.last %}bb{% endif %} b--light-gray">
           <article>
-            {% include "citation_in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
+            {% include "citation/in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
           </article>
       {% endfor %}
     </ul>

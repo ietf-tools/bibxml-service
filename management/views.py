@@ -9,6 +9,7 @@ from .task_status import list_running_tasks
 
 
 shared_context = dict(
+    # NOTE: Use this context only in auth-guarded views
     api_secret=settings.API_SECRET,
     known_datasets=settings.KNOWN_DATASETS,
     authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
@@ -21,7 +22,7 @@ def manage(request):
         describe_indexing_task(tid)
         for tid in list_running_tasks()]
 
-    return render(request, 'manage.html', dict(
+    return render(request, 'management/home.html', dict(
         **shared_context,
         running_tasks=running_tasks,
         task_monitor_host="{}:{}".format(
@@ -31,7 +32,7 @@ def manage(request):
 
 
 def manage_dataset(request, dataset_id):
-    return render(request, 'manage_dataset.html', dict(
+    return render(request, 'management/dataset.html', dict(
         **shared_context,
         dataset_id=dataset_id,
         history=get_dataset_task_history(dataset_id),

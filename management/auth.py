@@ -1,3 +1,7 @@
+"""Authentication uses token provided via API_SECRET Django setting,
+provisioned at deploy time.
+"""
+
 import functools
 import base64
 
@@ -5,7 +9,8 @@ from django.http.response import HttpResponse, HttpResponseForbidden
 from django.conf import settings
 
 
-def auth(viewfunc):
+def api(viewfunc):
+    """Header token auth. Use for management API endpoints."""
     @functools.wraps(viewfunc)
     def wrapper(request, *args, **kwargs):
         provided_secret = request.headers.get('x-ietf-token', None)
@@ -17,7 +22,8 @@ def auth(viewfunc):
     return wrapper
 
 
-def basic_auth(viewfunc):
+def basic(viewfunc):
+    """HTTP Basic auth. Use for management HTML views."""
     @functools.wraps(viewfunc)
     def wrapper(request, *args, **kwargs):
         auth = request.headers.get('authorization', '').split()

@@ -5,7 +5,6 @@ from urllib.parse import unquote_plus
 from django.http import HttpResponse, JsonResponse
 from django.db.models.query import Q
 from django.conf import settings
-from django.shortcuts import render
 
 from main.exceptions import RefNotFoundError
 
@@ -24,20 +23,6 @@ DEFAULT_LEGACY_REF_FORMATTER = (
 DEFAULT_LEGACY_QUERY_BUILDER = (
     lambda legacy_ref:
     Q(ref__iexact=DEFAULT_LEGACY_REF_FORMATTER(legacy_ref)))
-
-
-def index(request):
-    """Serves human-readable spec for main API."""
-    return render(request, "human_readable_openapi_spec.html", dict(
-        spec_url="/openapi.yaml",
-    ))
-
-
-def index_legacy(request):
-    """Serves human-readable spec for compatibility/legacy API."""
-    return render(request, "human_readable_openapi_spec.html", dict(
-        spec_url="/openapi-legacy.yaml",
-    ))
 
 
 def get_ref(request, dataset_name, ref):
@@ -165,6 +150,3 @@ class CitationSearchResultListView(BaseCitationSearchView):
             "meta": meta,
             "data": [obj.body for obj in context['object_list']],
         })
-
-
-# Human-readable API spec

@@ -1,0 +1,55 @@
+{% extends "browse/base.html" %}
+
+{% block title %}{{ block.super }} Citations{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block content %}
+
+  <div class="nowrap overflow-x-auto">
+    <h2 class="f5 dib mr3 ">Browse indexed or external source</h2>
+    {% for ds_id in browsable_datasets %}
+      <a class="
+            link
+            {% if dataset_id == ds_id %}underline{% endif %}
+            dim
+            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+            f5 f4-ns dib mr3
+          " href="{% url "browse_dataset" ds_id %}">
+        {{ ds_id }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <h2 class="f5">Search documents for substring match</h2>
+  <form class="black-80" method="GET" action="{% url "search_citations" %}">
+    <input
+      id="query"
+      name="query"
+      type="text"
+      placeholder="Search by substring match"
+      class="w-60 input-reset dib ba b--black-20 pa2"
+      aria-describedby="query-desc" />
+    <input
+      type="submit"
+      class="w-15 dim pa2 ph3 dib ba b--dark-blue bg-dark-blue white"
+      value="Search" />
+    <div id="query-desc" class="f6 black-60 db mb4 measure lh-copy">
+      <p>Some operators are supported.
+         Example query: <code class="nowrap pa1 ph2 bg-light-gray black-80">+nist "metropolitan area" -"wind damage"</code>.
+      <p>Note: currently match is performed against entire JSON representations of citations.
+    </div>
+  </form>
+
+  <h2 class="f5">See also</h2>
+  <ul class="list pl0 mb5">
+    <li>
+      <a href="{% url "api_index" %}" target="_blank" class="link">
+        API reference &rarr;
+      </a>
+    <li>
+      <a href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}" target="_blank" class="link">
+        Compatibility API reference &rarr;
+      </a>
+  </ul>
+{% endblock %}

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{ title|default: "API documentation" }}</title>
+    <title>{{ title|default:"API documentation" }}</title>
 
     <meta charset="utf-8"/>
     <meta name="viewport"
@@ -18,7 +18,7 @@
     </style>
   </head>
   <body>
-    <redoc spec-url="{{ spec_url }}"></redoc>
+    <redoc spec-url="{{ spec_path }}"></redoc>
     <script src="https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js"></script>
   </body>
 </html>

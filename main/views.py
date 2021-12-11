@@ -3,10 +3,15 @@
 from urllib.parse import quote_plus, unquote_plus
 
 from django.db.models.query import QuerySet
-from django.http.response import HttpResponseBadRequest, HttpResponseNotFound
+from django.http.response import HttpResponseNotFound, Http404
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.conf import settings
-from django.views.generic.list import ListView, MultipleObjectTemplateResponseMixin
+from django.views.generic.list import ListView
+from django.views.generic.list import MultipleObjectTemplateResponseMixin
+from django.contrib import messages
+
+from bibxml import error_views
 
 from .exceptions import RefNotFoundError
 from .models import RefData
@@ -24,15 +29,39 @@ shared_context = dict(
 
 
 def browse_external_citation(request, dataset_id):
+    """Validates external citation request before
+    redirecting to citation details view.
+
+    Intended to simplify handling HTML forms.
+    """
+    origin = request.headers.get('referer', '/')
+
     if dataset_id not in settings.EXTERNAL_DATASETS:
-        raise HttpResponseBadRequest("Unknown external dataset")
+        messages.error(
+            request,
+            "Unknown external dataset {}".format(dataset_id))
+
     if dataset_id == 'doi':
         ref = request.GET.get('ref')
-        if not ref:
-            return HttpResponseBadRequest("No ref is given")
-        return redirect('browse_citation', dataset_id, quote_plus(ref))
+        if ref:
+            try:
+                get_doi_ref(ref)
+            except RuntimeError as exc:
+                messages.error(
+                    request,
+                    "Couldn’t retrieve citation: {}".format(
+                        str(exc)))
+            else:
+                return redirect('browse_citation', dataset_id, quote_plus(ref))
+        else:
+            messages.error(request, "Missing reference to fetch {}")
     else:
-        raise HttpResponseBadRequest("Unsupported external dataset")
+        messages.error(
+            request,
+            "Unsupported external dataset {}".format(dataset_id))
+
+    # If we’re here, it must’ve failed
+    return HttpResponseRedirect(origin)
 
 
 def browse_citations(request, dataset_id=None, ref=None):
@@ -41,34 +70,52 @@ def browse_citations(request, dataset_id=None, ref=None):
             parsed_ref = unquote_plus(ref)
             try:
                 if dataset_id == 'doi':
-                    data = get_doi_ref(parsed_ref)
+                    try:
+                        data = get_doi_ref(parsed_ref)
+                    except Exception:
+                        return error_views.server_error(request)
                 else:
                     data = get_indexed_ref(dataset_id, parsed_ref)
             except RefNotFoundError:
-                return HttpResponseNotFound(
-                    "Requested reference not found: {}".
-                    format(parsed_ref))
+                raise Http404(
+                    "Requested reference “{}” "
+                    "could not be found in dataset “{}” "
+                    "(or external source is unavailable)".format(
+                        parsed_ref,
+                        dataset_id))
             else:
-                return render(request, 'browse_citation.html', dict(
+                return render(request, 'browse/citation_details.html', dict(
                     dataset_id=dataset_id,
                     ref=ref,
                     data=data,
                     **shared_context,
                 ))
-        return render(request, 'browse_dataset.html', dict(
+        return render(request, 'browse/dataset.html', dict(
             dataset_id=dataset_id,
             citations=list_refs(dataset_id),
             **shared_context,
         ))
-    return render(request, 'browse.html', dict(
+
+    non_empty_datasets = (
+        RefData.objects.values_list('dataset', flat=True).
+        distinct())
+
+    browsable_datasets = [
+        ds_id
+        for ds_id in shared_context['known_datasets']
+        if ds_id in non_empty_datasets
+        or ds_id in shared_context['external_datasets']]
+
+    return render(request, 'browse/home.html', dict(
         **shared_context,
+        browsable_datasets=browsable_datasets,
     ))
 
 
 class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
-    template_name = 'search_citations.html'
+    template_name = 'browse/search_citations.html'
     show_all_by_default = True
 
     def get_context_data(self, **kwargs):
@@ -82,7 +129,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
 class CitationListView(ListView):
     model = RefData
     paginate_by = 20
-    template_name = 'browse_dataset.html'
+    template_name = 'browse/dataset.html'
 
     def get_queryset(self) -> QuerySet[RefData]:
         return list_refs(self.kwargs['dataset_id'])
