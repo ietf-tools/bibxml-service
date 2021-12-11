@@ -53,6 +53,8 @@ services:
   web:
     image: local/web-precheck:latest
     hostname: web
+    volumes:
+      - .:/code
     command:
       - /bin/sh
       - -c
@@ -101,6 +103,7 @@ services:
         ./wait-for-migrations.sh &&
         celery -A management worker -l info -c 1
     volumes:
+      - .:/code
       - ./data/datasets:/code/datasets
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
