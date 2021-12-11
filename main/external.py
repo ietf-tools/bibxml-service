@@ -1,3 +1,5 @@
+import requests
+from simplejson import JSONDecodeError
 import requests_cache
 from doi2ietf import process_doi_list
 
@@ -19,7 +21,14 @@ def get_doi_ref(ref, format='relaton'):
     with requests_cache.enabled():
         doi_format = 'DICT' if format == 'relaton' else 'XML'
 
-        doi_list = process_doi_list([ref], doi_format)
+        try:
+            doi_list = process_doi_list([ref], doi_format)
+        except requests.exceptions.ConnectionError:
+            raise RuntimeError("Error connecting to external source")
+        except JSONDecodeError:
+            raise RuntimeError("Could not decode external source response")
+        except RuntimeError:
+            raise
 
         if len(doi_list) > 0:
             # TODO: What to do with multiple DOI results for a reference?
