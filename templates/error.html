@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  {{ error_title|default:"Server error" }}
+{% endblock %}
+
+{% block content %}
+  <h2>{{ error_title|default:"Server error" }}</h2>
+
+  <p>
+    {{ error_description|default:"Something went wrong on our side." }}
+
+  <div class="pv5">
+    <h2 class="f5">Go to</h2>
+    <ul class="list pl0">
+      <li>
+        <a href="{% url "browse" %}" class="link">
+          Landing page &rarr;
+        </a>
+      <li>
+        <a href="{% url "api_index" %}" class="link">
+          API reference &rarr;
+        </a>
+      <li>
+        <a href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}" class="link">
+          Compatibility API reference &rarr;
+        </a>
+    </ul>
+  </div>
+{% endblock %}
