@@ -315,21 +315,3 @@ PATH_TO_DATA_DIR = environ.get('PATH_TO_DATA_DIR')
 
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
 """Where to keep fetched source data and data generated during indexing."""
-
-# TODO: Extract KNOWN_DATASETS from environment
-KNOWN_DATASETS = [
-    'rfcs',
-    'ids',
-    'rfcsubseries',
-    'misc',
-    'w3c',
-    '3gpp',
-    'ieee',
-    'iana',
-    'nist',
-]
-"""A list of known static dataset IDs.
-
-For up-to-date list of actually available datasets,
-see bibxml-data-* repositories under ietf-ribose GitHub organization.
-"""
