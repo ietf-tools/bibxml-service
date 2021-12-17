@@ -74,7 +74,10 @@
       <p>Searches indexed sources only.
       <p>Some operators are supported.
          Example query: <code class="nowrap pa1 ph2 bg-light-gray black-80">+nist "metropolitan area" -"wind damage"</code>.
-      <p>Note: currently match is performed against entire JSON representations of citations.
+      <p>
+        Note: this search matches the query against entire JSON representations of citations.
+        (API may support
+        <a href="{% url "openapi_readable_spec" "openapi_spec_main" %}#operation/searchCitations">other search mechanisms</a>.)
     </div>
   </form>
 
