@@ -55,15 +55,13 @@ class BaseCitationSearchView(BaseListView):
         Can throw exceptions due to bad input."""
 
         if not self.query_in_path:
-            raw_query = request.GET.get('query', None)
+            query = request.GET.get('query', None)
         else:
-            raw_query = kwargs.get('query')
+            query = unquote_plus(kwargs.get('query')).strip()
 
         query_format = request.GET.get('query_format', 'json_repr')
 
-        if raw_query:
-            unquoted_query = unquote_plus(raw_query).strip()
-
+        if query:
             if query_format.lower() in self.supported_query_formats:
                 parser = getattr(
                     self,
@@ -72,7 +70,7 @@ class BaseCitationSearchView(BaseListView):
             else:
                 parser = self.parse_unsupported_query
 
-            self.query = parser(unquoted_query)
+            self.query = parser(query)
             self.query_format = query_format
 
         else:
