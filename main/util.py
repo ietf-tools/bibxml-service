@@ -1,5 +1,4 @@
 import json
-from typing import Callable
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponseBadRequest
