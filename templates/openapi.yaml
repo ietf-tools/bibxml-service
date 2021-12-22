@@ -19,6 +19,65 @@ servers:
 
 paths:
 
+  /docid/{type}/{id}/:
+    parameters:
+    - name: document type
+      in: path
+      description: Dataset type.
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Document ID.
+      required: true
+      schema:
+        type: string
+
+    get:
+      parameters:
+      - name: format
+        in: query
+        description: |
+          Format to return citation in.
+          If `bibxml` is requested, returns an application/xml response;
+          otherwise application/json response with Relaton structure under `data` key.
+        schema:
+          type: string
+          default: relaton
+          enum: [bibxml, relaton]
+      summary: Get citation
+      description: >
+        Retrieve citation with given document identifier (type & ID).
+        For external datasets (currently, `doi`), this incurs an additional network request.
+      operationId: getCitationByDocId
+
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                type: string
+                description: BibXML-formatted citation
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CitationDetailsResponse'
+
+        404:
+          description: no citation found matching given docid type and id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        500:
+          description: operation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /ref/{dataset}/{ref_id}/:
     parameters:
     - name: dataset
