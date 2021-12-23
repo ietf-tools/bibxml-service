@@ -1,6 +1,13 @@
 # syntax=docker/dockerfile:1
 FROM python:3
+
+ARG SNAPSHOT_HASH
+ARG SNAPSHOT_TIME
+
 ENV PYTHONUNBUFFERED=1
+ENV SNAPSHOT_HASH=$SNAPSHOT_HASH
+ENV SNAPSHOT_TIME=$SNAPSHOT_TIME
+
 WORKDIR /code
 COPY . /code/
 RUN pip install -r requirements.txt
