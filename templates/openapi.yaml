@@ -351,7 +351,7 @@ components:
       - {{ ds_id }}
       {% endfor %}
       description: |
-        Available legacy dataset IDs. This list is generated at runtime.
+        Available dataset IDs. This list is generated at runtime.
 
     CitationDetailsResponse:
       type: object
