@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponseBadRequest
@@ -92,7 +93,7 @@ class BaseCitationSearchView(BaseListView):
     def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
         return search_refs_json_repr_match(query)
 
-    def parse_json_struct_query(self, query: str) -> dict:
+    def parse_json_struct_query(self, query: str) -> dict[str, Any]:
         try:
             struct = json.loads(query)
         except json.JSONDecodeError:
