@@ -1,0 +1,35 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: build images
+        run: |
+          docker build --no-cache --build-arg SNAPSHOT_HASH="`git rev-parse HEAD`" --build-arg SNAPSHOT_TIME="`git log -1 --format=%cd`" --platform=linux/amd64 -t bibxml .
+
+          docker tag bibxml:latest 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
+
+          docker push 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
