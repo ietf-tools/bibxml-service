@@ -56,7 +56,7 @@ class BaseCitationSearchView(BaseListView):
         if not self.query_in_path:
             query = request.GET.get('query', None)
         else:
-            query = unquote_plus(kwargs.get('query')).strip()
+            query = unquote_plus(kwargs.get('query', '')).strip()
 
         query_format = request.GET.get('query_format', 'json_repr')
 
