@@ -7,8 +7,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-image:
+  deploy:
     runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: us-east-1
+
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -26,10 +32,36 @@ jobs:
         with:
           ref: main
 
-      - name: build images
+      - name: Build images
         run: |
           docker build --no-cache --build-arg SNAPSHOT_HASH="`git rev-parse HEAD`" --build-arg SNAPSHOT_TIME="`git log -1 --format=%cd`" --platform=linux/amd64 -t bibxml .
 
           docker tag bibxml:latest 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
 
           docker push 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
+
+      - name: Setup kubeconfig
+        env:
+          EKS_CLUSTER_NAME: eks-fargate
+        run: |
+          aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v1
+
+      - name: Rollout updates
+        env:
+          KUBECONFIG: /home/runner/.kube/config
+        run: |
+          kubectl rollout restart deployment web
+          kubectl rollout restart deployment celery
+          kubectl rollout restart deployment flower
+
+      - name: Check rollout statuses
+        env:
+          KUBECONFIG: /home/runner/.kube/config
+        run: |
+          kubectl rollout status deployment web
+          kubectl rollout status deployment celery
+          kubectl rollout status deployment flower
+          kubectl get po -o wide
