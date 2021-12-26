@@ -4,7 +4,7 @@ from urllib.parse import quote_plus, unquote_plus
 
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponseNotFound, Http404
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.conf import settings
 from django.views.generic.list import ListView
@@ -23,6 +23,10 @@ from .util import BaseCitationSearchView
 
 shared_context = dict(
     known_datasets=settings.KNOWN_DATASETS,
+    indexed_datasets=[
+        ds
+        for ds in settings.KNOWN_DATASETS
+        if ds not in settings.EXTERNAL_DATASETS],
     external_datasets=settings.EXTERNAL_DATASETS,
     authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     snapshot=settings.SNAPSHOT,
@@ -38,9 +42,8 @@ def home(request, dataset_id=None, ref=None):
 
     browsable_datasets = [
         ds_id
-        for ds_id in shared_context['known_datasets']
-        if ds_id in non_empty_datasets
-        or ds_id in shared_context['external_datasets']]
+        for ds_id in shared_context['indexed_datasets']
+        if ds_id in non_empty_datasets]
 
     return render(request, 'browse/home.html', dict(
         **shared_context,
@@ -50,41 +53,8 @@ def home(request, dataset_id=None, ref=None):
     ))
 
 
-def browse_external_citation(request, dataset_id):
-    """Validates external citation request before
-    redirecting to citation details view.
-
-    Intended to simplify handling HTML forms.
-    """
-    origin = request.headers.get('referer', '/')
-
-    if dataset_id not in settings.EXTERNAL_DATASETS:
-        messages.error(
-            request,
-            "Unknown external dataset {}".format(dataset_id))
-
-    if dataset_id == 'doi':
-        ref = request.GET.get('ref')
-        if ref:
-            try:
-                get_doi_ref(ref)
-            except RuntimeError as exc:
-                messages.error(
-                    request,
-                    "Couldn’t retrieve citation: {}".format(
-                        str(exc)))
-            else:
-                return redirect('browse_citation', dataset_id, quote_plus(ref))
-        else:
-            messages.error(request, "Missing reference to fetch {}")
-    else:
-        messages.error(
-            request,
-            "Unsupported external dataset {}".format(dataset_id))
-
-    # If we’re here, it must’ve failed
-    return HttpResponseRedirect(origin)
-
+# Indexed sources
+# ===============
 
 def browse_citation_by_docid(request, doctype=None, docid=None):
     if doctype and docid:
@@ -119,7 +89,12 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
                 ))
     else:
         # Faciliates searching by doctype via a regular HTML form.
+
         doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+
+        if not doctype or not docid:
+            return HttpResponseBadRequest("Missing document type and/or ID")
+
         citations = search_refs_relaton_struct({
             'docid': [{
                 'type': doctype,
@@ -137,7 +112,7 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
             return HttpResponseRedirect(request.headers.get('referer', '/'))
 
 
-def browse_citation_by_dataset(request, dataset_id, ref):
+def browse_indexed_reference(request, dataset_id, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
@@ -179,7 +154,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
         )
 
 
-class DatasetCitationListView(ListView):
+class IndexedDatasetCitationListView(ListView):
     model = RefData
     paginate_by = 20
     template_name = 'browse/dataset.html'
@@ -193,3 +168,74 @@ class DatasetCitationListView(ListView):
             dataset_id=self.kwargs['dataset_id'],
             **shared_context,
         )
+
+
+# External sources
+# ================
+
+def external_dataset(request, dataset_id):
+    return render(request, 'browse/dataset.html', dict(
+        dataset_id=dataset_id,
+        **shared_context,
+    ))
+
+
+def browse_external_reference(request, dataset_id, ref=None):
+    if ref:
+        parsed_ref = unquote_plus(ref)
+
+        if dataset_id == 'doi':
+            try:
+                data = get_doi_ref(parsed_ref)
+            except Exception:
+                return error_views.server_error(request)
+            else:
+                return render(request, 'browse/citation_details.html', dict(
+                    dataset_id=dataset_id,
+                    ref=ref,
+                    data=data,
+                    **shared_context,
+                ))
+        else:
+            return HttpResponseBadRequest("Unsupported external dataset ID")
+
+    else:
+        # Faciliates searching via a regular HTML form.
+
+        ref = request.GET.get('ref')
+
+        if not ref:
+            return HttpResponseBadRequest(
+                "Missing dataset ID and/or reference")
+
+        origin = request.headers.get('referer', '/')
+
+        if dataset_id not in settings.EXTERNAL_DATASETS:
+            messages.error(
+                request,
+                "Unknown external dataset {}".format(dataset_id))
+
+        if dataset_id == 'doi':
+            ref = request.GET.get('ref')
+            if ref:
+                try:
+                    get_doi_ref(ref)
+                except RuntimeError as exc:
+                    messages.error(
+                        request,
+                        "Couldn’t retrieve citation: {}".format(
+                            str(exc)))
+                else:
+                    return redirect(
+                        'browse_citation',
+                        dataset_id,
+                        quote_plus(ref))
+            else:
+                messages.error(request, "Missing reference to fetch {}")
+        else:
+            messages.error(
+                request,
+                "Unsupported external dataset {}".format(dataset_id))
+
+        # If we’re here, it must’ve failed
+        return HttpResponseRedirect(origin)

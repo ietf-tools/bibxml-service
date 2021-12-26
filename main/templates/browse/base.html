@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block nav %}
-  {% for ds_id in known_datasets %}
+  {% for ds_id in indexed_datasets %}
     <a class="
           link
           {% if dataset_id == ds_id %}underline{% endif %}
@@ -9,6 +9,17 @@
           {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
           f5 f4-ns dib mr3
         " href="{% url "browse_dataset" ds_id %}">
+      {{ ds_id }}
+    </a>
+  {% endfor %}
+  {% for ds_id in external_datasets %}
+    <a class="
+          link
+          {% if dataset_id == ds_id %}underline{% endif %}
+          dim
+          gray
+          f5 f4-ns dib mr3
+        " href="{% url "browse_external_dataset" ds_id %}">
       {{ ds_id }}
     </a>
   {% endfor %}

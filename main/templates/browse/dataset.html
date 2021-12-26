@@ -8,7 +8,7 @@
   <h2 class="f4 dib br3 ttu">{{ dataset_id }}</h2>
 
   {% if dataset_id in external_datasets %}
-    <form class="black-80" method="GET" action="{% url "browse_external_citation" dataset_id %}">
+    <form class="black-80" method="GET" action="{% url "load_external_citation" dataset_id %}">
       <div class="">
         <input
           id="ref"

@@ -97,32 +97,48 @@ urlpatterns = [
             ])),
         ])),
 
-        path('docid/', include([
-            path('', require_safe(
-                public_views.browse_citation_by_docid
-            ), name='browse_citation_by_docid_redirect'),
-            path('<doctype>/<path:docid>/', require_safe(
-                public_views.browse_citation_by_docid
-            ), name='browse_citation_by_docid'),
+        path('types/', include([
+            path('<doctype>/', include([
+                path('<path:docid>/', require_safe(
+                    public_views.browse_citation_by_docid
+                ), name='browse_citation_by_docid'),
+            ])),
         ])),
 
         path('search/', require_safe(
             public_views.CitationSearchResultListView.as_view()
         ), name='search_citations'),
 
-        path('external/<dataset_id>/', require_safe(
-            public_views.browse_external_citation
-        ), name='browse_external_citation'),
-
-        path('<dataset_id>/', include([
-            path('', require_safe(
-                public_views.DatasetCitationListView.as_view()
-            ), name='browse_dataset'),
-            path('<ref>/', require_safe(
-                public_views.browse_citation_by_dataset
-            ), name='browse_citation'),
+        path('load-and-redirect/', include([
+            path('by-docid/', require_safe(
+                public_views.browse_citation_by_docid
+            ), name='load_citation_by_docid'),
+            path('external/<dataset_id>/', require_safe(
+                public_views.browse_external_reference
+            ), name='load_external_citation'),
         ])),
 
+        path('indexed-sources/', include([
+            path('<dataset_id>/', include([
+                path('', require_safe(
+                    public_views.IndexedDatasetCitationListView.as_view()
+                ), name='browse_dataset'),
+                path('<ref>/', require_safe(
+                    public_views.browse_indexed_reference
+                ), name='browse_citation'),
+            ])),
+        ])),
+
+        path('external-sources/', include([
+            path('<dataset_id>/', include([
+                path('', require_safe(
+                    public_views.external_dataset
+                ), name='browse_external_dataset'),
+                path('<path:ref>/', require_safe(
+                    public_views.browse_external_reference
+                ), name='browse_external_citation'),
+            ])),
+        ])),
     ])),
 
 ]

@@ -8,7 +8,7 @@
 
   {% if doctypes %}
     <h2 class="f5">Find document by ID</h2>
-    <form class="black-80" method="GET" action="{% url "browse_citation_by_docid_redirect" %}">
+    <form class="black-80" method="GET" action="{% url "load_citation_by_docid" %}">
       <select name="doctype" title="Document type" class="w-10 ba b--black-20 input-reset dib pa2 br0">
         {% for doctype in doctypes %}
           <option value="{{ doctype.0 }}">
@@ -43,21 +43,6 @@
     </form>
   {% endif %}
 
-  <div class="nowrap overflow-x-auto">
-    <h2 class="f5 dib mr3 ">Browse indexed or external source</h2>
-    {% for ds_id in browsable_datasets %}
-      <a class="
-            link
-            {% if dataset_id == ds_id %}underline{% endif %}
-            dim
-            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
-            f5 f4-ns dib mr3
-          " href="{% url "browse_dataset" ds_id %}">
-        {{ ds_id }}
-      </a>
-    {% endfor %}
-  </div>
-
   <h2 class="f5">Search documents for substring match</h2>
   <form class="black-80" method="GET" action="{% url "search_citations" %}">
     <input
@@ -81,6 +66,36 @@
         <a href="{% url "openapi_readable_spec" "openapi_spec_main" %}#operation/searchCitations">other search mechanisms</a>.)
     </div>
   </form>
+
+  <div class="nowrap overflow-x-auto">
+    <h2 class="f5 dib mr3 ">Indexed sources</h2>
+    {% for ds_id in browsable_datasets %}
+      <a class="
+            link
+            {% if dataset_id == ds_id %}underline{% endif %}
+            dim
+            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+            f5 f4-ns dib mr3
+          " href="{% url "browse_dataset" ds_id %}">
+        {{ ds_id }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="nowrap overflow-x-auto">
+    <h2 class="f5 dib mr3 ">External source lookup</h2>
+    {% for ds_id in external_datasets %}
+      <a class="
+            link
+            {% if dataset_id == ds_id %}underline{% endif %}
+            dim
+            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
+            f5 f4-ns dib mr3
+          " href="{% url "browse_external_dataset" ds_id %}">
+        {{ ds_id }}
+      </a>
+    {% endfor %}
+  </div>
 
   <h2 class="f5">See also</h2>
   <ul class="list pl0 mb5">
