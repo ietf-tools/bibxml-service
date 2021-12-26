@@ -53,6 +53,7 @@ def list_doctypes() -> list[Tuple[str, str]]:
         (i.doctype, i.sample_docid)
         for i in (
             RefDataManager.
+            order_by('?').
             raw('''
                 select distinct on (doctype) id, doctype, sample_docid
                 from (
