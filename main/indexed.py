@@ -53,7 +53,7 @@ def list_doctypes() -> list[Tuple[str, str]]:
         (i.doctype, i.sample_docid)
         for i in (
             RefDataManager.
-            order_by('?').
+            order_by('?').  # This may be inefficient as dataset grows
             raw('''
                 select distinct on (doctype) id, doctype, sample_docid
                 from (
