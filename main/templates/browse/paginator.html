@@ -1,0 +1,13 @@
+{% if page_obj.has_previous %}
+  <a class="link" href="?{% if query %}query={{ query }}&{% endif %}page=1">&laquo; first</a>
+  <a class="link ph3" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">previous</a>
+{% endif %}
+
+<span class="flex-auto tr">
+  {{ page_obj.paginator.count }} total — page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+</span>
+
+{% if page_obj.has_next %}
+  <a class="link ph3" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.next_page_number }}">next</a>
+  <a class="link" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+{% endif %}
