@@ -23,13 +23,23 @@ paths:
     parameters:
     - name: document type
       in: path
-      description: Dataset type.
+      description: |
+        Dataset type.
+
+        Note that the schema lists _currently available types_
+        (present across indexed citations at the time of viewing this page),
+        other document types can be available at different points in time
+        depending on index state.
       required: true
       schema:
-        type: string
+        $ref: '#/components/schemas/AvailableDoctypes'
     - name: id
       in: path
-      description: Document ID.
+      description: |
+        Document ID. For example,
+        {% for doctype in known_doctypes %}
+        - `{{ doctype.1 }}` for document type {{ doctype.0 }}
+        {% endfor %}
       required: true
       schema:
         type: string
@@ -46,10 +56,9 @@ paths:
           type: string
           default: relaton
           enum: [bibxml, relaton]
-      summary: Get citation
+      summary: Get citation by document ID
       description: >
         Retrieve citation with given document identifier (type & ID).
-        For external datasets (currently, `doi`), this incurs an additional network request.
       operationId: getCitationByDocId
 
       responses:
@@ -82,13 +91,19 @@ paths:
     parameters:
     - name: dataset
       in: path
-      description: Dataset ID.
+      description: |
+        Dataset ID.
+
+        Note that the schema lists all registered datasets,
+        even those from which no citations have been indexed at the moment of viewing this page.
       required: true
       schema:
         $ref: '#/components/schemas/AvailableDatasets'
     - name: ref_id
       in: path
-      description: Standard reference. Special characters, such as forward slashes, must be URL-escaped.
+      description: |
+        Standard reference, as it appears in source dataset.
+        Special characters, such as forward slashes, must be URL-escaped.
       required: true
       schema:
         type: string
@@ -105,10 +120,14 @@ paths:
           type: string
           default: relaton
           enum: [bibxml, relaton]
-      summary: Get citation
-      description: >
-        Retrieve citation from given dataset by reference.
-        For external datasets (currently, `doi`), this incurs an additional network request.
+      summary: Get citation by reference in source dataset
+      description: |
+        This endpoint allows you to retrieve a citation from given dataset by reference.
+        For external datasets (currently, `doi`), this always incurs an additional network request.
+
+        NOTE: This endpoint may not be what you want to use, as datasets represent
+        internal sources of citation data. The /docid/… endpoint allows
+        you to get a citation by document type and ID, which may be more useful.
       operationId: getCitationByReferenceId
 
       responses:
@@ -344,14 +363,19 @@ components:
 
   schemas:
 
+    AvailableDoctypes:
+      type: string
+      enum:
+      {% for doctype in known_doctypes %}
+      - {{ doctype.0 }}
+      {% endfor %}
+
     AvailableDatasets:
       type: string
       enum:
       {% for ds_id in known_dataset_ids %}
       - {{ ds_id }}
       {% endfor %}
-      description: |
-        Available dataset IDs. This list is generated at runtime.
 
     CitationDetailsResponse:
       type: object
