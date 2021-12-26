@@ -83,7 +83,7 @@ urlpatterns = [
     path('', include([
 
         path('', require_safe(
-            public_views.browse_citations
+            public_views.home
         ), name='browse'),
 
         path('management/', include([
@@ -116,10 +116,10 @@ urlpatterns = [
 
         path('<dataset_id>/', include([
             path('', require_safe(
-                public_views.CitationListView.as_view()
+                public_views.DatasetCitationListView.as_view()
             ), name='browse_dataset'),
             path('<ref>/', require_safe(
-                public_views.browse_citations
+                public_views.browse_citation_by_dataset
             ), name='browse_citation'),
         ])),
 
