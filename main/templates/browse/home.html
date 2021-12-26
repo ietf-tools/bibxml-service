@@ -11,7 +11,7 @@
     <form class="black-80" method="GET" action="{% url "browse_citation_by_docid_redirect" %}">
       <select name="doctype" title="Document type" class="w-10 ba b--black-20 input-reset dib pa2 br0">
         {% for doctype in doctypes %}
-          <option value="{{ doctype }}">
+          <option value="{{ doctype.0 }}">
             {{ doctype.0 }}
           </option>
         {% endfor %}
