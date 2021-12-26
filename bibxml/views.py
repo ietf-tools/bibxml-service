@@ -3,10 +3,13 @@ from django.urls import reverse, NoReverseMatch
 from django.conf import settings
 from django.shortcuts import render
 
+from main.indexed import list_doctypes
+
 
 def openapi_spec(request):
     """Serves machine-readable spec for main API."""
     return render(request, 'openapi.yaml', dict(
+        known_doctypes=list_doctypes(),
         known_dataset_ids=list(
             getattr(settings, 'KNOWN_DATASETS', [])),
     ), content_type='text/x-yaml')
