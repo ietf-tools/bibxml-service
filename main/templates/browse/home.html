@@ -29,15 +29,16 @@
         value="Find" />
       <div id="docid-desc" class="f6 black-60 db mb4 measure lh-copy">
         <p>
-          Searches all indexed sources for a document matching given type and ID.
+          Finds a document exactly matching provided type and ID.
           If one is found, you’ll be redirected to it.
-        <p>Document identifier format depends on document type.
-        <p>
-          DOI example:
-          <code class="nowrap pa1 ph2 bg-light-gray black-80">10.1109/IEEESTD.2005.98651</code>
-        <p>
-          IEEE example:
-          <code class="nowrap pa1 ph2 bg-light-gray black-80">IEEE C57-12-20.2011</code>
+        <p>Document identifier format depends on document type. Examples:
+        <ul>
+          {% for doctype in doctypes %}
+          <li>
+            <code class="nowrap pa1 ph2 bg-light-gray black-80">{{ doctype.1 }}</code>
+            for document type “{{ doctype.0 }}”
+          {% endfor %}
+        </ul>
       </div>
     </form>
   {% endif %}
