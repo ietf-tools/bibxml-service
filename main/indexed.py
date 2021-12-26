@@ -50,12 +50,12 @@ def list_doctypes() -> list[Tuple[str, str]]:
     Returns a list of 2-tuples (document type, example document ID).
     """
     return [
-        (i.doctype, i.sample_docid)
+        (i.doctype, i.sample_id)
         for i in (
             RefDataManager.
             order_by('?').  # This may be inefficient as dataset grows
             raw('''
-                select distinct on (doctype) id, doctype, sample_docid
+                select distinct on (doctype) id, doctype, sample_id
                 from (
                     select id, jsonb_array_elements_text(
                         jsonb_path_query_array(
@@ -67,7 +67,7 @@ def list_doctypes() -> list[Tuple[str, str]]:
                             body,
                             '$.docid[*].id'
                         )
-                    ) as sample_docid
+                    ) as sample_id
                     from api_ref_data
                 ) as item
                 '''))]
