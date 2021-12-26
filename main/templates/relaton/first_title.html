@@ -1,4 +1,4 @@
 {# TODO: Refactor citation’s first title extraction using as_list filter #}
 {% with title.content as deftitle %}
-  {{ title.0.content|default:deftitle }}
+  {{ title.0.content|default:deftitle|default:"(no title)" }}
 {% endwith %}
