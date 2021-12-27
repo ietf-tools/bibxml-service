@@ -85,8 +85,11 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                             RefDataManager.update_or_create(
                                 ref=ref,
                                 dataset=ds_id,
-                                body=ref_data,
-                                representations=dict(bibxml=bibxml_data))
+                                defaults=dict(
+                                    body=ref_data,
+                                    representations=dict(bibxml=bibxml_data)
+                                ),
+                            )
 
                             indexed_refs.add(ref)
                     else:
