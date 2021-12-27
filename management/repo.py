@@ -2,7 +2,7 @@
 
 from os import access, path, rmdir, R_OK
 from celery.utils.log import get_task_logger
-from git import Repo
+from git import Repo  # type: ignore[attr-defined]
 
 
 logger = get_task_logger(__name__)
