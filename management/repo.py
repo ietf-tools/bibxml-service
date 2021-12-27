@@ -42,9 +42,10 @@ def ensure_latest(repo_url, branch, work_dir):
                 repo.remotes.origin.url == repo_url,
                 repo.active_branch.name == branch]):
             try:
-                repo.remotes.origin.pull(branch, no_rebase=True)
+                repo.remotes.origin.fetch(branch)
+                repo.head.reset(hard=True, working_tree=True)
             except:  # noqa: E722
-                logger.exception("Failed to pull repository")
+                logger.exception("Failed to fetch or check out branch")
                 raise
 
         else:
