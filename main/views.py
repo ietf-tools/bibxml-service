@@ -58,10 +58,11 @@ def home(request, dataset_id=None, ref=None):
 
 def browse_citation_by_docid(request, doctype=None, docid=None):
     if doctype and docid:
+        parsed_docid = unquote_plus(docid)
         citations = search_refs_relaton_struct({
             'docid': [{
                 'type': doctype,
-                'id': docid,
+                'id': parsed_docid,
             }],
         })
         num_citations = len(citations)
@@ -102,7 +103,10 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
             }],
         })
         if len(citations) == 1:
-            return redirect('browse_citation_by_docid', doctype, docid)
+            return redirect(
+                'browse_citation_by_docid',
+                doctype,
+                quote_plus(docid))
         else:
             messages.error(
                 request,
