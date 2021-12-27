@@ -39,6 +39,7 @@ def ensure_latest(repo_url, branch, work_dir):
         repo = Repo(work_dir)
 
         if all(['origin' in repo.remotes,
+                repo.remotes.origin.exists(),
                 repo.remotes.origin.url == repo_url,
                 repo.active_branch.name == branch]):
             try:
