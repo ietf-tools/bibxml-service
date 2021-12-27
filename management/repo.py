@@ -43,8 +43,11 @@ def ensure_latest(repo_url, branch, work_dir):
                 repo.remotes.origin.url == repo_url,
                 repo.active_branch.name == branch]):
             try:
-                repo.remotes.origin.fetch(branch)
-                repo.head.reset(hard=True, working_tree=True)
+                repo.remotes.origin.fetch(branch, depth=1, update_shallow=True)
+                repo.head.reset(
+                    'origin/{}'.format(branch),
+                    hard=True,
+                    working_tree=True)
             except:  # noqa: E722
                 logger.exception("Failed to fetch or check out branch")
                 raise
