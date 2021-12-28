@@ -1,5 +1,5 @@
 import json
-from typing import Union, Tuple
+from typing import Union, Tuple, Any
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db.models.query import QuerySet, Q
@@ -30,18 +30,20 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
         filter(search=SearchQuery(text, search_type='websearch')))
 
 
-def search_refs_relaton_struct(obj: Union[dict, list]) -> QuerySet[RefData]:
+def search_refs_relaton_struct(
+        *objs: list[Union[dict[Any, Any], list[Any]]]) -> QuerySet[RefData]:
     """Uses PostgreSQL’s JSON containment query.
 
-    Returns citations which Relaton structure contains ``obj``.
+    Returns citations which Relaton structure contains
+    at least one of given ``obj`` structures (they are OR'ed).
 
     .. seealso:: PostgreSQL docs on ``@>`` operator.
     """
+    subqueries = ['body @> %s::jsonb' for obj in objs]
+    query = 'SELECT * FROM api_ref_data WHERE %s' % ' OR '.join(subqueries)
     return (
         RefDataManager.
-        raw('''
-            SELECT * FROM api_ref_data WHERE body @> %s::jsonb
-            ''', [json.dumps(obj)]))
+        raw(query, [json.dumps(obj) for obj in objs]))
 
 
 def list_doctypes() -> list[Tuple[str, str]]:
