@@ -122,7 +122,10 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
                 request,
                 "No reliable match for a citation "
                 "matching doctype “{}” and ID “{}” "
-                "among indexed datasets.".format(doctype, docid))
+                "among indexed datasets ({} matches).".format(
+                    doctype,
+                    docid,
+                    len(citations)))
             return HttpResponseRedirect(request.headers.get('referer', '/'))
 
 
