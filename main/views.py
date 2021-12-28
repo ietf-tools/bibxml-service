@@ -64,6 +64,11 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
                 'type': doctype,
                 'id': parsed_docid,
             }],
+        }, {
+            'docid': {
+                'type': doctype,
+                'id': parsed_docid,
+            },
         })
         num_citations = len(citations)
         if num_citations == 1:
@@ -101,6 +106,11 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
                 'type': doctype,
                 'id': docid,
             }],
+        }, {
+            'docid': {
+                'type': doctype,
+                'id': docid,
+            },
         })
         if len(citations) == 1:
             return redirect(
