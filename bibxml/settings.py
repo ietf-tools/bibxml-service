@@ -117,7 +117,7 @@ CELERY_TASK_RESULT_EXPIRES = 604800
 # Redis
 
 REDIS_HOST = environ.get('REDIS_HOST')
-REDIS_PORT = environ.get('REDIS_PORT')
+REDIS_PORT = environ.get('REDIS_PORT', 0)
 
 
 # Version
