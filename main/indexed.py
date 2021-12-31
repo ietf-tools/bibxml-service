@@ -31,7 +31,7 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
 
 
 def search_refs_relaton_struct(
-        *objs: list[Union[dict[Any, Any], list[Any]]]) -> QuerySet[RefData]:
+        *objs: Union[dict[Any, Any], list[Any]]) -> QuerySet[RefData]:
     """Uses PostgreSQL’s JSON containment query.
 
     Returns citations which Relaton structure contains
