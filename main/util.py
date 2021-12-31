@@ -12,15 +12,35 @@ from .indexed import search_refs_json_repr_match, search_refs_relaton_struct
 
 
 class BaseCitationSearchView(BaseListView):
+    """Generic view that handles citation search.
+
+    Intended to be usable for both template-based GUI and API views."""
+
     model = RefData
     paginate_by = 20
+
     query_in_path = False
-    show_all_by_default = False
+    """Whether query will appear as path component named ``query``
+    (URLs must be configured appropriately).
+
+    Otherwise, it’s expected to be supplied
+    as a GET parameter named ``query``."""
 
     supported_query_formats = (
         'json_repr',
         'json_struct',
     )
+    """Allowed values of query format in request."""
+
+    query_format = None
+    """Query format obtained from request,
+    one of :attr:`supported_query_formats`."""
+
+    query = None
+    """Deserialized query, parsed from request."""
+
+    show_all_by_default = False
+    """Whether to show all items if query is not specified."""
 
     def get(self, request, *args, **kwargs):
         try:
@@ -33,8 +53,13 @@ class BaseCitationSearchView(BaseListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet[RefData]:
+        """Returns a ``QuerySet`` of ``RefData`` objects.
+
+        If query is present, delegates to :meth:`dispatch_handle_query`,
+        otherwise behavior depends on :attr:`show_all_by_default`."""
+
         if self.query is not None and self.query_format is not None:
-            return self.dispatch_do_query(self.query)
+            return self.dispatch_handle_query(self.query)
         else:
             if self.show_all_by_default:
                 return RefDataManager.all()
@@ -42,6 +67,9 @@ class BaseCitationSearchView(BaseListView):
                 return RefDataManager.none()
 
     def get_context_data(self, **kwargs):
+        """In addition to parent implementation,
+        provides a ``query`` variable."""
+
         return dict(
             **super().get_context_data(**kwargs),
             query=self.query,
@@ -49,8 +77,10 @@ class BaseCitationSearchView(BaseListView):
 
     def dispatch_parse_query(self, request, **kwargs):
         """Parses query and sets up necessary instance attributes
-        as a side effect. Guarantees self.query and self.query_format
+        as a side effect. Guarantees :attr:`query` and :attr:`query_format`
         will be present.
+
+        Delegates parsing to ``parse_{query-format}_query()`` method.
 
         Can throw exceptions due to bad input."""
 
@@ -77,9 +107,11 @@ class BaseCitationSearchView(BaseListView):
             self.query = None
             self.query_format = None
 
-    def dispatch_do_query(self, query):
-        """Handles query.
-        Should not throw exceptions arising from bad input."""
+    def dispatch_handle_query(self, query):
+        """Handles query by delegating
+        to ``handle_{query-format}_query()`` method.
+
+        Is not expected to throw exceptions arising from bad input."""
 
         handler = getattr(self, 'handle_%s_query' % self.query_format)
         return handler(query)
@@ -101,9 +133,12 @@ class BaseCitationSearchView(BaseListView):
         else:
             return struct
 
-    def handle_json_struct_query(self, query: dict) -> QuerySet[RefData]:
+    def handle_json_struct_query(
+            self,
+            query: dict[str, Any]) -> QuerySet[RefData]:
         return search_refs_relaton_struct(query)
 
 
 class UnsupportedQueryFormat(ValueError):
+    """Specified query format is not supported."""
     pass
