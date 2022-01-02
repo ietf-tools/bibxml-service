@@ -43,7 +43,7 @@
     <div class="fl w-100 w-50-ns">
       <dl class="lh-title pv2 mt0">
         {% for relation in data.relation|as_list %}
-          {% include "deflist/entry.html" with key=relation.description.content|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" %}
+          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" %}
         {% endfor %}
         {% include "deflist/entry.html" with key="type" val=data.type %}
         {% include "deflist/entry.html" with key="language" val=data.language|default:"—" %}
