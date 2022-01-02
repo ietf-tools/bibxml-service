@@ -30,6 +30,8 @@ def not_authorized(request, *args, **kwargs):
 def not_found(request, *args, **kwargs):
     exc = kwargs.get('exception', None)
 
+    exc_repr: Union[None, str] = None
+
     if exc:
         resolver_404_path = _get_resolver_404_path(exc)
         if resolver_404_path:
@@ -38,8 +40,6 @@ def not_found(request, *args, **kwargs):
                 resolver_404_path)
         else:
             exc_repr = str(exc)
-    else:
-        exc_repr = None
 
     return render_error(request, exc_repr, "Not found (404)")
 
