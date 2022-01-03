@@ -7,10 +7,21 @@ For an overview, see https://github.com/ietf-ribose/bibxml-project.
 This project uses Docker, Django and PostgreSQL.
 
 
-Setting up development environment and building documentation
--------------------------------------------------------------
+Quick start
+-----------
 
-See [documentation](docs/howto/develop-locally.rst).
+Ensure you have Docker Desktop with Compose V2 enabled,
+navigate to cloned repository root on your machine
+and run the following commands::
+
+    docker compose build
+    cd docs
+    docker compose up
+
+After that, point your browser to ``localhost:8001`` for further documentation.
+
+You can browse documentation `on GitHub <docs/index.rst>`_,
+but as it makes use of Sphinx-specific directives there will be rendering issues.
 
 
 Credits
