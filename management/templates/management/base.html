@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load compress static %}
 
 {% block title %}
   {{ block.super }}
@@ -12,7 +12,9 @@
 {% endblock %}
 
 {% block extra_scripts %}
-    <script src="{% static "js/api-button.js" %}"></script>
+  {% compress js %}
+    <script type="text/javascript" src="{% static "js/api-button.js" %}"></script>
+  {% endcompress %}
 {% endblock %}
 
 {% block root_html_attrs %}data-api-secret="{{ api_secret }}"{% endblock %}

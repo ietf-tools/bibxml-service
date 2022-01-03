@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.app.Config',
     'management.app.Config',
+    'compressor',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,31 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 STATIC_ROOT = BASE_DIR / 'build' / 'static'
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
+
+
+# Django compressor
+
+BABEL_CONFIG = BASE_DIR / 'babel.config.json'
+"""Absolute path to Babel configuration file for front-end build."""
+
+BABEL_EXECUTABLE = 'npx babel'
+"""How to invoke Babel."""
+
+COMPRESS_PRECOMPILERS = (
+   # ('text/jsx', 'cat {infile} | babel --config-file %s > {outfile}' % BABEL_CONFIG),
+   (
+       'text/javascript',
+       '%s {infile} --config-file %s --source-maps --out-file {outfile}'
+       % (BABEL_EXECUTABLE, BABEL_CONFIG),
+   ),
+)
+
+COMPRESS_ENABLED = True
 
 
 # Default primary key field type

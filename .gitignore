@@ -1,6 +1,7 @@
 /data
 /build
 /env
+/node_modules
 .env
 *.pyc
 http_cache.sqlite

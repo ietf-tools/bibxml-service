@@ -1,0 +1,9 @@
+{
+  "name": "bibxml-service-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@babel/cli": "^7.16.7",
+    "@babel/preset-env": "^7.16.7"
+  }
+}
