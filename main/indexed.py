@@ -1,5 +1,5 @@
 import json
-from typing import Union, Tuple, Any
+from typing import Dict, List, Union, Tuple, Any
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db.models.query import QuerySet, Q
@@ -31,7 +31,7 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
 
 
 def search_refs_relaton_struct(
-        *objs: Union[dict[Any, Any], list[Any]]) -> QuerySet[RefData]:
+        *objs: Union[Dict[Any, Any], List[Any]]) -> QuerySet[RefData]:
     """Uses PostgreSQL’s JSON containment query.
 
     Returns citations which Relaton structure contains
@@ -46,7 +46,7 @@ def search_refs_relaton_struct(
         raw(query, [json.dumps(obj) for obj in objs]))
 
 
-def list_doctypes() -> list[Tuple[str, str]]:
+def list_doctypes() -> List[Tuple[str, str]]:
     """Lists all distinct ``docid[*].doctype`` values among citation data.
 
     Returns a list of 2-tuples (document type, example document ID).

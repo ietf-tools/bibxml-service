@@ -5,7 +5,7 @@ This means if Redis is down, we may lose this correspondence,
 but Celery-provided admin UI can still be used to monitor status of tasks
 (just without dataset correspondence)."""
 
-from typing import TypedDict, Union
+from typing import List, Optional, TypedDict, Union
 import traceback
 
 from celery.result import AsyncResult
@@ -24,8 +24,8 @@ TaskProgress = TypedDict(
 
 
 class IndexingTaskCeleryMeta(TypedDict):
-    requested_refs: Union[list[str], None]
-    """Citation refs requested for indexing."""
+    requested_refs: Optional[str]  # Union[list[str], None]
+    """Citation refs requested for indexing, as a comma-separated list."""
 
     dataset_id: str
     """Dataset ID being indexed."""
@@ -44,7 +44,7 @@ class IndexingTaskDescription(TypedDict):
     status: str
     """Upper-case string describing Celery task state."""
 
-    requested_refs: Union[list[str], None]
+    requested_refs: Union[List[str], None]
     """Citation refs requested for indexing."""
 
     dataset_id: Union[str, None]
@@ -87,7 +87,7 @@ def push_task(dataset_id, task_id):
 
 
 def get_dataset_task_history(dataset_name, limit=10) -> \
-        list[IndexingTaskDescription]:
+        List[IndexingTaskDescription]:
     task_ids = get_task_ids(dataset_name, limit)
     tasks = []
 
@@ -97,7 +97,7 @@ def get_dataset_task_history(dataset_name, limit=10) -> \
     return tasks
 
 
-def list_running_tasks() -> list[str]:
+def list_running_tasks() -> List[str]:
     jobs = app.control.inspect().active()
     return [task['id'] for hostname in jobs for task in jobs[hostname]]
 
