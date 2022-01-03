@@ -75,6 +75,10 @@ def list_doctypes() -> List[Tuple[str, str]]:
                 '''))]
 
 
+def get_indexed_ref_by_docid(type: str, id: str) -> RefData:
+    pass
+
+
 def get_indexed_ref(dataset_id, ref, format='relaton'):
     """Retrieves citation from static indexed dataset.
 
