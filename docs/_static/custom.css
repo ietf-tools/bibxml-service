@@ -1,0 +1,37 @@
+a.reference.external .viewcode-link .pre {
+  font-weight: normal;
+  opacity: 0.5;
+}
+
+a.reference.external .viewcode-link .pre::after {
+  content: " (GitHub)";
+  margin-right: 1em;
+}
+
+/*
+Hide external link if internal source link is available.
+Sadly, Sphinx doesn’t make internal links available for variables.
+*/
+a.reference.internal + a.reference.external {
+  display: none;
+}
+.py.data:not(:first-of-type) a.reference.external {
+  display: none;
+}
+
+
+body {
+  min-width: unset;
+  max-width: 50rem;
+}
+div.header h1 {
+  white-space: nowrap;
+}
+p {
+  break-inside: avoid;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+p:not(.admonition-title) + p {
+  text-indent: 2em;
+}

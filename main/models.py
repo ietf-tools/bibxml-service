@@ -2,27 +2,45 @@ from django.db import models
 
 
 class RefData(models.Model):
-    ref = models.CharField(
-        max_length=128,
-        help_text="Reference (or ID). "
-                  "Corresponds to source dataset filename without extension.")
+    """Holds indexed citation metadata.
 
-    ref_id = models.CharField(max_length=64)
-    """DEPRECATED: Use ref"""
+    Model meta notes:
 
-    ref_type = models.CharField(max_length=24)
-    """DEPRECATED: Use ref"""
+    - Explicit table name ``api_ref_data`` is used
+    - ``ref`` and ``dataset`` combinations must be unique
+    """
 
     dataset = models.CharField(
         max_length=24,
         help_text="Internal dataset ID.")
-    """Matches ID in settings.RELATON_DATASETS."""
+    """
+    Which dataset given citation was indexed from.
+    Matches dataset ID in :any:`settings.KNOWN_DATASETS`.
+    """
+
+    ref = models.CharField(
+        max_length=128,
+        help_text="Reference (or ID). "
+                  "Corresponds to source dataset filename without extension.")
+    """
+    Corresponds to object name within source dataset,
+    filename extension excluded.
+    """
 
     body = models.JSONField()
-    """Contains canonical Relaton representation"""
+    """Contains canonical Relaton representation of the citation."""
 
     representations = models.JSONField()
-    """Contains a mapping of { format: string }, where format is e.g. bibxml"""
+    """Contains alternative representations of the citation.
+    A mapping of ``{ <format_id>: <freeform string> }``,
+    where format is e.g. “bibxml”.
+    """
+
+    ref_id = models.CharField(max_length=64)
+    # DEPRECATED: Use ref
+
+    ref_type = models.CharField(max_length=24)
+    # DEPRECATED: Use ref
 
     class Meta:
         db_table = 'api_ref_data'

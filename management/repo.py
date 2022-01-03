@@ -9,6 +9,11 @@ logger = get_task_logger(__name__)
 
 
 def reclone(repo_url, branch, work_dir):
+    """
+    Wipes proposed ``work_dir``,
+    and clones given repository into that location.
+    """
+
     try:
         rmdir(work_dir)
     except FileNotFoundError:
@@ -24,13 +29,15 @@ def reclone(repo_url, branch, work_dir):
 
 
 def ensure_latest(repo_url, branch, work_dir):
-    """If specified working directory contains a Git repo
+    """
+    If specified working directory contains a Git repo
     matching provided configuration (URL and branch), performs a pull.
 
     Otherwise, removes working directory if it exists
     and clones the repository afresh.
 
-    :returns: Repo instance"""
+    :returns: GitPython’s Repo instance
+    """
 
     if all([path.isdir(work_dir),
             path.isdir(path.join(work_dir, '.git')),

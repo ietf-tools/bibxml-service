@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  watch:
+    image: local/web-precheck:latest
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        cd /code &&
+        rm -rf /build/html/* &&
+        sphinx-build -a -E -n -v -b dirhtml /code/docs/ /build/html &&
+        watchmedo shell-command \
+          --patterns="*.rst;*.py;*.css" \
+          --recursive \
+          --drop \
+          --command='rm -rf /build/html/* && sphinx-build -a -E -n -v -b dirhtml /code/docs/ /build/html'
+    volumes:
+      - ..:/code
+      - ./build:/build
+  serve:
+    image: python:3
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        cd /build/html && python -m http.server 8080
+    volumes:
+      - ./build:/build
+    depends_on:
+      - watch
+    ports:
+      - "8001:8080"

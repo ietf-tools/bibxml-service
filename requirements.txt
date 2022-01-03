@@ -13,6 +13,8 @@ doi2ietf>=0.1.2
 flake8
 whitenoise>=5.3.0,<6.0
 pydantic>=1.8,<1.9
+watchdog
+sphinx
 
 # These are dependencies of doi2ietf, but we are currently importing them for error handling purposes
 types-requests

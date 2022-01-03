@@ -14,17 +14,19 @@ from .task_status import IndexingTaskCeleryMeta
 logger = get_task_logger(__name__)
 
 
-@app.task(bind=True)
-def fetch_and_index(task, dataset_id, refs=None):
+def _fetch_and_index(task, dataset_id, refs=None):
     """(Re)indexes given dataset.
 
     :param refs: a list of refs to index,
                  if not provided the entire dataset is indexed
 
-    :returns: an object of the shape
-              { total: int,
-                indexed: int,
-                refs: comma-separated string of requested refs }
+    :returns:
+
+        An object of the shape::
+
+            { total: int,
+              indexed: int,
+              refs: comma-separated string of requested refs }
     """
 
     task_desc: IndexingTaskCeleryMeta = dict(
@@ -154,3 +156,5 @@ def fetch_and_index(task, dataset_id, refs=None):
         traceback.print_exc()
         print("Indexing {}: Task failed to complete".format(dataset_id))
         raise
+
+fetch_and_index = app.task(bind=True)(_fetch_and_index)
