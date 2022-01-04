@@ -1,11 +1,6 @@
-"""A Redis cache is used to keep track of Celery task IDs and dataset IDs
-they operate on.
+"""Primitives for working with indexing task status."""
 
-This means if Redis is down, we may lose this correspondence,
-but Celery-provided admin UI can still be used to monitor status of tasks
-(just without dataset correspondence)."""
-
-from typing import List, Optional, TypedDict, Union
+from typing import List, Optional, TypedDict, Union, cast
 import traceback
 
 from celery.result import AsyncResult
@@ -17,13 +12,21 @@ from . import cache
 TaskError = TypedDict(
     'TaskError',
     {'type': str, 'message': str})
+"""Error description for a failed task."""
+
 
 TaskProgress = TypedDict(
     'TaskProgress',
     {'total': Union[int, None], 'current': int})
+"""Progress description for task in progress."""
 
 
 class IndexingTaskCeleryMeta(TypedDict):
+    """
+    Represents extra metadata for indexing task.
+    This structure is stored in Celery using the ``meta`` attribute.
+    """
+
     requested_refs: Optional[str]  # Union[list[str], None]
     """Citation refs requested for indexing, as a comma-separated list."""
 
@@ -38,6 +41,11 @@ class IndexingTaskCeleryMeta(TypedDict):
 
 
 class IndexingTaskDescription(TypedDict):
+    """
+    Indexing task description is built from Celery’s basic task metadata
+    and custom metadata that conforms to :class:`IndexingTaskCeleryMeta`.
+    """
+
     task_id: str
     """Celery task ID."""
 
@@ -123,7 +131,7 @@ def describe_indexing_task(tid: str) -> IndexingTaskDescription:
         outcome_summary=None,
     )
 
-    meta = result.info or {}
+    meta = cast(IndexingTaskCeleryMeta, result.info or {})
 
     if isinstance(meta, Exception):
         task['error'] = dict(
@@ -155,7 +163,7 @@ def describe_indexing_task(tid: str) -> IndexingTaskDescription:
         elif result.failed():
             err_msg = meta.get('exc_message', ['N/A'])
             task['error'] = dict(
-                type=meta.get('exc_type', 'N/A'),
+                type=str(meta.get('exc_type', 'N/A')),
                 message='\n'.join(err_msg)
                         if isinstance(err_msg, list)
                         else repr(err_msg))
