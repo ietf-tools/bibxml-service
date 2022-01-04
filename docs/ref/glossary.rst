@@ -5,7 +5,7 @@ Glossary
 .. glossary::
 
    document
-       Generally, this refers to a standard.
+       In context of BibXML, this refers to a standard.
 
    citation
        Document metadata used to reference a document when citing.
@@ -14,18 +14,28 @@ Glossary
        In BibXML service, data for a single citation can be provided
        by multiple datasets.
 
+       For indexed citations, data for a citation with particular :term:`docid:`
+       consists of data in ``body`` on ``RefData`` instance(s) that specify
+       that docid.
+
    document identifier
    docid
-       Contained in ``docid`` field of citation’s Relaton representation
-       as a pair ``{ type, id }``, where ``type`` is :term:`document type`
+       Identifier given to the document by the publisher and/or author.
+
+       Contained in ``docid`` field of citation’s Relaton representation,
+       and is a pair ``{ type, id }``, where ``type`` is :term:`document type`
        and determines the format of ``id``.
 
-       A single citation can have multiple IDs (e.g., a DOI, an ISBN, etc.).
+       A single document can have multiple identifiers (e.g., a DOI, an ISBN, etc.).
+       Each identifier is expected to be universally unique to this document.
 
-       - It is unclear whether multiple IDs of the same *type* is logically valid.
+       .. note:: Not all identifier formats are standardized at this time.
+
+       .. todo:: Clarify whether citation with more than one ID of the same *type*
+                 is a logically valid scenario.
 
    document type
-       Represents a family of documents.
+       Part of :term:`document identifier` representing the family of documents.
        Often but not always the same as publishing organization’s abbreviation.
 
        Contained in ``docid[*].type`` field of citation’s Relaton representation.
@@ -48,6 +58,8 @@ Glossary
        Unique per dataset.
 
        - Not the same as :term:`document identifier`.
+         Identifier can be considered part of public API,
+         while reference is more an implementation detail of BibXML service.
        - If multiple references (typically from different datasets)
          contain the same ``{ type, id }`` combination in their data,
          those references are treated as representing the same :term:`citation`.
@@ -56,6 +68,7 @@ Glossary
 
    static dataset
    internal dataset
+   internal source
        Citation source that allows to retrieve all of its citations in bulk
        in Relaton format with minimal or no processing.
 
@@ -63,8 +76,10 @@ Glossary
        with Relaton citation data serialized to YAML files.
 
    external dataset
-       Citation source that allows to retrieve a single citation
-       given document type and ID. Retrieval incurs a network request
+   external source
+       Citation source that allows to retrieve a *single* citation
+       given :term:`document identifier` (type and ID).
+       Retrieval incurs a network request
        and the cost of on-the-fly conversion to requested format
        (Relaton or BibXML).
 
