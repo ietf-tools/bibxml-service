@@ -1,6 +1,6 @@
-=====================================================
-``main`` — citation data model, retrieval API and GUI
-=====================================================
+=========================================
+``main`` — citation retrieval API and GUI
+=========================================
 
 .. contents::
    :local:
@@ -8,9 +8,23 @@
 Views
 =====
 
+.. automodule:: main.views
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Utility/generic views
+---------------------
+
 .. automodule:: main.util
    :members:
    :show-inheritance:
+
+Template tags
+-------------
+
+.. automodule:: main.templatetags.relaton
+   :members:
 
 Models
 ======

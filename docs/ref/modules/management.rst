@@ -2,6 +2,8 @@
 ``management`` — citation sourcing
 ==================================
 
+.. todo:: Complete management module reference.
+
 .. module:: management
 
 .. contents::
