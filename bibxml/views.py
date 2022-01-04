@@ -38,4 +38,6 @@ def readable_openapi_spec(request, spec: str):
 
 
 def readable_openapi_spec_main(request):
+    """A shortut for :func:`readable_openapi_spec`
+    with pre-filled spec ID referencing main OpenAPI spec."""
     return readable_openapi_spec(request, 'openapi_spec_main')
