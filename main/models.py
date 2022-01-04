@@ -2,7 +2,7 @@ from django.db import models
 
 
 class RefData(models.Model):
-    """Holds indexed citation metadata.
+    """Holds :term:`citation` data.
 
     Model meta notes:
 
@@ -24,11 +24,11 @@ class RefData(models.Model):
                   "Corresponds to source dataset filename without extension.")
     """
     Corresponds to object name within source dataset,
-    filename extension excluded.
+    filename extension excluded. See :term:`ref`.
     """
 
     body = models.JSONField()
-    """Contains canonical Relaton representation of the citation."""
+    """Contains canonical Relaton representation of the :term:`citation`."""
 
     representations = models.JSONField()
     """Contains alternative representations of the citation.
