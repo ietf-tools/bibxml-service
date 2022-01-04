@@ -31,6 +31,7 @@ shared_context = dict(
     authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     snapshot=settings.SNAPSHOT,
 )
+"""Shared context passed to GUI templates."""
 
 
 def home(request, dataset_id=None, ref=None):
@@ -53,8 +54,8 @@ def home(request, dataset_id=None, ref=None):
     ))
 
 
-# Indexed sources
-# ===============
+# Browsing by document ID
+# =======================
 
 def browse_citation_by_docid(request, doctype=None, docid=None):
     if doctype and docid:
@@ -129,35 +130,6 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
             return HttpResponseRedirect(request.headers.get('referer', '/'))
 
 
-def browse_indexed_reference(request, dataset_id, ref):
-    parsed_ref = unquote_plus(ref)
-
-    try:
-        if dataset_id == 'doi':
-            try:
-                data = get_doi_ref(parsed_ref)
-            except Exception:
-                return error_views.server_error(request)
-        else:
-            data = get_indexed_ref(dataset_id, parsed_ref)
-
-    except RefNotFoundError:
-        raise Http404(
-            "Requested reference “{}” "
-            "could not be found in dataset “{}” "
-            "(or external source is unavailable)".format(
-                parsed_ref,
-                dataset_id))
-
-    else:
-        return render(request, 'browse/citation_details.html', dict(
-            dataset_id=dataset_id,
-            ref=ref,
-            data=data,
-            **shared_context,
-        ))
-
-
 class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
@@ -167,22 +139,6 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
     def get_context_data(self, **kwargs):
         return dict(
             **super().get_context_data(**kwargs),
-            **shared_context,
-        )
-
-
-class IndexedDatasetCitationListView(ListView):
-    model = RefData
-    paginate_by = 20
-    template_name = 'browse/dataset.html'
-
-    def get_queryset(self) -> QuerySet[RefData]:
-        return list_refs(self.kwargs['dataset_id'])
-
-    def get_context_data(self, **kwargs):
-        return dict(
-            **super().get_context_data(**kwargs),
-            dataset_id=self.kwargs['dataset_id'],
             **shared_context,
         )
 
@@ -256,3 +212,51 @@ def browse_external_reference(request, dataset_id, ref=None):
 
         # If we’re here, it must’ve failed
         return HttpResponseRedirect(origin)
+
+
+# Browsing by dataset (semi-internal)
+# ===================================
+
+def browse_indexed_reference(request, dataset_id, ref):
+    parsed_ref = unquote_plus(ref)
+
+    try:
+        if dataset_id == 'doi':
+            try:
+                data = get_doi_ref(parsed_ref)
+            except Exception:
+                return error_views.server_error(request)
+        else:
+            data = get_indexed_ref(dataset_id, parsed_ref)
+
+    except RefNotFoundError:
+        raise Http404(
+            "Requested reference “{}” "
+            "could not be found in dataset “{}” "
+            "(or external source is unavailable)".format(
+                parsed_ref,
+                dataset_id))
+
+    else:
+        return render(request, 'browse/citation_details.html', dict(
+            dataset_id=dataset_id,
+            ref=ref,
+            data=data,
+            **shared_context,
+        ))
+
+
+class IndexedDatasetCitationListView(ListView):
+    model = RefData
+    paginate_by = 20
+    template_name = 'browse/dataset.html'
+
+    def get_queryset(self) -> QuerySet[RefData]:
+        return list_refs(self.kwargs['dataset_id'])
+
+    def get_context_data(self, **kwargs):
+        return dict(
+            **super().get_context_data(**kwargs),
+            dataset_id=self.kwargs['dataset_id'],
+            **shared_context,
+        )
