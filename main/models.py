@@ -4,6 +4,10 @@ from django.db import models
 class RefData(models.Model):
     """Holds :term:`citation` data.
 
+    Always contains a Relaton representation,
+    and can contain pre-crafted representations in other formats
+    (like ``bibxml``).
+
     Model meta notes:
 
     - Explicit table name ``api_ref_data`` is used
