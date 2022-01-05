@@ -55,7 +55,7 @@ def list_doctypes() -> List[Tuple[str, str]]:
         (i.doctype, i.sample_id)
         for i in (
             RefDataManager.
-            order_by('?').  # This may be inefficient as dataset grows
+            # order_by('?').  # This may be inefficient as dataset grows
             raw('''
                 select distinct on (doctype) id, doctype, sample_id
                 from (
