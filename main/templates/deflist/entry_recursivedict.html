@@ -9,6 +9,6 @@
       {% endfor %}
     </dl>
   {% else %}
-    {{ val }}
+    {{ val|default:"—" }}
   {% endif %}
 </dd>

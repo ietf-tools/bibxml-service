@@ -7,6 +7,6 @@
   {% if tmpl %}
     {% include tmpl with val=val %}
   {% else %}
-    {{ val }}
+    {{ val|default:"—" }}
   {% endif %}
 </dd>
