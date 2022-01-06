@@ -23,6 +23,7 @@
           {% endfor %}
         {% endif %}
         {% include "deflist/entry.html" with key="revdate" val=data.revdate|default:"—" %}
+        {% include "deflist/entry.html" with key="fetched" val=data.fetched|default:"—" %}
         {% for c in data.contributor|as_list %}
           {% with c.organization as org and c.person.name.surname.content as surname and c.person.name.forename.content as forename and c.person.name.completename.content as fullname %}
             {% if surname or forename %}  
