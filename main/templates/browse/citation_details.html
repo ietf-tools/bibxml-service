@@ -58,7 +58,7 @@
         {% include "deflist/entry.html" with key="language" val=data.language|default:"—" %}
         {% include "deflist/entry.html" with key=data.link.type|default:"link" val=data.link.content %}
         {% for title in data.title|as_list %}
-          {% include "deflist/entry.html" with key=title.type|stringformat:"s (title)" val=title.content %}
+          {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content %}
         {% endfor %}
         {% include "deflist/entry.html" with key="abstract" val=data.abstract|default:"—" %}
       </dl>
