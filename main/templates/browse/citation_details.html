@@ -2,12 +2,20 @@
 
 {% load relaton %}
 
-{% block title %}{{ block.super }} — {{ ref }}{% endblock %}
+{% block title %}
+  {{ block.super }}
+  —
+  {% with docid=data.docid|as_list|first %}
+    {{ docid.type }}/{{ docid.id }}
+    —
+  {% endwith %}
+  {% include "relaton/first_title.html" with title=data.title %}
+{% endblock %}
 
 
 {% block content %}
   <header class="">
-    {% include "relaton/doc_ids.html" with ids=data.docid|as_list ref=ref %}
+    {% include "relaton/doc_ids.html" with ids=data.docid|as_list %}
     <h2 class="fw3 f3 measure-wide">
       {% include "relaton/first_title.html" with title=data.title %}
     </h2>
