@@ -52,6 +52,7 @@
         {% for title in data.title|as_list %}
           {% include "deflist/entry.html" with key=title.type|stringformat:"s (title)" val=title.content %}
         {% endfor %}
+        {% include "deflist/entry.html" with key="abstract" val=data.abstract|default:"—" %}
       </dl>
     </div>
   </div>
