@@ -1,4 +1,7 @@
+from typing import Any
 from django import template
+
+from common.util import as_list as base_as_list
 
 
 register = template.Library()
@@ -6,15 +9,13 @@ register = template.Library()
 
 @register.filter
 def as_list(value):
-    """Coerces value to list, if needed.
+    """Returns the value as a list (see :func:`main.util.as_list`),
+    or the value itself if it is either ``None``
+    or a list containing only ``None`` values."""
 
-    Returns either the value,
-    or a single-item list with value if value is not a list,
-    or None if value is None."""
+    result: Any = base_as_list(value)
 
-    if isinstance(value, list):
-        return value
-    elif value is None:
+    if len(result) == 0 or all([val is None for val in result]):
         return None
     else:
-        return [value]
+        return result
