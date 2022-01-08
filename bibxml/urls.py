@@ -99,7 +99,7 @@ urlpatterns = [
 
         path('types/', include([
             path('<doctype>/', include([
-                path('<docid>/', require_safe(
+                path('<path:docid>/', require_safe(
                     public_views.browse_citation_by_docid
                 ), name='browse_citation_by_docid'),
             ])),
