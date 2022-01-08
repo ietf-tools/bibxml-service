@@ -132,7 +132,7 @@ class CitationSearchResultListView(BaseCitationSearchView):
                 params.pop('page')
             except KeyError:
                 pass
-            params_encoded = params.urlencode(())
+            params_encoded = params.urlencode()
 
             if page_obj.has_next():
                 meta['next'] = "{}?page={}&{}".format(
