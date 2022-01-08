@@ -82,9 +82,9 @@ def get_indexed_ref_by_docid(type: str, id: str) -> RefData:
 def get_indexed_ref(dataset_id, ref, format='relaton'):
     """Retrieves citation from static indexed dataset.
 
-    :param string format: "bibxml" or "relaton"
-    :returns object: if format is "relaton", a dict.
-    :returns string: if format is "bibxml", an XML string.
+    :param str format: "bibxml" or "relaton"
+    :returns dict: if format is "relaton", a :class:`dict`.
+    :returns str: if format is "bibxml", an XML string.
     :raises RefNotFoundError: either reference or requested format not found
     """
 
@@ -94,9 +94,10 @@ def get_indexed_ref(dataset_id, ref, format='relaton'):
 def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
     """Retrieves citation from static indexed dataset.
 
-    :param string format: "bibxml" or "relaton"
-    :returns object: if format is "relaton", a dict.
-    :returns string: if format is "bibxml", an XML string.
+    :param str format: "bibxml" or "relaton"
+    :param django.db.models.Q query: query
+    :returns: reference in specified format, if available
+    :rtype: dict or str, depending on format
     :raises RefNotFoundError: either reference or requested format not found
     """
 

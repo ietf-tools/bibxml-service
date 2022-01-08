@@ -9,7 +9,7 @@ from main.exceptions import RefNotFoundError
 def get_doi_ref(ref, format='relaton'):
     """Uses ``doi2ietf`` library to obtain DOI results matching given reference.
 
-    :param format string: "bibxml" or "relaton"
+    :param str format: "bibxml" or "relaton"
     :returns object: if format is "relaton", the first DOI result as dict.
     :returns string: if format is "bibxml", the first DOI result as XML string.
     :raises RefNotFoundError: reference not found.
