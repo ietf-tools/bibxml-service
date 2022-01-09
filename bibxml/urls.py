@@ -112,7 +112,7 @@ urlpatterns = [
             ), name='get_citation_by_docid'),
             path('external/<dataset_id>/', require_safe(
                 public_views.browse_external_reference
-            ), name='load_external_citation'),
+            ), name='get_external_citation'),
         ])),
 
         path('indexed-sources/', include([
