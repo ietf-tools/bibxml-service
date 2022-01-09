@@ -6,13 +6,13 @@ from django.db.models.query import QuerySet, Q
 from django.db.models import TextField
 from django.db.models.functions import Cast
 
-from .exceptions import RefNotFoundError
 
 from common.util import as_list
 from bib_models import BibliographicItem
 from bib_models.merger import bibitem_merger
 
 from .types import DocID, SourcedBibliographicItem
+from .exceptions import RefNotFoundError
 from .models import RefData
 
 
