@@ -11,14 +11,12 @@ from .exceptions import RefNotFoundError
 from bib_models import BibliographicItem
 from bib_models.merger import bibitem_merger
 
-# TODO: Obsolete, now that we gave up on multi-DB approach
-RefDataManager = RefData.objects
 from .types import DocID
 from .models import RefData
 
 
 def list_refs(dataset_id) -> QuerySet[RefData]:
-    return RefDataManager.filter(dataset__iexact=dataset_id)
+    return RefData.objects.filter(dataset__iexact=dataset_id)
 
 
 def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
@@ -28,7 +26,7 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
     Supports typical websearch operators like quotes, plus, minus, OR, AND.
     """
     return (
-        RefDataManager.
+        RefData.objects.
         annotate(search=SearchVector(Cast('body', TextField()))).
         filter(search=SearchQuery(text, search_type='websearch')))
 
@@ -45,7 +43,7 @@ def search_refs_relaton_struct(
     subqueries = ['body @> %s::jsonb' for obj in objs]
     query = 'SELECT * FROM api_ref_data WHERE %s' % ' OR '.join(subqueries)
     return (
-        RefDataManager.
+        RefData.objects.
         raw(query, [json.dumps(obj) for obj in objs]))
 
 
@@ -209,7 +207,7 @@ def list_doctypes() -> List[Tuple[str, str]]:
     return [
         (i.doctype, i.sample_id)
         for i in (
-            RefDataManager.
+            RefData.objects.
             # order_by('?').  # This may be inefficient as dataset grows
             raw('''
                 select distinct on (doctype) id, doctype, sample_id
@@ -291,7 +289,7 @@ def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
         raise ValueError("Unknown citation format requested")
 
     try:
-        result = RefDataManager.get(
+        result = RefData.objects.get(
             query &
             Q(dataset__iexact=dataset_id))
     except RefData.DoesNotExist:
