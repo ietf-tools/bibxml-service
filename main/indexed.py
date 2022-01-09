@@ -242,11 +242,11 @@ def build_citation_for_docid(id: DocID) -> BibliographicItem:
                                 instance.
     :raises RefNotFoundError: if no matching refs were found.
     """
-    doctype = json.dumps(id['type'])
-    docid = json.dumps(id['id'])
+    doctype = json.dumps('(?i)^%s$' % id['type'])
+    docid = json.dumps('(?i)^%s$' % id['id'])
 
     refs = search_refs_relaton_field({
-        'docid[*]': '@.type == %s && @.id == %s' % (
+        'docid[*]': '@.type like_regex %s && @.id like_regex %s' % (
             doctype,
             docid,
         ),
