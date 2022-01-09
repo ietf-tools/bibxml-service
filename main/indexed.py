@@ -23,7 +23,7 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
     """Uses given string to search across serialized JSON representations
     of Relaton citation data.
 
-    Supports typical websearch operators like quotes, plus, minus, OR, AND.
+    Supports PostgreSQL websearch operators like quotes, plus, minus, OR, AND.
     """
     return (
         RefData.objects.
@@ -33,12 +33,14 @@ def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
 
 def search_refs_relaton_struct(
         *objs: Union[Dict[Any, Any], List[Any]]) -> QuerySet[RefData]:
-    """Uses PostgreSQL’s JSON containment query.
-
-    Returns citations which Relaton structure contains
-    at least one of given ``obj`` structures (they are OR'ed).
+    """Uses PostgreSQL’s JSON containment query
+    to find bibliographic items containing given structure.
 
     .. seealso:: PostgreSQL docs on ``@>`` operator.
+
+    :returns: RefData where Relaton body contains
+              at least one of given ``obj`` structures (they are OR'ed).
+    :rtype: Queryset[RefData]
     """
     subqueries = ['body @> %s::jsonb' for obj in objs]
     query = 'SELECT * FROM api_ref_data WHERE %s' % ' OR '.join(subqueries)
@@ -264,7 +266,7 @@ def build_citation_for_docid(id: DocID) -> BibliographicItem:
 
 
 def get_indexed_ref(dataset_id, ref, format='relaton'):
-    """Retrieves citation from static indexed dataset.
+    """Retrieves a reference from an indexed internal dataset.
 
     :param str format: "bibxml" or "relaton"
     :returns dict: if format is "relaton", a :class:`dict`.
@@ -276,7 +278,7 @@ def get_indexed_ref(dataset_id, ref, format='relaton'):
 
 
 def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
-    """Retrieves citation from static indexed dataset.
+    """Uses query to retrieve a reference from an indexed internal dataset.
 
     :param str format: "bibxml" or "relaton"
     :param django.db.models.Q query: query
