@@ -87,7 +87,7 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
     except RefNotFoundError:
         search_query = QueryDict('', mutable=True)
         search_query.update({
-            'query': '{} {}'.format(doctype, docid),
+            'query': '{}'.format(docid),
         })
         messages.info(
             request,
