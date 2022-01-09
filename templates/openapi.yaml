@@ -19,47 +19,50 @@ servers:
 
 paths:
 
-  /docid/{type}/{id}/:
-    parameters:
-    - name: document type
-      in: path
-      description: |
-        Dataset type.
-
-        Note that the schema lists _currently available types_
-        (present across indexed citations at the time of viewing this page),
-        other document types can be available at different points in time
-        depending on index state.
-      required: true
-      schema:
-        $ref: '#/components/schemas/AvailableDoctypes'
-    - name: id
-      in: path
-      description: |
-        Document ID. For example,
-        {% for doctype in known_doctypes %}
-        - `{{ doctype.1 }}` for document type {{ doctype.0 }}
-        {% endfor %}
-      required: true
-      schema:
-        type: string
-
+  /by-docid/:
     get:
+      summary: Get citation by document ID
+      description: >
+        Retrieve a citation by document identifier.
+      operationId: getCitationByDocId
+
       parameters:
+      - name: doctype
+        in: query
+        description: |
+          Document type.
+
+          Note that the schema lists _currently available types_
+          (present across indexed citations at the time of viewing this page),
+          other document types can be available at different points in time
+          depending on index state.
+        required: true
+        schema:
+          $ref: '#/components/schemas/AvailableDoctypes'
+
+      - name: docid
+        in: query
+        description: |
+          Document ID. For example,
+          {% for doctype in known_doctypes %}
+          - `{{ doctype.1 }}` for document type {{ doctype.0 }}
+          {% endfor %}
+        required: true
+        schema:
+          type: string
+
       - name: format
         in: query
         description: |
           Format to return citation in.
           If `bibxml` is requested, returns an application/xml response;
           otherwise application/json response with Relaton structure under `data` key.
+
+          (Note: `bibxml` is not supported yet by this endpoint.)
         schema:
           type: string
           default: relaton
           enum: [bibxml, relaton]
-      summary: Get citation by document ID
-      description: >
-        Retrieve citation with given document identifier (type & ID).
-      operationId: getCitationByDocId
 
       responses:
         200:
@@ -122,12 +125,14 @@ paths:
           enum: [bibxml, relaton]
       summary: Get citation by reference in source dataset
       description: |
-        This endpoint allows you to retrieve a citation from given dataset by reference.
-        For external datasets (currently, `doi`), this always incurs an additional network request.
+        This endpoint allows you to retrieve a reference from given dataset.
+
+        For external datasets, this always incurs an additional network request.
 
         NOTE: This endpoint may not be what you want to use, as datasets represent
         internal sources of citation data. The /docid/… endpoint allows
         you to get a citation by document type and ID, which may be more useful.
+        External dataset support for this endpoint may be removed.
       operationId: getCitationByReferenceId
 
       responses:
