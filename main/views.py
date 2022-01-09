@@ -73,16 +73,13 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
     passing space-separated document type and ID as query.
     """
 
-    doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+    doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
 
-    if not doctype or not docid:
-        return HttpResponseBadRequest("Missing document type and/or ID")
+    if not docid:
+        return HttpResponseBadRequest("Missing document ID")
 
     try:
-        citation = build_citation_for_docid({
-            'id': docid,
-            'type': doctype,
-        })
+        citation = build_citation_for_docid(docid, doctype)
 
     except RefNotFoundError:
         search_query = QueryDict('', mutable=True)
@@ -93,10 +90,10 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
             request,
             "Could not find a bibliographic item "
             "exactly matching requested document identifier "
-            "of type “{}” and ID “{}”, "
+            "with ID “{}” (type {}), "
             "you were redirected to search".format(
-                doctype,
-                docid))
+                docid,
+                doctype or "unspecified"))
         return redirect('{}?{}'.format(
             reverse('search_citations'),
             search_query.urlencode(),

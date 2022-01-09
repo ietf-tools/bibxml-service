@@ -59,27 +59,24 @@ def get_doi_ref(request, ref):
 
 
 def get_by_docid(request):
-    doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+    doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
     format = request.GET.get('format', 'relaton')
 
-    if not doctype or not docid:
-        return HttpResponseBadRequest("Missing document type and/or ID")
+    if not docid:
+        return HttpResponseBadRequest("Missing document ID")
 
     if format != 'relaton':
         return HttpResponseBadRequest(
             "Only Relaton format is supported for now by this endpoint")
 
     try:
-        citation = build_citation_for_docid({
-            'id': docid,
-            'type': doctype,
-        })
+        citation = build_citation_for_docid(docid, doctype)
     except RefNotFoundError:
         return JsonResponse({
             "error":
                 "Unable to find bibliographic item matching "
-                "document type {} and ID {}".
-                format(doctype, docid),
+                "document ID {} (type {})".
+                format(docid, doctype or "unspecified"),
         }, status=404)
     else:
         if format == 'bibxml':

@@ -6,47 +6,19 @@
 
 {% block content %}
 
-  {% if doctypes %}
-    <h2 class="f5">Find document by ID</h2>
-    <form class="black-80" method="GET" action="{% url "get_citation_by_docid" %}">
-      {% include "browse/search_by_docid_form.html" with highlight=1 %}
-      <div class="f6 black-60 db mb4 measure lh-copy">
-        <p>
-          Finds a document exactly matching provided type and ID.
-          If one is found, you’ll be redirected to it.
-        <p>Document identifier format depends on document type. Examples:
-        <ul>
+  <form class="black-80" method="GET" action="{% url "get_citation_by_docid" %}">
+    {% include "browse/search_by_docid_form.html" with highlight=1 %}
+    <div class="f6 black-60 db mb4 measure lh-copy">
+      {% if doctypes %}
+        <p>Example identifiers:
+        <ul class="list pa0">
           {% for doctype in doctypes %}
             <li class="nowrap">
               <code class="nowrap pa1 ph2 bg-light-gray black-80">{{ doctype.1 }}</code>
               for document type “{{ doctype.0 }}”
           {% endfor %}
         </ul>
-      </div>
-    </form>
-  {% endif %}
-
-  <h2 class="f5">Search documents for substring match</h2>
-  <form class="black-80" method="GET" action="{% url "search_citations" %}">
-    <input
-      id="query"
-      name="query"
-      type="text"
-      placeholder="Query"
-      class="w-60 input-reset dib ba b--black-20 pa2"
-      aria-describedby="query-desc" />
-    <input
-      type="submit"
-      class="w-15 dim pa2 ph3 dib ba b--dark-blue bg-dark-blue white"
-      value="Search" />
-    <div id="query-desc" class="f6 black-60 db mb4 measure lh-copy">
-      <p>Searches indexed sources only.
-      <p>Some operators are supported.
-         Example query: <code class="nowrap pa1 ph2 bg-light-gray black-80">+nist "metropolitan area" -"wind damage"</code>.
-      <p>
-        Note: this search matches the query against entire JSON representations of citations.
-        (API may support
-        <a href="{% url "openapi_readable_spec" "openapi_spec_main" %}#operation/searchCitations">other search mechanisms</a>.)
+      {% endif %}
     </div>
   </form>
 

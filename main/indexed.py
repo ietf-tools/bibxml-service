@@ -231,9 +231,9 @@ def list_doctypes() -> List[Tuple[str, str]]:
                 '''))]
 
 
-def build_citation_for_docid(id: DocID) -> BibliographicItem:
+def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> BibliographicItem:
     """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
-    that matched given document identifier.
+    that matched given document identifier (``docid.id`` value).
 
     Returns complete citation representation contained in ``body``.
     If multiple refs were found, their citation data are merged.
@@ -242,15 +242,18 @@ def build_citation_for_docid(id: DocID) -> BibliographicItem:
                                 instance.
     :raises RefNotFoundError: if no matching refs were found.
     """
-    doctype = json.dumps('(?i)^%s$' % id['type'])
-    docid = json.dumps('(?i)^%s$' % id['id'])
+    docid = json.dumps('(?i)^%s$' % id)
 
-    refs = search_refs_relaton_field({
-        'docid[*]': '@.type like_regex %s && @.id like_regex %s' % (
+    if id_type:
+        doctype = json.dumps('(?i)^%s$' % id_type)
+        query = '@.type like_regex %s && @.id like_regex %s' % (
             doctype,
             docid,
-        ),
-    }, exact=True)
+        )
+    else:
+        query = '@.id like_regex %s' % docid
+
+    refs = search_refs_relaton_field({'docid[*]': query}, exact=True)
 
     if len(refs) == 1:
         # print("Obtained raw ref", json.dumps(refs[0].body, indent=4))
