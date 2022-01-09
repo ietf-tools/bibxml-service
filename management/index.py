@@ -7,8 +7,7 @@ import yaml
 from celery.utils.log import get_task_logger
 from django.db import transaction
 
-# NOTE: Cross-app import is inelegant
-from main.indexed import RefDataManager
+from main.models import RefData
 
 
 logger = get_task_logger(__name__)
@@ -82,7 +81,7 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                                 relaton_fhandler.read(),
                                 Loader=yaml.SafeLoader)
 
-                            RefDataManager.update_or_create(
+                            RefData.objects.update_or_create(
                                 ref=ref,
                                 dataset=ds_id,
                                 defaults=dict(
@@ -102,7 +101,7 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
             # and some of those refs were not found in source,
             # delete those refs from the dataset.
             missing_refs = requested_refs - indexed_refs
-            (RefDataManager.
+            (RefData.objects.
                 filter(dataset=ds_id).
                 exclude(ref__in=missing_refs).
                 delete())
@@ -110,7 +109,7 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
         else:
             # If we’re reindexing the entire dataset,
             # delete all refs not found in source.
-            (RefDataManager.
+            (RefData.objects.
                 filter(dataset=ds_id).
                 exclude(ref__in=indexed_refs).
                 delete())
@@ -122,6 +121,6 @@ def reset_index_for_dataset(ds_id):
     """Deletes all references for given dataset."""
 
     with transaction.atomic():
-        (RefDataManager.
+        (RefData.objects.
             filter(dataset=ds_id).
             delete())
