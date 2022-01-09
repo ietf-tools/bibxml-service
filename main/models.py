@@ -63,5 +63,11 @@ class RefData(models.Model):
                     config='english'),
                 name='body_astext_gin',
             ),
-            # TODO: Add more specific indexes for RefData.body
+            GinIndex(
+                SearchVector(
+                    'body',
+                    config='english'),
+                name='body_ts_gin',
+            ),
+            # TODO: Add more specific indexes for RefData.body subfields
         ]
