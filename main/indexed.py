@@ -271,7 +271,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> Bibliogr
         for docid in as_list(base['docid']):
             if seen.get(docid['id'], docid['type']) != docid['type']:
                 raise RefNotFoundError(
-                    "Refs with the same ID but incompatible types found", id)
+                    "Refs with the same docid.id but incompatible types found", id)
             seen[docid['id']] = docid['type']
 
         return BibliographicItem(**base)
