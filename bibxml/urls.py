@@ -38,6 +38,11 @@ urlpatterns = [
             path('search/<query>/', require_safe(
                 public_api.CitationSearchResultListView.as_view()
             ), name='api_search'),
+
+            path('by-docid/', require_safe(
+                public_api.get_by_docid
+            ), name='api_get_by_docid'),
+
             path('ref/', include([
                 path('doi/<ref>/', require_safe(
                     public_api.get_doi_ref
@@ -97,22 +102,14 @@ urlpatterns = [
             ])),
         ])),
 
-        path('types/', include([
-            path('<doctype>/', include([
-                path('<path:docid>/', require_safe(
-                    public_views.browse_citation_by_docid
-                ), name='browse_citation_by_docid'),
-            ])),
-        ])),
-
         path('search/', require_safe(
             public_views.CitationSearchResultListView.as_view()
         ), name='search_citations'),
 
-        path('load-and-redirect/', include([
+        path('get-one/', include([
             path('by-docid/', require_safe(
                 public_views.browse_citation_by_docid
-            ), name='load_citation_by_docid'),
+            ), name='get_citation_by_docid'),
             path('external/<dataset_id>/', require_safe(
                 public_views.browse_external_reference
             ), name='load_external_citation'),

@@ -65,11 +65,18 @@
     </div>
   </div>
 
-  {% include "citation/download_links.html" with dataset_id=dataset_id ref=ref %}
+  {% include "citation/download_links.html" with docid=data.docid.0 %}
 
-  <p class="gray f7">
-    Available using API: {% url "api_get_ref" dataset_id ref %}
-  </p>
+  <div class="gray f7">
+    <p class="gray f7">
+      Available using API:
+    </p>
+    <ul class="list">
+      {% for docid in data.docid|as_list %}
+        <li>{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}
+      {% endfor %}
+    </ul>
+  </div>
 
   <dl class="lh-title pv2 mt2">
     {% if data.keyword %}

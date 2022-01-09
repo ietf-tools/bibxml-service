@@ -2,16 +2,16 @@
 
 from urllib.parse import unquote_plus
 
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.db.models.query import Q
 from django.conf import settings
 
-from main.exceptions import RefNotFoundError
-
+from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
 from .indexed import get_indexed_ref_by_query
+from .indexed import build_citation_for_docid
 from .external import get_doi_ref as _get_doi_ref
-from .util import BaseCitationSearchView
+from .exceptions import RefNotFoundError
 
 
 DEFAULT_LEGACY_REF_PREFIX = 'reference.'
@@ -56,6 +56,39 @@ def get_doi_ref(request, ref):
         }, status=404)
     else:
         return JsonResponse({"data": result})
+
+
+def get_by_docid(request):
+    doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+    format = request.GET.get('format', 'relaton')
+
+    if not doctype or not docid:
+        return HttpResponseBadRequest("Missing document type and/or ID")
+
+    if format != 'relaton':
+        return HttpResponseBadRequest(
+            "Only Relaton format is supported for now by this endpoint")
+
+    try:
+        citation = build_citation_for_docid({
+            'id': docid,
+            'type': doctype,
+        })
+    except RefNotFoundError:
+        return JsonResponse({
+            "error":
+                "Unable to find bibliographic item matching "
+                "document type {} and ID {}".
+                format(doctype, docid),
+        }, status=404)
+    else:
+        if format == 'bibxml':
+            return HttpResponse(
+                result,
+                content_type="application/xml",
+                charset="utf-8")
+        else:
+            return JsonResponse({"data": citation.dict()})
 
 
 def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
@@ -122,7 +155,7 @@ class CitationSearchResultListView(BaseCitationSearchView):
     query_in_path = True
 
     def render_to_response(self, context):
-        meta = dict(total_records=self.object_list.count())
+        meta = dict(total_records=len(self.object_list))
 
         page_obj = context['page_obj']
         if page_obj:
@@ -148,5 +181,5 @@ class CitationSearchResultListView(BaseCitationSearchView):
 
         return JsonResponse({
             "meta": meta,
-            "data": [obj.body for obj in context['object_list']],
+            "data": [obj.dict() for obj in context['object_list']],
         })

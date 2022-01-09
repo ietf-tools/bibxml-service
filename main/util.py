@@ -1,14 +1,16 @@
 import json
-from typing import Any
+from typing import Any, List
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponseBadRequest
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
 
+from .types import SourcedBibliographicItem
 from .models import RefData
-from .indexed import RefDataManager
+from .indexed import build_search_results
 from .indexed import search_refs_json_repr_match, search_refs_relaton_struct
+from .indexed import search_refs_relaton_field
 
 
 class BaseCitationSearchView(BaseListView):
@@ -16,7 +18,7 @@ class BaseCitationSearchView(BaseListView):
 
     Intended to be usable for both template-based GUI and API views."""
 
-    model = RefData
+    # model = RefData
     paginate_by = 20
 
     query_in_path = False
@@ -52,19 +54,19 @@ class BaseCitationSearchView(BaseListView):
 
         return super().get(request, *args, **kwargs)
 
-    def get_queryset(self) -> QuerySet[RefData]:
+    def get_queryset(self) -> List[SourcedBibliographicItem]:
         """Returns a ``QuerySet`` of ``RefData`` objects.
 
         If query is present, delegates to :meth:`dispatch_handle_query`,
         otherwise behavior depends on :attr:`show_all_by_default`."""
 
         if self.query is not None and self.query_format is not None:
-            return self.dispatch_handle_query(self.query)
+            return build_search_results(self.dispatch_handle_query(self.query))
         else:
             if self.show_all_by_default:
-                return RefDataManager.all()
+                return build_search_results(RefData.objects.all())
             else:
-                return RefDataManager.none()
+                return []
 
     def get_context_data(self, **kwargs):
         """In addition to parent implementation,
@@ -107,14 +109,16 @@ class BaseCitationSearchView(BaseListView):
             self.query = None
             self.query_format = None
 
-    def dispatch_handle_query(self, query):
+    def dispatch_handle_query(self, query) -> QuerySet[RefData]:
         """Handles query by delegating
         to ``handle_{query-format}_query()`` method.
 
         Is not expected to throw exceptions arising from bad input."""
 
         handler = getattr(self, 'handle_%s_query' % self.query_format)
-        return handler(query)
+        qs = handler(query)
+        # print("got qs", [i.pk for i in qs])
+        return qs
 
     def parse_unsupported_query(self, query_format: str, query: str):
         raise UnsupportedQueryFormat()
@@ -123,7 +127,7 @@ class BaseCitationSearchView(BaseListView):
         return query
 
     def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
-        return search_refs_json_repr_match(query)
+        return search_refs_relaton_field({'': query})
 
     def parse_json_struct_query(self, query: str) -> dict[str, Any]:
         try:

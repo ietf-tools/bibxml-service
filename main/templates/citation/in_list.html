@@ -3,13 +3,11 @@
 {# Expects context: data, dataset_id, ref #}
 
 <p class="nowrap truncate f5 mb2">
-  <a class="link" href="{% url "browse_citation" dataset_id ref %}">
-    {% include "relaton/first_title.html" with title=data.title %}
-  </a>
+  {% include "relaton/first_title.html" with title=data.title %}
 </p>
 <div class="flex-ns items-center">
   <span class="f5 lh-copy flex-auto">
     {% include "relaton/doc_ids.html" with ids=data.docid|as_list ref=ref %}
   </span>
-  {% include "citation/download_links.html" with dataset_id=dataset_id ref=ref %}
+  {% include "citation/download_links.html" with docid=data.docid.0 %}
 </div>

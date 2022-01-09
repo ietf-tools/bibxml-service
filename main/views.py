@@ -4,6 +4,8 @@ from urllib.parse import quote_plus, unquote_plus
 
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponseNotFound, Http404
+from django.urls import reverse
+from django.http import QueryDict
 from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.conf import settings
@@ -17,6 +19,7 @@ from .exceptions import RefNotFoundError
 from .models import RefData
 from .indexed import get_indexed_ref, list_refs, list_doctypes
 from .indexed import search_refs_relaton_struct
+from .indexed import build_citation_for_docid
 from .external import get_doi_ref
 from .util import BaseCitationSearchView
 
@@ -58,76 +61,54 @@ def home(request):
 # =======================
 
 def browse_citation_by_docid(request, doctype=None, docid=None):
-    if doctype and docid:
-        parsed_docid = unquote_plus(docid)
-        citations = search_refs_relaton_struct({
-            'docid': [{
-                'type': doctype,
-                'id': parsed_docid,
-            }],
-        }, {
-            'docid': {
-                'type': doctype,
-                'id': parsed_docid,
-            },
+    """
+    Reads ``docid`` and ``doctype`` from GET query,
+    uses :func:`main.indexed.build_citation_for_docid`
+    to get a bibliographic item and in case of success
+    renders the citation details template.
+
+    If bibliographic item could not be built
+    (no matching document ID found across Relaton sources),
+    queues an ``info``-level message
+    and redirects to search page,
+    passing space-separated document type and ID as query.
+    """
+
+    doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
+
+    if not doctype or not docid:
+        return HttpResponseBadRequest("Missing document type and/or ID")
+
+    try:
+        citation = build_citation_for_docid({
+            'id': docid,
+            'type': doctype,
         })
-        num_citations = len(citations)
-        if num_citations == 1:
-            citation = citations[0]
-            return render(request, 'browse/citation_details.html', dict(
-                dataset_id=citation.dataset,
-                ref=citation.ref,
-                data=citation.body,
-                **shared_context,
-            ))
-        elif num_citations == 0:
-            return HttpResponseNotFound(
-                "Citation with docid.type {} and docid.id {} "
-                "was not found in indexed sources".format(
-                    doctype,
-                    docid,
-                ))
-        else:
-            return HttpResponseNotFound(
-                "Multiple citations with docid.type {} and docid.id {} "
-                "were found in indexed sources".format(
-                    doctype,
-                    docid
-                ))
-    else:
-        # Faciliates searching by doctype via a regular HTML form.
 
-        doctype, docid = request.GET.get('doctype'), request.GET.get('docid')
-
-        if not doctype or not docid:
-            return HttpResponseBadRequest("Missing document type and/or ID")
-
-        citations = search_refs_relaton_struct({
-            'docid': [{
-                'type': doctype,
-                'id': docid,
-            }],
-        }, {
-            'docid': {
-                'type': doctype,
-                'id': docid,
-            },
+    except RefNotFoundError:
+        search_query = QueryDict('', mutable=True)
+        search_query.update({
+            'query': '{} {}'.format(doctype, docid),
         })
-        if len(citations) == 1:
-            return redirect(
-                'browse_citation_by_docid',
+        messages.info(
+            request,
+            "Could not find a bibliographic item "
+            "exactly matching requested document identifier "
+            "of type “{}” and ID “{}”, "
+            "you were redirected to search".format(
                 doctype,
-                quote_plus(docid))
-        else:
-            messages.error(
-                request,
-                "No reliable match for a citation "
-                "matching doctype “{}” and ID “{}” "
-                "among indexed datasets ({} matches).".format(
-                    doctype,
-                    docid,
-                    len(citations)))
-            return HttpResponseRedirect(request.headers.get('referer', '/'))
+                docid))
+        return redirect('{}?{}'.format(
+            reverse('search_citations'),
+            search_query.urlencode(),
+        ))
+
+    else:
+        return render(request, 'browse/citation_details.html', dict(
+            data=citation.dict(),
+            doctypes=list_doctypes(),
+            **shared_context,
+        ))
 
 
 class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
@@ -139,6 +120,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
     def get_context_data(self, **kwargs):
         return dict(
             **super().get_context_data(**kwargs),
+            doctypes=list_doctypes(),
             **shared_context,
         )
 

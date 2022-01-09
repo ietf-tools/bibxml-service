@@ -1,15 +1,11 @@
 <div class="flex-ns mb1 mb0-ns items-center lh-copy">
   {% for docid in ids %}
-    <span class="nowrap truncate f5 flex items-center mr2">
-      <span class="f7 br3
-        {% if docid.type|lower == dataset_id|lower %}bg-dark-blue
-        {% else %}bg-gray
-        {% endif %} white ph2">{{ docid.type }}</span>
-      <span class="ph2 truncate
-        {% if docid.type|lower == dataset_id|lower %}dark-blue
-        {% else %}gray
-        {% endif %}">{{ docid.id }}</span>
-    </span>
+    <a
+        href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
+        class="nowrap dark-blue truncate f5 flex items-center mr2">
+      <span class="f7 br3 bg-dark-blue white ph2">{{ docid.type }}</span>
+      <span class="ph2 truncate dark-blue">{{ docid.id }}</span>
+    </a>
   {% empty %}
     (no docid available)
   {% endfor %}
