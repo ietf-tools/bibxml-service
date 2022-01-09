@@ -260,6 +260,17 @@ def build_citation_for_docid(id: DocID) -> BibliographicItem:
         base: Dict[str, Any] = {}
         for ref in refs:
             bibitem_merger.merge(base, BibliographicItem(**ref.body).dict())
+
+        # Sanity check that IDs don’t clash across types,
+        # otherwise we are dealing with different bibliographic items
+        # that should not be merged
+        seen: Dict[str, str] = {}
+        for docid in as_list(base['docid']):
+            if seen.get(docid['id'], docid['type']) != docid['type']:
+                raise RefNotFoundError(
+                    "Refs with the same ID but incompatible types found", id)
+            seen[docid['id']] = docid['type']
+
         return BibliographicItem(**base)
 
     else:
