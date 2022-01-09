@@ -24,7 +24,7 @@
 {% block home_link %}{% url "manage" %}{% endblock %}
 
 {% block nav %}
-  {% for ds_id in known_datasets %}
+  {% for ds_id in indexed_datasets %}
     <a class="
           link
           {% if dataset_id == ds_id %}underline{% endif %}
