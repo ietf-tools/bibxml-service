@@ -39,13 +39,13 @@
                 {% include "deflist/entry.html" with key=c.role val=name %}
               {% endwith %}
             {% elif fullname %}
-              {% include "deflist/entry.html" with key=c.role val=fullname %}
+              {% include "deflist/entry.html" with key=c.role|default:"(unknown roles)"|as_list|join:", " val=fullname %}
             {% else %}
               {% include "deflist/entry_recursivedict.html" with key=c.role val=org %}
             {% endif %}
           {% endwith %}
         {% endfor %}
-        {% include "deflist/entry.html" with key="place" val=data.place|default:"—" %}
+        {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
       </dl>
     </div>
 
@@ -55,12 +55,14 @@
           {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" %}
         {% endfor %}
         {% include "deflist/entry.html" with key="type" val=data.type %}
-        {% include "deflist/entry.html" with key="language" val=data.language|default:"—" %}
-        {% include "deflist/entry.html" with key=data.link.type|default:"link" val=data.link.content %}
+        {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
+        {% for link in data.link|as_list %}
+          {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content %}
+        {% endfor %}
         {% for title in data.title|as_list %}
           {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content %}
         {% endfor %}
-        {% include "deflist/entry.html" with key="abstract" val=data.abstract|default:"—" %}
+        {% include "deflist/entry_list.html" with key="abstract(s)" items=data.abstract|default:"—"|as_list tmpl="relaton/formatted_string.html" multiline=1 %}
       </dl>
     </div>
   </div>
