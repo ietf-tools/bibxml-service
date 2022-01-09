@@ -194,7 +194,7 @@ def search_refs_relaton_field(
         ored_queries.append('(%s)' % ' AND '.join(anded_queries))
 
     final_query = '''
-        SELECT * FROM api_ref_data WHERE %s
+        SELECT id, body, ref, dataset FROM api_ref_data WHERE %s
     ''' % ' OR '.join(ored_queries)
 
     # print("search_refs_relaton_field: final query", final_query, interpolated_params)
