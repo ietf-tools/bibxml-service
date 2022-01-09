@@ -37,6 +37,8 @@ shared_context = dict(
 
 
 def home(request):
+    """Serves main landing page."""
+
     non_empty_datasets = (
         RefData.objects.values_list('dataset', flat=True).
         distinct())
