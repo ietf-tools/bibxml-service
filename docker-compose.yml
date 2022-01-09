@@ -7,7 +7,13 @@ services:
 
   # Single instance only.
   db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: Dockerfile-pg
+      args:
+        POSTGRES_DB: ${DB_NAME:?missing DB name}
+        POSTGRES_USER: ${DB_NAME:?err}
+        POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
     volumes:
       - ./data/db:/var/lib/postgresql/data
     hostname: db
