@@ -135,6 +135,8 @@ class BaseCitationSearchView(BaseListView):
             'abstract': query,
         }, {
             'title': query,
+        }, {
+            'contributor': query,
         })
         if len(quick_search) > 0:
             return quick_search
