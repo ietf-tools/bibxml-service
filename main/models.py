@@ -5,7 +5,8 @@ from django.contrib.postgres.search import SearchVector
 
 
 class RefData(models.Model):
-    """Holds :term:`citation` data.
+    """Holds bibliographic item data sourced from a dataset,
+    for use by internal sources.
 
     Always contains a Relaton representation,
     and can contain pre-crafted representations in other formats
@@ -35,7 +36,9 @@ class RefData(models.Model):
     """
 
     body = models.JSONField()
-    """Contains canonical Relaton representation of the :term:`citation`."""
+    """Contains canonical Relaton representation
+    of :term:`bibliographic item`
+    (:class:`bib_models.BibliographicItem`)."""
 
     representations = models.JSONField()
     """Contains alternative representations of the citation.
