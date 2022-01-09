@@ -8,18 +8,19 @@ Glossary
        In context of BibXML, this refers to a standard.
 
    citation
+   bibliographic item
        Document metadata used to reference a document when citing.
        Corresponds to ``BibliographicItem`` in Relaton models.
 
        In BibXML service, data for a single citation can be provided
        by multiple datasets.
 
-       For indexed citations, data for a citation with particular :term:`docid:`
-       consists of data in ``body`` on ``RefData`` instance(s) that specify
+       For indexed citations, data for a citation with particular :term:`docid`
+       is created from ``body`` values on ``RefData`` instance(s) that specify
        that docid.
 
-   document identifier
    docid
+   document identifier
        Identifier given to the document by the publisher and/or author.
 
        Contained in ``docid`` field of citation’s Relaton representation,
@@ -51,6 +52,9 @@ Glossary
        - One dataset can provide citations of more than one document type.
        - More than one dataset can provide data for the citation
          with the same :term:`document identifier`.
+       
+       Citation source can be either a :term:`Relaton source`
+       or an :term:`external source`.
 
    reference
    ref
@@ -67,8 +71,7 @@ Glossary
        Indexed references correspond to :class:`main.models.RefData` instances.
 
    static dataset
-   internal dataset
-   internal source
+   Relaton source
        Citation source that allows to retrieve all of its citations in bulk
        in Relaton format with minimal or no processing.
 
@@ -77,10 +80,10 @@ Glossary
 
    external dataset
    external source
-       Citation source that allows to retrieve a *single* citation
+       Citation source that allows to retrieve individual citations
        given :term:`document identifier` (type and ID).
-       Retrieval incurs a network request
-       and the cost of on-the-fly conversion to requested format
+       Retrieval incurs a network request to external service
+       and the cost of on-the-fly conversion to the requested format
        (Relaton or BibXML).
 
    indexing

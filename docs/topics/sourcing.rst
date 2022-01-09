@@ -2,25 +2,28 @@
 Citation sourcing
 =================
 
-BibXML service deals with two types of citation sources.
+BibXML service deals with two types
+of :term:`citation sources <citation source>`.
 
-Internal (indexed) citations can be searched and explored,
+All citations indexed from internal/static sources can be searched,
 while external citations can be retrieved individually by exact references
 (incurring an extra server-to-server network request).
 
 Internal sources
 ================
 
-Citation sources maintained as Git repositories
+Internal sources are under IETF control,
+and are maintained as Git repositories
 with Relaton and BibXML citation data serialized into YAML/XML files
 under ``data/`` within repository root.
 
-- External tools periodically collect citations into these repositories.
-- When BibXML service is instructed to retrieve citations
-  from any of those sources, it queues an asynchronous task
-  that pulls or clones the relevant repositories,
-  reads citation data and populates the database,
-  making citations searchable over API and GUI.
+These sources are periodically updated by tools outside of BibXML service.
+
+When BibXML service is instructed to retrieve citations
+from any of those sources, it queues an asynchronous task
+that pulls or clones the relevant repositories,
+reads citation data and populates the database,
+making citations searchable over API and GUI.
 
 .. seealso::
 
@@ -33,8 +36,8 @@ External sources
 External sources don’t make citation data available
 in bulk and in Relaton format.
 
-- BibXML service supports requesting individual citations from such a source.
-- External sources are not searched.
+- An external source allows to request an individual citation by document ID.
+- It may or may not provide search across available citations.
 
 Currently, only DOI (via Crossref API) is supported as external source.
 

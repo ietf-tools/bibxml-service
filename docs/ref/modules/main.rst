@@ -8,10 +8,14 @@
 Views
 =====
 
-.. automodule:: main.views
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. module:: main.views
+
+.. autofunction:: main.views.home
+
+Browsing citations by :term:`document identifier`
+-------------------------------------------------
+
+.. autofunction:: main.views.browse_citation_by_docid
 
 Utility/generic views
 ---------------------
@@ -32,14 +36,16 @@ Models
 .. autoclass:: main.models.RefData
    :members:
 
-``indexed``: working with fully sourced citations
-=================================================
+``indexed``: querying sourced citations
+=======================================
 
 .. automodule:: main.indexed
    :members:
 
-``external``: working with external citation sources
-====================================================
+.. autoexception:: main.exceptions.RefNotFoundError
+
+``external``: querying external citation sources
+================================================
 
 .. automodule:: main.external
    :members:
