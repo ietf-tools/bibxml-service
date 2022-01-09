@@ -16,6 +16,8 @@ handler500 = error_views.server_error
 
 urlpatterns = [
 
+    path('__debug__/', include('debug_toolbar.urls')),
+
     # API specs
     path('openapi.yaml', require_safe(
         views.openapi_spec
