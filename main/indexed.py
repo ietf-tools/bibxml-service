@@ -7,7 +7,6 @@ from django.db.models import TextField
 from django.db.models.functions import Cast
 
 from .exceptions import RefNotFoundError
-from .models import RefData
 
 from bib_models import BibliographicItem
 from bib_models.merger import bibitem_merger
