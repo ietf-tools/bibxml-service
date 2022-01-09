@@ -1,7 +1,19 @@
-from typing import Union, TypeVar, List
+from typing import Any, Union, TypeVar, Iterable, List
 
 
 T = TypeVar('T')
+
+
+def flatten(items: Iterable[Any]) -> Iterable[Any]:
+    """Flattens an iterable of possibly nested iterables
+    (preserving strings, byte arrays and dictionaries)."""
+
+    for x in items:
+        if isinstance(x, Iterable) and not isinstance(x, (str, bytes, dict)):
+            for sub_x in flatten(x):
+                yield sub_x
+        else:
+            yield x
 
 
 def as_list(value: Union[T, List[T]]) -> List[T]:
