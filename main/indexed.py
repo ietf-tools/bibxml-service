@@ -1,5 +1,5 @@
 import json
-from typing import Dict, List, Union, Tuple, Any
+from typing import cast as typeCast, Set, FrozenSet, Optional, Dict, List, Union, Tuple, Any
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db.models.query import QuerySet, Q
@@ -8,10 +8,11 @@ from django.db.models.functions import Cast
 
 from .exceptions import RefNotFoundError
 
+from common.util import as_list
 from bib_models import BibliographicItem
 from bib_models.merger import bibitem_merger
 
-from .types import DocID
+from .types import DocID, SourcedBibliographicItem
 from .models import RefData
 
 
@@ -263,6 +264,82 @@ def build_citation_for_docid(id: DocID) -> BibliographicItem:
 
     else:
         raise RefNotFoundError("Not found in indexed sources by docid", id)
+
+
+DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
+
+
+def build_search_results(
+    refs: QuerySet[RefData],
+    order_by: Optional[str] = None,
+) -> List[SourcedBibliographicItem]:
+    """Given a :class:`QuerySet` of :class:`RefData` entries,
+    build a list of :class:`SourcedBibliographicItem` objects
+    by merging ``RefData`` with intersecting document identifiers.
+    """
+
+    # Tracks which document ID is represented by which source references
+    # (referenced by indices in the ``refs`` list)
+    refs_by_docid: Dict[FrozenSet[DocIDTuple], List[int]] = {}
+
+    # Tracks which document IDs refer to the same bibliographic item
+    # For bibliographic items that have at least one document ID in common,
+    # all their document IDs are considered aliases to each other.
+    alias_docids: Dict[FrozenSet[DocIDTuple], Set[DocIDTuple]] = {}
+
+    results: List[SourcedBibliographicItem] = []
+
+    for idx, ref in enumerate(refs):
+        docid_tuples: FrozenSet[DocIDTuple] = frozenset(
+            typeCast(DocIDTuple, tuple(d.items()))
+            for d in as_list(ref.body['docid'])
+        )
+        for id in docid_tuples:
+            id_tuple: FrozenSet[DocIDTuple] = frozenset([id])
+            refs_by_docid.setdefault(id_tuple, [])
+            alias_docids.setdefault(id_tuple, set())
+            refs_by_docid[id_tuple].append(idx)
+            alias_docids[id_tuple].update(docid_tuples)
+
+    processed_docids = set[DocIDTuple]()
+
+    for _docid, ref_indexes in refs_by_docid.items():
+        docid, = _docid
+        if docid in processed_docids:
+            # This identifier was already processed as an alias
+            continue
+        # Don’t process this identifier as an alias next time
+        processed_docids.add(docid)
+
+        aliases: Set[DocIDTuple] = alias_docids.get(_docid, set())
+
+        # Refs that contain bibliographic data
+        # for this document identifier
+        ref_idxs = refs_by_docid.get(_docid, [])
+
+        # For any aliases that were not yet processed,
+        # add refs that contain their bibliographic data
+        # to refs for this document identifier
+        # and exclude from processing
+        for alias_docid in (aliases - processed_docids):
+            processed_docids.add(alias_docid)
+            ref_idxs.extend(
+                refs_by_docid.get(
+                    frozenset([alias_docid]),
+                    []))
+
+        refs_to_merge: Set[RefData] = set([refs[idx] for idx in ref_idxs])
+
+        if len(refs_to_merge) > 0:
+            base: Dict[str, Any] = {'sources': {}}
+            for ref in refs_to_merge:
+                bibitem_merger.merge(base, ref.body)
+                base['sources'][ref.dataset] = {
+                    'ref': ref.ref,
+                }
+            results.append(SourcedBibliographicItem(**base))
+
+    return results
 
 
 def get_indexed_ref(dataset_id, ref, format='relaton'):
