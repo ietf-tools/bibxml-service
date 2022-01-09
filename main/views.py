@@ -34,7 +34,7 @@ shared_context = dict(
 """Shared context passed to GUI templates."""
 
 
-def home(request, dataset_id=None, ref=None):
+def home(request):
     non_empty_datasets = (
         RefData.objects.values_list('dataset', flat=True).
         distinct())
