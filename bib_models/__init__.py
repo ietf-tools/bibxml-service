@@ -72,15 +72,18 @@ class Contributor(BaseModel):
 
 
 class CopyrightOwner(BaseModel):
-    url: str
-    name: str
+    name: Union[List[str], str]
+    url: Optional[str] = None
     abbrevation: Optional[str] = None
 
 
 # ``from`` is reserved, so we use TypedDict instead of a Pydantic model.
 # TODO: Define Copyright as a Pydantic model
 # (figure out how to use reserved identifiers as fields)
-Copyright = TypedDict('Copyright', {'from': int, 'owner': CopyrightOwner})
+Copyright = TypedDict('Copyright', {
+    'from': int,
+    'owner': Union[List[CopyrightOwner], CopyrightOwner],
+})
 
 
 class BibliographicItem(BaseModel):
