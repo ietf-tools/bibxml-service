@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
 
 
 class RefData(models.Model):
@@ -49,3 +50,10 @@ class RefData(models.Model):
     class Meta:
         db_table = 'api_ref_data'
         unique_together = [['ref', 'dataset']]
+        indexes = [
+            GinIndex(
+                fields=['body'],
+                name='body_gin',
+            ),
+            # TODO: Add more specific indexes for RefData.body
+        ]
