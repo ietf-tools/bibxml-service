@@ -111,4 +111,4 @@ class BibliographicItem(BaseModel):
 
     keyword: Optional[Union[List[str], str]] = None
 
-    copyright: Optional[Copyright] = None
+    copyright: Optional[Union[List[Copyright], Copyright]] = None
