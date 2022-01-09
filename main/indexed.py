@@ -9,9 +9,12 @@ from django.db.models.functions import Cast
 from .exceptions import RefNotFoundError
 from .models import RefData
 
+from bib_models import BibliographicItem
+from bib_models.merger import bibitem_merger
 
 # TODO: Obsolete, now that we gave up on multi-DB approach
 RefDataManager = RefData.objects
+from .types import DocID
 from .models import RefData
 
 
@@ -228,8 +231,39 @@ def list_doctypes() -> List[Tuple[str, str]]:
                 '''))]
 
 
-def get_indexed_ref_by_docid(type: str, id: str) -> RefData:
-    pass
+def build_citation_for_docid(id: DocID) -> BibliographicItem:
+    """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
+    that matched given document identifier.
+
+    Returns complete citation representation contained in ``body``.
+    If multiple refs were found, their citation data are merged.
+
+    :returns BibliographicItem: a :class:`bib_models.BibliographicItem`
+                                instance.
+    :raises RefNotFoundError: if no matching refs were found.
+    """
+    doctype = json.dumps(id['type'])
+    docid = json.dumps(id['id'])
+
+    refs = search_refs_relaton_field({
+        'docid[*]': '@.type == %s && @.id == %s' % (
+            doctype,
+            docid,
+        ),
+    }, exact=True)
+
+    if len(refs) == 1:
+        # print("Obtained raw ref", json.dumps(refs[0].body, indent=4))
+        return BibliographicItem(**refs[0].body)
+
+    elif len(refs) > 1:
+        base: Dict[str, Any] = {}
+        for ref in refs:
+            bibitem_merger.merge(base, BibliographicItem(**ref.body).dict())
+        return BibliographicItem(**base)
+
+    else:
+        raise RefNotFoundError("Not found in indexed sources by docid", id)
 
 
 def get_indexed_ref(dataset_id, ref, format='relaton'):
