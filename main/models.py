@@ -1,5 +1,7 @@
 from django.db import models
+from django.db.models.functions import Cast
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 
 
 class RefData(models.Model):
@@ -54,6 +56,12 @@ class RefData(models.Model):
             GinIndex(
                 fields=['body'],
                 name='body_gin',
+            ),
+            GinIndex(
+                SearchVector(
+                    Cast('body', models.TextField()),
+                    config='english'),
+                name='body_astext_gin',
             ),
             # TODO: Add more specific indexes for RefData.body
         ]
