@@ -12,6 +12,7 @@ from .models import RefData
 
 # TODO: Obsolete, now that we gave up on multi-DB approach
 RefDataManager = RefData.objects
+from .models import RefData
 
 
 def list_refs(dataset_id) -> QuerySet[RefData]:
@@ -44,6 +45,158 @@ def search_refs_relaton_struct(
     return (
         RefDataManager.
         raw(query, [json.dumps(obj) for obj in objs]))
+
+
+def search_refs_relaton_field(
+        *field_queries: Dict[str, str],
+        exact=False) -> QuerySet[RefData]:
+    """
+    Each of ``field_queries`` should be a dictionary of the following shape::
+
+        { '<field spec>': '<query>', '<field spec>': '<query>', ... }
+
+    .. important:: Do **not** pass user input directly in field specs
+                   if you don’t set ``exact`` to ``True``.
+
+    The ``exact`` flag applies to all ``field_queries``.
+
+    - If ``exact`` is ``False`` (default),
+      wildcards in field paths are not allowed,
+      and object at each field path is passed through ``to_tsvector()``
+      while corresponding value is passed through ``::tsquery``
+      for fuzzy matching.
+
+      Example::
+
+          { 'docid': 'IEEE', 'keyword': 'something' }
+
+      Empty field spec is treated specially, matching the whole body::
+
+          { '': 'string anywhere in body' }
+
+    - If ``exact`` is ``True``, field path specification
+      can use PostgreSQL’s ``jsonpath``
+      with wildcards (e.g., ``somearray[*].someitem``),
+      and values must be PostgreSQL JSON queries like this: ``@ == \"%s\"``
+      (where ``@`` references given field path).
+
+      There is more flexibility, but it is required to be exact
+      when specifying queries. Incorrect syntax will cause
+      a ``ProgrammingError``, which this function won’t catch.
+
+      Example::
+
+          {
+              'docid[*]': '@.type == "IEEE" && @.id == "some-ieee-id"',
+              'keyword[*]': '@ == "something"',
+          }
+
+      Note that the above example will not match a document
+      where keyword is not a list, but a string ``"something"``.
+
+    Queries within each dictionary of ``field_queries`` are AND’ed,
+    and resulting queries
+    (if you pass more than one dict in ``field_queries``)
+    are OR’ed.
+
+    :rtype: Queryset[RefData]
+    """
+
+    ored_queries = []
+    interpolated_params: Dict[str, Union[str, int]] = {}
+
+    for idx, fields in enumerate(field_queries):
+        anded_queries = []
+        for fieldpath, query in fields.items():
+            interpolated_param_key = '{idx}_{fieldpath}'.format(
+                idx=idx,
+                fieldpath=fieldpath)
+
+            if exact:
+                interpolated_params[interpolated_param_key] = \
+                    '$.{fieldpath} ? ({query})'.format(
+                        fieldpath=fieldpath,
+                        query=query)
+                anded_queries.append(
+                    'body @? %({key})s'.format(
+                        key=interpolated_param_key,
+                    ),
+                )
+
+            else:
+                interpolated_params[interpolated_param_key] = query
+                if fieldpath == '':
+                    # Below query:
+                    #
+                    # 1) constructs one “normal” tsvector
+                    #    using JSON values only,
+                    # 2) serializes JSON to text
+                    #    with some post-processing
+                    #    (currently replaing slashes with spaces, thus
+                    #    breaking any string with a slash into 2 tokens),
+                    #    turns that text into a tsvector but then
+                    #    subtracts all lexemas corresponding to JSON keys,
+                    # 3) applies the websearch query
+                    #    to the union of both above vectors.
+                    #
+                    # (This works around PostgreSQL’s text search
+                    # not splitting tokens on slashes.
+                    #
+                    # With simple `to_tsvector(bibitem_json)`,
+                    # if you search for NBS.IR.82-2601p1 you won’t match
+                    # `{type: 'DOI', id: '10.6028/NBS.IR.82-2601p1'}`
+                    # as 10.6028/NBS.IR.82-2601p1 is a single token.
+                    #
+                    # Another way to work around this
+                    # could be by tuning DB configuration.)
+                    tpl = '''
+                        (
+                            jsonb_to_tsvector(
+                                'english',
+                                body,
+                                '["string", "numeric", "boolean"]'
+                            ) ||
+                            ts_delete(
+                                to_tsvector(
+                                    'english',
+                                    translate(body::text, '/', ' ')
+                                ),
+                                tsvector_to_array(
+                                    jsonb_to_tsvector(
+                                        'english',
+                                        body,
+                                        '["key"]'
+                                    )
+                                )
+                            )
+                        ) @@ websearch_to_tsquery('english', %({key})s)
+                    '''
+                else:
+                    tpl = '''
+                        to_tsvector(
+                            'english',
+                            jsonb_extract_path(body, {fieldpath})
+                        ) @@ websearch_to_tsquery('english', %({key})s)
+                    '''
+                anded_queries.append(
+                    tpl.format(
+                        # {fieldpath} is properly escaped,
+                        # callers must not pass user input here.
+                        fieldpath=','.join([
+                            "'%s'" % part
+                            for part in fieldpath.split('.')]),
+                        key=interpolated_param_key,
+                    ),
+                )
+        ored_queries.append('(%s)' % ' AND '.join(anded_queries))
+
+    final_query = '''
+        SELECT * FROM api_ref_data WHERE %s
+    ''' % ' OR '.join(ored_queries)
+
+    # print("search_refs_relaton_field: final query", final_query, interpolated_params)
+
+    return RefData.objects.raw(final_query, interpolated_params)
 
 
 def list_doctypes() -> List[Tuple[str, str]]:
