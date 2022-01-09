@@ -127,6 +127,17 @@ class BaseCitationSearchView(BaseListView):
         return query
 
     def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
+        quick_search = search_refs_relaton_field({
+            'keyword': query,
+        }, {
+            'docid': query,
+        }, {
+            'abstract': query,
+        }, {
+            'title': query,
+        })
+        if len(quick_search) > 0:
+            return quick_search
         return search_refs_relaton_field({'': query})
 
     def parse_json_struct_query(self, query: str) -> dict[str, Any]:
