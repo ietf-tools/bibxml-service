@@ -3,9 +3,9 @@
 from urllib.parse import quote_plus, unquote_plus
 
 from django.db.models.query import QuerySet
-from django.http.response import HttpResponseNotFound, Http404
 from django.urls import reverse
 from django.http import QueryDict
+from django.http.response import Http404
 from django.http.response import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.conf import settings
@@ -18,7 +18,6 @@ from bibxml import error_views
 from .exceptions import RefNotFoundError
 from .models import RefData
 from .indexed import get_indexed_ref, list_refs, list_doctypes
-from .indexed import search_refs_relaton_struct
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref
 from .util import BaseCitationSearchView
