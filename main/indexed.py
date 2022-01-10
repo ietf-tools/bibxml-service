@@ -261,19 +261,33 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> Bibliogr
 
     elif len(refs) > 1:
         base: Dict[str, Any] = {}
+        seen_docids_by_type: Dict[str, str] = {}
         for ref in refs:
-            bibitem_merger.merge(base, BibliographicItem(**ref.body).dict())
+            bibitem = ref.body
 
-        # Sanity check that IDs don’t clash across types,
-        # otherwise we are dealing with different bibliographic items
-        # that should not be merged
-        seen: Dict[str, str] = {}
-        for docid in as_list(base['docid']):
-            if seen.get(docid['id'], docid['type']) != docid['type']:
-                raise RefNotFoundError(
-                    "Refs with the same docid.id but incompatible types found", id)
-            seen[docid['id']] = docid['type']
+            for _docid in bibitem.get('docid', []):
+                # Identifier sanity check
+                _type = _docid.get('type', '').strip()
+                _id = _docid.get('id', None)
+                _scope = _docid.get('scope', None)
+                if not _id:
+                    raise RefNotFoundError(
+                        "Encountered a ref missing docid.id", id)
+                if not isinstance(_type, str) or len(_type) < 1:
+                    raise RefNotFoundError(
+                        "Encountered a ref missing docid.type", id)
 
+                # Sanity check that ID-IDs don’t clash across types,
+                # otherwise we are dealing with different bibliographic items
+                # that should not be merged
+                if seen_docids_by_type.get(_type, _id) != _id:
+                    raise RefNotFoundError(
+                        "Mismatching docid.type/docid.id when merging",
+                        id)
+                if _scope is None:
+                    seen_docids_by_type[_type] = _id
+
+            bibitem_merger.merge(base, BibliographicItem(**bibitem).dict())
         return BibliographicItem(**base)
 
     else:
@@ -305,8 +319,10 @@ def build_search_results(
 
     for idx, ref in enumerate(refs):
         docid_tuples: FrozenSet[DocIDTuple] = frozenset(
-            typeCast(DocIDTuple, tuple(d.items()))
-            for d in as_list(ref.body['docid'])
+            typeCast(DocIDTuple, tuple(docid.items()))
+            for docid in as_list(ref.body['docid'])
+            # Exclude docid with missing id or type
+            if docid.get('type', None) and docid.get('id', None)
         )
         for id in docid_tuples:
             id_tuple: FrozenSet[DocIDTuple] = frozenset([id])
