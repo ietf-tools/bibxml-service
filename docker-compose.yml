@@ -59,8 +59,6 @@ services:
   web:
     image: local/web-precheck:latest
     hostname: web
-    volumes:
-      - .:/code
     command:
       - /bin/sh
       - -c
