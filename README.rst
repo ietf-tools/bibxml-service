@@ -18,12 +18,18 @@ it is recommended to build the documentation into HTML.
 This can be done using Docker without any other dependencies.
 
 Ensure you have Docker Desktop with Compose V2 enabled,
-navigate to cloned repository root on your machine
+navigate to cloned repository root using terminal on your machine
 and run the following commands::
 
     docker compose build
     cd docs
     docker compose up
+
+After that, point your browser to ``localhost:8001`` for further documentation.
+
+For development convenience, ``docker compose up`` will also watch
+project for changes and rebuild documentation automatically
+until you stop the process (e.g. with Ctrl+C).
 
 .. note:: If you don’t use Docker Desktop,
           you may need to install Compose separately.
@@ -32,9 +38,6 @@ and run the following commands::
           you should replace ``docker compose`` with ``docker-compose``,
           and depending on your installation
           you might need to prepend ``sudo``.
-
-After that, point your browser to ``localhost:8001`` for further documentation.
-
 
 Credits
 -------
