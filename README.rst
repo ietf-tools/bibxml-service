@@ -18,6 +18,11 @@ and run the following commands::
     cd docs
     docker compose up
 
+.. note:: If you don’t use Docker Desktop,
+          you may need to install Compose separately.
+          In that case it might be available under a separate binary
+          and you should replace ``docker compose`` with ``docker-compose``.
+
 After that, point your browser to ``localhost:8001`` for further documentation.
 
 You can browse documentation `on GitHub <docs/index.rst>`_,
