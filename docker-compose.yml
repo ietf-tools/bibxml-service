@@ -58,7 +58,7 @@ services:
   # Can be run in multiple instances.
   web:
     image: local/web-precheck:latest
-    hostname: web
+    hostname: ${HOST:?err}
     command:
       - /bin/sh
       - -c
