@@ -20,8 +20,11 @@ and run the following commands::
 
 .. note:: If you don’t use Docker Desktop,
           you may need to install Compose separately.
-          In that case it might be available under a separate binary
-          and you should replace ``docker compose`` with ``docker-compose``.
+
+          If you install it as a separate binary,
+          you should replace ``docker compose`` with ``docker-compose``,
+          and depending on your installation
+          you might need to prepend ``sudo``.
 
 After that, point your browser to ``localhost:8001`` for further documentation.
 
