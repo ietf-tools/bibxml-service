@@ -125,6 +125,7 @@ COMPRESS_PRECOMPILERS = (
 )
 
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 
 
 # Default primary key field type
