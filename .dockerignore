@@ -1,5 +1,6 @@
 env
 build
 data
+node_modules
 *.sqlite
 *.pyc
