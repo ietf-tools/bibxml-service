@@ -36,12 +36,12 @@
           {% with c.organization as org and c.person.name.surname.content as surname and c.person.name.forename.content as forename and c.person.name.completename.content as fullname %}
             {% if surname or forename %}  
               {% with forename|add:" "|add:surname as name %}
-                {% include "deflist/entry.html" with key=c.role val=name %}
+                {% include "deflist/entry.html" with key=c.role|default:"(unknown roles)"|as_list|join:", " val=name %}
               {% endwith %}
             {% elif fullname %}
               {% include "deflist/entry.html" with key=c.role|default:"(unknown roles)"|as_list|join:", " val=fullname %}
             {% else %}
-              {% include "deflist/entry_recursivedict.html" with key=c.role val=org %}
+              {% include "deflist/entry_recursivedict.html" with key=c.role|default:"(unknown roles)"|as_list|join:", " val=org %}
             {% endif %}
           {% endwith %}
         {% endfor %}
