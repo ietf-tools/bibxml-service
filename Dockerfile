@@ -18,5 +18,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
 COPY . /code
 WORKDIR /code
 
+RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 RUN ["pip", "install", "-r", "requirements.txt"]
 RUN ["npm", "install"]
