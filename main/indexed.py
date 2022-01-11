@@ -117,15 +117,15 @@ def search_refs_relaton_field(
 
     for idx, fields in enumerate(field_queries):
         anded_queries = []
-        for fieldpath, query in fields.items():
+        for fieldspec, query in fields.items():
             interpolated_param_key = '{idx}_{fieldpath}'.format(
                 idx=idx,
-                fieldpath=fieldpath)
+                fieldpath=fieldspec)
 
             if exact:
                 interpolated_params[interpolated_param_key] = \
                     '$.{fieldpath} ? ({query})'.format(
-                        fieldpath=fieldpath,
+                        fieldpath=fieldspec,
                         query=query)
                 anded_queries.append(
                     'body @? %({key})s'.format(
@@ -135,7 +135,7 @@ def search_refs_relaton_field(
 
             else:
                 interpolated_params[interpolated_param_key] = query
-                if fieldpath == '':
+                if fieldspec == '':
                     # Below query:
                     #
                     # 1) constructs one “normal” tsvector
@@ -181,23 +181,27 @@ def search_refs_relaton_field(
                             )
                         ) @@ websearch_to_tsquery('english', %({key})s)
                     '''
+                    anded_queries.append(tpl.format(
+                        key=interpolated_param_key,
+                    ))
                 else:
                     tpl = '''
                         to_tsvector(
                             'english',
-                            jsonb_extract_path(body, {fieldpath})
+                            jsonb_build_array({json_selectors})
                         ) @@ websearch_to_tsquery('english', %({key})s)
                     '''
-                anded_queries.append(
-                    tpl.format(
-                        # {fieldpath} is properly escaped,
-                        # callers must not pass user input here.
-                        fieldpath=','.join([
-                            "'%s'" % part
-                            for part in fieldpath.split('.')]),
+                    anded_queries.append(tpl.format(
                         key=interpolated_param_key,
-                    ),
-                )
+                        json_selectors=', '.join([
+                            'jsonb_extract_path(body, {fieldpath})'.format(
+                                # {fieldpath} is not properly escaped,
+                                # callers must not pass user input here.
+                                fieldpath=','.join([
+                                    "'%s'" % part
+                                    for part in fieldpath.split('.')]),
+                            ) for fieldpath in fieldspec.split(',')]),
+                    ))
         ored_queries.append('(%s)' % ' AND '.join(anded_queries))
 
     final_query = '''
