@@ -30,7 +30,7 @@ class Link(BaseModel):
 
 class Date(BaseModel):
     type: str
-    value: Union[datetime.date, str]
+    value: datetime.date
 
 
 class GenericStringValue(BaseModel):
