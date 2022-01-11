@@ -332,7 +332,7 @@ AUTHORITATIVE_DATASETS = [
 DATASET_SOURCE_OVERRIDES = {
     'ieee': {
         'relaton_data': {
-            'repo_url': 'git://github.com/ietf-ribose/relaton-data-ieee.git',
+            'repo_url': 'https://github.com/ietf-ribose/relaton-data-ieee',
         },
     },
 }
