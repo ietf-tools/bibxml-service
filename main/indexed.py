@@ -321,8 +321,8 @@ def build_search_results(
         docid_tuples: FrozenSet[DocIDTuple] = frozenset(
             typeCast(DocIDTuple, tuple(docid.items()))
             for docid in as_list(ref.body['docid'])
-            # Exclude docid with missing id or type
-            if docid.get('type', None) and docid.get('id', None)
+            # Exclude identifiers with scope or missing id
+            if docid.get('id', None) and not docid.get('scope', None)
         )
         for id in docid_tuples:
             id_tuple: FrozenSet[DocIDTuple] = frozenset([id])
