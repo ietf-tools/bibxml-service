@@ -177,7 +177,7 @@ def search_refs_relaton_field(
                     anded_queries.append(tpl.format(
                         key=interpolated_param_key,
                         json_selectors=', '.join([
-                            'jsonb_extract_path(body, {fieldpath})'.format(
+                            'translate(jsonb_extract_path_text(body, {fieldpath}), \'/\', \' \')'.format(
                                 # {fieldpath} is not properly escaped,
                                 # callers must not pass user input here.
                                 fieldpath=','.join([
