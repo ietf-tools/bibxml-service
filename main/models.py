@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models.functions import Cast
+from django.db.models.fields.json import KeyTransform
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVector
 
@@ -65,6 +66,12 @@ class RefData(models.Model):
                     Cast('body', models.TextField()),
                     config='english'),
                 name='body_astext_gin',
+            ),
+            GinIndex(
+                SearchVector(
+                    KeyTransform('docid', 'body'),
+                    config='english'),
+                name='body_docid_gin',
             ),
             GinIndex(
                 SearchVector(
