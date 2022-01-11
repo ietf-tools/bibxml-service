@@ -1,18 +1,18 @@
 <div class="overflow-x-auto-ns flex-ns mb1 mb0-ns items-center lh-copy">
   {% for docid in ids %}
-    {% if docid.type %}
-      <a
-          href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
-          class="nowrap dark-blue f5 flex items-center mr2">
-        <span class="f7 br3 bg-dark-blue white ph2">{{ docid.type }}</span>
-        <span class="ph2 dark-blue">{{ docid.id }}</span>
-      </a>
-    {% else %}
-      <span class="nowrap gray truncate f5 flex items-center mr2" title="Untyped identifier">
-        <span class="ph2 ">{{ docid.id }}</span>
-      </span>
+    {% if not docid.scope %}
+      {% if docid.type %}
+        <a
+            href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
+            class="nowrap dark-blue f5 flex items-center mr2">
+          <span class="f7 br3 bg-dark-blue white ph2">{{ docid.type }}</span>
+          <span class="ph2 dark-blue">{{ docid.id }}</span>
+        </a>
+      {% else %}
+        <span class="nowrap gray f5 flex items-center mr2" title="Untyped identifier">
+          <span class="ph2 ">{{ docid.id }}</span>
+        </span>
+      {% endif %}
     {% endif %}
-  {% empty %}
-    (no docid available)
   {% endfor %}
 </div>
