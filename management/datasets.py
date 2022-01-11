@@ -1,7 +1,7 @@
 from django.conf import settings
 
 
-GITHUB_REPO_URL = "git://github.com/{user}/{repo}.git"
+GITHUB_REPO_URL = "https://github.com/{user}/{repo}"
 
 
 def locate_bibxml_source_repo(dataset_id):
