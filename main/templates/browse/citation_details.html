@@ -85,4 +85,21 @@
       {% include "deflist/entry_list.html" with key="keywords" items=data.keyword|as_list %}
     {% endif %}
   </dl>
+
+  {% if data.sources %}
+    <dl class="lh-title mt0">
+      {% for source in data.sources.items %}
+        <dt class="b nowrap mt1 f6">
+          source “{{ source.0 }}”:
+        </dt>
+        <dd class="ml0">
+          ref. {{ source.1.ref }}
+          {% if source.1.validation_errors %}
+            <span class="dark-red f6">(source structure warnings)</span>
+            <pre class="code pre gray f7 h4 overflow-y-auto">{{ source.1.validation_errors }}<br /><br />{{ source.1.bibitem | pprint }}</pre>
+          {% endif %}
+        </dd>
+      {% endfor %}
+    </dl>
+  {% endif %}
 {% endblock %}
