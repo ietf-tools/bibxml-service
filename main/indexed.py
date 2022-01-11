@@ -153,14 +153,12 @@ def search_refs_relaton_field(
                     # could be by tuning DB configuration.)
                     tpl = '''
                         (
-                            jsonb_to_tsvector(
-                                'english',
-                                body,
-                                '["string", "numeric", "boolean"]'
-                            ) ||
                             to_tsvector(
                                 'english',
-                                translate((body->'docid')::text, '/', ' ')
+                                json_build_array(
+                                    body,
+                                    translate((body->'docid')::text, '/', ' ')
+                                )
                             )
                         ) @@ websearch_to_tsquery('english', %({key})s)
                     '''
