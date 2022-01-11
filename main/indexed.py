@@ -138,8 +138,8 @@ def search_refs_relaton_field(
                 if fieldspec == '':
                     # Below query creates a tsvector from the entire body,
                     # and then adds a tsvector produced from body.docid as text
-                    # with spaces instead of slashes to tokenize slash-separated
-                    # parts of IDs.
+                    # with spaces instead of slashes
+                    # to tokenize slash-separated parts of IDs.
                     #
                     # (This works around PostgreSQL’s text search
                     # not splitting tokens on slashes.
