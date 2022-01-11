@@ -301,11 +301,11 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
                 # Sanity check that ID-IDs don’t clash across types,
                 # otherwise we are dealing with different bibliographic items
                 # that should not be merged
-                if seen_docids_by_type.get(_type, _id) != _id:
-                    raise RefNotFoundError(
-                        "Mismatching docid.type/docid.id when merging",
-                        id)
                 if _scope is None:
+                    if seen_docids_by_type.get(_type, _id) != _id:
+                        raise RefNotFoundError(
+                            "Mismatching docid.type/docid.id when merging",
+                            id)
                     seen_docids_by_type[_type] = _id
 
             bibitem_merger.merge(base, bibitem)
@@ -363,8 +363,11 @@ def build_search_results(
         docid_tuples: FrozenSet[DocIDTuple] = frozenset(
             typeCast(DocIDTuple, tuple(docid.items()))
             for docid in as_list(ref.body['docid'])
-            # Exclude identifiers with scope or missing id
-            if docid.get('id', None) and not docid.get('scope', None)
+            # Exclude identifiers with scope or missing id/type
+            if all([
+                docid.get('type', None),
+                docid.get('id', None),
+                not docid.get('scope', None)])
         )
         for id in docid_tuples:
             id_tuple: FrozenSet[DocIDTuple] = frozenset([id])
