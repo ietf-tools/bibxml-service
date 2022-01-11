@@ -260,6 +260,8 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
         )
     else:
         query = '@.id like_regex %s' % docid
+        # To exclude untyped:
+        # query = '@.id like_regex %s && exists (@.type)' % docid
 
     refs = search_refs_relaton_field({'docid[*]': query}, exact=True)
 
