@@ -1,5 +1,8 @@
+import logging
 import json
 from typing import cast as typeCast, Set, FrozenSet, Optional, Dict, List, Union, Tuple, Any
+
+from pydantic import ValidationError
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.db.models.query import QuerySet, Q
@@ -11,9 +14,12 @@ from common.util import as_list
 from bib_models import BibliographicItem
 from bib_models.merger import bibitem_merger
 
-from .types import DocID, SourcedBibliographicItem
+from .types import SourcedBibliographicItem
 from .exceptions import RefNotFoundError
 from .models import RefData
+
+
+log = logging.getLogger(__name__)
 
 
 def list_refs(dataset_id) -> QuerySet[RefData]:
@@ -231,7 +237,8 @@ def list_doctypes() -> List[Tuple[str, str]]:
                 '''))]
 
 
-def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> BibliographicItem:
+def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
+        SourcedBibliographicItem:
     """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
     that matched given document identifier (``docid.id`` value).
 
@@ -255,12 +262,25 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> Bibliogr
 
     refs = search_refs_relaton_field({'docid[*]': query}, exact=True)
 
+    base: Dict[str, Any] = {'sources': {}}
+
     if len(refs) == 1:
         # print("Obtained raw ref", json.dumps(refs[0].body, indent=4))
-        return BibliographicItem(**refs[0].body)
+        ref = refs[0]
+        base.update(ref.body)
+        base['sources'][ref.dataset] = {
+            'ref': ref.ref,
+            'bibitem': ref.body,
+        }
+        try:
+            BibliographicItem(**ref.body)
+        except ValidationError as e:
+            log.warn(
+                "Incorrect bibliographic item format: %s, %s",
+                ref.ref, e)
+            base['sources'][ref.dataset]['validation_errors'] = str(e)
 
     elif len(refs) > 1:
-        base: Dict[str, Any] = {}
         seen_docids_by_type: Dict[str, str] = {}
         for ref in refs:
             bibitem = ref.body
@@ -287,11 +307,32 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> Bibliogr
                 if _scope is None:
                     seen_docids_by_type[_type] = _id
 
-            bibitem_merger.merge(base, BibliographicItem(**bibitem).dict())
-        return BibliographicItem(**base)
-
+            bibitem_merger.merge(base, bibitem)
+            base['sources'][ref.dataset] = {
+                'ref': ref.ref,
+                'bibitem': ref.body,
+            }
+            try:
+                BibliographicItem(**ref.body)
+            except ValidationError as e:
+                log.warn(
+                    "Incorrect bibliographic item format: %s, %s",
+                    ref.ref, e)
+                base['sources'][ref.dataset]['validation_errors'] = str(e)
     else:
         raise RefNotFoundError("Not found in indexed sources by docid", id)
+
+    if any([len(s.get('validation_errors', [])) > 0
+            for s in base.get('sources', {}).values()]):
+        return SourcedBibliographicItem.construct(**base)
+    else:
+        try:
+            return SourcedBibliographicItem(**base)
+        except ValidationError:
+            log.exception(
+                "Failed to validate final sourced bibliographic item",
+                id)
+            return SourcedBibliographicItem.construct(**base)
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
@@ -366,8 +407,13 @@ def build_search_results(
                 bibitem_merger.merge(base, ref.body)
                 base['sources'][ref.dataset] = {
                     'ref': ref.ref,
+                    'bibitem': ref.body,
                 }
-            results.append(SourcedBibliographicItem(**base))
+                try:
+                    BibliographicItem(**ref.body)
+                except ValidationError as e:
+                    base['sources'][ref.dataset]['validation_errors'] = str(e)
+            results.append(SourcedBibliographicItem.construct(**base))
 
     return results
 

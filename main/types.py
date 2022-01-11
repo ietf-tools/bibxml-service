@@ -21,6 +21,10 @@ class FoundBibliographicItem(BaseModel):
 
 
 class SourceMeta(BaseModel):
+    bibitem: BibliographicItem
+
+    validation_errors: Optional[List[str]] = None
+
     details: Optional[str] = None
     """Extra source details, human-readable."""
 
