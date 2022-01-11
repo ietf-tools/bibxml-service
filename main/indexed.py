@@ -136,18 +136,10 @@ def search_refs_relaton_field(
             else:
                 interpolated_params[interpolated_param_key] = query
                 if fieldspec == '':
-                    # Below query:
-                    #
-                    # 1) constructs one “normal” tsvector
-                    #    using JSON values only,
-                    # 2) serializes JSON to text
-                    #    with some post-processing
-                    #    (currently replaing slashes with spaces, thus
-                    #    breaking any string with a slash into 2 tokens),
-                    #    turns that text into a tsvector but then
-                    #    subtracts all lexemas corresponding to JSON keys,
-                    # 3) applies the websearch query
-                    #    to the union of both above vectors.
+                    # Below query creates a tsvector from the entire body,
+                    # and then adds a tsvector produced from body.docid as text
+                    # with spaces instead of slashes to tokenize slash-separated
+                    # parts of IDs.
                     #
                     # (This works around PostgreSQL’s text search
                     # not splitting tokens on slashes.
@@ -166,18 +158,9 @@ def search_refs_relaton_field(
                                 body,
                                 '["string", "numeric", "boolean"]'
                             ) ||
-                            ts_delete(
-                                to_tsvector(
-                                    'english',
-                                    translate(body::text, '/', ' ')
-                                ),
-                                tsvector_to_array(
-                                    jsonb_to_tsvector(
-                                        'english',
-                                        body,
-                                        '["key"]'
-                                    )
-                                )
+                            to_tsvector(
+                                'english',
+                                translate((body->'docid')::text, '/', ' ')
                             )
                         ) @@ websearch_to_tsquery('english', %({key})s)
                     '''
