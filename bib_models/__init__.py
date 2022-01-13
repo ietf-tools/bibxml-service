@@ -42,6 +42,8 @@ class GenericStringValue(BaseModel):
 
 class PersonName(BaseModel):
     completename: Optional[GenericStringValue] = None
+    surname: Optional[GenericStringValue] = None
+    forename: Optional[GenericStringValue] = None
 
 
 class Contact(BaseModel):
