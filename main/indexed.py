@@ -12,7 +12,7 @@ from django.db.models.functions import Cast
 
 
 from common.util import as_list
-from bib_models import BibliographicItem
+from bib_models.models import BibliographicItem
 from bib_models.merger import bibitem_merger
 
 from .types import SourcedBibliographicItem

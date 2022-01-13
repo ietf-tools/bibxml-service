@@ -4,10 +4,12 @@ from crossref.restful import Works
 
 from common.util import as_list
 
-from bib_models import Link, Title, DocID, BibliographicItem
-from bib_models import Contributor, Person, PersonName, PersonAffiliation
-from bib_models import Organization, GenericStringValue
+from bib_models.dicts import DocID, Title, Contributor, Organization
+from bib_models.dicts import Person, PersonAffiliation, PersonName
+from bib_models.dicts import GenericStringValue
+from bib_models.models import BibliographicItem
 
+from main.exceptions import RefNotFoundError
 from main.types import SourcedBibliographicItem, ExternalSourceMeta
 
 
@@ -25,37 +27,53 @@ ALT_TITLES = [
 ]
 
 
-def get_bibitem(doi: str) -> SourcedBibliographicItem:
+def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
     """Retrieves DOI information from CrossRef
     and deserializes into a :class:`bib_models.BibliographicItem` instance."""
+
+    if docid['type'] != 'DOI':
+        raise RefNotFoundError(
+            "DOI source requires DOI docid.type",
+            repr(docid))
+
+    doi = docid['id']
 
     resp = works.doi(doi)
 
     docids: List[DocID] = [DocID(
         type='DOI',
         id=resp['DOI'],
+        scope=None,
     )]
 
     docids.extend([
         DocID(
             type='ISSN',
             # We are ignoring issn-type (unclear purpose)
-            id=issn)
+            id=issn,
+            scope=None,
+        )
         for issn in resp.get('ISSN', [])])
 
     docids.extend([
         DocID(
             type='ISBN',
             # We are ignoring isbn-type
-            id=ISBN_TMPL.format(*isbn))
+            id=ISBN_TMPL.format(*isbn),
+            scope=None,
+        )
         for isbn in resp.get('ISBN', [])
         if len(isbn) == 13])
 
     isbn = resp.get('reference', {}).get('isbn')
     if isbn and isbn not in docids:
-        docids.append(DocID(type='ISBN', id=isbn))
+        docids.append(DocID(
+            type='ISBN',
+            id=isbn,
+            scope=None,
+        ))
 
-    contributors = [
+    contributors: List[Contributor] = [
         *(to_contributor('author', author)
           for author in resp.get('author', [])),
         *(to_contributor('editor', editor)
@@ -73,8 +91,8 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
             ),
         ))
 
-    titles = [
-        Title(content=title)
+    titles: List[Title] = [
+        Title(content=title, format=None, type=None)
         for title in resp['title']
     ]
     for tid in ALT_TITLES:
@@ -128,24 +146,38 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
     )
 
 
-def to_contributor(role: str, crossref_author: Dict[str, Any]) -> Contributor:
+def to_contributor(role: str, crossref_author: Dict[str, Any]) \
+        -> Contributor:
     return Contributor(
         role=[role],
-        person=Person(
+        organization=None,
+        person=dict(
             affiliation=[PersonAffiliation(
                 organization=Organization(
                     name=[aff['name']],
+                    contact=[],
+                    url=None,
+                    abbreviation=None,
                 ),
             ) for aff in crossref_author['affiliation']],
             name=PersonName(
                 surname=GenericStringValue(
                     content=crossref_author['family'],
+                    format=None,
+                    script=[],
+                    language=[],
                 ),
                 completename=GenericStringValue(
                     content=crossref_author['name'],
+                    format=None,
+                    script=[],
+                    language=[],
                 ) if 'name' in crossref_author else None,
                 forename=GenericStringValue(
                     content=crossref_author['given'],
+                    format=None,
+                    script=[],
+                    language=[],
                 ) if 'given' in crossref_author else None,
             ),
         ),
