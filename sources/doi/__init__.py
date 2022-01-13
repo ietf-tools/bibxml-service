@@ -36,17 +36,20 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
         id=resp['DOI'],
     )]
 
-    docids.extend([DocID(
-        type='ISSN',
-        # We are ignoring issn-type (unclear purpose)
-        id=issn,
-    ) for issn in resp.get('ISSN', [])])
+    docids.extend([
+        DocID(
+            type='ISSN',
+            # We are ignoring issn-type (unclear purpose)
+            id=issn)
+        for issn in resp.get('ISSN', [])])
 
-    docids.extend([DocID(
-        type='ISBN',
-        # We are ignoring isbn-type
-        id=isbn,
-    ) for isbn in resp.get('ISBN', [])])
+    docids.extend([
+        DocID(
+            type='ISBN',
+            # We are ignoring isbn-type
+            id=ISBN_TMPL.format(*isbn))
+        for isbn in resp.get('ISBN', [])
+        if len(isbn) == 13])
 
     isbn = resp.get('reference', {}).get('isbn')
     if isbn and isbn not in docids:
