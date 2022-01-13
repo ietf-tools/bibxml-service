@@ -62,7 +62,10 @@ class PersonAffiliation(BaseModel):
 
 class Person(BaseModel):
     name: PersonName
-    affiliation: Optional[PersonAffiliation] = None
+    affiliation: Optional[Union[
+        List[PersonAffiliation],
+        PersonAffiliation,
+    ]] = None
 
 
 class Contributor(BaseModel):
