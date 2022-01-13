@@ -50,7 +50,7 @@ class Contact(BaseModel):
 
 
 class Organization(BaseModel):
-    name: str
+    name: Union[List[str], str]
     url: Optional[str] = None
     contact: Optional[Contact] = None
     abbreviation: Optional[str] = None
