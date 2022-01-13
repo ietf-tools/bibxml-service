@@ -93,10 +93,14 @@
           source “{{ source.0 }}”:
         </dt>
         <dd class="ml0">
-          ref. {{ source.1.ref }}
-          {% if source.1.validation_errors %}
-            <span class="dark-red f6">(source structure warnings)</span>
-            <pre class="code pre gray f7 h4 overflow-y-auto">{{ source.1.validation_errors }}<br /><br />{{ source.1.bibitem | pprint }}</pre>
+          {% if source.1.ref %}
+            ref. {{ source.1.ref }}
+          {% endif %}
+          {% if not source.1.ref or source.1.validation_errors %}
+            {% if source.1.validation_errors %}
+              <span class="dark-red f6">(source structure warnings)</span>
+            {% endif %}
+            <pre class="code pre gray f7 h4 overflow-y-auto">{{ source.1.validation_errors|default:"(no validation errors)" }}<br /><br />{{ source.1.bibitem | pprint }}</pre>
           {% endif %}
         </dd>
       {% endfor %}
