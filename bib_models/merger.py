@@ -1,3 +1,8 @@
+"""
+Helpers for merging dictionary representations
+of BibliographicItem models.
+"""
+
 from typing import Any
 from deepmerge import Merger, STRATEGY_END
 from common.util import as_list
