@@ -46,7 +46,7 @@ class ExternalSourceRequest(BaseModel):
     time: Optional[int] = None
     """How long the request took."""
 
-    url: Optional[str] = None
+    url: str
     """Which URL was hit."""
 
 
