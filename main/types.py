@@ -40,7 +40,7 @@ class InternalSourceMeta(SourceMeta):
     """Ref in source dataset."""
 
 
-class ExternalSourceRequest(SourceMeta):
+class ExternalSourceRequest(BaseModel):
     """Represents a request to external source."""
 
     time: Optional[int] = None
@@ -50,7 +50,7 @@ class ExternalSourceRequest(SourceMeta):
     """Which URL was hit."""
 
 
-class ExternalSourceMeta(BaseModel):
+class ExternalSourceMeta(SourceMeta):
     requests: List[ExternalSourceRequest]
     """Requests incurred
     when retrieving info from this source."""
