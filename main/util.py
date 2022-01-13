@@ -9,7 +9,7 @@ from django.db.models.query import QuerySet
 from .types import SourcedBibliographicItem
 from .models import RefData
 from .indexed import build_search_results
-from .indexed import search_refs_json_repr_match, search_refs_relaton_struct
+from .indexed import search_refs_relaton_struct
 from .indexed import search_refs_relaton_field
 
 
