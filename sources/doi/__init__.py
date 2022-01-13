@@ -62,6 +62,9 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
         link=[Link(
             content=resp['URL'],
         )],
+        abstract=[{
+            'content': resp['abstract'],
+        }] if 'abstract' in resp else [],
         contributor=[
             *(to_contributor('author', author)
               for author in resp.get('author', [])),
