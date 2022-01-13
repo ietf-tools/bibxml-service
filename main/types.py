@@ -1,8 +1,8 @@
 """Type helpers specific to bibliographic item retrieval."""
 
 from pydantic import BaseModel
-from typing import TypedDict, Mapping, List, Union, Optional
-from bib_models import BibliographicItem, Title, DocID as DocIDModel
+from typing import TypedDict, Mapping, List, Union, Optional, Dict, Any
+from bib_models import BibliographicItem, Title
 
 
 class DocID(TypedDict):
