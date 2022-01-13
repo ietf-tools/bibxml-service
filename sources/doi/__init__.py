@@ -57,14 +57,14 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
         title=[Title(
             # We are ignoring subtitle, original-title, short-title,
             # container-title, short-container-title, group-title
-            content=resp['title'],
-        )],
+            content=title,
+        ) for title in resp['title']],
         link=[Link(
-            content=resp['url'],
+            content=resp['URL'],
         )],
         contributor=[
             *(to_contributor('author', author)
-              for author in resp['author']),
+              for author in resp.get('author', [])),
             *(to_contributor('editor', editor)
               for editor in resp.get('editor', [])),
             *(to_contributor('translator', translator)
