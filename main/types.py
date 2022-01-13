@@ -21,7 +21,7 @@ class FoundBibliographicItem(BaseModel):
 
 
 class SourceMeta(BaseModel):
-    bibitem: BibliographicItem
+    bibitem: Union[BibliographicItem, Dict[str, Any]]
 
     validation_errors: Optional[List[str]] = None
 
