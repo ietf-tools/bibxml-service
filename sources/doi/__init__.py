@@ -89,7 +89,7 @@ def get_bibitem(doi: str) -> SourcedBibliographicItem:
         **data,
         sources={
             'doi': ExternalSourceMeta(
-                bibitem=item,
+                bibitem=resp,
                 validation_errors=errors,
                 requests=[],
             ),
