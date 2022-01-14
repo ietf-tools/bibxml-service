@@ -42,32 +42,18 @@ def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
             "DOI source requires DOI docid.type",
             repr(docid))
 
-    doi = docid.id
+    resp = works.doi(docid.id)
 
-    resp = works.doi(doi)
+    docids: List[DocID] = [
+        DocID(type='DOI', id=resp['DOI']),
 
-    docids: List[DocID] = [DocID(
-        type='DOI',
-        id=resp['DOI'],
-    )]
+        *(DocID(type='ISSN', id=issn)
+          for issn in resp.get('ISSN', [])),
 
-    docids.extend([
-        DocID(
-            type='ISSN',
-            # We are ignoring issn-type (unclear purpose)
-            id=issn,
-        )
-        for issn in resp.get('ISSN', [])])
-
-    docids.extend([
-        DocID(
-            type='ISBN',
-            # We are ignoring isbn-type
-            id=ISBN_TMPL.format(*isbn),
-        )
-        for isbn in resp.get('ISBN', [])
-        if len(isbn) == 13])
-
+        *(DocID(type='ISBN', id=ISBN_TMPL.format(*isbn))
+          for isbn in resp.get('ISBN', [])
+          if len(isbn) == 13),
+    ]
     isbn = resp.get('reference', {}).get('isbn')
     if isbn and isbn not in docids:
         docids.append(DocID(
@@ -94,15 +80,14 @@ def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
         ))
 
     titles: List[Title] = [
-        Title(content=title, format=None, type=None)
-        for title in resp['title']
+        *(Title(content=title, type=None)
+          for title in resp['title']),
+
+        *(Title(content=title, type=tid)
+          for tid in ALT_TITLES
+          for title in as_list(resp.get(tid, []))
+          if tid in resp),
     ]
-    for tid in ALT_TITLES:
-        if tid in resp:
-            titles.extend([
-                Title(content=title, type=tid)
-                for title in as_list(resp.get(tid, []))
-            ])
 
     data = dict(
         # The following are not captured:
@@ -113,6 +98,7 @@ def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
         # dates: accepted, content-updated, published-print, approved,
         # indexed, posted, published, published-other, deposited
         # alternative-id
+        # isbn-type, issn-type
         # publisher, publisher-location
         # type, subtype — need to map to Relaton’s types
         # subject
