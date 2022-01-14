@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 from pydantic import ValidationError
-from crossref.restful import Works
+from crossref.restful import Works, Etiquette
 
 from common.util import as_list
 
@@ -13,7 +13,13 @@ from main.exceptions import RefNotFoundError
 from main.types import SourcedBibliographicItem, ExternalSourceMeta
 
 
-works = Works()
+etiquette = Etiquette(
+    'BibXML service',
+    '2022.01.14_1',
+    'https://demo.bibxml.org/',
+    'ietf-ribose@ribose.com',
+)
+works = Works(etiquette=etiquette)
 
 
 ISBN_TMPL = '{0}{1}{2}-{3}-{4}{5}{6}{7}-{8}{9}{10}{11}-{12}'
