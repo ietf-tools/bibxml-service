@@ -3,7 +3,7 @@
 from pydantic import BaseModel
 from typing import Mapping, List, Union, Optional, Dict, Any
 from bib_models.models import BibliographicItem
-from bib_models.dicts import Title, DocID
+from bib_models.dataclasses import Title, DocID
 
 
 class FoundBibliographicItem(BaseModel):

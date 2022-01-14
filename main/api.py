@@ -6,6 +6,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.db.models.query import Q
 from django.conf import settings
 
+from common.pydantic import unpack_dataclasses
+
 from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
 from .indexed import get_indexed_ref_by_query
@@ -85,7 +87,7 @@ def get_by_docid(request):
                 content_type="application/xml",
                 charset="utf-8")
         else:
-            return JsonResponse({"data": citation.dict()})
+            return JsonResponse({"data": unpack_dataclasses(citation.dict())})
 
 
 def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
@@ -178,5 +180,8 @@ class CitationSearchResultListView(BaseCitationSearchView):
 
         return JsonResponse({
             "meta": meta,
-            "data": [obj.dict() for obj in context['object_list']],
+            "data": [
+                unpack_dataclasses(obj.dict())
+                for obj in context['object_list']
+            ],
         })

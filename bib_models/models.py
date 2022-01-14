@@ -1,43 +1,37 @@
 """
 Some of Relaton models implemented as Pydantic models.
-
-Makes use of ``TypedDict``-based definitions from :mod:`dict`
-to reduce duplication.
-
-.. note::
-
-   TypedDict definitions don’t allow default values.
-
-   This means model fields using TypedDict will require
-   passing ``None`` for fields that are ``Optional[]``
-   in TypedDict specifications.
-
-   Resist the temptation to go ``total=False`` on TypedDicts,
-   since that would disable warnings for missing field validation.
 """
 
 from typing import List, Union, Optional
 import datetime
 
 from pydantic import BaseModel
+from dataclasses import dataclass
 
-from .dicts import DocID, Title
-from .dicts import Contributor, Copyright, GenericStringValue
+from .dataclasses import DocID, Title
+from .dataclasses import Contributor, Copyright, GenericStringValue
 
 
-class BiblioNote(BaseModel):
+@dataclass
+class BiblioNote:
     content: str
     type: Optional[str] = None
 
 
-class Link(BaseModel):
+@dataclass
+class Link:
     content: str
     type: Optional[str] = None
 
 
-class Date(BaseModel):
+@dataclass
+class Date:
     type: str
     value: datetime.date
+
+
+class IgnoringConfig:
+    extra = 'ignore'
 
 
 class BibliographicItem(BaseModel):

@@ -14,6 +14,7 @@ from django.views.generic.list import MultipleObjectTemplateResponseMixin
 from django.contrib import messages
 
 from bibxml import error_views
+from common.pydantic import unpack_dataclasses
 
 from .exceptions import RefNotFoundError
 from .models import RefData
@@ -102,8 +103,9 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
         ))
 
     else:
+        result = unpack_dataclasses(citation.dict())
         return render(request, 'browse/citation_details.html', dict(
-            data=citation.dict(),
+            data=result,
             doctypes=list_doctypes(),
             **shared_context,
         ))
