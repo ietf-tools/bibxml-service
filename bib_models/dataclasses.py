@@ -1,6 +1,6 @@
 """
 Parts of Relaton BibliographicItem models implemented
-as :class:`TypedDict` classes.
+as simple Python dataclasses.
 """
 
 from typing import TypedDict, Optional, Union, List
