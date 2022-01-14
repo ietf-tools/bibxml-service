@@ -1,6 +1,8 @@
-<dt class="b nowrap mt1 f6">
-  {{ key }}{% if idx %} {{ idx }}{% endif %}:
-</dt>
+{% if key %}
+  <dt class="b nowrap mt1 f6">
+    {{ key }}{% if idx %} {{ idx }}{% endif %}:
+  </dt>
+{% endif %}
 <dd class="ml0 truncate">
   {% if val.items %}
     <dl class="pl4 ma0">
@@ -10,6 +12,18 @@
         {% endif %}
       {% endfor %}
     </dl>
+  {% elif val|stringformat:"r"|first == "[" %}
+    <ul class="list pa0 ma0">
+      {% for item in val %}
+        <li>
+          {% if item.items or val|stringformat:"r"|first == "[" %}
+            {% include "deflist/entry_recursivedict.html" with key=False val=item %}
+          {% else %}
+            {{ val|default:"—" }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
   {% else %}
     {{ val|default:"—" }}
   {% endif %}

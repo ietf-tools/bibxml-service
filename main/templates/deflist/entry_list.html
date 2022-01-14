@@ -1,12 +1,14 @@
-<dt class="b nowrap mt1 f6 {% if inline %}dib{% endif %}">
-  {{ key }}{% if idx %} ({{ idx }}){% endif %}:
-</dt>
+{% if key %}
+  <dt class="b nowrap mt1 f6 {% if inline %}dib{% endif %}">
+    {{ key }}{% if idx %} ({{ idx }}){% endif %}:
+  </dt>
+{% endif %}
 <dd class="ml0 {% if not multiline %}truncate{% endif %}{% if inline %}dib{% endif %}" title="{{ items|length }} item(s)">
   <ul class="list pl4 ma0">
     {% for val in items %}
       <li title="{{ val }}">
         {% if tmpl %}
-          {% include tmpl with key=forloop.counter val=val %}
+          {% include tmpl with key=False val=val %}
         {% else %}
           {{ val|default:"—" }}
         {% endif %}
