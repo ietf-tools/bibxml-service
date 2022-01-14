@@ -16,7 +16,7 @@ from main.types import SourcedBibliographicItem, ExternalSourceMeta
 etiquette = Etiquette(
     'BibXML service',
     '2022.01.14_1',
-    'https://demo.bibxml.org/',
+    'https://dev.bibxml.org/',
     'ietf-ribose@ribose.com',
 )
 works = Works(etiquette=etiquette)
