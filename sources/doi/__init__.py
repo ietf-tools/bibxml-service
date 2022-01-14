@@ -101,7 +101,7 @@ def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
         if tid in resp:
             titles.extend([
                 Title(content=title, type=tid)
-                for title in as_list(resp.get('tid', []))
+                for title in as_list(resp.get(tid, []))
             ])
 
     data = dict(
