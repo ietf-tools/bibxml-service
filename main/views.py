@@ -1,6 +1,6 @@
 """View functions for citation browse GUI."""
 
-from urllib.parse import quote_plus, unquote_plus
+from urllib.parse import unquote_plus
 
 from django.db.models.query import QuerySet
 from django.urls import reverse
