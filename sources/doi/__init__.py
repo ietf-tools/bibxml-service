@@ -150,7 +150,7 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
             name=PersonName(
                 surname=GenericStringValue(
                     content=crossref_author['family'],
-                ),
+                ) if 'family' in crossref_author else None,
                 completename=GenericStringValue(
                     content=crossref_author['name'],
                 ) if 'name' in crossref_author else None,
