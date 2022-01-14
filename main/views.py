@@ -135,65 +135,39 @@ def external_dataset(request, dataset_id):
     ))
 
 
-def browse_external_reference(request, dataset_id, ref=None):
-    if ref:
-        parsed_ref = unquote_plus(ref)
+def browse_external_reference(request, dataset_id):
+    ref = request.GET.get('ref')
 
-        if dataset_id == 'doi':
-            try:
-                data = get_doi_ref(parsed_ref)
-            except Exception:
-                return error_views.server_error(request)
-            else:
-                return render(request, 'browse/citation_details.html', dict(
-                    dataset_id=dataset_id,
-                    ref=ref,
-                    data=data,
-                    **shared_context,
-                ))
+    if not ref:
+        return HttpResponseBadRequest(
+            "Missing reference to fetch")
+
+    if dataset_id not in settings.EXTERNAL_DATASETS:
+        return HttpResponseBadRequest(
+            "Unknown dataset requested")
+
+    if dataset_id == 'doi':
+        try:
+            data = unpack_dataclasses(get_doi_ref(ref).dict())
+        except RuntimeError as exc:
+            messages.error(
+                request,
+                "Couldn’t retrieve citation: {}".format(
+                    str(exc)))
         else:
-            return HttpResponseBadRequest("Unsupported external dataset ID")
-
+            return render(request, 'browse/citation_details.html', dict(
+                dataset_id=dataset_id,
+                ref=ref,
+                data=data,
+                **shared_context,
+            ))
     else:
-        # Faciliates searching via a regular HTML form.
+        messages.error(
+            request,
+            "Unsupported external dataset {}".format(dataset_id))
 
-        ref = request.GET.get('ref')
-
-        if not ref:
-            return HttpResponseBadRequest(
-                "Missing dataset ID and/or reference")
-
-        origin = request.headers.get('referer', '/')
-
-        if dataset_id not in settings.EXTERNAL_DATASETS:
-            messages.error(
-                request,
-                "Unknown external dataset {}".format(dataset_id))
-
-        if dataset_id == 'doi':
-            ref = request.GET.get('ref')
-            if ref:
-                try:
-                    get_doi_ref(ref)
-                except RuntimeError as exc:
-                    messages.error(
-                        request,
-                        "Couldn’t retrieve citation: {}".format(
-                            str(exc)))
-                else:
-                    return redirect(
-                        'browse_citation',
-                        dataset_id,
-                        quote_plus(ref))
-            else:
-                messages.error(request, "Missing reference to fetch {}")
-        else:
-            messages.error(
-                request,
-                "Unsupported external dataset {}".format(dataset_id))
-
-        # If we’re here, it must’ve failed
-        return HttpResponseRedirect(origin)
+    # If we’re here, it must’ve failed
+    return HttpResponseRedirect(request.headers.get('referer', '/'))
 
 
 # Browsing by dataset (semi-internal)

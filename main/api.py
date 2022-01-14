@@ -49,9 +49,13 @@ def get_ref(request, dataset_name, ref):
 
 def get_doi_ref(request, ref):
     format = request.GET.get('format', 'relaton')
+    if format != 'relaton':
+        return JsonResponse({
+            "error": "BibXML format is not supported yet by this endpoint",
+        }, status=500)
     try:
         parsed_ref = unquote_plus(ref)
-        result = _get_doi_ref(parsed_ref, format)
+        result = _get_doi_ref(parsed_ref)
     except RefNotFoundError:
         return JsonResponse({
             "error": "Unable to find DOI ref {}".format(parsed_ref),
