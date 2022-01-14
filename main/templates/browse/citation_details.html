@@ -81,6 +81,9 @@
   </div>
 
   <dl class="lh-title pv2 mt2">
+    {% if data.copyright %}
+      {% include "deflist/entry_list.html" with key="copyright(s)" items=data.copyright|as_list tmpl="deflist/entry_recursivedict.html" %}
+    {% endif %}
     {% if data.keyword %}
       {% include "deflist/entry_list.html" with key="keywords" items=data.keyword|as_list %}
     {% endif %}
