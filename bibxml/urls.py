@@ -1,4 +1,5 @@
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
 
@@ -19,39 +20,41 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
 
     # API specs
-    path('openapi.yaml', require_safe(
+    path('openapi.yaml', never_cache(require_safe(
         views.openapi_spec
-    ), name='openapi_spec_main'),
-    path('openapi-legacy.yaml', require_safe(
+    )), name='openapi_spec_main'),
+    path('openapi-legacy.yaml', never_cache(require_safe(
         views.legacy_openapi_spec
-    ), name='openapi_spec_legacy'),
-    path('api-spec/<spec>/', require_safe(
+    )), name='openapi_spec_legacy'),
+    path('api-spec/<spec>/', never_cache(require_safe(
         views.readable_openapi_spec
-    ), name='openapi_readable_spec'),
+    )), name='openapi_readable_spec'),
 
     # Main API
     path('api/', include([
         path('v1/', include([
-            path('', require_safe(
+            path('', never_cache(require_safe(
                 views.readable_openapi_spec_main
-            ), name='api_index'),
+            )), name='api_index'),
 
             # Public endpoints
-            path('search/<query>/', require_safe(
+
+            # We let search results to be cached on a different level
+            path('search/<query>/', never_cache(require_safe(
                 public_api.CitationSearchResultListView.as_view()
-            ), name='api_search'),
+            )), name='api_search'),
 
             path('by-docid/', require_safe(
                 public_api.get_by_docid
             ), name='api_get_by_docid'),
 
             path('ref/', include([
-                path('doi/<ref>/', require_safe(
+                path('doi/<ref>/', never_cache(require_safe(
                     public_api.get_doi_ref
-                ), name='api_get_doi_ref'),
-                path('<dataset_name>/<ref>/', require_safe(
+                )), name='api_get_doi_ref'),
+                path('<dataset_name>/<ref>/', never_cache(require_safe(
                     public_api.get_ref
-                ), name='api_get_ref'),
+                )), name='api_get_ref'),
             ])),
 
             # Management endpoints
@@ -65,9 +68,9 @@ urlpatterns = [
                     ))), name='api_stop_all_tasks'),
                 ])),
                 path('<dataset_name>/', include([
-                    path('status/', require_safe(
+                    path('status/', never_cache(require_safe(
                         mgmt_api.indexer_status
-                    ), name='api_indexer_status'),
+                    )), name='api_indexer_status'),
                     path('reindex/', csrf_exempt(require_POST(auth.api(
                         mgmt_api.run_indexer
                     ))), name='api_run_indexer'),
@@ -81,9 +84,13 @@ urlpatterns = [
 
     # Compatibility API
     path('public/rfc/', include([
-        path('<legacy_dataset_name>/<legacy_reference>.xml', require_safe(
-            public_api.get_ref_by_legacy_path
-        ), name='compat_api_get_ref_by_legacy_path'),
+        path(
+            '<legacy_dataset_name>/<legacy_reference>.xml',
+            never_cache(require_safe(
+                public_api.get_ref_by_legacy_path
+            )),
+            name='compat_api_get_ref_by_legacy_path',
+        ),
     ])),
 
     # Main GUI
@@ -94,45 +101,48 @@ urlpatterns = [
         ), name='browse'),
 
         path('management/', include([
-            path('', require_safe(auth.basic(
+            path('', require_safe(auth.basic(never_cache(
                 mgmt_views.manage
-            )), name='manage'),
+            ))), name='manage'),
             path('<dataset_id>/', include([
-                path('', require_safe(auth.basic(
+                path('', require_safe(auth.basic(never_cache(
                     mgmt_views.manage_dataset
-                )), name='manage_dataset'),
+                ))), name='manage_dataset'),
             ])),
         ])),
 
-        path('search/', require_safe(
+        # We let search results to be cached on a different level
+        path('search/', never_cache(require_safe(
             public_views.CitationSearchResultListView.as_view()
-        ), name='search_citations'),
+        )), name='search_citations'),
 
         path('get-one/', include([
             path('by-docid/', require_safe(
                 public_views.browse_citation_by_docid
             ), name='get_citation_by_docid'),
-            path('external/<dataset_id>/', require_safe(
+
+            # We let external source retrieval logic to cache this one:
+            path('external/<dataset_id>/', never_cache(require_safe(
                 public_views.browse_external_reference
-            ), name='get_external_citation'),
+            )), name='get_external_citation'),
         ])),
 
         path('indexed-sources/', include([
             path('<dataset_id>/', include([
-                path('', require_safe(
+                path('', never_cache(require_safe(
                     public_views.IndexedDatasetCitationListView.as_view()
-                ), name='browse_dataset'),
-                path('<ref>/', require_safe(
+                )), name='browse_dataset'),
+                path('<ref>/', never_cache(require_safe(
                     public_views.browse_indexed_reference
-                ), name='browse_citation'),
+                )), name='browse_citation'),
             ])),
         ])),
 
         path('external-sources/', include([
             path('<dataset_id>/', include([
-                path('', require_safe(
+                path('', never_cache(require_safe(
                     public_views.external_dataset
-                ), name='browse_external_dataset'),
+                )), name='browse_external_dataset'),
                 path('<path:ref>/', require_safe(
                     public_views.browse_external_reference
                 ), name='browse_external_citation'),

@@ -5,6 +5,7 @@ from urllib.parse import unquote_plus
 from django.http import HttpResponseBadRequest
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
+from django.core.cache import cache
 
 from .types import SourcedBibliographicItem
 from .models import RefData
@@ -61,7 +62,11 @@ class BaseCitationSearchView(BaseListView):
         otherwise behavior depends on :attr:`show_all_by_default`."""
 
         if self.query is not None and self.query_format is not None:
-            return build_search_results(self.dispatch_handle_query(self.query))
+            return cache.get_or_set(
+                json.dumps({'query': self.query, 'format': self.query_format}),
+                (lambda: build_search_results(self.dispatch_handle_query(self.query))),
+                # Caching for 1 hour
+                3600)
         else:
             if self.show_all_by_default:
                 return build_search_results(RefData.objects.all())
