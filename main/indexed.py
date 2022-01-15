@@ -83,9 +83,9 @@ def search_refs_relaton_field(
 
     - If ``exact`` is ``False`` (default),
       wildcards in field paths are not allowed,
-      and object at each field path is passed through ``to_tsvector()``
-      while corresponding value is passed through ``::tsquery``
-      for fuzzy matching.
+      and object at each field path is converted to tsvector
+      while corresponding value is converted to tsquery
+      with fuzzy matching and websearch operator support.
 
       Example::
 
