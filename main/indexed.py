@@ -220,7 +220,9 @@ def list_doctypes() -> List[Tuple[str, str]]:
                     ) as sample_id
                     from api_ref_data
                 ) as item
-                '''))]
+                ''')
+        )
+    ]
 
 
 def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
