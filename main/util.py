@@ -167,7 +167,7 @@ class BaseCitationSearchView(BaseListView):
             limit=self.limit_to,
         )
 
-        if quick_search.exists():
+        if len(quick_search) > 0:
             return quick_search
 
         return search_refs_relaton_field({'': query}, limit=self.limit_to)
