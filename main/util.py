@@ -5,6 +5,7 @@ from urllib.parse import unquote_plus
 from django.http import HttpResponseBadRequest
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
+from django.conf import settings
 from django.core.cache import cache
 
 from .types import SourcedBibliographicItem
@@ -45,6 +46,10 @@ class BaseCitationSearchView(BaseListView):
     show_all_by_default = False
     """Whether to show all items if query is not specified."""
 
+    result_cache_seconds = getattr(settings, 'SEARCH_CACHE_SECONDS', 3600)
+    """How long to cache search results for. Results are cached as a list
+    is constructed from query and query format. Default is one hour."""
+
     def get(self, request, *args, **kwargs):
         try:
             self.dispatch_parse_query(request, **kwargs)
@@ -64,9 +69,10 @@ class BaseCitationSearchView(BaseListView):
         if self.query is not None and self.query_format is not None:
             return cache.get_or_set(
                 json.dumps({'query': self.query, 'format': self.query_format}),
-                (lambda: build_search_results(self.dispatch_handle_query(self.query))),
-                # Caching for 1 hour
-                3600)
+                (lambda: build_search_results(
+                    self.dispatch_handle_query(self.query)
+                )),
+                self.result_cache_seconds)
         else:
             if self.show_all_by_default:
                 return build_search_results(RefData.objects.all())
