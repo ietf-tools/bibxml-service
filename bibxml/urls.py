@@ -1,5 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache
+from django.views.decorators.cache import never_cache, cache_page
+from django.conf import settings
 from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
 
@@ -13,6 +14,8 @@ from . import views, error_views
 handler403 = error_views.not_authorized
 handler404 = error_views.not_found
 handler500 = error_views.server_error
+
+default_ttl = getattr(settings, 'DEFAULT_CACHE_SECONDS', 3600)
 
 
 urlpatterns = [
@@ -96,9 +99,9 @@ urlpatterns = [
     # Main GUI
     path('', include([
 
-        path('', require_safe(
+        path('', cache_page(default_ttl)(require_safe(
             public_views.home
-        ), name='browse'),
+        )), name='browse'),
 
         path('management/', include([
             path('', require_safe(auth.basic(never_cache(

@@ -31,7 +31,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -39,7 +38,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -168,7 +166,6 @@ SNAPSHOT = {
 
 DEFAULT_CACHE_SECONDS = 21600
 SEARCH_CACHE_SECONDS = 3600
-CACHE_MIDDLEWARE_SECONDS = DEFAULT_CACHE_SECONDS
 
 if environ.get('REDIS_HOST') and environ.get('REDIS_PORT'):
     CACHES = {
