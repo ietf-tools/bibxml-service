@@ -154,9 +154,9 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
                 completename=GenericStringValue(
                     content=crossref_author['name'],
                 ) if 'name' in crossref_author else None,
-                forename=GenericStringValue(
+                forename=[GenericStringValue(
                     content=crossref_author['given'],
-                ) if 'given' in crossref_author else None,
+                )] if 'given' in crossref_author else [],
             ),
         ),
     )
