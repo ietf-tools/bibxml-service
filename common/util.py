@@ -1,3 +1,6 @@
+"""List-related utilities."""
+
+
 from typing import Any, Union, TypeVar, Iterable, List
 
 
