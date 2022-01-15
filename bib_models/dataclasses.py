@@ -36,7 +36,10 @@ class Organization:
 class PersonName:
     completename: Optional[GenericStringValue] = None
     surname: Optional[GenericStringValue] = None
-    forename: Optional[GenericStringValue] = None
+    forename: Optional[Union[
+        List[GenericStringValue],
+        GenericStringValue,
+    ]] = None
 
 
 @dataclass
@@ -85,7 +88,5 @@ class DocID:
 
 
 @dataclass
-class Title:
-    content: str
-    format: Optional[str] = None
+class Title(GenericStringValue):
     type: Optional[str] = None
