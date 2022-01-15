@@ -170,6 +170,14 @@ DEFAULT_CACHE_SECONDS = 21600
 SEARCH_CACHE_SECONDS = 3600
 CACHE_MIDDLEWARE_SECONDS = DEFAULT_CACHE_SECONDS
 
+if environ.get('REDIS_HOST') and environ.get('REDIS_PORT'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
+        }
+    }
+
 
 # BibXML-specific
 
