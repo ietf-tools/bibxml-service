@@ -1,0 +1,10 @@
+{% with val.surname.content as surname and val.completename.content as fullname and val.forename as given_names %}
+  {% if fullname %}
+    {{ fullname }}
+  {% else %}
+    {% for name in given_names %}
+      {{ name.content }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    {{ surname }}
+  {% endif %}
+{% endwith %}
