@@ -173,6 +173,12 @@ CACHE_MIDDLEWARE_SECONDS = DEFAULT_CACHE_SECONDS
 
 # BibXML-specific
 
+DEFAULT_SEARCH_RESULT_LIMIT = 400
+"""Default hard limit for found item count.
+
+If the user hits this limit, they are expected to provide
+a more precise query."""
+
 LEGACY_DATASETS = {
     'bibxml': 'rfcs',
     'bibxml2': 'misc',

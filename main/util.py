@@ -23,6 +23,12 @@ class BaseCitationSearchView(BaseListView):
     # model = RefData
     paginate_by = 20
 
+    limit_to = getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
+    """Hard limit for found item count.
+
+    If the user hits this limit, they are expected to provide
+    a more precise query."""
+
     query_in_path = False
     """Whether query will appear as path component named ``query``
     (URLs must be configured appropriately).
@@ -44,7 +50,9 @@ class BaseCitationSearchView(BaseListView):
     """Deserialized query, parsed from request."""
 
     show_all_by_default = False
-    """Whether to show all items if query is not specified."""
+    """Whether to show all items if query is not specified.
+
+    Still subject to ``limit_to``."""
 
     result_cache_seconds = getattr(settings, 'SEARCH_CACHE_SECONDS', 3600)
     """How long to cache search results for. Results are cached as a list
@@ -67,17 +75,26 @@ class BaseCitationSearchView(BaseListView):
         otherwise behavior depends on :attr:`show_all_by_default`."""
 
         if self.query is not None and self.query_format is not None:
-            return cache.get_or_set(
-                json.dumps({'query': self.query, 'format': self.query_format}),
-                (lambda: build_search_results(
-                    self.dispatch_handle_query(self.query)
-                )),
-                self.result_cache_seconds)
+            result_getter = (lambda: build_search_results(
+                self.dispatch_handle_query(self.query)))
+
         else:
             if self.show_all_by_default:
-                return build_search_results(RefData.objects.all())
+                result_getter = (lambda: build_search_results(
+                    RefData.objects.all()[:self.limit_to]))
+
             else:
-                return []
+                result_getter = (lambda: [])
+
+        return cache.get_or_set(
+            json.dumps({
+                'query': self.query,
+                'query_format': self.query_format,
+                'limit': self.limit_to,
+                'show_all': self.show_all_by_default,
+            }),
+            result_getter,
+            self.result_cache_seconds)
 
     def get_context_data(self, **kwargs):
         """In addition to parent implementation,
@@ -85,6 +102,7 @@ class BaseCitationSearchView(BaseListView):
 
         return dict(
             **super().get_context_data(**kwargs),
+            result_cap=self.limit_to,
             query=self.query,
         )
 
@@ -138,16 +156,21 @@ class BaseCitationSearchView(BaseListView):
         return query
 
     def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
-        quick_search = search_refs_relaton_field({
-            'docid': query,
-        }, {
-            'keyword': query,
-        }, {
-            'title': query,
-        })
-        if len(quick_search) > 0:
+        quick_search = search_refs_relaton_field(
+            {
+                'docid': query,
+            }, {
+                'keyword': query,
+            }, {
+                'title': query,
+            },
+            limit=self.limit_to,
+        )
+
+        if quick_search.exists():
             return quick_search
-        return search_refs_relaton_field({'': query})
+
+        return search_refs_relaton_field({'': query}, limit=self.limit_to)
 
     def parse_json_struct_query(self, query: str) -> dict[str, Any]:
         try:
@@ -160,7 +183,7 @@ class BaseCitationSearchView(BaseListView):
     def handle_json_struct_query(
             self,
             query: dict[str, Any]) -> QuerySet[RefData]:
-        return search_refs_relaton_struct(query)
+        return search_refs_relaton_struct(query, limit=self.limit_to)
 
 
 class UnsupportedQueryFormat(ValueError):

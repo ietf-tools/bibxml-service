@@ -4,7 +4,17 @@
 {% endif %}
 
 <span class="flex-auto tr">
-  {{ page_obj.paginator.count }} total — page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  <span class="nowrap">
+    page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  </span>
+  <span class="nowrap f7">
+    &ensp;
+    {% if result_cap and page_obj.paginator.count == result_cap %}
+      limited to {{ result_cap }} results
+    {% else %}
+      found {{ page_obj.paginator.count }} total
+    {% endif %}
+  </span>
 </span>
 
 {% if page_obj.has_next %}

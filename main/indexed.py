@@ -6,9 +6,11 @@ from typing import Dict, List, Union, Tuple, Any
 from pydantic import ValidationError
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
-from django.db.models.query import QuerySet, Q
 from django.db.models import TextField
+from django.db.models.query import QuerySet, Q
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
+from django.conf import settings
 
 
 from common.util import as_list
@@ -27,20 +29,24 @@ def list_refs(dataset_id) -> QuerySet[RefData]:
     return RefData.objects.filter(dataset__iexact=dataset_id)
 
 
-def search_refs_json_repr_match(text: str) -> QuerySet[RefData]:
+def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
     """Uses given string to search across serialized JSON representations
     of Relaton citation data.
 
     Supports PostgreSQL websearch operators like quotes, plus, minus, OR, AND.
     """
+    limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
+
     return (
         RefData.objects.
         annotate(search=SearchVector(Cast('body', TextField()))).
-        filter(search=SearchQuery(text, search_type='websearch')))
+        filter(search=SearchQuery(text, search_type='websearch'))
+        [:limit])
 
 
 def search_refs_relaton_struct(
-        *objs: Union[Dict[Any, Any], List[Any]]) -> QuerySet[RefData]:
+        *objs: Union[Dict[Any, Any], List[Any]],
+        limit=None) -> QuerySet[RefData]:
     """Uses PostgreSQL’s JSON containment query
     to find bibliographic items containing given structure.
 
@@ -50,16 +56,21 @@ def search_refs_relaton_struct(
               at least one of given ``obj`` structures (they are OR'ed).
     :rtype: Queryset[RefData]
     """
+    limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
+
     subqueries = ['body @> %s::jsonb' for obj in objs]
-    query = 'SELECT * FROM api_ref_data WHERE %s' % ' OR '.join(subqueries)
-    return (
-        RefData.objects.
-        raw(query, [json.dumps(obj) for obj in objs]))
+
+    query = RawSQL('''
+        SELECT id FROM api_ref_data WHERE %s
+    ''' % ' OR '.join(subqueries), [json.dumps(obj) for obj in objs])
+
+    return RefData.objects.filter(id__in=query)[:limit]
 
 
 def search_refs_relaton_field(
         *field_queries: Dict[str, str],
-        exact=False) -> QuerySet[RefData]:
+        exact=False,
+        limit=None) -> QuerySet[RefData]:
     """
     Each of ``field_queries`` should be a dictionary of the following shape::
 
@@ -112,29 +123,25 @@ def search_refs_relaton_field(
     :rtype: Queryset[RefData]
     """
 
+    limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
+
     ored_queries = []
-    interpolated_params: Dict[str, Union[str, int]] = {}
+    interpolated_params: List[str] = []
 
     for idx, fields in enumerate(field_queries):
         anded_queries = []
         for fieldspec, query in fields.items():
-            interpolated_param_key = '{idx}_{fieldpath}'.format(
-                idx=idx,
-                fieldpath=fieldspec)
-
             if exact:
-                interpolated_params[interpolated_param_key] = \
+                interpolated_params.append(
                     '$.{fieldpath} ? ({query})'.format(
                         fieldpath=fieldspec,
-                        query=query)
+                        query=query))
                 anded_queries.append(
-                    'body @? %({key})s'.format(
-                        key=interpolated_param_key,
-                    ),
+                    'body @? %s',
                 )
 
             else:
-                interpolated_params[interpolated_param_key] = query
+                interpolated_params.append(query)
                 if fieldspec == '':
                     # Below query creates a tsvector from the entire body,
                     # and then adds a tsvector produced from body.docid as text
@@ -160,20 +167,17 @@ def search_refs_relaton_field(
                                     translate((body->'docid')::text, '/', ' ')
                                 )
                             )
-                        ) @@ websearch_to_tsquery('english', %({key})s)
+                        ) @@ websearch_to_tsquery('english', %s)
                     '''
-                    anded_queries.append(tpl.format(
-                        key=interpolated_param_key,
-                    ))
+                    anded_queries.append(tpl)
                 else:
                     tpl = '''
                         to_tsvector(
                             'english',
                             jsonb_build_array({json_selectors})
-                        ) @@ websearch_to_tsquery('english', %({key})s)
+                        ) @@ websearch_to_tsquery('english', %s)
                     '''
                     anded_queries.append(tpl.format(
-                        key=interpolated_param_key,
                         json_selectors=', '.join([
                             'translate(jsonb_extract_path_text(body, {fieldpath}), \'/\', \' \')'.format(
                                 # {fieldpath} is not properly escaped,
@@ -185,13 +189,13 @@ def search_refs_relaton_field(
                     ))
         ored_queries.append('(%s)' % ' AND '.join(anded_queries))
 
-    final_query = '''
-        SELECT id, body, ref, dataset FROM api_ref_data WHERE %s
-    ''' % ' OR '.join(ored_queries)
+    final_query = RawSQL('''
+        SELECT id FROM api_ref_data WHERE %s
+    ''' % ' OR '.join(ored_queries), interpolated_params)
 
     # print("search_refs_relaton_field: final query", final_query, interpolated_params)
 
-    return RefData.objects.raw(final_query, interpolated_params)
+    return RefData.objects.filter(id__in=final_query)[:limit]
 
 
 def list_doctypes() -> List[Tuple[str, str]]:

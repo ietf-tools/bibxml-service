@@ -20,7 +20,7 @@
 
   {% if object_list %}
     <nav class="flex items-center">
-      {% include "browse/paginator.html" with query=request.GET.query|urlencode page_obj=page_obj %}
+      {% include "browse/paginator.html" with query=request.GET.query|urlencode page_obj=page_obj result_cap=result_cap %}
     </nav>
   {% else %}
     <p>There were no citations found matching the above query.</p>
