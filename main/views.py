@@ -106,7 +106,6 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
         result = unpack_dataclasses(citation.dict())
         return render(request, 'browse/citation_details.html', dict(
             data=result,
-            doctypes=list_doctypes(),
             **shared_context,
         ))
 
@@ -120,7 +119,6 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
     def get_context_data(self, **kwargs):
         return dict(
             **super().get_context_data(**kwargs),
-            doctypes=list_doctypes(),
             **shared_context,
         )
 

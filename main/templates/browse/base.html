@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
 {% block nav %}
-  {% if doctypes %}
-    <form class="dib w-80 black-80" method="GET" action="{% url "get_citation_by_docid" %}">
-      {% include "browse/search_by_docid_form.html" %}
-    </form>
-  {% elif dataset_id %}
+  <form class="dib w-40 mr3 black-80" method="GET" action="{% url "get_citation_by_docid" %}">
+    {% include "browse/search_by_docid_form.html" %}
+  </form>
+  {% if dataset_id %}
     {% for ds_id in indexed_datasets %}
       <a class="
             link
