@@ -18,7 +18,7 @@ from common.pydantic import unpack_dataclasses
 
 from .exceptions import RefNotFoundError
 from .models import RefData
-from .indexed import get_indexed_ref, list_refs, list_doctypes
+from .indexed import get_indexed_ref, list_refs
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref
 from .util import BaseCitationSearchView
@@ -55,7 +55,6 @@ def home(request):
         **shared_context,
         total_indexed_citations=total_indexed_citations,
         browsable_datasets=browsable_datasets,
-        doctypes=list_doctypes(),
     ))
 
 

@@ -6,8 +6,9 @@
 
 {% block content %}
 
-  <form class="black-80" method="GET" action="{% url "get_citation_by_docid" %}">
+  <form class="black-80 mb3" method="GET" action="{% url "get_citation_by_docid" %}">
     {% include "browse/search_by_docid_form.html" with highlight=1 %}
+    {% comment %}
     <div class="f6 black-60 db mb4 measure lh-copy">
       {% if doctypes %}
         <p>Example identifiers:
@@ -20,6 +21,7 @@
         </ul>
       {% endif %}
     </div>
+    {% endcomment %}
   </form>
 
   <div class="nowrap overflow-x-auto">
