@@ -81,7 +81,9 @@ def browse_citation_by_docid(request, doctype=None, docid=None):
         return HttpResponseBadRequest("Missing document ID")
 
     try:
-        citation = build_citation_for_docid(docid, doctype)
+        citation = build_citation_for_docid(
+            docid.strip(),
+            doctype.strip() if doctype else None)
 
     except RefNotFoundError:
         search_query = QueryDict('', mutable=True)
@@ -145,7 +147,7 @@ def browse_external_reference(request, dataset_id):
 
     if dataset_id == 'doi':
         try:
-            data = unpack_dataclasses(get_doi_ref(ref).dict())
+            data = unpack_dataclasses(get_doi_ref(ref.strip()).dict())
         except RuntimeError as exc:
             messages.error(
                 request,

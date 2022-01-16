@@ -76,7 +76,9 @@ def get_by_docid(request):
             "Only Relaton format is supported for now by this endpoint")
 
     try:
-        citation = build_citation_for_docid(docid, doctype)
+        citation = build_citation_for_docid(
+            docid.strip(),
+            doctype.strip() if doctype else None)
     except RefNotFoundError:
         return JsonResponse({
             "error":
