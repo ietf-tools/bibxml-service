@@ -40,8 +40,8 @@ def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
     return (
         RefData.objects.
         annotate(search=SearchVector(Cast('body', TextField()))).
-        filter(search=SearchQuery(text, search_type='websearch'))
-        [:limit])
+        filter(search=SearchQuery(text, search_type='websearch')).
+        only('ref', 'dataset', 'body')[:limit])
 
 
 def search_refs_relaton_struct(
@@ -64,7 +64,9 @@ def search_refs_relaton_struct(
         SELECT id FROM api_ref_data WHERE %s
     ''' % ' OR '.join(subqueries), [json.dumps(obj) for obj in objs])
 
-    return RefData.objects.filter(id__in=query)[:limit]
+    return (
+        RefData.objects.filter(id__in=query).
+        only('ref', 'dataset', 'body')[:limit])
 
 
 def search_refs_relaton_field(
@@ -195,7 +197,10 @@ def search_refs_relaton_field(
 
     # print("search_refs_relaton_field: final query", final_query, interpolated_params)
 
-    return RefData.objects.filter(id__in=final_query)[:limit]
+    return (
+        RefData.objects.
+        filter(id__in=final_query).
+        only('ref', 'dataset', 'body')[:limit])
 
 
 def list_doctypes() -> List[Tuple[str, str]]:
