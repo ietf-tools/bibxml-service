@@ -36,6 +36,7 @@ class Organization:
 class PersonName:
     completename: Optional[GenericStringValue] = None
     surname: Optional[GenericStringValue] = None
+    initial: Optional[List[GenericStringValue]] = None
     forename: Optional[Union[
         List[GenericStringValue],
         GenericStringValue,
