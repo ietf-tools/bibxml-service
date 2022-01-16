@@ -63,7 +63,7 @@
     </div>
   </div>
 
-  {% include "citation/download_links.html" with docid=data.docid.0 %}
+  {% include "citation/download_links.html" with docid=data.docid|as_list|first %}
 
   <div class="gray f7">
     <p class="gray f7">
