@@ -56,7 +56,7 @@ class BibliographicItem(BaseModel):
 
     biblionote: Optional[Union[List[BiblioNote], BiblioNote]] = None
 
-    contributor: Optional[List[Contributor], Contributor] = None
+    contributor: Optional[List[Contributor]] = None
 
     place: Optional[Union[List[str], str]] = None
 
