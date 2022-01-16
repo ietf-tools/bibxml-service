@@ -1,7 +1,9 @@
+from typing import Union
 import requests
 import requests_cache
 from simplejson import JSONDecodeError
 
+from main.exceptions import RefNotFoundError
 from sources.doi import get_bibitem
 from bib_models.dataclasses import DocID
 from .types import SourcedBibliographicItem
@@ -16,7 +18,7 @@ def get_doi_ref(doi: str) -> SourcedBibliographicItem:
 
     with requests_cache.enabled():
         try:
-            doi: SourcedBibliographicItem = get_bibitem(DocID(
+            doi: Union[SourcedBibliographicItem, None] = get_bibitem(DocID(
                 type='DOI',
                 id=doi,
             ))
@@ -27,9 +29,8 @@ def get_doi_ref(doi: str) -> SourcedBibliographicItem:
         except RuntimeError:
             raise
         else:
+            if not doi:
+                raise RefNotFoundError(
+                    "External source returned nothing",
+                    doi)
             return doi
-
-        # How do we get:
-        # raise RefNotFoundError(
-        #     "Reference not found: got empty list from DOI",
-        #     ref)

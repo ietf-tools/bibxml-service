@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 from pydantic import ValidationError
 from crossref.restful import Works, Etiquette
 
@@ -33,7 +33,7 @@ ALT_TITLES = [
 ]
 
 
-def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
+def get_bibitem(docid: DocID) -> Union[SourcedBibliographicItem, None]:
     """Retrieves DOI information from CrossRef
     and deserializes into a :class:`bib_models.BibliographicItem` instance."""
 
@@ -43,6 +43,9 @@ def get_bibitem(docid: DocID) -> SourcedBibliographicItem:
             repr(docid))
 
     resp = works.doi(docid.id)
+
+    if not resp:
+        return None
 
     docids: List[DocID] = [
         DocID(type='DOI', id=resp['DOI']),
