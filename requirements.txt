@@ -18,6 +18,7 @@ pydantic>=1.8,<1.9
 watchdog
 sphinx
 crossrefapi>=1.5,<2
+sentry-sdk
 
 # These are dependencies of doi2ietf, but we are currently importing them for error handling purposes
 types-requests

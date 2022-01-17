@@ -84,6 +84,7 @@ services:
       DB_USER: ${DB_NAME:?err}
       DB_NAME: ${DB_NAME:?err}
       DB_SECRET: "${DB_SECRET:?err}"
+      SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
 
       # Indexer-specific
@@ -124,6 +125,7 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
     depends_on:
       - web-precheck

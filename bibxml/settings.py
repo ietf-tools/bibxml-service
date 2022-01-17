@@ -2,6 +2,20 @@ from typing import List
 from pathlib import Path
 from os import environ, path
 
+if environ.get("SENTRY_DSN", None):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=environ.get("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+
+        # Can be adjusted in production to reduce overhead.
+        traces_sample_rate=1.0,
+
+        send_default_pii=False,
+    )
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
