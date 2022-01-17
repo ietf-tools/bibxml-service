@@ -240,26 +240,43 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
     that matched given document identifier (``docid.id`` value).
 
     Returns complete citation representation contained in ``body``.
+
     If multiple refs were found, their citation data are merged.
+    (At most 10 found refs are considered, which is already atypically many.)
 
     :returns BibliographicItem: a :class:`bib_models.BibliographicItem`
                                 instance.
     :raises RefNotFoundError: if no matching refs were found.
     """
-    docid = json.dumps('(?i)^%s$' % id)
 
-    if id_type:
-        doctype = json.dumps('(?i)^%s$' % id_type)
-        query = '@.type like_regex %s && @.id like_regex %s' % (
-            doctype,
-            docid,
-        )
-    else:
-        query = '@.id like_regex %s' % docid
-        # To exclude untyped:
-        # query = '@.id like_regex %s && exists (@.type)' % docid
+    # Retrieve pre-indexed refs
 
-    refs = search_refs_relaton_field({'docid[*]': query}, exact=True)
+    # Exact & fast
+    refs = search_refs_relaton_struct(
+        {'docid': [{'id': id, 'type': id_type}]}
+        if id_type else {'docid': [{'id': id}]},
+        {'docid': {'id': id, 'type': id_type}}
+        if id_type else {'docid': {'id': id}},
+        limit=10,
+    )
+
+    if len(refs) < 1:
+        # Less exact, case-insensitive, slower
+        docid = json.dumps('(?i)^%s$' % id)
+        if id_type:
+            doctype = json.dumps('(?i)^%s$' % id_type)
+            query = '@.type like_regex %s && @.id like_regex %s' % (
+                doctype,
+                docid,
+            )
+        else:
+            query = '@.id like_regex %s' % docid
+            # To exclude untyped:
+            # query = '@.id like_regex %s && exists (@.type)' % docid
+        refs = search_refs_relaton_field(
+            {'docid[*]': query},
+            exact=True,
+            limit=10)
 
     base: Dict[str, Any] = {'sources': {}}
 
