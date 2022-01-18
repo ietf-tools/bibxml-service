@@ -1,6 +1,8 @@
-from typing import List
+from typing import List, Tuple, Any, Callable
 from pathlib import Path
 from os import environ, path
+from django.core.exceptions import ImproperlyConfigured
+
 
 if environ.get("SENTRY_DSN", None):
     import sentry_sdk
@@ -18,6 +20,92 @@ if environ.get("SENTRY_DSN", None):
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = int(environ.get("DEBUG", default=0)) == 1
+
+
+# Checking environment
+# ====================
+
+env_checks: List[Tuple[
+    str,
+    Callable[[Any], bool],
+    str
+]] = [(
+    'CONTACT_EMAIL',
+    lambda val: val.strip() != '',
+    "contact email must be specified",
+), (
+    'SERVICE_NAME',
+    lambda val: val.strip() != '',
+    "service name must be specified",
+), (
+    'PRIMARY_HOSTNAME',
+    lambda val: all([val.strip() != '', val.strip() != '*' or DEBUG]),
+    "primary hostname must be specified",
+), (
+    'DB_NAME',
+    lambda val: val.strip() != '',
+    "default PostgreSQL database name must be specified",
+), (
+    'DB_USER',
+    lambda val: val.strip() != '',
+    "database username must be specified",
+), (
+    'DB_SECRET',
+    lambda val: val.strip() != '',
+    "database user credential must be specified",
+), (
+    'DB_HOST',
+    lambda val: val.strip() != '',
+    "default database server hostname must be specified",
+), (
+    'DB_PORT',
+    lambda val: val.strip() != '',
+    "default database server port number must be specified",
+), (
+    'DJANGO_SECRET',
+    lambda val: val.strip() != '',
+    "Django secret must be set",
+), (
+    'REDIS_HOST',
+    lambda val: val.strip() != '',
+    "Redis server host must be specified",
+), (
+    'REDIS_PORT',
+    lambda val: val.strip() != '',
+    "Redis server port must be specified",
+), (
+    'SNAPSHOT_HASH',
+    lambda val: val.strip() != '',
+    "snapshot hash must be specified",
+), (
+    'SNAPSHOT_TIME',
+    lambda val: val.strip() != '',
+    "snapshot time must be specified",
+)]
+
+failed_env_checks: List[Tuple[str, str]] = [
+    (name, err)
+    for name, check, err in env_checks
+    if check(str(environ.get(name, ''))) is False
+]
+
+if len(failed_env_checks) > 0:
+    error_messages: List[str] = [
+        '{msg} (variable {varname})'.format(
+            varname=failed_check[0],
+            msg=failed_check[1])
+        for failed_check in failed_env_checks
+    ]
+    raise ImproperlyConfigured(
+        "Invalid environment configuration: %s"
+        % ', '.join(error_messages))
+
+
+# Basic Django settings
+# =====================
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = environ.get("DJANGO_SECRET")
