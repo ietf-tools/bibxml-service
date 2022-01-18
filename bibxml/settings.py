@@ -139,7 +139,7 @@ COMPRESS_PRECOMPILERS = (
 )
 
 COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE = not DEBUG
 
 
 # Default primary key field type
