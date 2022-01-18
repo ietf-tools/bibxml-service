@@ -18,7 +18,6 @@ if environ.get("SENTRY_DSN", None):
         send_default_pii=False,
     )
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -110,8 +109,10 @@ if len(failed_env_checks) > 0:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = environ.get("DJANGO_SECRET")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(environ.get("DEBUG", default=0)) == 1
+ADMINS = [(
+    "%s operations" % environ.get("SERVICE_NAME"),
+    environ.get("CONTACT_EMAIL"),
+)]
 
 if DEBUG:
     import socket
@@ -194,6 +195,14 @@ USE_L10N = True
 USE_TZ = True
 
 
+# Email
+
+EMAIL_SUBJECT_PREFIX = f"[Django at {environ.get('PRIMARY_HOSTNAME', '')}] "
+
+if environ.get("SERVER_EMAIL", None):
+    SERVER_EMAIL = environ.get("SERVER_EMAIL")
+
+
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = '/static/'
@@ -256,14 +265,6 @@ REDIS_HOST = environ.get('REDIS_HOST')
 REDIS_PORT = environ.get('REDIS_PORT', 0)
 
 
-# Version
-
-SNAPSHOT = {
-    'hash': environ.get('SNAPSHOT_HASH', None),
-    'time': environ.get('SNAPSHOT_TIME', None),
-}
-
-
 # Caching
 
 DEFAULT_CACHE_SECONDS = 21600
@@ -276,6 +277,18 @@ if environ.get('REDIS_HOST') and environ.get('REDIS_PORT'):
             'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
         }
     }
+
+
+# Custom
+
+SNAPSHOT = {
+    'hash': environ.get('SNAPSHOT_HASH', None),
+    'time': environ.get('SNAPSHOT_TIME', None),
+}
+
+SERVICE_NAME = environ.get("SERVICE_NAME")
+
+HOSTNAME = environ.get("PRIMARY_HOSTNAME")
 
 
 # BibXML-specific
