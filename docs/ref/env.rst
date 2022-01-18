@@ -34,7 +34,7 @@ Most of them are passed to containers’ respective environments.
     User password for PostgreSQL server authentication.
 
 ``DJANGO_SECRET`` (**required**)
-    Django’s secret key.
+    Django’s secret key. Must be unique, long and confidential.
 
 ``API_SECRET`` (**required**)
     Token for management GUI and API access.
@@ -57,7 +57,7 @@ Most of them are passed to containers’ respective environments.
     If set to 1, Django’s built-in ``runserver`` is used
     to serve the GUI, and error pages are verbose.
 
-    Don’t set in production.
+    .. important:: Don’t set in production.
 
 
 Environment variables read by Django

@@ -48,30 +48,15 @@ Building base image
 
    .. seealso:: :doc:`/ref/env`
 
-   .. important::
-   
-      * Do not use this environment in production. Refer to corresponding operations document.
-   
-      * ``DB_NAME``, ``DB_SECRET`` values depend on bibxml-indexer runtime environment.
-      
-        In the basic case, they can match the ones provided in bibxml-indexer environment
-        for things to work.
-        (This is not ideal:
-        bibxml-indexer must have write access to the shared index database,
-        while bibxml-service only needs to read from it.
-        A separate PostgreSQL user for bibxml-service with read-only access
-        would make more sense, but is not currently accommodated
-        by Compose configuration.)
-   
-      * DJANGO_SECRET must be unique.
-   
-      * DEBUG must not be set to 1 in production.
+   .. important:: This environment is not suitable for production use.
 
 2. In repository root, run ``docker compose build``.
 
 
 Building documentation
 ======================
+
+Make sure to build base image first (see above).
 
 1. Under ``docs/``, run ``docker compose up``.
 
@@ -87,15 +72,15 @@ Running the service
 
 To simply serve the BibXML service, run ``docker compose up``.
 
-If you plan on making changes,
-instead for better development experience run::
+Web front-end should be available under ``localhost:8000``.
+API spec should be available under ``localhost:8000/api/v1``.
+
+If you plan on making changes *and* you set DEBUG=1 in your environment,
+for better development experience you can run the command this way instead::
 
     docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 This will mount source code directory and enable hot reload on changes.
-
-Web front-end should be available under ``localhost:8000``.
-API spec should be available under ``localhost:8000/api/v1``.
 
 
 Monitoring logs
