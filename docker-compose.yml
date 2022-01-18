@@ -34,6 +34,8 @@ services:
       - /bin/sh
       - -c
       - |
+        export SNAPSHOT_HASH=$$(git rev-parse HEAD) &&
+        export SNAPSHOT_TIME=$$(git log -1 --format=%cd) &&
         python manage.py migrate &&
         python manage.py check --deploy
     environment:
@@ -111,6 +113,8 @@ services:
       - /bin/sh
       - -c
       - |
+        export SNAPSHOT_HASH=$$(git rev-parse HEAD) &&
+        export SNAPSHOT_TIME=$$(git log -1 --format=%cd) &&
         ./wait-for-migrations.sh &&
         celery -A management worker -l info -c 1
     volumes:
