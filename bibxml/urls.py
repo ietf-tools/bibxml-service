@@ -99,9 +99,9 @@ urlpatterns = [
     # Main GUI
     path('', include([
 
-        path('', cache_page(default_ttl)(require_safe(
+        path('', never_cache(cache_page(default_ttl)(require_safe(
             public_views.home
-        )), name='browse'),
+        ))), name='browse'),
 
         path('management/', include([
             path('', require_safe(auth.basic(never_cache(
