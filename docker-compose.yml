@@ -50,6 +50,8 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      SERVICE_NAME: ${SERVICE_NAME:?missing service name}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:?missing service name}
       PYTHONUNBUFFERED: 1
     depends_on:
       - db
@@ -84,6 +86,9 @@ services:
       DB_USER: ${DB_NAME:?err}
       DB_NAME: ${DB_NAME:?err}
       DB_SECRET: "${DB_SECRET:?err}"
+      SERVICE_NAME: ${SERVICE_NAME:?missing service name}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:?missing service name}
+      SERVER_EMAIL: ${SERVER_EMAIL}
       SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
 
@@ -125,6 +130,8 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      SERVICE_NAME: ${SERVICE_NAME:?missing service name}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:?missing service name}
       SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
     depends_on:
