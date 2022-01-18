@@ -10,7 +10,7 @@ This project uses Docker, Django and PostgreSQL.
 Quick start
 -----------
 
-Please refer to `“Building documentation” section <docs/howto/develop-locally.rst>`_.
+Please refer to `“Building documentation” section <docs/howto/develop-locally.rst#building-documentation>`_.
 
 Documentation has a section on setting up BibXML service locally.
 
