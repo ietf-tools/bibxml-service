@@ -42,6 +42,8 @@ Building base image
        DJANGO_SECRET="FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF"
        HOST=localhost
        API_SECRET="test"
+       SERVICE_NAME="IETF BibXML service"
+       CONTACT_EMAIL="<ops contact email>"
        DEBUG=1
 
    .. seealso:: :doc:`/ref/env`
