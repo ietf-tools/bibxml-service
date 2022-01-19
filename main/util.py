@@ -1,3 +1,4 @@
+import re
 import json
 from typing import Any, List
 from urllib.parse import unquote_plus
@@ -13,6 +14,16 @@ from .models import RefData
 from .indexed import build_search_results
 from .indexed import search_refs_relaton_struct
 from .indexed import search_refs_relaton_field
+
+
+websearch_re = [
+    re.compile(r'"\S+"'),  # Quoted substring
+    re.compile(r'\s-\S'),  # Token prepended with a - (negation)
+    re.compile(r'\bOR\b'),  # OR operator
+]
+"""If any of these expression matches,
+we will treat user-provided search string
+as a PostgreSQL web search style query."""
 
 
 class BaseCitationSearchView(BaseListView):
@@ -156,20 +167,25 @@ class BaseCitationSearchView(BaseListView):
         return query
 
     def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
-        quick_search = search_refs_relaton_field(
-            {
-                'docid': query,
-            }, {
-                'keyword': query,
-            }, {
-                'title': query,
-            },
-            limit=self.limit_to,
-        )
+        # Try to guess whether the websearch syntax was used.
+        is_websearch = any(
+            exp.search(query) is not None
+            for exp in websearch_re)
 
-        if len(quick_search) > 0:
-            return quick_search
+        if not is_websearch:
+            # If websearch, start with fast simple case-insensitive regex match
+            # against select fields
+            results = search_refs_relaton_field(
+                {
+                    'docid': '@.id like_regex %s' % json.dumps(f'(?i){query}'),
+                },
+                limit=self.limit_to,
+                exact=True,
+            )
+            if len(results) > 0:
+                return results
 
+        # Otherwise, try the query (possibly websearch) against the entire body
         return search_refs_relaton_field({'': query}, limit=self.limit_to)
 
     def parse_json_struct_query(self, query: str) -> dict[str, Any]:
