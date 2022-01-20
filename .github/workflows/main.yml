@@ -63,5 +63,5 @@ jobs:
         run: |
           kubectl rollout status deployment web
           kubectl rollout status deployment celery
-          kubectl rollout restart deployment flower
+          kubectl rollout status deployment flower
           kubectl get po -o wide
