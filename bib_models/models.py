@@ -6,7 +6,7 @@ from typing import List, Union, Optional
 import datetime
 
 from pydantic import BaseModel
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 
 from .dataclasses import DocID, Title
 from .dataclasses import Contributor, Copyright, GenericStringValue

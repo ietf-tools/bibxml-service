@@ -4,7 +4,7 @@ as simple Python dataclasses.
 """
 
 from typing import TypedDict, Optional, Union, List
-from dataclasses import dataclass
+from pydantic.dataclasses import dataclass
 
 
 @dataclass
