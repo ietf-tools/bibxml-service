@@ -11,13 +11,9 @@ pyyaml>=5.4
 types-PyYAML
 gitpython>=3.1,<4.0
 requests_cache>=0.7.4,<1.0
-doi2ietf>=0.1.2
 flake8
 whitenoise>=5.3.0,<6.0
 pydantic>=1.8,<1.9
 crossrefapi>=1.5,<2
+simplejson
 sentry-sdk
-
-# These are dependencies of doi2ietf, but we are currently importing them for error handling purposes
-types-requests
-types-simplejson
