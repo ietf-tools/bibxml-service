@@ -16,7 +16,7 @@ Glossary
 
    citation
        In BibXML service codebase and documentation,
-       sometimes mistakenly used as a synonym for :term:`bibliograhpic item`.
+       sometimes mistakenly used as a synonym for :term:`bibliographic item`.
 
    docid
    document identifier
@@ -33,7 +33,7 @@ Glossary
        A single document can have multiple identifiers (e.g., a DOI, an ISBN, etc.).
        Each identifier is expected to be universally unique to this document.
 
-       Multiple bibliograhpic items that share at least one document ID.
+       Multiple bibliographic items that share at least one document ID.
        are considered to be representing the same bibliographic item
        (see also :mod:`bib_models.merger`).
 
@@ -71,7 +71,7 @@ Glossary
    internal source
    indexed source
        Primary, fast to access source
-       that returns bibliograhpic data in Relaton format
+       that returns bibliographic data in Relaton format
        with minimal or no processing and supports structured search.
 
        Itself is not an authoritative source and is ephemeral.
