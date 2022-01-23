@@ -108,7 +108,7 @@ input, button, select, textarea {
 
     div.deflist-entry, div.deflist-entry-inline {
       > dt, > dd {
-        @apply pt-4 px-2;
+        @apply pt-4 px-4 sm:px-2;
       }
       > dt {
         @apply tracking-tight sm:text-right;
