@@ -8,6 +8,7 @@ from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
 from django.conf import settings
 from django.core.cache import cache
+from django.contrib import messages
 
 from .types import SourcedBibliographicItem
 from .models import RefData
@@ -78,6 +79,28 @@ class BaseCitationSearchView(BaseListView):
             return HttpResponseBadRequest("Unable to parse query")
 
         return super().get(request, *args, **kwargs)
+
+    def paginate_queryset(self, queryset, page_size):
+        try:
+            return super().paginate_queryset(queryset, page_size)
+        except Http404:
+            if self.is_gui:
+                messages.warning(
+                    self.request,
+                    "Requested page number doesn’t exist in this search, "
+                    "or at least not anymore. Showing first page instead.")
+                paginator = self.get_paginator(
+                    queryset, page_size, orphans=self.get_paginate_orphans(),
+                    allow_empty_first_page=True)
+                page = paginator.page(1)
+                return (
+                    paginator,
+                    page,
+                    page.object_list,
+                    page.has_other_pages(),
+                )
+            else:
+                raise
 
     def get_queryset(self) -> List[SourcedBibliographicItem]:
         """Returns a ``QuerySet`` of ``RefData`` objects.
