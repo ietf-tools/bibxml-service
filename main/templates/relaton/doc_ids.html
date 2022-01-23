@@ -1,18 +1,25 @@
-<div class="overflow-x-auto-ns flex-ns mb1 mb0-ns items-center lh-copy">
-  {% for docid in ids %}
-    {% if not docid.scope %}
-      {% if docid.type %}
-        <a
-            href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
-            class="nowrap dark-blue f5 flex items-center mr2">
-          <span class="f7 br3 bg-dark-blue white ph2">{{ docid.type }}</span>
-          <span class="ph2 dark-blue">{{ docid.id }}</span>
-        </a>
-      {% else %}
-        <span class="nowrap gray f5 flex items-center mr2" title="Untyped identifier">
-          <span class="ph2 ">{{ docid.id }}</span>
+{% for docid in ids %}
+  <span class="first:font-semibold bibitem-docid relative" title="{{ docid.type|default:"Untyped identifier" }}">
+    {% if as_links and docid.id and docid.type and not docid.scope %}
+      <a
+        tabindex="{% if forloop.first and tabindex %}{{ tabindex }}{% else %}-1{% endif %}"
+        href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}{% if request.GET.query %}&query={{ request.GET.query|urlencode:"" }}{% if query_format %}&query_format={{ query_format }}{% endif %}{% if page_obj %}&page={{ page_obj.number }}{% endif %}{% endif %}"
+        class="bibitem-docid-id">
+        {{ docid.id }}</a>
+      {% if show_type %}
+        <span class="text-xs">
+          {{ docid.type }}
+        </span>
+      {% endif %}
+    {% else %}
+      <span class="bibitem-docid-id">
+        {{ docid.id }}
+      </span>
+      {% if show_type %}
+        <span class="text-xs">
+          {{ docid.type|default:"(untyped):" }}
         </span>
       {% endif %}
     {% endif %}
-  {% endfor %}
-</div>
+  </span>
+{% endfor %}

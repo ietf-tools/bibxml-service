@@ -1,20 +1,47 @@
 import re
 import json
-from typing import Any, List
+from typing import Any, List, Callable, Union
 from urllib.parse import unquote_plus
 
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
+from django.db.utils import ProgrammingError, DataError
 from django.conf import settings
 from django.core.cache import cache
+from django.http import Http404
 from django.contrib import messages
 
-from .types import SourcedBibliographicItem
+from .types import CompositeSourcedBibliographicItem
 from .models import RefData
 from .indexed import build_search_results
 from .indexed import search_refs_relaton_struct
 from .indexed import search_refs_relaton_field
+
+
+QUERY_FORMAT_LABELS = {
+    'json_struct': "JSON containment",
+    'docid_regex': "docid substring",
+    'json_path': "JSON path",
+    'websearch': "web search",
+}
+
+
+jsonpath_re = [
+    re.compile(r'^\$\.'),  # Query a la $.docid[*]… is a @@ style query
+]
+"""If any of these expression matches,
+user-provided search string can be assumed to be
+a PostgreSQL’s ``@@`` JSON path style query
+against the whole bibliographic item."""
+
+is_jsonpath: Callable[[str], bool] = (
+    lambda query: any(
+        exp.search(query) is not None
+        for exp in jsonpath_re)
+)
+"""Returns True if given query looks like a JSON path query."""
 
 
 websearch_re = [
@@ -23,8 +50,41 @@ websearch_re = [
     re.compile(r'\bOR\b'),  # OR operator
 ]
 """If any of these expression matches,
-we will treat user-provided search string
-as a PostgreSQL web search style query."""
+user-provided search string can be assumed to be
+a PostgreSQL web search style query."""
+
+is_websearch: Callable[[str], bool] = (
+    lambda query: not is_jsonpath(query) and any(
+        exp.search(query) is not None
+        for exp in websearch_re)
+)
+"""Returns True if given query looks like a web search style query."""
+
+
+def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
+        -> bool:
+    """The service allows the user to make complex queries directly
+    using PostgreSQL’s various JSON path and/or regular expression
+    matching functions.
+
+    As it appears impossible to validate a query in advance,
+    we allow PostgreSQL to throw and check the thrown exception
+    for certain substrings that point to input syntax issues.
+    Those can then be suppressed and user would be able to edit the query.
+
+    We do not want to accidentally suppress actual error states,
+    which would bubble up under the same exception classes.
+
+    Note that user input must obviously still be properly escaped.
+    Escaping is delegated to Django’s ORM, see :mod:`main.indexed`.
+    """
+
+    err = repr(exc)
+    return any((
+        "invalid regular expression" in err,
+        "syntax error" in err and "jsonpath input" in err,
+        "unexpected end of quoted string" in err and "jsonpath input" in err,
+    ))
 
 
 class BaseCitationSearchView(BaseListView):
@@ -49,14 +109,24 @@ class BaseCitationSearchView(BaseListView):
     as a GET parameter named ``query``."""
 
     supported_query_formats = (
-        'json_repr',
+        'docid_regex',
         'json_struct',
+        'json_path',
+        'websearch',
     )
-    """Allowed values of query format in request."""
+    """Allowed values of query format in request.
+
+    Order of supported query formats matters when fallback is allowed,
+    then it’s better to ordered them fast and precise
+    to slow and imprecise."""
 
     query_format = None
     """Query format obtained from request,
     one of :attr:`supported_query_formats`."""
+
+    query_format_allow_fallback = None
+    """If True, and given query is unsuccessful, will try the next format.
+    Can be overridden with ``allow_format_callback`` GET parameter."""
 
     query = None
     """Deserialized query, parsed from request."""
@@ -66,17 +136,58 @@ class BaseCitationSearchView(BaseListView):
 
     Still subject to ``limit_to``."""
 
+    base_urlpattern_name: Union[str, None] = None
+    """Base URL pattern name for this view."""
+
     result_cache_seconds = getattr(settings, 'SEARCH_CACHE_SECONDS', 3600)
     """How long to cache search results for. Results are cached as a list
     is constructed from query and query format. Default is one hour."""
 
     def get(self, request, *args, **kwargs):
+        self.is_gui = hasattr(self, 'template_name')
+
+        if not self.query_in_path:
+            self.raw_query = request.GET.get('query', None)
+        else:
+            self.raw_query = unquote_plus(kwargs.get('query', '')).strip()
+
+        if not self.raw_query and self.is_gui:
+            messages.warning(
+                request,
+                "Search query was not provided.")
+            return HttpResponseRedirect(request.headers.get('referer', '/'))
+
+        self.query_format_allow_fallback = bool(request.GET.get(
+            'allow_format_fallback',
+            self.query_format_allow_fallback or False))
+
+        query_format = request.GET.get(
+            'query_format',
+            self.supported_query_formats[0])
+
         try:
-            self.dispatch_parse_query(request, **kwargs)
+            self.dispatch_parse_query(
+                request,
+                query=self.raw_query,
+                query_format=query_format,
+                suppress_errors=self.query_format_allow_fallback,
+                **kwargs)
+
         except UnsupportedQueryFormat:
-            return HttpResponseBadRequest("Unsupported query format")
+            if self.is_gui:
+                messages.warning(
+                    request,
+                    "Search query format is unsupported.")
+            else:
+                return HttpResponseBadRequest("Unsupported query format")
+
         except ValueError:
-            return HttpResponseBadRequest("Unable to parse query")
+            if self.is_gui:
+                messages.warning(
+                    request,
+                    "Unable to parse search query.")
+            else:
+                return HttpResponseBadRequest("Unable to parse query")
 
         return super().get(request, *args, **kwargs)
 
@@ -102,7 +213,7 @@ class BaseCitationSearchView(BaseListView):
             else:
                 raise
 
-    def get_queryset(self) -> List[SourcedBibliographicItem]:
+    def get_queryset(self) -> List[CompositeSourcedBibliographicItem]:
         """Returns a ``QuerySet`` of ``RefData`` objects.
 
         If query is present, delegates to :meth:`dispatch_handle_query`,
@@ -112,49 +223,105 @@ class BaseCitationSearchView(BaseListView):
             result_getter = (lambda: build_search_results(
                 self.dispatch_handle_query(self.query)))
 
-        else:
-            if self.show_all_by_default:
-                result_getter = (lambda: build_search_results(
-                    RefData.objects.all()[:self.limit_to]))
-
+            if self.request.GET.get('bypass_cache'):
+                return result_getter()
             else:
-                result_getter = (lambda: [])
+                return cache.get_or_set(
+                    json.dumps({
+                        'query': self.query,
+                        'query_format': self.query_format,
+                        'limit': self.limit_to,
+                        'show_all': self.show_all_by_default,
+                    }),
+                    result_getter,
+                    self.result_cache_seconds)
+        else:
+            return []
 
-        return cache.get_or_set(
-            json.dumps({
-                'query': self.query,
-                'query_format': self.query_format,
-                'limit': self.limit_to,
-                'show_all': self.show_all_by_default,
-            }),
-            result_getter,
-            self.result_cache_seconds)
+    def get_search_query_context_data(self, **kwargs):
+        query_format_label = QUERY_FORMAT_LABELS.get(
+            self.query_format,
+            self.query_format,
+        ) if self.query_format else None
+
+        return dict(
+            result_cap=self.limit_to,
+            cache_ttl=self.result_cache_seconds,
+            query=self.query,
+            query_format=self.query_format,
+            query_format_label=query_format_label,
+        )
 
     def get_context_data(self, **kwargs):
         """In addition to parent implementation,
-        provides a ``query`` variable."""
+        provides search-related variables.
 
-        return dict(
+        As a side-effect, queries a message regarding query format.
+        """
+
+        ctx = dict(
             **super().get_context_data(**kwargs),
-            result_cap=self.limit_to,
-            query=self.query,
+            **self.get_search_query_context_data(),
         )
 
-    def dispatch_parse_query(self, request, **kwargs):
-        """Parses query and sets up necessary instance attributes
-        as a side effect. Guarantees :attr:`query` and :attr:`query_format`
-        will be present.
+        query_format_label = ctx['query_format_label']
+
+        orig_format = self.request.GET.get('query_format')
+        if self.query_format and orig_format != self.query_format:
+            if orig_format:
+                msg = (
+                    "Requested query did not yield results; "
+                    f"treating query as “{query_format_label}”."
+                )
+            else:
+                msg = (
+                    "No search method was given; "
+                    f"treating query as “{query_format_label}”."
+                )
+            messages.info(self.request, msg)
+
+        return ctx
+
+    def get_next_query_format(self, query_format) -> Union[str, None]:
+        """Given ``query_format``, finds the next supported format in list.
+
+        :returns: The next supported format.
+
+                  - If ``query_format`` is invalid,
+                    returns *the first* supported format.
+                  - If no more formats are available,
+                    returns None.
+
+        :rtype: None or str
+        """
+        idx = self.supported_query_formats.index(query_format)
+        try:
+            return self.supported_query_formats[idx + 1]
+        except ValueError:
+            # Bad format, try from the beginning
+            return self.supported_query_formats[0]
+        except IndexError:
+            # No more formats to try
+            return None
+
+    def dispatch_parse_query(self,
+                             request,
+                             query=None,
+                             query_format=None,
+                             suppress_errors=False,
+                             **kwargs):
+        """Parses query and guarantees :attr:`query` and :attr:`query_format`
+        are present, although they can be ``None``.
 
         Delegates parsing to ``parse_{query-format}_query()`` method.
 
-        Can throw exceptions due to bad input."""
+        Throws exceptions due to bad input,
+        unless ``suppress_errors`` is given.
 
-        if not self.query_in_path:
-            query = request.GET.get('query', None)
-        else:
-            query = unquote_plus(kwargs.get('query', '')).strip()
-
-        query_format = request.GET.get('query_format', 'json_repr')
+        If :attr:`query_format_allow_fallback` is ``True``,
+        recurses via :meth:`get_next_query_format()` instead of raising,
+        but ``suppress_errors`` is still effective at final pass.
+        """
 
         if query:
             if query_format.lower() in self.supported_query_formats:
@@ -165,64 +332,162 @@ class BaseCitationSearchView(BaseListView):
             else:
                 parser = self.parse_unsupported_query
 
-            self.query = parser(query)
-            self.query_format = query_format
+            try:
+                self.query = parser(query)
+            except (UnsupportedQueryFormat, ValueError) as parse_error:
+                if self.query_format_allow_fallback:
+                    next_format = self.get_next_query_format(query_format)
+                    if next_format:
+                        return self.dispatch_parse_query(
+                            request,
+                            query,
+                            query_format=next_format,
+                            suppress_errors=suppress_errors)
+                if suppress_errors:
+                    self.query_format = None
+                else:
+                    raise parse_error
+            else:
+                self.query_format = query_format
 
         else:
             self.query = None
             self.query_format = None
 
-    def dispatch_handle_query(self, query) -> QuerySet[RefData]:
+    def dispatch_handle_query(self, query) \
+            -> QuerySet[RefData]:
         """Handles query by delegating
         to ``handle_{query-format}_query()`` method.
 
-        Is not expected to throw exceptions arising from bad input."""
+        Forces evaluation of returned queryset of ``RefData`` instances.
+
+        Exceptions arising from
+
+        Is not expected to throw exceptions arising from bad input.
+
+        If :attr:`query_format_allow_fallback` is ``True``,
+        an error or empty queryset obtained when
+        """
 
         handler = getattr(self, 'handle_%s_query' % self.query_format)
-        qs = handler(query)
-        # print("got qs", [i.pk for i in qs])
+
+        result_count: Union[int, None] = None
+        try:
+            qs = handler(query)
+            result_count = len(qs)
+            # print("got qs", [i.pk for i in qs])
+        except (ProgrammingError, DataError) as e:
+            print(repr(e))
+            if not is_benign_user_input_error(e):
+                raise
+            successful = False
+            if self.show_all_by_default:
+                qs = RefData.objects.all()[:self.limit_to]
+            else:
+                qs = RefData.objects.none()
+        else:
+            successful = result_count > 0
+
+        if not successful and self.query_format_allow_fallback:
+            next_format = self.get_next_query_format(self.query_format)
+            if next_format:
+                self.dispatch_parse_query(
+                    self.request,
+                    query=self.raw_query,
+                    query_format=next_format,
+                    suppress_errors=True)
+                return self.dispatch_handle_query(self.query)
+
+        elif not successful:
+            msg = (
+                "Query may have used incorrect syntax."
+                if result_count is None
+                else "No bibliographic items were found matching the query.")
+            can_try_other_formats = (
+                self.supported_query_formats.index(self.query_format)
+                < (len(self.supported_query_formats) - 1)
+            )
+            if not self.query_format_allow_fallback and can_try_other_formats:
+                querydict = self.request.GET.copy()
+                querydict['allow_format_fallback'] = True
+                try:
+                    querydict.pop('query_format')
+                except KeyError:
+                    pass
+                else:
+                    url = '{}?{}'.format(
+                        reverse('search_citations'),
+                        querydict.urlencode(),
+                    )
+                    msg = (
+                        f"{msg} "
+                        f"You may <a class=\"underline\" href=\"{url}\">retry the same query</a> "
+                        "trying all available search methods."
+                    )
+            messages.error(self.request, msg)
+
         return qs
 
-    def parse_unsupported_query(self, query_format: str, query: str):
+    def parse_unsupported_query(self, query: str):
         raise UnsupportedQueryFormat()
 
-    def parse_json_repr_query(self, query: str) -> str:
-        return query
+    # Supported query formats
+    # =======================
 
-    def handle_json_repr_query(self, query: str) -> QuerySet[RefData]:
-        # Try to guess whether the websearch syntax was used.
-        is_websearch = any(
-            exp.search(query) is not None
-            for exp in websearch_re)
+    # Parsers
 
-        if not is_websearch:
-            # If websearch, start with fast simple case-insensitive regex match
-            # against select fields
-            results = search_refs_relaton_field(
-                {
-                    'docid': '@.id like_regex %s' % json.dumps(f'(?i){query}'),
-                },
-                limit=self.limit_to,
-                exact=True,
-            )
-            if len(results) > 0:
-                return results
-
-        # Otherwise, try the query (possibly websearch) against the entire body
-        return search_refs_relaton_field({'': query}, limit=self.limit_to)
+    def parse_docid_regex_query(self, query: str) -> str:
+        if not is_websearch(query) and not is_jsonpath(query):
+            return query
+        else:
+            raise ValueError("Query does not look like a regex query")
 
     def parse_json_struct_query(self, query: str) -> dict[str, Any]:
         try:
             struct = json.loads(query)
         except json.JSONDecodeError:
-            raise ValueError("Invalid query format")
+            raise ValueError("Invalid query format (not a JSON structure)")
         else:
             return struct
+
+    def parse_json_path_query(self, query: str) -> str:
+        return query
+
+    def parse_websearch_query(self, query: str) -> str:
+        return query
+
+    # Handlers
+
+    def handle_docid_regex_query(self, query: str) -> QuerySet[RefData]:
+        return search_refs_relaton_field(
+            {
+                'docid': '@.id like_regex "(?i)%s"' % re.escape(query),
+            },
+            limit=self.limit_to,
+            exact=True,
+        )
 
     def handle_json_struct_query(
             self,
             query: dict[str, Any]) -> QuerySet[RefData]:
-        return search_refs_relaton_struct(query, limit=self.limit_to)
+        return search_refs_relaton_struct(
+            query,
+            limit=self.limit_to)
+
+    def handle_json_path_query(
+            self,
+            query: str) -> QuerySet[RefData]:
+        return search_refs_relaton_field(
+            {'': query},
+            limit=self.limit_to,
+            exact=True,
+        )
+
+    def handle_websearch_query(self, query: str) -> QuerySet[RefData]:
+        return search_refs_relaton_field(
+            {'': query},
+            limit=self.limit_to,
+        )
 
 
 class UnsupportedQueryFormat(ValueError):

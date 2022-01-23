@@ -1,68 +1,93 @@
 {% extends "browse/base.html" %}
 
-{% block title %}{{ block.super }} Citations{% endblock %}
-
 {% block nav %}{% endblock %}
 
+{% block container_grid_classes %}
+  xl:thegrid-mini
+{% endblock %}
+
+{% block content_grid_classes %}
+  xl:thegrid-mini
+  md:grid-cols-6
+  lg:grid-cols-10
+  xl:grid-cols-12
+{% endblock %}
+
+{% block header_extras %}
+  <a
+    class="
+      {% include "_side_block_classes.html" %}
+      block p-4 bg-lime-600 text-lime-100 tracking-tight text-lg
+      leading-tight
+    "
+    href="{% url "api_index" %}" target="_blank"
+  >
+    API&nbsp;reference&nbsp;&rarr;
+  </a>
+
+  <a
+    class="
+      {% include "_side_block_classes.html" %}
+      block p-4 bg-lime-600/70 text-lime-100 dark:text-dark-700 tracking-tight text-lg
+      leading-tight
+    "
+    href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}" target="_blank"
+  >
+    Compatibility
+    API&nbsp;reference&nbsp;&rarr;
+  </a>
+{% endblock %}
+
+
 {% block content %}
-
-  <form class="black-80 mb3" method="GET" action="{% url "get_citation_by_docid" %}">
-    {% include "browse/search_by_docid_form.html" with highlight=1 %}
-    {% comment %}
-    <div class="f6 black-60 db mb4 measure lh-copy">
-      {% if doctypes %}
-        <p>Example identifiers:
-        <ul class="list pa0">
-          {% for doctype in doctypes %}
-            <li class="nowrap">
-              <code class="nowrap pa1 ph2 bg-light-gray black-80">{{ doctype.1 }}</code>
-              for document type “{{ doctype.0 }}”
-          {% endfor %}
-        </ul>
-      {% endif %}
-    </div>
-    {% endcomment %}
-  </form>
-
-  <div class="nowrap overflow-x-auto">
-    <h2 class="f5 dib mr3 ">Indexed sources</h2>
-    {% for ds_id in browsable_datasets %}
-      <a class="
-            link
-            {% if dataset_id == ds_id %}underline{% endif %}
-            dim
-            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
-            f5 f4-ns dib mr3
-          " href="{% url "browse_dataset" ds_id %}">
-        {{ ds_id }}
-      </a>
-    {% endfor %}
+  <div
+    class="
+      lg:col-span-10 lg:row-span-3
+      md:col-span-6 md:row-span-3
+      p-4
+      bg-sky-600 text-sky-100
+      flex flex-col flex-nowrap
+    "
+    method="GET"
+    action="{% url "get_bibliographic_item" %}"
+  >
+    {% include "browse/search_forms.html" with expanded=1 query=request.GET.query query_format=request.GET.query_format|default:"websearch" %}
   </div>
 
-  <div class="nowrap overflow-x-auto">
-    <h2 class="f5 dib mr3 ">External source lookup</h2>
-    {% for ds_id in external_datasets %}
-      <a class="
-            link
-            {% if dataset_id == ds_id %}underline{% endif %}
-            dim
-            {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
-            f5 f4-ns dib mr3
-          " href="{% url "browse_external_dataset" ds_id %}">
-        {{ ds_id }}
-      </a>
-    {% endfor %}
+  <div class="md:col-span-3 overflow-hidden flex flex-col flex-nowrap p-4 justify-start ">
+    <form
+      class="
+        w-full flex
+        flex-row flex-nowrap
+      "
+      method="GET"
+      action="{% url "get_external_citation" "doi" %}"
+    >
+      <input
+        name="ref"
+        type="text"
+        placeholder="DOI lookup via Crossref"
+        class="min-w-0 grow text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit"
+      />
+      <button type="submit" class="button">
+        {% include "_search_icon.html" only %}
+      </button>
+    </form>
   </div>
 
-  <h2 class="f5">See also</h2>
-  <ul class="list pl0 mb5">
-    <li>
-      <a href="{% url "api_index" %}" target="_blank" class="link">
-        API reference &rarr;
-      </a>
-    <li>
-      <a href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}" target="_blank" class="link">
-        Compatibility API reference &rarr;
-      </a>
-  </ul>
+  <div class="p-4 md:col-span-2 text-sm leading-tight">
+    Indexed sources:
+    <ul class="flex flex-row flex-wrap">
+      {% for ds_id in browsable_datasets %}
+        <li class="mr-2">
+          <a class="{% if dataset_id == ds_id %}font-bold{% endif %}" href="{% url "browse_dataset" ds_id %}">
+            {{ ds_id }}
+          </a>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
+
+{% block before_container %}
+  {% include "_messages.html" %}
 {% endblock %}

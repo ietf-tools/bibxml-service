@@ -121,6 +121,10 @@ urlpatterns = [
             ])),
         ])),
 
+        path('get-bibliographic-item/', never_cache(require_safe(
+            public_views.smart_query
+        )), name='get_bibliographic_item'),
+
         # We let search results to be cached on a different level
         path('search/', never_cache(require_safe(
             public_views.CitationSearchResultListView.as_view()

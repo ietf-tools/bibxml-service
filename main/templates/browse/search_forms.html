@@ -1,0 +1,62 @@
+{# Accepts query, query_format, expanded #}
+
+{% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" autofocus="1" %}
+
+<details {% if query_format or expanded %}open{% endif %} class="grow relative min-h-[10rem]">
+  <summary class="mb-1">Advanced search</summary>
+  <form
+    method="GET"
+    action="{% url "search_citations" %}"
+    class="
+      flex flex-col flex-nowrap
+      absolute inset-0 top-8
+    "
+  >
+    <input type="hidden" value="1" name="bypass_cache" />
+    <textarea
+      name="query"
+      type="text"
+      placeholder="Search query…"
+      class="
+        grow
+        w-full
+        font-mono
+        text-sm
+        text-inherit
+        placeholder:text-inherit
+        bg-dark-800/20
+      "
+    >{% if query %}{{ query }}{% endif %}</textarea>
+    <ul
+      class="
+        flex leading-tighten text-sm
+        py-4
+        items-center
+        flex-row flex-nowrap space-x-4
+        overflow-y-hidden
+        overflow-x-auto
+      "
+    >
+      {% for format, label in supported_search_formats %}
+        <li class="whitespace-nowrap">
+          <input
+            type="radio"
+            id="search_query_format_{{ format }}"
+            name="query_format"
+            {% if query_format == format %}checked{% endif %}
+            value="{{ format }}"
+            class="place-self-end text-sky-700"
+          />
+          <label for="search_query_format_{{ format }}">
+            {{ label }}
+          </label>
+      {% endfor %}
+    </ul>
+
+    <input
+      type="submit"
+      value="Advanced search"
+      class="button"
+    />
+  </form>
+</details>

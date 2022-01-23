@@ -1,0 +1,23 @@
+{# Accepts htmlclass, control_htmlclass, tabindex, autofocus #}
+
+<form
+  class="
+    w-full flex
+    flex-row flex-nowrap
+    {{ htmlclass }}
+  "
+  method="GET"
+  action="{% url "get_bibliographic_item" %}"
+>
+  <input
+    {% if tabindex %}tabindex="{{ tabindex }}"{% endif %}
+    {% if autofocus %}autofocus{% endif %}
+    name="query"
+    type="text"
+    placeholder="Quick search…"
+    class="min-w-0 grow text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit {{ control_htmlclass }}"
+  />
+  <button type="submit" class="button {{ control_htmlclass }}" title="Quick auto search">
+    {% include "_search_icon.html" only %}
+  </button>
+</form>

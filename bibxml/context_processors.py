@@ -10,6 +10,13 @@ def profiling(request):
     )
 
 
+def service_meta(request):
+    return dict(
+        snapshot=settings.SNAPSHOT,
+        service_name=settings.SERVICE_NAME,
+    )
+
+
 def sources(request):
     return dict(
         known_datasets=settings.KNOWN_DATASETS,

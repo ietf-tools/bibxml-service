@@ -1,38 +1,35 @@
 """Type helpers specific to bibliographic item retrieval."""
 
+import datetime
+from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
 from typing import Mapping, List, Union, Optional, Dict, Any
 from bib_models.models import BibliographicItem
-from bib_models.dataclasses import Title, DocID
 
 
-class FoundBibliographicItem(BaseModel):
-    """Minimum bibliographic item data for search result listing."""
+# Sources
+# =======
 
-    docid: List[DocID]
-    title: List[Title]
-    type: Union[List[str], str]
-    sources: List[str]
-
-
-class SourceMeta(BaseModel):
-    bibitem: Union[BibliographicItem, Dict[str, Any]]
-
-    validation_errors: Optional[List[str]] = None
-
-    details: Optional[str] = None
-    """Extra source details, human-readable."""
+@dataclass
+class SourceMeta:
+    id: str
+    """Source ID."""
 
     home_url: Optional[str] = None
-    """Source dataset home page."""
+    """Source dataset or external service home page."""
 
     issues_url: Optional[str] = None
     """Where to file issues."""
 
 
-class InternalSourceMeta(SourceMeta):
-    ref: str
-    """Ref in source dataset."""
+@dataclass
+class IndexedSourceMeta(SourceMeta):
+    indexed_at: Optional[datetime.date] = None
+
+
+@dataclass
+class ExternalSourceMeta(SourceMeta):
+    pass
 
 
 class ExternalSourceRequest(BaseModel):
@@ -45,12 +42,42 @@ class ExternalSourceRequest(BaseModel):
     """Which URL was hit."""
 
 
-class ExternalSourceMeta(SourceMeta):
+# Sourced items
+# =============
+
+class SourcedBibliographicItem(BaseModel):
+    bibitem: Union[BibliographicItem, Dict[str, Any]]
+
+    validation_errors: Optional[List[str]] = None
+
+    details: Optional[str] = None
+    """Extra details about this sourcing, human-readable."""
+
+
+class IndexedBibliographicItem(SourcedBibliographicItem):
+    ref: str
+    """Ref in source dataset."""
+
+    source: IndexedSourceMeta
+
+
+class ExternalBibliographicItem(SourcedBibliographicItem):
     requests: List[ExternalSourceRequest]
     """Requests incurred
     when retrieving info from this source."""
 
+    source: ExternalSourceMeta
 
-class SourcedBibliographicItem(BibliographicItem):
-    sources: Mapping[str, Union[InternalSourceMeta, ExternalSourceMeta]]
-    """Source-specific metadata."""
+
+class CompositeSourcedBibliographicItem(BibliographicItem):
+    """An item obtained by merging sourced items with the same ID."""
+
+    # sourced: List[SourcedBibliographicItem]
+    # """Source-specific metadata."""
+
+    sources: Mapping[str, SourcedBibliographicItem]
+    """Source-specific metadata.
+    Keys contain source ID and ref (e.g., ref@source-id),
+    since there can be multiple refs per source
+    and refs can be non-unique across different sources.
+    """

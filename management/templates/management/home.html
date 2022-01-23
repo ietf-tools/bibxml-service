@@ -1,16 +1,12 @@
 {% extends "management/base.html" %}
 
 {% block content %}
-  <p class="f5 lh-copy">
-    Choose a dataset to manage.
-  </p>
-
-  <h2 class="f5">Running task(s)</h2>
+  <h2 class="text-lg tracking-tight mb-2">Running task(s)</h2>
   {% if running_tasks %}
-    <ul class="list pl0">
+    <ul class="">
       {% for task in running_tasks %}
         <li class="pv3 cf">
-          <article>
+          <article class="p-4 bg-dark-200">
             {% include "indexing_task.html" with task=task %}
           </article>
       {% endfor %}
@@ -19,9 +15,9 @@
     None.
   {% endif %}
 
-  <div class="pv5">
-    <h2 class="f5">See also</h2>
-    <ul class="list pl0">
+  <div class="py-8">
+    <h2 class="text-lg tracking-tight">See also</h2>
+    <ul class="">
       <li>
         <a href="{% url "browse" %}" target="_blank" class="link">
           Public-facing service &rarr;

@@ -1,0 +1,13 @@
+{% if not small %}
+  md:col-span-2
+  lg:col-span-3
+{% endif %}
+{% if not stack %}
+  {# Only makes sense if small. #}
+  md:!col-start-1
+{% else %}
+  {# Only can stack up to two. #}
+  md:!col-start-2
+{% endif %}
+tracking-tight
+overflow-hidden

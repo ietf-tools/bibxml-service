@@ -12,13 +12,13 @@ from bib_models.dataclasses import Person, PersonAffiliation, PersonName
 from bib_models.dataclasses import GenericStringValue
 from bib_models.models import BibliographicItem, Link
 
+from main.types import ExternalBibliographicItem, ExternalSourceMeta
 from main.exceptions import RefNotFoundError
-from main.types import SourcedBibliographicItem, ExternalSourceMeta
 
 
 etiquette = Etiquette(
     settings.SERVICE_NAME,
-    'version at %s' % settings.SNAPSHOT['hash'],
+    settings.SNAPSHOT,
     settings.HOSTNAME,
     settings.ADMINS[0][1],
 )
@@ -36,7 +36,8 @@ ALT_TITLES = [
 ]
 
 
-def get_bibitem(docid: DocID) -> Union[SourcedBibliographicItem, None]:
+def get_bibitem(docid: DocID) \
+        -> Union[ExternalBibliographicItem, None]:
     """Retrieves DOI information from CrossRef
     and deserializes into a :class:`bib_models.BibliographicItem` instance."""
 
@@ -124,19 +125,18 @@ def get_bibitem(docid: DocID) -> Union[SourcedBibliographicItem, None]:
     errors = []
 
     try:
-        BibliographicItem(**data)
+        bibitem = BibliographicItem(**data)
     except ValidationError as e:
         errors.append(str(e))
+        bibitem = BibliographicItem.construct(**data)
 
-    return SourcedBibliographicItem(
-        **data,
-        sources={
-            'doi': ExternalSourceMeta(
-                bibitem=resp,
-                validation_errors=errors,
-                requests=[],
-            ),
-        },
+    return ExternalBibliographicItem(
+        source=ExternalSourceMeta(
+            id='crossref-doi',
+        ),
+        bibitem=bibitem,
+        validation_errors=errors,
+        requests=[],
     )
 
 

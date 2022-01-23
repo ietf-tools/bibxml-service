@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html.management > body > header h1:after {
+  display: inline-block;
+  content: "management";
+  position: absolute;
+  padding: 1px 4px;
+  font-size: 8px;
+  background: #E7040F;
+  color: white;
+  top: -50%;
+  right: 0;
+}
+
+/* May not be needed, given Tailwind’s reset */
+input, button, select, textarea {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+@layer components {
+  .thegrid-mini {
+    grid-template-rows: 100px 100px 100px 100px 100px;
+    grid-auto-rows: unset;
+  }
+
+  .thegrid-default-rows {
+    grid-auto-rows: minmax(max(5rem, 12.5vh), 1fr);
+    grid-template-rows: repeat(auto-fill, minmax(max(5rem, 12.5vh), 1fr));
+  }
+
+  @media screen(xl) {
+    .thegrid-default-rows {
+      grid-auto-rows: minmax(max(5rem, 6.25vh), 1fr);
+      grid-template-rows: repeat(auto-fill, minmax(max(5rem, 6.25vh), 1fr));
+    }
+  }
+
+  .custom-progress {
+    @apply appearance-none border-none;
+    @apply bg-none;
+    @apply text-white/40;
+  }
+  .custom-progress::-webkit-progress-value {
+    @apply bg-white/40;
+  }
+  .custom-progress::-webkit-progress-bar {
+    @apply bg-transparent;
+  }
+  .custom-progress::-moz-progress-bar {
+    @apply bg-white/40;
+  }
+
+  mark {
+    @apply bg-amber-200 dark:bg-amber-800 dark:text-amber-100;
+  }
+
+  .link {
+    @apply text-sky-700 underline underline-offset-1 dark:text-sky-500;
+  }
+  .link:hover {
+    @apply text-sky-800 no-underline dark:text-sky-200;
+  }
+
+  article.bibitem-in-list .bibitem-title {
+    @apply md:truncate;
+  }
+  article.bibitem-in-list:hover .bibitem-title,
+  article.bibitem-in-list:focus-within .bibitem-title {
+    @apply whitespace-normal;
+  }
+  article.bibitem-in-list .bibitem-docids {
+    @apply md:overflow-hidden px-4 md:px-0;
+  }
+  article.bibitem-in-list:hover .bibitem-docids {
+    @apply md:overflow-auto;
+  }
+  .bibitem-docids .bibitem-docid {
+    @apply md:pl-4 whitespace-nowrap;
+  }
+  article.bibitem-in-list .bibitem-docids a.bibitem-docid-id {
+    @apply link;
+  }
+  article.bibitem-in-list .bibitem-docids > :last-child,
+  article.bibitem-in-list:hover .bibitem-docids > :last-child,
+  article.bibitem-in-list:focus-within .bibitem-docids > :last-child {
+    @apply overflow-visible whitespace-nowrap;
+  }
+  article.bibitem-in-list .bibitem-docids > :not(:last-child),
+  article.bibitem-in-list:hover .bibitem-docids > :not(:last-child),
+  article.bibitem-in-list:focus-within .bibitem-docids > :not(:last-child) {
+    @apply whitespace-nowrap after:content-['_•_'] after:mx-2 md:after:ml-4 md:after:mr-0 after:font-normal;
+  }
+  article.bibitem-in-list:not(:hover):not(:focus-within) .bibitem-docids > :not(:last-child) {
+    @apply md:after:hidden md:truncate;
+  }
+  article.bibitem-in-list:hover .bibitem-docids,
+  article.bibitem-in-list:focus-within .bibitem-docids {
+    @apply md:flex md:flex-row md:flex-wrap;
+  }
+
+  .bibitem-full .bibitem-dl {
+    @apply overflow-hidden;
+    @apply text-sm;
+
+    div.deflist-entry, div.deflist-entry-inline {
+      > dt, > dd {
+        @apply pt-4 px-2;
+      }
+      > dt {
+        @apply tracking-tight sm:text-right;
+        @apply font-medium dark:font-semibold;
+      }
+      > dd {
+        @apply pb-4 md:pb-0;
+      }
+    }
+    div.deflist-entry {
+      @apply leading-tight;
+      @apply sm:grid sm:grid-cols-6 sm:px-0 sm:overflow-hidden;
+      @apply bg-gradient-to-t from-[white/10];
+      @apply border-inherit;
+
+      > dt, > dd {
+        @apply border-inherit;
+      }
+      > dt {
+        @apply sm:border-b-2 sm:col-span-2 sm:justify-self-end;
+      }
+      > dd {
+        @apply border-b-2 sm:col-span-4 sm:overflow-y-auto sm:justify-self-start;
+      }
+      > dt.sr-only + dd {
+        @apply sm:!col-span-6 sm:pl-4;
+      }
+    }
+    div.deflist-entry-wide {
+      @apply md:col-span-2;
+      > dt {
+        @apply col-span-1;
+      }
+      > dd {
+        @apply sm:col-span-5;
+      }
+    }
+    div.deflist-entry-inline {
+      @apply inline;
+      > dt, > dd {
+        @apply sm:inline sm:truncate md:px-0;
+      }
+      > dt {
+        @apply text-xs;
+      }
+    }
+    .bibitem-docids {
+      .bibitem-docid {
+        @apply pl-0 mr-2 block;
+      }
+    }
+  }
+
+  .button {
+    @apply inline-block p-2 px-4 bg-sky-700 text-sky-100;
+  }
+
+  a:hover {
+    @apply underline;
+  }
+}

@@ -16,8 +16,7 @@
     const url = el.dataset['api-endpoint'];
     const meth = el.dataset['api-method'];
     if (url && meth) {
-      el.classList.add('link');
-      el.classList.add('dim');
+      el.classList.add('button');
       el.style.cursor = 'pointer';
       el.innerHTML = label;
       el.setAttribute('role', 'button');

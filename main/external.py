@@ -6,10 +6,10 @@ from simplejson import JSONDecodeError
 from main.exceptions import RefNotFoundError
 from sources.doi import get_bibitem
 from bib_models.dataclasses import DocID
-from .types import SourcedBibliographicItem
+from .types import ExternalBibliographicItem
 
 
-def get_doi_ref(doi: str) -> SourcedBibliographicItem:
+def get_doi_ref(doi: str) -> ExternalBibliographicItem:
     """
     :returns: a :class`bib_models.BibliographicItem` instance
     :rtype BibliographicItem:
@@ -18,10 +18,11 @@ def get_doi_ref(doi: str) -> SourcedBibliographicItem:
 
     with requests_cache.enabled():
         try:
-            doi: Union[SourcedBibliographicItem, None] = get_bibitem(DocID(
-                type='DOI',
-                id=doi,
-            ))
+            doi: Union[ExternalBibliographicItem, None] = \
+                get_bibitem(DocID(
+                    type='DOI',
+                    id=doi,
+                ))
         except requests.exceptions.ConnectionError:
             raise RuntimeError("Error connecting to external source")
         except JSONDecodeError:

@@ -1,4 +1,4 @@
-{% load static %}
+{% load static compress %}
 <!DOCTYPE html>
 <html lang="en" class="{% block root_html_class %}{% endblock %}" {% block root_html_attrs %}{% endblock %}>
   <head>
@@ -9,55 +9,99 @@
         content="width=device-width,
         initial-scale=1">
 
-    <link rel="stylesheet" href="{% static "css/reset.css" %}" />
-    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css" />
+    {% compress css %}
+      <link type="text/css" rel="stylesheet" href="{% static "css/main.css" %}" />
+    {% endcompress %}
 
     {% block extra_head %}{% endblock %}
   </head>
 
-  <body class="sans-serif">
+  <body class="font-sans
+      bg-dark-300
+      !bg-gradient-to-bl from-dark-100 to-dark-400
+      text-dark-600
+      dark:bg-dark-600
+      dark:from-dark-500 dark:to-dark-700
+      dark:text-dark-300
+    ">
 
-    {% if snapshot %}
-      <aside class="ph3 ph5-ns">
-        <span class="f7 black-20 nowrap code truncate" title="Running commit from {{ snapshot.time }}">
-          {{ snapshot.hash|slice:5 }}
-        </span>
-      </aside>
-    {% endif %}
+    {% block before_container %}{% endblock %}
 
-    <header>
-      <nav class="ph3 ph5-ns pv3">
-        <div class="nowrap overflow-x-auto">
-          <h1 class="f5 f4-ns dib mr3 relative">
-            <a class="link dim" href="{% block home_link %}{% url "browse" %}{% endblock %}">
-              IETF BibXML service
-            </a>
-          </h1>
+    <div class="
+      md:h-screen md:overflow-hidden
+      md:grid
+      md:grid-flow-col
+      md:grid-cols-8
+      lg:grid-cols-[repeat(15,minmax(0,1fr))]
+      xl:container xl:mx-auto xl:place-content-center
+
+      md:thegrid-default-rows
+      {% block container_grid_classes %}
+      {% endblock %}
+    ">
+
+      <header class="
+        {% include "_side_block_classes.html" %}
+        p-4
+        flex flex-col justify-start
+        bg-dark-700
+        text-dark-100
+        dark:text-inherit
+      ">
+        <h1 class="font-semibold tracking-tight leading-tight mb-1">
+          <a href="{% block home_link %}{% url "browse" %}{% endblock %}">
+            {{ service_name }}
+          </a>
+        </h1>
+        <div class="text-xs whitespace-nowrap">
+          v{{ snapshot }}
+        </div>
+        <nav class="flex flex-row items-center">
           {% block nav %}
           {% endblock %}
-        </div>
-      </nav>
-      {% block header %}{% endblock %}
-    </header>
+        </nav>
+      </header>
 
-    {% if messages %}
-      {% for message in messages %}
-        <div class="flex items-center pa2 ph3 ph4-ns mb3
-            {% if "error" in message.tags %}bg-washed-red dark-red
-            {% else %}bg-lightest-blue navy
-            {% endif %}">
-          <svg class="w1" data-icon="info" viewBox="0 0 32 32" style="fill: currentcolor">
-            <title>info icon</title>
-            <path d="M16 0 A16 16 0 0 1 16 32 A16 16 0 0 1 16 0 M19 15 L13 15 L13 26 L19 26 z M16 6 A3 3 0 0 0 16 12 A3 3 0 0 0 16 6"></path>
-          </svg>
-          <span class="lh-title ml3 w-75 lh-solid">{{ message }}</span>
-        </div>
-      {% endfor %}
-    {% endif %}
+      {% block header_extras %}
+      {% endblock %}
 
-    <main class="ph3 ph5-ns">
-      {% block content %}{% endblock %}
-    </main>
+      <main class="
+        md:row-start-1
+        md:row-[span_8_/_span_8]
+
+        md:col-span-6
+        lg:col-[span_12_/_span_12]
+        xl:col-[span_12_/_span_12]
+
+        overflow-y-auto
+        overflow-x-visible
+
+        md:place-content-start
+        md:grid
+        md:grid-flow-row
+
+        {% block content_grid_classes %}
+          md:min-h-screen
+
+          {# Single column #}
+          md:grid-cols-[100%]
+        {% endblock %}
+
+        md:thegrid-default-rows
+
+        snap-y
+      ">
+
+        {% block content %}
+          {% include "_messages.html" %}
+        {% endblock %}
+
+      </main>
+
+      {% block after_content %}
+      {% endblock %}
+
+    </div>
 
     {% block extra_scripts %}{% endblock %}
 

@@ -2,36 +2,47 @@
 
 {% block title %}{{ block.super }} — Search: {{ query }}{% endblock %}
 
-{% block content %}
-  <h2 class="f4 dib br3">
-    {% if request.GET.query_format == "json_struct" %}
-      Search matching JSON structure
-      <br />
-    {% else %}
-      Searching for
-      &nbsp;
-    {% endif %}
-    {% if query %}
-      <code class="f5 pa1 ph2 bg-light-gray">{{ query }}</code>
-    {% else %}
-      empty string (showing all)
-    {% endif %}
+{% block header_extras %}
+  {{ block.super }}
+
+  <h2
+    class="
+      {% include "_side_block_classes.html" %}
+      md:row-span-2
+      leading-tight
+      flex flex-col bg-sky-600 text-sky-100
+    "
+  >
+    <div class="p-4">
+      Results
+      <span class="whitespace-nowrap">for {{ query_format_label|default:"N/A" }}</span>
+    </div>
+    <pre class="
+      p-2 m-2 bg-sky-700 grow text-sm font-bold whitespace-pre-wrap overflow-y-auto
+      {% if query|length > 30 %}
+        !text-xs
+      {% endif %}
+    ">{{ query|default:"N/A" }}</pre>
   </h2>
 
-  {% if object_list %}
-    <nav class="flex items-center">
-      {% include "browse/paginator.html" with query=request.GET.query|urlencode page_obj=page_obj result_cap=result_cap %}
-    </nav>
-  {% else %}
-    <p>There were no citations found matching the above query.</p>
-  {% endif %}
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    overflow-hidden bg-sky-700 text-sky-100 flex flex-col flex-nowrap
+  ">
+    {% include "browse/paginator.html" with query=request.GET.query|urlencode page_obj=page_obj result_cap=result_cap %}
+  </nav>
+{% endblock %}
 
-  <ul class="list pl0">
-    {% for citation in object_list %}
-      <li class="pv2 cf bt {% if forloop.last %}bb{% endif %} b--light-gray">
-        <article>
-          {% include "citation/in_list.html" with data=citation %}
-        </article>
-    {% endfor %}
-  </ul>
+{% block content %}
+  {{ block.super }}
+
+  {% for citation in object_list %}
+    {% include "citation/in_list.html" with data=citation %}
+  {% empty %}
+    <p class="lg:col-span-8 md:col-span-2 p-4">No items to show.</p>
+  {% endfor %}
+{% endblock %}
+
+{% block after_content %}
+  {% include "_profiling_block.html" %}
 {% endblock %}

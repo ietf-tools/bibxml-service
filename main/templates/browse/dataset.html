@@ -4,8 +4,47 @@
 
 {% block title %}{{ block.super }} — {{ dataset_id }}{% endblock %}
 
+{% block header_extras %}
+  <div class="
+    {% include "_side_block_classes.html" %}
+    leading-tight flex flex-col bg-slate-600 text-slate-100 p-4
+  ">
+    <h2>Viewing indexed source <span class="font-bold">{{ dataset_id }}</span></h2>
+  </div>
+
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    overflow-hidden bg-slate-500 text-slate-100 flex flex-col flex-nowrap
+  ">
+    {% include "browse/paginator.html" with page_obj=page_obj %}
+  </nav>
+
+  <div class="
+    {% include "_side_block_classes.html" %}
+    bg-slate-600 text-slate-100 p-4 text-sm leading-tight
+  ">
+    <ul class="flex flex-row flex-wrap">
+      {% for ds_id in indexed_datasets %}
+        <li class="mr-2">
+          <a class="{% if dataset_id == ds_id %}font-bold{% endif %}" href="{% url "browse_dataset" ds_id %}">
+            {{ ds_id }}
+          </a>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    overflow-hidden bg-sky-600 text-sky-100 flex flex-col flex-nowrap p-4
+  ">
+    {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" only %}
+  </nav>
+
+  {{ block.super }}
+{% endblock %}
+
 {% block content %}
-  <h2 class="f4 dib br3 ttu">{{ dataset_id }}</h2>
+  {{ block.super }}
 
   {% if dataset_id in external_datasets %}
     <form class="black-80" method="GET" action="{% url "get_external_citation" dataset_id %}">
@@ -25,19 +64,9 @@
         </div>
       </div>
     </form>
-
   {% else %}
-    <nav class="flex items-center">
-      {% include "browse/paginator.html" with page_obj=page_obj %}
-    </nav>
-
-    <ul class="list pl0">
-      {% for citation in object_list %}
-        <li class="pv2 cf bt {% if forloop.last %}bb{% endif %} b--light-gray">
-          <article>
-            {% include "citation/in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
-          </article>
-      {% endfor %}
-    </ul>
+    {% for citation in object_list %}
+      {% include "citation/in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
+    {% endfor %}
   {% endif %}
 {% endblock %}

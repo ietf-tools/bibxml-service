@@ -1,5 +1,6 @@
 """View functions for citation browse GUI."""
 
+import logging
 from urllib.parse import unquote_plus
 
 from django.db.models.query import QuerySet
@@ -22,10 +23,21 @@ from .indexed import get_indexed_ref, list_refs
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref
 from .util import BaseCitationSearchView
+from .util import QUERY_FORMAT_LABELS
+
+
+log = logging.getLogger(__name__)
 
 
 shared_context = dict(
-    snapshot=settings.SNAPSHOT,
+    supported_search_formats=[
+        (format, QUERY_FORMAT_LABELS.get(format, format))
+        for format in [
+            'docid_regex',
+            'json_path',
+            'websearch',
+        ]
+    ],
 )
 """Shared context passed to GUI templates."""
 
@@ -51,21 +63,47 @@ def home(request):
     ))
 
 
+def smart_query(request):
+    """Tries to find a bibliographic item
+    from search query given in ``query`` GET parameter,
+    with optional ``query_format``."""
+
+    query = request.GET.get('query', None)
+    query_format = request.GET.get('query_format', None)
+
+    if not query:
+        messages.warning(request, "Query was not provided.")
+        return HttpResponseRedirect(request.headers.get('referer', '/'))
+
+    if not query_format:
+        querydict = QueryDict('', mutable=True)
+        querydict.update({'docid': query})
+        request.GET = querydict
+        return browse_citation_by_docid(request)
+
+    else:
+        return redirect('{}?{}'.format(
+            reverse('search_citations'),
+            request.GET.urlencode(),
+        ))
+
+
 # Browsing by document ID
 # =======================
 
 def browse_citation_by_docid(request):
     """
-    Reads ``docid`` and ``doctype`` from GET query,
+    Reads ``docid`` (and optionally ``doctype``) from GET query,
     uses :func:`main.indexed.build_citation_for_docid`
     to get a bibliographic item and in case of success
     renders the citation details template.
 
     If bibliographic item could not be built
     (no matching document ID found across Relaton sources),
+    tries to infer query format,
     queues an ``info``-level message
-    and redirects to search page,
-    passing space-separated document type and ID as query.
+    and redirects to search page
+    passing given document ID as query (``doctype`` in that case is ignored).
     """
 
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
@@ -78,22 +116,23 @@ def browse_citation_by_docid(request):
             docid.strip(),
             doctype.strip() if doctype else None)
 
-    except RefNotFoundError:
-        search_query = QueryDict('', mutable=True)
-        search_query.update({
-            'query': '{}'.format(docid),
+    except RefNotFoundError as e:
+        query = docid
+        search_querydict = QueryDict('', mutable=True)
+        search_querydict.update({
+            'query': '{}'.format(query),
+            'allow_format_fallback': True,
+            'bypass_cache': True,
         })
+        log.exception("Error locating item: %s, %s", docid, doctype)
         messages.info(
             request,
             "Could not find a bibliographic item "
-            "exactly matching requested document identifier "
-            "with ID “{}” (type {}), "
-            "you were redirected to search".format(
-                docid,
-                doctype or "unspecified"))
+            f"exactly matching given document identifier (err: {e}), "
+            "trying search instead.")
         return redirect('{}?{}'.format(
             reverse('search_citations'),
-            search_query.urlencode(),
+            search_querydict.urlencode(),
         ))
 
     else:
@@ -129,33 +168,33 @@ def external_dataset(request, dataset_id):
 def browse_external_reference(request, dataset_id):
     ref = request.GET.get('ref')
 
-    if not ref:
-        return HttpResponseBadRequest(
-            "Missing reference to fetch")
+    if ref:
+        if dataset_id not in settings.EXTERNAL_DATASETS:
+            return HttpResponseBadRequest("Unknown dataset requested")
 
-    if dataset_id not in settings.EXTERNAL_DATASETS:
-        return HttpResponseBadRequest(
-            "Unknown dataset requested")
-
-    if dataset_id == 'doi':
-        try:
-            data = unpack_dataclasses(get_doi_ref(ref.strip()).dict())
-        except RuntimeError as exc:
+        if dataset_id == 'doi':
+            try:
+                data = unpack_dataclasses(get_doi_ref(ref.strip()).dict())
+            except RuntimeError as exc:
+                messages.error(
+                    request,
+                    "Couldn’t retrieve citation: {}".format(
+                        str(exc)))
+            else:
+                return render(request, 'browse/citation_details.html', dict(
+                    dataset_id=dataset_id,
+                    ref=ref,
+                    data=data,
+                    **shared_context,
+                ))
+        else:
             messages.error(
                 request,
-                "Couldn’t retrieve citation: {}".format(
-                    str(exc)))
-        else:
-            return render(request, 'browse/citation_details.html', dict(
-                dataset_id=dataset_id,
-                ref=ref,
-                data=data,
-                **shared_context,
-            ))
+                "Unsupported external source {}".format(dataset_id))
     else:
         messages.error(
             request,
-            "Unsupported external dataset {}".format(dataset_id))
+            "Did not receive a reference for external lookup")
 
     # If we’re here, it must’ve failed
     return HttpResponseRedirect(request.headers.get('referer', '/'))

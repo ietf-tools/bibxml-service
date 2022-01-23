@@ -1,23 +1,58 @@
-{% if page_obj.has_previous %}
-  <a class="link nowrap" href="?{% if query %}query={{ query }}&{% endif %}page=1">&laquo; first</a>
-  <a class="link ph3" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">prev.</a>
-{% endif %}
-
-<span class="flex-auto tr">
-  <span class="nowrap">
-    page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-  </span>
-  <span class="nowrap f7">
-    &ensp;
-    {% if result_cap and page_obj.paginator.count == result_cap %}
-      limited to {{ result_cap }} results
-    {% else %}
-      found {{ page_obj.paginator.count }} total
+<div class="flex flex-row flex-nowrap items-stretch w-full">
+  <a
+    title="Go to first page"
+    class="p-2 {% if not page_obj.has_previous %}invisible{% endif %}"
+    {% if page_obj.has_previous %}
+      href="?{% if query %}query={{ query }}{% if query_format %}&query_format={{ query_format }}{% endif %}&{% endif %}page=1"
     {% endif %}
-  </span>
-</span>
+  >&laquo;</a>
+  <a
+    class="p-2 {% if not page_obj.has_previous %}invisible{% endif %}"
+    {% if page_obj.has_previous %}
+      href="?{% if query %}query={{ query }}{% if query_format %}&query_format={{ query_format }}{% endif %}&{% endif %}page={{ page_obj.previous_page_number }}"
+    {% endif %}
+  >prev.</a>
 
-{% if page_obj.has_next %}
-  <a class="link ph3" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.next_page_number }}">next</a>
-  <a class="link nowrap" href="?{% if query %}query={{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-{% endif %}
+  <span
+    class="md:diagonal-fractions grow text-center grid place-content-center text-lg font-light"
+    title="Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}"
+  >
+    {{ page_obj.number }}/{{ page_obj.paginator.num_pages }}
+  </span>
+
+  <a
+    class="p-2 {% if not page_obj.has_next %}invisible{% endif %}"
+    {% if page_obj.has_next %}
+      href="?{% if query %}query={{ query }}{% if query_format %}&query_format={{ query_format }}{% endif %}&{% endif %}page={{ page_obj.next_page_number }}"
+    {% endif %}
+  >next</a>
+  <a
+    title="Go to last page"
+    class="p-2 {% if not page_obj.has_next %}invisible{% endif %}"
+    {% if page_obj.has_next %}
+      href="?{% if query %}query={{ query }}{% if query_format %}&query_format={{ query_format }}{% endif %}&{% endif %}page={{ page_obj.paginator.num_pages }}"
+    {% endif %}
+  >&raquo;</a>
+</div>
+
+<progress
+  class="
+    w-full h-2 block
+    custom-progress
+    place-self-stretch
+    grow
+  "
+  max="{{ page_obj.paginator.num_pages }}"
+  value="{{ page_obj.number }}">
+</progress>
+
+<div class="p-4 py-2 whitespace-nowrap truncate text-xs text-center">
+  {{ page_obj.paginator.count }}{% if result_cap and page_obj.paginator.count >= result_cap %}+{% endif %}
+  to&nbsp;show.
+  {% if query %}
+    <a
+      class="link text-inherit visited:text-inherit hover:text-inherit"
+      href="{% url "browse" %}?query_format={{ query_format }}&{{ request.GET.urlencode }}"
+    >Refine&nbsp;query</a>
+  {% endif %}
+</div>

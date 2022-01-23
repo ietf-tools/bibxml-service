@@ -12,58 +12,140 @@
   {% include "relaton/first_title.html" with title=data.title %}
 {% endblock %}
 
+{% block content_grid_classes %}
+  md:min-h-screen
+
+  md:grid-cols-2
+  md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
+  md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
+
+  bg-dark-100
+  dark:bg-dark-700
+
+  snap-y
+
+  bibitem-full
+{% endblock %}
+
+{% block header_extras %}
+  {% if request.GET.query %}
+    <a
+      role="nav" class="
+        {% include "_side_block_classes.html" %}
+        overflow-hidden bg-sky-700 text-sky-100 flex flex-col flex-nowrap
+        p-4 block
+      "
+      href="{% url "search_citations" %}?{% if request.GET.query %}query={{ request.GET.query|urlencode:"" }}{% if request.GET.query_format %}&query_format={{ request.GET.query_format }}{% endif %}{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}{% endif %}"
+    >
+      &larr; Back to search
+    </a>
+  {% endif %}
+
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    overflow-hidden bg-sky-600 text-sky-100 flex flex-col flex-nowrap p-4
+  ">
+    {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" only %}
+  </nav>
+{% endblock %}
 
 {% block content %}
-  <header class="">
-    {% include "relaton/doc_ids.html" with ids=data.docid|as_list %}
-    <h2 class="fw3 f3 measure-wide">
+  {{ block.super }}
+
+  <header class="
+    md:col-span-2 md:row-span-4 xl:row-span-2 py-4 md:pr-16
+    sticky top-0
+    text-dark-900 dark:text-dark-200
+    bg-dark-400/30 dark:bg-dark-800/50 backdrop-blur-lg z-10
+    overflow-hidden
+  ">
+    <div class="px-4 leading-tight">{{ data.type|as_list|join:", " }}</div>
+    <h2 class="px-4 mt-2 font-serif font-thin dark:font-light tracking-tight dark:tracking-normal text-2xl smd:truncate z-20 relative">
       {% include "relaton/first_title.html" with title=data.title %}
     </h2>
   </header>
 
-  <div class="cf">
-    <div class="fl w-100 w-50-ns">
-      <dl class="lh-title pv2 mt0">
+  {% for ref, sourced_item in data.sources.items|dictsort:0 %}
+    {% with data=sourced_item.bibitem %}
+      <dl class="
+        bibitem-dl
+
+        md:col-span-2
+        md:row-[span_14_/_span_14]
+        sticky
+        top-[max(5rem,12.5vh)] {# Dependent variable! Double grid row height #}
+        z-20 {# Overlay the sticky header #}
+
+        bg-gradient-to-tl
+        odd:bg-dark-200 odd:from-dark-300/60 odd:to-dark-200
+        even:bg-dark-100 even:from-dark-200/60 even:to-dark-100
+        dark:odd:bg-dark-700 dark:odd:from-dark-800/60 dark:odd:to-dark-700
+        dark:even:bg-dark-800 dark:even:from-dark-900/60 dark:even:to-dark-800
+
+        border-sky-600/25
+
+        md:grid
+        md:grid-cols-2
+        md:grid-flow-row-dense
+        md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
+        md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
+      " data-source-entry='{# #}'>
+        {% include "deflist/entry.html" with key="source" idx=forloop.counter val=sourced_item tmpl="citation/sourced.html" htmlclass="md:row-span-2 bg-sky-600/25 sm:!border-transparent text-base tracking-tight" key_sr_only=1 %}
+        {% include "deflist/entry.html" with key="document identifiers" ids=data.docid|as_list tmpl="relaton/doc_ids.html" show_type=1 htmlclass="md:row-span-2 bibitem-docids text-base tracking-tight" key_sr_only=1 %}
+
+        {% for title in data.title|as_list %}
+          {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content break_row=forloop.first wide=1 %}
+        {% endfor %}
+
+        {% if data.abstract %}
+          {% include "deflist/entry_list.html" with key="abstract(s)" items=data.abstract|default:"—"|as_list tmpl="relaton/formatted_string.html" wide="1" htmlclass="md:row-span-2" multiline=1 %}
+        {% endif %}
+
         {% include "deflist/entry.html" with key="edition" val=data.edition|default:"—" %}
+
         {% if data.date %}
           {% for date in data.date|as_list %}
-            {% include "deflist/entry.html" with key=date.type val=date.value %}
+            {% include "deflist/entry.html" with key=date.type val=date.value break_row=forloop.first %}
           {% endfor %}
         {% endif %}
+
         {% include "deflist/entry.html" with key="revdate" val=data.revdate|default:"—" %}
         {% include "deflist/entry.html" with key="fetched" val=data.fetched|default:"—" %}
         {% for c in data.contributor|as_list %}
           {% if c.organization %}
-            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.organization %}
+            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.organization.abbreviation|default:c.organization.name|as_list|first break_row=forloop.first %}
           {% elif c.person.name %}
-            {% include "deflist/entry.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.person.name tmpl="relaton/person_name.html" %}
+            {% include "deflist/entry.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.person.name tmpl="relaton/person_name.html" break_row=forloop.first %}
           {% else %}
-            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c %}
+            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c break_row=forloop.first %}
           {% endif %}
         {% endfor %}
+
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
-      </dl>
-    </div>
 
-    <div class="fl w-100 w-50-ns">
-      <dl class="lh-title pv2 mt0">
         {% for relation in data.relation|as_list %}
-          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" %}
+          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" break_row=forloop.first %}
         {% endfor %}
-        {% include "deflist/entry.html" with key="type" val=data.type %}
-        {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
-        {% for link in data.link|as_list %}
-          {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content %}
-        {% endfor %}
-        {% for title in data.title|as_list %}
-          {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content %}
-        {% endfor %}
-        {% include "deflist/entry_list.html" with key="abstract(s)" items=data.abstract|default:"—"|as_list tmpl="relaton/formatted_string.html" multiline=1 %}
-      </dl>
-    </div>
-  </div>
 
-  {% include "citation/download_links.html" with docid=data.docid|as_list|first %}
+        {% if data.language %}
+          {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
+        {% endif %}
+
+        {% for link in data.link|as_list %}
+          {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content break_row=forloop.first wide=1 %}
+        {% endfor %}
+
+        {% if data.copyright %}
+          {% include "deflist/entry_list.html" with key="copyright(s)" items=data.copyright|as_list tmpl="relaton/copyright.html" %}
+        {% endif %}
+        {% if data.keyword %}
+          {% include "deflist/entry_list.html" with key="keywords" items=data.keyword|as_list inline=1 %}
+        {% endif %}
+      </dl>
+    {% endwith %}
+  {% endfor %}
+
+  {% comment %}
 
   <div class="gray f7">
     <p class="gray f7">
@@ -105,4 +187,41 @@
       {% endfor %}
     </dl>
   {% endif %}
+  {% endcomment %}
+{% endblock %}
+
+{% block after_content %}
+  {% with data.docid|as_list|first as docid %}
+    <ul class="
+        {% include "_side_block_classes.html" %}
+        list-disc list-outside marker:text-sky-300 marker:content-['—_']
+        p-4 bg-dark-600 text-dark-300
+        text-xs
+    ">
+      <p>Get bibliographic item</p>
+      <li>
+        <a
+            class="
+              {% include "_side_block_classes.html" %}
+            "
+            download="{{ docid.type }}-{{ docid.id }}.json"
+            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton">
+          Relaton&nbsp;JSON
+        </a>
+
+      <li>
+        <span
+            class="
+              {% include "_side_block_classes.html" %}
+              opacity-50
+            "
+            download="{{ dataset_id }}-{{ ref }}.xml"
+            href="{# url "api_get_ref" dataset_id ref #}?format=bibxml">
+          BibXML
+          (temporarily unavailable)
+        </span>
+    </ul>
+  {% endwith %}
+
+  {% include "_profiling_block.html" %}
 {% endblock %}

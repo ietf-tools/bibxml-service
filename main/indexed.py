@@ -1,3 +1,4 @@
+import re
 import logging
 import json
 from typing import cast as typeCast, Set, FrozenSet, Optional
@@ -6,18 +7,23 @@ from typing import Dict, List, Union, Tuple, Any
 from pydantic import ValidationError
 
 from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.search import SearchHeadline
+from django.db.models.functions import Cast
 from django.db.models import TextField
 from django.db.models.query import QuerySet, Q
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Cast
 from django.conf import settings
 
+# from sources import list_internal as list_internal_sources
+# from sources import InternalSource
 
+from management.datasets import get_source_meta
 from common.util import as_list
 from bib_models.models import BibliographicItem
+from bib_models.dataclasses import DocID
 from bib_models.merger import bibitem_merger
 
-from .types import SourcedBibliographicItem
+from .types import IndexedBibliographicItem, CompositeSourcedBibliographicItem
 from .exceptions import RefNotFoundError
 from .models import RefData
 
@@ -48,12 +54,14 @@ def search_refs_relaton_struct(
         *objs: Union[Dict[Any, Any], List[Any]],
         limit=None) -> QuerySet[RefData]:
     """Uses PostgreSQL’s JSON containment query
-    to find bibliographic items containing given structure.
+    to find bibliographic items containing any of given structures.
+
+    .. note:: This search is case-sensitive.
 
     .. seealso:: PostgreSQL docs on ``@>`` operator.
 
     :returns: RefData where Relaton body contains
-              at least one of given ``obj`` structures (they are OR'ed).
+              at least one of given ``obj`` structures.
     :rtype: Queryset[RefData]
     """
     if len(objs) < 1:
@@ -85,49 +93,69 @@ def search_refs_relaton_field(
 
         { '<field spec>': '<query>', '<field spec>': '<query>', ... }
 
+    Returns items for which any of the field queries returns a match.
+
     .. important:: Do **not** pass user input directly in field specs
                    if you don’t set ``exact`` to ``True``.
-
-    The ``exact`` flag applies to all ``field_queries``.
-
-    - If ``exact`` is ``False`` (default),
-      wildcards in field paths are not allowed,
-      and object at each field path is converted to tsvector
-      while corresponding value is converted to tsquery
-      with fuzzy matching and websearch operator support.
-
-      Example::
-
-          { 'docid': 'IEEE', 'keyword': 'something' }
-
-      Empty field spec is treated specially, matching the whole body::
-
-          { '': 'string anywhere in body' }
-
-    - If ``exact`` is ``True``, field path specification
-      can use PostgreSQL’s ``jsonpath``
-      with wildcards (e.g., ``somearray[*].someitem``),
-      and values must be PostgreSQL JSON queries like this: ``@ == \"%s\"``
-      (where ``@`` references given field path).
-
-      There is more flexibility, but it is required to be exact
-      when specifying queries. Incorrect syntax will cause
-      a ``ProgrammingError``, which this function won’t catch.
-
-      Example::
-
-          {
-              'docid[*]': '@.type == "IEEE" && @.id == "some-ieee-id"',
-              'keyword[*]': '@ == "something"',
-          }
-
-      Note that the above example will not match a document
-      where keyword is not a list, but a string ``"something"``.
 
     Queries within each dictionary of ``field_queries`` are AND’ed,
     and resulting queries
     (if you pass more than one dict in ``field_queries``)
     are OR’ed.
+
+    :param int limit: Converts to DB ``LIMIT``.
+
+    :param bool exact: The ``exact`` flag applies to all ``field_queries``
+        and determines whether to treat them as JSON path style queries
+        or as web search style queries.
+
+        - If ``exact`` is ``False`` (default),
+          queries are treated web search style.
+
+          A tsvector from JSON data at each specified field is taken,
+          its corresponding query is converted
+          to a fuzzy web search tsquery, and `@@` operator is used.
+
+          Wildcards in field path specs are not allowed.
+
+          .. important:: Field path specs are not escaped.
+                         Do not pass user input.
+
+          Example::
+
+              { 'docid': 'IEEE', 'keyword': 'foo -bar OR "foo bar"' }
+
+          Empty field spec is treated specially, matching the whole body::
+
+              { '': '"websearch string" anywhere in body' }
+
+        - If ``exact`` is ``True``, queries are treated as JSON path.
+
+          Field specs can be of the shape ``somearray[*].someitem``,
+          and their values must be PostgreSQL JSON queries like ``@ == \"%s\"``
+          (where ``@`` references current field path).
+          The match is done using PostgreSQL’s ``@?`` operator.
+
+          There is more precision than with websearch,
+          but it is required to be exact when specifying queries.
+          Incorrect syntax will cause a ``ProgrammingError`` or ``DataError``,
+          which this function won’t catch.
+
+          Example::
+
+              {
+                  'docid[*]': '@.type == "IEEE" && @.id == "some-ieee-id"',
+                  'keyword[*]': '@ == "something"',
+              }
+
+          Note that the above example will not match a document
+          where keyword is not a list,
+          only where it is an exact string ``"something"``.
+
+          Empty field spec is treated specially, matching the whole body
+          via PostgreSQL’s ``@@`` operator::
+
+              { '': '$.docid[*].id like_regex "(?i)rfc"' }
 
     :rtype: Queryset[RefData]
     """
@@ -139,45 +167,34 @@ def search_refs_relaton_field(
     ored_queries = []
     interpolated_params: List[str] = []
 
+    annotate_headline: Union[None, str] = None
+
     for idx, fields in enumerate(field_queries):
         anded_queries = []
         for fieldspec, query in fields.items():
             if exact:
-                interpolated_params.append(
-                    '$.{fieldpath} ? ({query})'.format(
-                        fieldpath=fieldspec,
-                        query=query))
-                anded_queries.append(
-                    'body @? %s',
-                )
+                if fieldspec == '':
+                    interpolated_params.append(query)
+                    anded_queries.append(
+                        'body @@ %s',
+                    )
+                else:
+                    interpolated_params.append(
+                        '$.{fieldpath} ? ({query})'.format(
+                            fieldpath=fieldspec,
+                            query=query))
+                    anded_queries.append(
+                        'body @? %s',
+                    )
 
             else:
                 interpolated_params.append(query)
                 if fieldspec == '':
-                    # Below query creates a tsvector from the entire body,
-                    # and then adds a tsvector produced from body.docid as text
-                    # with spaces instead of slashes
-                    # to tokenize slash-separated parts of IDs.
-                    #
-                    # (This works around PostgreSQL’s text search
-                    # not splitting tokens on slashes.
-                    #
-                    # With simple `to_tsvector(bibitem_json)`,
-                    # if you search for NBS.IR.82-2601p1 you won’t match
-                    # `{type: 'DOI', id: '10.6028/NBS.IR.82-2601p1'}`
-                    # as 10.6028/NBS.IR.82-2601p1 is a single token.
-                    #
-                    # Another way to work around this
-                    # could be by tuning DB configuration.)
+                    annotate_headline = 'body'
                     tpl = '''
-                        (
-                            to_tsvector(
-                                'english',
-                                json_build_array(
-                                    body,
-                                    translate((body->'docid')::text, '/', ' ')
-                                )
-                            )
+                        to_tsvector(
+                            'english',
+                            body
                         ) @@ websearch_to_tsquery('english', %s)
                     '''
                     anded_queries.append(tpl)
@@ -204,12 +221,26 @@ def search_refs_relaton_field(
         SELECT id FROM api_ref_data WHERE %s
     ''' % ' OR '.join(ored_queries), interpolated_params)
 
-    # print("search_refs_relaton_field: final query", final_query, interpolated_params)
+    # log.debug(
+    #     "search_refs_relaton_field: final query",
+    #     repr(final_query),
+    #     annotate_headline or "no annotation",
+    #     field_queries)
 
-    return (
-        RefData.objects.
-        filter(id__in=final_query).
-        only('ref', 'dataset', 'body')[:limit])
+    qs = RefData.objects.filter(id__in=final_query)
+    if annotate_headline is not None:
+        query = SearchQuery(query, config='english', search_type='websearch')
+        qs = qs.annotate(headline=SearchHeadline(
+            Cast(annotate_headline, TextField()),
+            query,
+            start_sel='<mark>',
+            stop_sel='</mark>',
+            max_words=5,
+            min_words=2,
+            max_fragments=2,
+            config='english',
+        ))
+    return qs.only('ref', 'dataset', 'body')[:limit]
 
 
 def list_doctypes() -> List[Tuple[str, str]]:
@@ -243,8 +274,62 @@ def list_doctypes() -> List[Tuple[str, str]]:
     ]
 
 
+def search_refs_for_docids(*ids: Union[DocID, str]) \
+        -> QuerySet[RefData]:
+
+    # Exact & fast
+    struct_queries: List[Any] = [
+        struct
+        for (id, id_type) in (
+            (id.id, id.type) if isinstance(id, DocID) else (id, None)
+            for id in ids
+        )
+        for struct in (
+            {'docid': [{'id': id, 'type': id_type}]}
+            if id_type else {'docid': [{'id': id}]},
+            # {'docid': {'id': id, 'type': id_type}}
+            # if id_type else {'docid': {'id': id}},
+        )
+    ]
+    refs = search_refs_relaton_struct(
+        *struct_queries,
+        limit=15,
+    )
+
+    if len(refs) < 1:
+        # Less exact, case-insensitive, slower
+        jsonpath_queries = [
+            # To exclude untyped:
+            # f'@.id like_regex {docid} && exists (@.type)' % docid
+            {'docid[*]':
+                f'@.type like_regex {id} && @.id like_regex {id_type}'
+                if id_type else f'@.id like_regex {id}'}
+            for (id, id_type) in ((
+                '"(?i)^%s$"' % re.escape(
+                    id.id
+                    if isinstance(id, DocID) else id
+                ),
+                '"(?i)^%s$"' % re.escape(id.type)
+                if getattr(id, 'type', None) else None,
+            ) for id in ids)
+        ]
+        refs = search_refs_relaton_field(
+            *jsonpath_queries,
+            exact=True,
+            limit=15,
+        )
+        # try:
+        #     # Force evaluation
+        #     refs[0]
+        # except (IndexError, DataError):
+        #     # No results or malformed JSON path query
+        #     pass
+
+    return refs
+
+
 def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
-        SourcedBibliographicItem:
+        CompositeSourcedBibliographicItem:
     """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
     that matched given document identifier (``docid.id`` value).
 
@@ -259,58 +344,58 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
     """
 
     # Retrieve pre-indexed refs
+    refs = search_refs_for_docids(DocID(id, id_type) if id_type else id)
+    docids = [
+        DocID(id=docid['id'], type=docid['type'])
+        for ref in refs
+        for docid in as_list(ref.body['docid'])
+        # Require id and type, but no scope:
+        if (docid.get('id', None)
+            and docid.get('type', None)
+            and not docid.get('scope', None)
+            # Exclude originally given ID:
+            and docid['id'] != id or docid['type'] != id_type)
+    ]
 
-    # Exact & fast
-    refs = search_refs_relaton_struct(
-        {'docid': [{'id': id, 'type': id_type}]}
-        if id_type else {'docid': [{'id': id}]},
-        {'docid': {'id': id, 'type': id_type}}
-        if id_type else {'docid': {'id': id}},
-        limit=10,
-    )
+    refs = [*refs, *search_refs_for_docids(*docids)]
 
-    if len(refs) < 1:
-        # Less exact, case-insensitive, slower
-        docid = json.dumps('(?i)^%s$' % id)
-        if id_type:
-            doctype = json.dumps('(?i)^%s$' % id_type)
-            query = '@.type like_regex %s && @.id like_regex %s' % (
-                doctype,
-                docid,
-            )
-        else:
-            query = '@.id like_regex %s' % docid
-            # To exclude untyped:
-            # query = '@.id like_regex %s && exists (@.type)' % docid
-        refs = search_refs_relaton_field(
-            {'docid[*]': query},
-            exact=True,
-            limit=10)
+    base: Dict[str, Any] = {}
+    # Merged bibitems
 
-    base: Dict[str, Any] = {'sources': {}}
+    sources: Dict[str, IndexedBibliographicItem] = {}
+    # Their sources
 
     if len(refs) == 1:
-        # print("Obtained raw ref", json.dumps(refs[0].body, indent=4))
         ref = refs[0]
+
+        source = get_source_meta(ref.dataset)
+        sourced_id = f'{ref.ref}@{source.id}'
+
         base.update(ref.body)
-        base['sources'][ref.dataset] = {
-            'ref': ref.ref,
-            'bibitem': ref.body,
-        }
         try:
-            BibliographicItem(**ref.body)
+            bibitem = BibliographicItem(**ref.body)
+            validation_errors = []
         except ValidationError as e:
             log.warn(
                 "Incorrect bibliographic item format: %s, %s",
                 ref.ref, e)
-            base['sources'][ref.dataset]['validation_errors'] = str(e)
+            bibitem = BibliographicItem.construct(**ref.body)
+            validation_errors = [str(e)]
+        sources[sourced_id] = IndexedBibliographicItem(
+            ref=ref.ref,
+            source=source,
+            bibitem=bibitem,
+            validation_errors=validation_errors,
+        )
 
     elif len(refs) > 1:
         seen_types_by_id: Dict[str, str] = {}
-        for ref in refs:
-            bibitem = ref.body
 
-            for _docid in bibitem.get('docid', []):
+        for ref in refs:
+            source = get_source_meta(ref.dataset)
+            sourced_id = f'{ref.ref}@{source.id}'
+
+            for _docid in ref.body.get('docid', []):
                 # Identifier sanity check
                 _type = _docid.get('type', '').strip()
                 _id = _docid.get('id', None)
@@ -339,32 +424,43 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
                             id)
                     seen_types_by_id[_id] = _type
 
-            bibitem_merger.merge(base, bibitem)
-            base['sources'][ref.dataset] = {
-                'ref': ref.ref,
-                'bibitem': ref.body,
-            }
+            bibitem_merger.merge(base, ref.body)
             try:
-                BibliographicItem(**ref.body)
+                bibitem = BibliographicItem(**ref.body)
+                validation_errors = []
             except ValidationError as e:
                 log.warn(
                     "Incorrect bibliographic item format: %s, %s",
                     ref.ref, e)
-                base['sources'][ref.dataset]['validation_errors'] = str(e)
+                bibitem = BibliographicItem.construct(**ref.body)
+                validation_errors = [str(e)]
+
+            sources[sourced_id] = IndexedBibliographicItem(
+                ref=ref.ref,
+                source=source,
+                bibitem=bibitem,
+                validation_errors=validation_errors,
+            )
     else:
         raise RefNotFoundError("Not found in indexed sources by docid", id)
 
-    if any([len(s.get('validation_errors', [])) > 0
-            for s in base.get('sources', {}).values()]):
-        return SourcedBibliographicItem.construct(**base)
-    else:
-        try:
-            return SourcedBibliographicItem(**base)
-        except ValidationError:
-            log.exception(
-                "Failed to validate final sourced bibliographic item",
-                id)
-            return SourcedBibliographicItem.construct(**base)
+    composite: Dict[str, Any] = {
+        **base,
+        'sources': sources,
+    }
+    return CompositeSourcedBibliographicItem.construct(**composite)
+
+    # if any([len(s.validation_errors or []) > 0
+    #         for s in sources.values()]):
+    #     return CompositeSourcedBibliographicItem.construct(**composite)
+    # else:
+    #     try:
+    #         return CompositeSourcedBibliographicItem(**base)
+    #     except ValidationError:
+    #         log.exception(
+    #             "Failed to validate composite sourced bibliographic item %s",
+    #             id)
+    #         return CompositeSourcedBibliographicItem.construct(**composite)
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
@@ -373,7 +469,7 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 def build_search_results(
     refs: QuerySet[RefData],
     order_by: Optional[str] = None,
-) -> List[SourcedBibliographicItem]:
+) -> List[IndexedBibliographicItem]:
     """Given a :class:`QuerySet` of :class:`RefData` entries,
     build a list of :class:`SourcedBibliographicItem` objects
     by merging ``RefData`` with intersecting document identifiers.
@@ -388,7 +484,7 @@ def build_search_results(
     # all their document IDs are considered aliases to each other.
     alias_docids: Dict[FrozenSet[DocIDTuple], Set[DocIDTuple]] = {}
 
-    results: List[SourcedBibliographicItem] = []
+    results: List[CompositeSourcedBibliographicItem] = []
 
     for idx, ref in enumerate(refs):
         docid_tuples: FrozenSet[DocIDTuple] = frozenset(
@@ -438,17 +534,28 @@ def build_search_results(
 
         if len(refs_to_merge) > 0:
             base: Dict[str, Any] = {'sources': {}}
+            sources: Dict[str, IndexedBibliographicItem] = {}
             for ref in refs_to_merge:
+                if hasattr(ref, 'headline'):
+                    base['headline'] = ref.headline
+
                 bibitem_merger.merge(base, ref.body)
-                base['sources'][ref.dataset] = {
-                    'ref': ref.ref,
-                    'bibitem': ref.body,
-                }
+
+                source = get_source_meta(ref.dataset)
+                sourced_id = f'{ref.ref}@{source.id}'
                 try:
-                    BibliographicItem(**ref.body)
+                    bibitem = BibliographicItem(**ref.body)
+                    validation_errors = []
                 except ValidationError as e:
-                    base['sources'][ref.dataset]['validation_errors'] = str(e)
-            results.append(SourcedBibliographicItem.construct(**base))
+                    bibitem = BibliographicItem.construct(**ref.body)
+                    validation_errors = [str(e)]
+                sources[sourced_id] = IndexedBibliographicItem(
+                    ref=ref.ref,
+                    source=source,
+                    bibitem=bibitem,
+                    validation_errors=validation_errors,
+                )
+            results.append(CompositeSourcedBibliographicItem.construct(**base))
 
     return results
 

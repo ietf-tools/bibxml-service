@@ -1,0 +1,8 @@
+&copy;&nbsp;{{ val.from }}
+<span class="truncate">
+  {% for owner in val.owner %}
+    {% with owner.name|first as owner_name %}
+      {% if owner.url %}<a class="truncate link" href="{{ owner.url }}">{{ owner_name }}</a>{% else %}{{ owner_name }}{% endif %}{% if not forloop.last %}, {% endif %}
+    {% endwith %}
+  {% endfor %}
+</span>

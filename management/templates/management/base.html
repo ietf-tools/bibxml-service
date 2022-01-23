@@ -7,14 +7,15 @@
   Management
 {% endblock %}
 
-{% block extra_head %}
-  <link rel="stylesheet" href="{% static "css/management.css" %}" />
-{% endblock %}
-
 {% block extra_scripts %}
   {% compress js %}
     <script type="text/javascript" src="{% static "js/api-button.js" %}"></script>
   {% endcompress %}
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:!block
+  p-4
 {% endblock %}
 
 {% block root_html_attrs %}data-api-secret="{{ api_secret }}"{% endblock %}
@@ -23,16 +24,21 @@
 
 {% block home_link %}{% url "manage" %}{% endblock %}
 
+{% block header_extras %}
+  <div class="
+    {% include "_side_block_classes.html" %}
+    bg-slate-600 text-slate-100 p-4 text-sm leading-tight
+  ">
+    <ul class="flex flex-row flex-wrap">
+      {% for ds_id in indexed_datasets %}
+        <li class="mr-2">
+          <a class="{% if dataset_id == ds_id %}font-bold{% endif %}" href="{% url "manage_dataset" ds_id %}">
+            {{ ds_id }}
+          </a>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
+
 {% block nav %}
-  {% for ds_id in indexed_datasets %}
-    <a class="
-          link
-          {% if dataset_id == ds_id %}underline{% endif %}
-          dim
-          {% if ds_id in authoritative_datasets %}black-80 fw5{% else %}gray{% endif %}
-          f5 f4-ns dib mr3
-        " href="{% url "manage_dataset" ds_id %}">
-      {{ ds_id }}
-    </a>
-  {% endfor %}
 {% endblock %}

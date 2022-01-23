@@ -1,12 +1,21 @@
-{# NOTE: inline rendering isn’t well-tested #}
+{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only #}
 
-<dt class="b nowrap mt1 f6 {% if inline %}dib{% endif %}">
-  {{ key }}{% if idx %} ({{ idx }}){% endif %}:
-</dt>
-<dd class="ml0 truncate {% if inline %}dib{% endif %}" title="{{ val }}">
-  {% if tmpl %}
-    {% include tmpl with val=val %}
-  {% else %}
-    {{ val|default:"—" }}
-  {% endif %}
-</dd>
+<div class="
+  deflist-entry
+  {% if wide %}deflist-entry-wide{% endif %}
+  {% if break_row %}md:col-start-1{% endif %}
+  {{ htmlclass }}
+">
+  <dt class="{% if key_sr_only %}sr-only{% endif %}">
+    {{ key }}{% if idx %}&nbsp;({{ idx }}){% endif %}:
+  </dt>
+  <dd class="" title="{% if key_sr_only %}{{ key }}{% endif %} {% if not tmpl %}{{ val }}{% endif %}">
+    <span class="val">
+      {% if tmpl %}
+        {% include tmpl with val=val %}
+      {% else %}
+        {{ val|default:"—" }}
+      {% endif %}
+    </span>
+  </dd>
+</div>

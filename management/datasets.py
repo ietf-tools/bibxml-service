@@ -1,7 +1,20 @@
 from django.conf import settings
+from main.types import IndexedSourceMeta
 
 
 GITHUB_REPO_URL = "https://github.com/{user}/{repo}"
+
+
+def get_source_meta(dataset_id: str) -> IndexedSourceMeta:
+    internal_repo_name = f'relaton-data-{dataset_id}'
+    internal_repo_github = \
+        f'https://github.com/ietf-ribose/{internal_repo_name}'
+
+    return IndexedSourceMeta(
+        id=internal_repo_name,
+        home_url=internal_repo_github,
+        issues_url=f'{internal_repo_github}/issues',
+    )
 
 
 def locate_bibxml_source_repo(dataset_id):
