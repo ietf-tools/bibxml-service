@@ -58,11 +58,15 @@ def search_refs_relaton_struct(
     """
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
-    subqueries = ['body @> %s::jsonb' for obj in objs]
+    params: List[str] = []
+    subqueries = []
+    for obj in objs:
+        params.append(json.dumps(obj))
+        subqueries.append('body @> %s::jsonb')
 
     query = RawSQL('''
-        SELECT id FROM api_ref_data WHERE %s
-    ''' % ' OR '.join(subqueries), [json.dumps(obj) for obj in objs])
+        SELECT id FROM api_ref_data WHERE ({})
+    '''.format(' OR '.join(subqueries)), params)
 
     return (
         RefData.objects.filter(id__in=query).
