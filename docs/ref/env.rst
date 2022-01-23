@@ -15,6 +15,9 @@ Most of them are passed to containers’ respective environments.
 
 .. seealso:: :doc:`/ref/containers`
 
+``SNAPSHOT`` (**required**)
+    Version, taken from the latest Git tag. Use `git describe --abbrev=0`.
+
 ``HOST`` (**required**)
     Hostname used for Web GUI.
     HTTP requests with mismatching Host header will result in an error.
@@ -72,6 +75,3 @@ container definitions, for example:
    :language: yaml
    :start-at: web:
    :end-before: depends_on:
-
-Note ``SNAPSHOT_HASH`` and ``SNAPSHOT_TIME`` populated
-using ``git``.
