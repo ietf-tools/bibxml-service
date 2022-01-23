@@ -14,8 +14,6 @@ services:
         POSTGRES_DB: ${DB_NAME:?missing DB name}
         POSTGRES_USER: ${DB_NAME:?err}
         POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
     hostname: db
     environment:
       POSTGRES_DB: ${DB_NAME:?missing DB name}
