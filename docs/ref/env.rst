@@ -20,8 +20,7 @@ Most of them are passed to containers’ respective environments.
     HTTP requests with mismatching Host header will result in an error.
 
     Currently, it is used in ``ALLOWED_HOSTS`` setting,
-    but planned to be reused in other places as well.
-    Thus, a wildcard *is not allowed*.
+    as well as Crossref etiquette.
 
 ``PORT`` (**required**)
     Docker Compose will make Web GUI available
