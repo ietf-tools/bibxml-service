@@ -297,7 +297,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
             base['sources'][ref.dataset]['validation_errors'] = str(e)
 
     elif len(refs) > 1:
-        seen_docids_by_type: Dict[str, str] = {}
+        seen_types_by_id: Dict[str, str] = {}
         for ref in refs:
             bibitem = ref.body
 
@@ -308,20 +308,27 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
                 _scope = _docid.get('scope', None)
                 if not _id:
                     raise RefNotFoundError(
-                        "Encountered a ref missing docid.id", id)
+                        "Encountered item missing docid.id", id)
                 if not isinstance(_type, str) or len(_type) < 1:
                     raise RefNotFoundError(
-                        "Encountered a ref missing docid.type", id)
+                        "Encountered item missing docid.type", id)
 
                 # Sanity check that ID-IDs don’t clash across types,
                 # otherwise we are dealing with different bibliographic items
                 # that should not be merged
                 if _scope is None:
-                    if seen_docids_by_type.get(_type, _id) != _id:
+                    seen_type = seen_types_by_id.get(_id, _type)
+                    if seen_type != _type:
+                        log.warning(
+                            "Mismatching docid.type/docid.id when merging: "
+                            "ID %s, got type %s, "
+                            "but already seen type %s for this ID",
+                            _id, _type, seen_type)
                         raise RefNotFoundError(
-                            "Mismatching docid.type/docid.id when merging",
+                            "Encountered items "
+                            "with incompatible document identifier types",
                             id)
-                    seen_docids_by_type[_type] = _id
+                    seen_types_by_id[_id] = _type
 
             bibitem_merger.merge(base, bibitem)
             base['sources'][ref.dataset] = {
