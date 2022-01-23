@@ -11,61 +11,98 @@ or ``.env`` file, or by Django).
 
 .. seealso:: :func:`main.bibxml.check_settings()`
 
-``SNAPSHOT`` (**required** by Django, provided by Compose)
+``SNAPSHOT``
+    **required by Django**, provided by Compose
+
     Version, taken from the latest Git tag.
     Obtained via `git describe --abbrev=0`.
 
-``HOST`` (**required** by Django and Compose, pass-through)
+``HOST``
+    **required by Django** and Compose, pass-through
+
     Hostname used for Web GUI.
     HTTP requests with mismatching Host header will result in an error.
 
     Currently, it is used in ``ALLOWED_HOSTS`` setting,
     as well as Crossref etiquette.
 
-``PORT`` (**required** by Compose)
+``PORT``
+    required by Compose
+
     Docker Compose will make Web GUI available
     on the host OS under this port number.
 
-``CPU_COUNT`` (**recommended** by Compose)
+``CPU_COUNT``
+    accepted by Compose, recommended in production
+
     Determines the number of workers in the web container.
 
-``DB_NAME`` (**required** by Django and Compose, pass-through)
+``DB_NAME``
+    **required by Django** and Compose, pass-through
+
     PostgreSQL database and user name.
 
-``DB_USER`` (**required** by Django, provided by Compose)
+``DB_USER``
+    **required by Django**, provided by Compose
 
-``DB_HOST`` (**required** by Django, provided by Compose)
+    Username for PostgreSQL server authentication.
 
-``DB_PORT`` (**required** by Django, provided by Compose)
+``DB_HOST``
+    **required by Django**, provided by Compose
 
-``DB_SECRET`` (**required** by Django and Compose, pass-through)
+    DB server hostname.
+
+``DB_PORT``
+    **required by Django**, provided by Compose
+
+    DB server port number.
+
+``DB_SECRET``
+    **required by Django** and Compose, pass-through
+
     User password for PostgreSQL server authentication.
 
-``REDIS_HOST`` (**required** by Django, provided by Compose)
+``REDIS_HOST``
+    **required by Django**, provided by Compose
 
-``REDIS_PORT`` (**required** by Django, provided by Compose)
+``REDIS_PORT``
+    **required by Django**, provided by Compose
 
-``DJANGO_SECRET`` (**required** by Django and Compose, pass-through)
+``DJANGO_SECRET``
+    **required by Django** and Compose, pass-through
+
     Django’s secret key. Must be unique, long and confidential.
 
-``API_SECRET`` (**required** by Django and Compose, pass-through)
+``API_SECRET``
+    **required by Django** and Compose, pass-through
+
     Token for management GUI and API access.
 
-``SERVICE_NAME`` (**required** by Django and Compose, pass-through)
+``SERVICE_NAME``
+    **required by Django** and Compose, pass-through
+
     The official name of the service. Short.
 
-``CONTACT_EMAIL`` (**required** by Django and Compose, pass-through)
+``CONTACT_EMAIL``
+    **required by Django** and Compose, pass-through
+
     Email service operating team could be contacted via.
     May be used for exception notifications and more.
 
-``SERVER_EMAIL`` (accepted by Django and Compose, pass-through)
+``SERVER_EMAIL`` 
+    accepted by Django and Compose, pass-through, recommended in production
+
     For emails sent by the service directly,
     this will be used as the “from” address.
 
-``SENTRY_DSN`` (accepted by Django and Compose, pass-through)
+``SENTRY_DSN`` 
+    accepted by Django and Compose, pass-through
+
     Endpoint for reporting metrics & errors to Sentry.
 
-``DEBUG`` (accepted by Django and Compose, pass-through)
+``DEBUG`` 
+    accepted by Django and Compose, pass-through
+
     If set to 1, Django’s built-in ``runserver`` is used
     to serve the GUI, and error pages are verbose.
 
