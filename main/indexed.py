@@ -56,6 +56,9 @@ def search_refs_relaton_struct(
               at least one of given ``obj`` structures (they are OR'ed).
     :rtype: Queryset[RefData]
     """
+    if len(objs) < 1:
+        return RefData.objects.none()
+
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
     params: List[str] = []
@@ -128,6 +131,8 @@ def search_refs_relaton_field(
 
     :rtype: Queryset[RefData]
     """
+    if len(field_queries) < 1:
+        return RefData.objects.none()
 
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
