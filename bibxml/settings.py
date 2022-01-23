@@ -241,6 +241,9 @@ BABEL_CONFIG = BASE_DIR / 'babel.config.json'
 BABEL_EXECUTABLE = 'npx babel'
 """How to invoke Babel."""
 
+POSTCSS_EXECUTABLE = 'npx postcss'
+"""How to invoke PostCSS CLI."""
+
 COMPRESS_PRECOMPILERS = (
    # ('text/jsx', 'cat {infile} | babel --config-file %s > {outfile}' % BABEL_CONFIG),
    (
@@ -248,10 +251,18 @@ COMPRESS_PRECOMPILERS = (
        '%s {infile} --config-file %s --source-maps --out-file {outfile}'
        % (BABEL_EXECUTABLE, BABEL_CONFIG),
    ),
+   (
+       'text/css',
+       '%s {infile} -o {outfile}'
+       % (POSTCSS_EXECUTABLE, ),
+   ),
 )
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = not DEBUG
+
+if DEBUG:
+    COMPRESS_MTIME_DELAY = 2
 
 
 # Default primary key field type
