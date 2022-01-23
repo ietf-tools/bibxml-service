@@ -1,4 +1,5 @@
 from django.db import connection
+from django.conf import settings
 
 
 def profiling(request):
@@ -6,4 +7,16 @@ def profiling(request):
         profiling=dict(
             query_times=[p['time'] for p in connection.queries],
         ),
+    )
+
+
+def sources(request):
+    return dict(
+        known_datasets=settings.KNOWN_DATASETS,
+        indexed_datasets=[
+            ds
+            for ds in settings.KNOWN_DATASETS
+            if ds not in settings.EXTERNAL_DATASETS],
+        external_datasets=settings.EXTERNAL_DATASETS,
+        authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     )

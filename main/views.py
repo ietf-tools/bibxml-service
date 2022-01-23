@@ -25,13 +25,6 @@ from .util import BaseCitationSearchView
 
 
 shared_context = dict(
-    known_datasets=settings.KNOWN_DATASETS,
-    indexed_datasets=[
-        ds
-        for ds in settings.KNOWN_DATASETS
-        if ds not in settings.EXTERNAL_DATASETS],
-    external_datasets=settings.EXTERNAL_DATASETS,
-    authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     snapshot=settings.SNAPSHOT,
 )
 """Shared context passed to GUI templates."""
