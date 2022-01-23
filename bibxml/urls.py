@@ -45,6 +45,10 @@ urlpatterns = [
 
             # Public endpoints
 
+            path('json-schema/<ref>/', never_cache(require_safe(
+                public_api.json_schema
+            )), name='json_schema'),
+
             # We let search results to be cached on a different level
             path('search/<query>/', never_cache(require_safe(
                 public_api.CitationSearchResultListView.as_view()

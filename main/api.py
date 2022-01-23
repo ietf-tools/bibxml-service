@@ -7,6 +7,7 @@ from django.db.models.query import Q
 from django.conf import settings
 
 from common.pydantic import unpack_dataclasses
+from bib_models.models import BibliographicItem
 
 from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
@@ -191,3 +192,17 @@ class CitationSearchResultListView(BaseCitationSearchView):
                 for obj in context['object_list']
             ],
         })
+
+
+SCHEMA_REFS = {
+    'BibliographicItem': BibliographicItem,
+}
+
+
+def json_schema(request, ref: str):
+    """Return a JSON Schema for a given reference."""
+
+    if ref not in SCHEMA_REFS:
+        return HttpResponseBadRequest("Unknown ref")
+
+    return SCHEMA_REFS[ref].schema_json(indent=2)
