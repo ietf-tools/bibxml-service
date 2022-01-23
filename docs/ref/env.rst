@@ -11,50 +11,50 @@ or ``.env`` file, or by Django).
 
 .. seealso:: :func:`main.bibxml.check_settings()`
 
-``SNAPSHOT`` (**required**) (required by Django, provided by Compose)
+``SNAPSHOT`` (**required** by Django, provided by Compose)
     Version, taken from the latest Git tag.
     Obtained via `git describe --abbrev=0`.
 
-``HOST`` (**required**) (required by Django and Compose, pass-through)
+``HOST`` (**required** by Django and Compose, pass-through)
     Hostname used for Web GUI.
     HTTP requests with mismatching Host header will result in an error.
 
     Currently, it is used in ``ALLOWED_HOSTS`` setting,
     as well as Crossref etiquette.
 
-``PORT`` (**required**) (required by Compose)
+``PORT`` (**required** by Compose)
     Docker Compose will make Web GUI available
     on the host OS under this port number.
 
-``CPU_COUNT`` (**recommended**) (required by Compose)
+``CPU_COUNT`` (**recommended** by Compose)
     Determines the number of workers in the web container.
 
-``DB_NAME`` (**required**) (required by Django and Compose, pass-through)
+``DB_NAME`` (**required** by Django and Compose, pass-through)
     PostgreSQL database and user name.
 
-``DB_USER`` (**required**) (provided by Compose)
+``DB_USER`` (**required** by Django, provided by Compose)
 
-``DB_HOST`` (**required**) (provided by Compose)
+``DB_HOST`` (**required** by Django, provided by Compose)
 
-``DB_PORT`` (**required**) (provided by Compose)
+``DB_PORT`` (**required** by Django, provided by Compose)
 
-``DB_SECRET`` (**required**) (required by Django and Compose, pass-through)
+``DB_SECRET`` (**required** by Django and Compose, pass-through)
     User password for PostgreSQL server authentication.
 
-``REDIS_HOST`` (**required**) (provided by Compose)
+``REDIS_HOST`` (**required** by Django, provided by Compose)
 
-``REDIS_PORT`` (**required**) (provided by Compose)
+``REDIS_PORT`` (**required** by Django, provided by Compose)
 
-``DJANGO_SECRET`` (**required**)  (required by Django and Compose, pass-through)
+``DJANGO_SECRET`` (**required** by Django and Compose, pass-through)
     Django’s secret key. Must be unique, long and confidential.
 
-``API_SECRET`` (**required**) (required by Django and Compose, pass-through)
+``API_SECRET`` (**required** by Django and Compose, pass-through)
     Token for management GUI and API access.
 
-``SERVICE_NAME`` (**required**) (required by Django and Compose, pass-through)
+``SERVICE_NAME`` (**required** by Django and Compose, pass-through)
     The official name of the service. Short.
 
-``CONTACT_EMAIL`` (**required**) (required by Django and Compose, pass-through)
+``CONTACT_EMAIL`` (**required** by Django and Compose, pass-through)
     Email service operating team could be contacted via.
     May be used for exception notifications and more.
 
