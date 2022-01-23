@@ -108,7 +108,6 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
     template_name = 'browse/search_citations.html'
-    show_all_by_default = True
 
     def get_context_data(self, **kwargs):
         return dict(
@@ -196,7 +195,7 @@ def browse_indexed_reference(request, dataset_id, ref):
 
 class IndexedDatasetCitationListView(ListView):
     model = RefData
-    paginate_by = 20
+    paginate_by = 10
     template_name = 'browse/dataset.html'
 
     def get_queryset(self) -> QuerySet[RefData]:

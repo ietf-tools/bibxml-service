@@ -32,7 +32,7 @@ class BaseCitationSearchView(BaseListView):
     Intended to be usable for both template-based GUI and API views."""
 
     # model = RefData
-    paginate_by = 20
+    paginate_by = 10
 
     limit_to = getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
     """Hard limit for found item count.
