@@ -102,6 +102,19 @@ if len(failed_env_checks) > 0:
         "Invalid environment configuration: %s"
         % ', '.join(error_messages))
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
 
 # Basic Django settings
 # =====================
