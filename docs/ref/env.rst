@@ -27,6 +27,9 @@ Most of them are passed to containers’ respective environments.
     Docker Compose will make Web GUI available
     on the host OS under this port number.
 
+``CPU_COUNT`` (**recommended**)
+    Determines the number of workers in the web container.
+
 ``DB_NAME`` (**required**)
     PostgreSQL database and user name.
 

@@ -75,7 +75,7 @@ services:
         if [ "$DEBUG" = "1" ]; then
           python manage.py runserver 0.0.0.0:8000
         else
-          daphne bibxml.asgi:application -p 8000 -b 0.0.0.0
+          hypercorn -b '0.0.0.0:8000' -w ${CPU_COUNT:-1} bibxml.asgi:application
         fi
     ports:
       - "${PORT:?missing port to expose web service under}:8000"
