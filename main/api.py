@@ -88,13 +88,13 @@ def get_by_docid(request):
                 format(docid, doctype or "unspecified"),
         }, status=404)
     else:
-        if format == 'bibxml':
-            return HttpResponse(
-                result,
-                content_type="application/xml",
-                charset="utf-8")
-        else:
-            return JsonResponse({"data": unpack_dataclasses(citation.dict())})
+        # if format == 'bibxml':
+        #     return HttpResponse(
+        #         result,
+        #         content_type="application/xml",
+        #         charset="utf-8")
+        # else:
+        return JsonResponse({"data": unpack_dataclasses(citation.dict())})
 
 
 def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
