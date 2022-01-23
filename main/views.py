@@ -54,7 +54,7 @@ def home(request):
 # Browsing by document ID
 # =======================
 
-def browse_citation_by_docid(request, doctype=None, docid=None):
+def browse_citation_by_docid(request):
     """
     Reads ``docid`` and ``doctype`` from GET query,
     uses :func:`main.indexed.build_citation_for_docid`
