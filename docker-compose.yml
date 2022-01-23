@@ -68,8 +68,6 @@ services:
         export SNAPSHOT_HASH=$$(git rev-parse HEAD) &&
         export SNAPSHOT_TIME=$$(git log -1 --format=%cd) &&
         ./wait-for-migrations.sh &&
-        python manage.py collectstatic --noinput &&
-        python manage.py compress &&
         if [ "$DEBUG" = "1" ]; then
           python manage.py runserver 0.0.0.0:8000
         else
