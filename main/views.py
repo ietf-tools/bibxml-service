@@ -48,7 +48,7 @@ def home(request):
 
     browsable_datasets = [
         ds_id
-        for ds_id in shared_context['indexed_datasets']
+        for ds_id in settings.KNOWN_DATASETS
         if ds_id in non_empty_datasets]
 
     return render(request, 'browse/home.html', dict(

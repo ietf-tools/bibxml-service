@@ -2,8 +2,8 @@
 
 from os import path
 import glob
-import yaml
 
+import yaml
 from celery.utils.log import get_task_logger
 from django.db import transaction
 

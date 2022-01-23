@@ -1,6 +1,6 @@
 """
 Helpers for merging dictionary representations
-of BibliographicItem models.
+of :class:`bib_models.models.BibliographicItem` instances.
 """
 
 from typing import Any

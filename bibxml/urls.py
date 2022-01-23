@@ -15,7 +15,10 @@ handler403 = error_views.not_authorized
 handler404 = error_views.not_found
 handler500 = error_views.server_error
 
-default_ttl = getattr(settings, 'DEFAULT_CACHE_SECONDS', 3600)
+default_ttl = (
+    getattr(settings, 'DEFAULT_CACHE_SECONDS', 3600)
+    if not settings.DEBUG
+    else 0)
 
 
 urlpatterns = [

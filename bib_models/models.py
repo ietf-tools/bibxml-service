@@ -5,7 +5,7 @@ Some of Relaton models implemented as Pydantic models.
 from typing import List, Union, Optional
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Extra
 from pydantic.dataclasses import dataclass
 
 from .dataclasses import DocID, Title
@@ -30,12 +30,8 @@ class Date:
     value: datetime.date
 
 
-class IgnoringConfig:
-    extra = 'ignore'
-
-
-class BibliographicItem(BaseModel):
-    """Relaton’s ``BibliographicItem`` expressed as a Pydantic model."""
+class BibliographicItem(BaseModel, extra=Extra.allow):
+    """Relaton’s BibliographicItem expressed as a Pydantic model."""
 
     docid: Union[List[DocID], DocID]
     docnumber: Optional[str] = None

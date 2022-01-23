@@ -83,8 +83,8 @@ Copyright = TypedDict('Copyright', {
 
 @dataclass
 class DocID:
-    type: str
     id: str
+    type: str
     scope: Optional[str] = None
 
 

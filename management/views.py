@@ -24,7 +24,8 @@ shared_context = dict(
 def manage(request):
     running_tasks = [
         describe_indexing_task(tid)
-        for tid in list_running_tasks()]
+        for tid in list_running_tasks()
+    ]
 
     return render(request, 'management/home.html', dict(
         **shared_context,
