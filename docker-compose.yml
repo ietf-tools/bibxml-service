@@ -40,7 +40,7 @@ services:
         python manage.py check --deploy
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
-      DATASET_TMP_ROOT: "/code/datasets"
+      DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
       DB_HOST: db
@@ -97,7 +97,7 @@ services:
       # Indexer-specific
       # TODO: Some environment variables could be removed from web container, and only made available to celery
       API_SECRET: "${API_SECRET:?missing API secret}"
-      DATASET_TMP_ROOT: "/code/datasets"
+      DATASET_TMP_ROOT: "/data/datasets"
       CELERY_BROKER_URL: "redis://redis:6379"
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
@@ -119,10 +119,9 @@ services:
         celery -A management worker -l info -c 1
     volumes:
       - .:/code
-      - ./data/datasets:/code/datasets
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
-      DATASET_TMP_ROOT: "/code/datasets"
+      DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
       DB_HOST: db
