@@ -10,12 +10,8 @@ register = template.Library()
 @register.filter
 def as_list(value):
     """Returns the value as a list (see :func:`main.util.as_list`),
-    or the value itself if it is either ``None``
-    or a list containing only ``None`` values."""
+    omitting any ``None`` values."""
 
     result: Any = base_as_list(value)
 
-    if len(result) == 0 or all([val is None for val in result]):
-        return None
-    else:
-        return result
+    return [val for val in result if val is not None and val != '']
