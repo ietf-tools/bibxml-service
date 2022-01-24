@@ -124,7 +124,7 @@ def browse_citation_by_docid(request):
             'allow_format_fallback': True,
             'bypass_cache': True,
         })
-        log.exception("Error locating item: %s, %s", docid, doctype)
+        log.warning("Could not locate item by docid: %s, %s", docid, doctype)
         messages.info(
             request,
             "Could not find a bibliographic item "
