@@ -48,19 +48,19 @@ if environ.get("SENTRY_DSN", None):
     import logging
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.logging import LoggingIntegration
-    sentry_warning_logging = LoggingIntegration(
-         level=logging.INFO,
-         event_level=logging.WARNING
-    )
 
     sentry_sdk.init(
         dsn=environ.get("SENTRY_DSN"),
-        integrations=[DjangoIntegration(), sentry_warning_logging],
+        integrations=[
+            DjangoIntegration(),
+            LoggingIntegration(
+                level=logging.INFO,
+                event_level=logging.WARNING,
+            ),
+        ],
         server_name=environ.get("PRIMARY_HOSTNAME"),
-
         # Can be adjusted in production to reduce overhead.
         traces_sample_rate=1.0,
-
         send_default_pii=False,
     )
 
