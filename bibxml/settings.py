@@ -434,4 +434,5 @@ API_SECRET = environ.get('API_SECRET')
 """Secret used to authenticate API requests and access to management GUI."""
 
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
-"""Where to keep fetched source data and data generated during indexing."""
+"""Where to keep fetched source data and data generated during indexing.
+Should be a directory. No trailing slash."""
