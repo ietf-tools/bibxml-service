@@ -124,13 +124,7 @@
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
 
         {% for relation in data.relation|as_list %}
-          {% with formattedref=relation.bibitem.formattedref.content rel_docid=relation.bibitem.docid|as_list|first %}
-            {% with linked_id=rel_docid.id|default:formattedref %}
-              {% if linked_id %}
-                {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=linked_id tmpl="citation/docid_link.html" break_row=forloop.first %}
-              {% endif %}
-            {% endwith %}
-          {% endwith %}
+            {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation tmpl="relaton/relation.html" break_row=forloop.first %}
         {% endfor %}
 
         {% if data.language %}
