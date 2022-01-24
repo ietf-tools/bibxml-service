@@ -1,13 +1,4 @@
-from django.db import connection
 from django.conf import settings
-
-
-def profiling(request):
-    return dict(
-        profiling=dict(
-            query_times=[p['time'] for p in connection.queries],
-        ),
-    )
 
 
 def service_meta(request):
