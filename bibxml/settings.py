@@ -45,11 +45,17 @@ ALLOWED_HOSTS = [
 
 if environ.get("SENTRY_DSN", None):
     import sentry_sdk
+    import logging
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.django import LoggingIntegration
+    sentry_warning_logging = LoggingIntegration(
+         level=logging.INFO,
+         event_level=logging.WARNING
+    )
 
     sentry_sdk.init(
         dsn=environ.get("SENTRY_DSN"),
-        integrations=[DjangoIntegration()],
+        integrations=[DjangoIntegration(), sentry_warning_logging],
         server_name=environ.get("PRIMARY_HOSTNAME"),
 
         # Can be adjusted in production to reduce overhead.
