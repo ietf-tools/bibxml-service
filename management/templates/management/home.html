@@ -1,21 +1,21 @@
 {% extends "management/base.html" %}
 
 {% block content %}
-  <h2 class="text-lg tracking-tight mb-2">Running task(s)</h2>
-  {% if running_tasks %}
-    <ul class="">
-      {% for task in running_tasks %}
-        <li class="">
-          <article class="p-4 bg-dark-500/20">
+  <div>
+    <h2 class="text-lg tracking-tight">Running task(s)</h2>
+    {% if running_tasks %}
+      <ul class="">
+        {% for task in running_tasks %}
+          <li class="">
             {% include "indexing_task.html" with task=task %}
-          </article>
-      {% endfor %}
-    </ul>
-  {% else %}
-    None.
-  {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      None.
+    {% endif %}
+  </div>
 
-  <div class="py-8">
+  <div>
     <h2 class="text-lg tracking-tight">See also</h2>
     <ul class="">
       <li>
