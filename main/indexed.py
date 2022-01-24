@@ -354,7 +354,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
             and docid.get('type', None)
             and not docid.get('scope', None)
             # Exclude originally given ID:
-            and docid['id'] != id or docid['type'] != id_type)
+            and (docid['id'] != id or docid['type'] != id_type))
     ]
 
     refs = [*refs, *search_refs_for_docids(*docids)]
