@@ -54,8 +54,8 @@ def get_doi_ref(request, ref):
         return JsonResponse({
             "error": "BibXML format is not supported yet by this endpoint",
         }, status=500)
+    parsed_ref = unquote_plus(ref)
     try:
-        parsed_ref = unquote_plus(ref)
         result = _get_doi_ref(parsed_ref)
     except RefNotFoundError:
         return JsonResponse({
@@ -122,10 +122,10 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
             query_builder = DEFAULT_LEGACY_QUERY_BUILDER
 
         parsed_legacy_ref = unquote_plus(legacy_reference)
+        parsed_ref = ref_formatter(parsed_legacy_ref)
 
         try:
             if dataset_id == 'doi':
-                parsed_ref = ref_formatter(parsed_legacy_ref)
                 bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
             else:
                 bibxml_repr = get_indexed_ref_by_query(
