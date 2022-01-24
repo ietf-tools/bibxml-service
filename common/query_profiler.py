@@ -1,6 +1,10 @@
 import time
+import logging
 from django.conf import settings
 from django.db import connection
+
+
+log = logging.getLogger(__name__)
 
 
 def context_processor(request):
@@ -52,18 +56,26 @@ class QueryProfiler:
         # Here, profiler.queries is populated.
 
     """
-    def __init__(self):
+    def __init__(self, warning_threshold_sec=4):
         self.queries = []
+        self.warning_threshold_sec = warning_threshold_sec
 
     def __call__(self, execute, sql, params, many, context):
         start = time.monotonic()
 
         result = execute(sql, params, many, context)
 
+        elapsed_seconds = time.monotonic() - start
         self.queries.append(dict(
           sql=sql,
           params=params,
-          time=time.monotonic() - start,
+          time=elapsed_seconds,
         ))
+
+        if elapsed_seconds > self.warning_threshold_sec:
+            log.warning(
+                "Query took %s seconds (too long): %s (params %s)",
+                str(elapsed_seconds)[:5],
+                sql, repr(params))
 
         return result
