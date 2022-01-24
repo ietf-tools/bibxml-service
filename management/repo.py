@@ -1,8 +1,11 @@
 """Utilities for dealing with Git."""
 
-from os import access, path, rmdir, R_OK
-from celery.utils.log import get_task_logger
+from os import access, path, R_OK, sep
+from shutil import rmtree
 from git import Repo  # type: ignore[attr-defined]
+from celery.utils.log import get_task_logger
+from django.core.exceptions import SuspiciousOperation
+from django.conf import settings
 
 
 logger = get_task_logger(__name__)
@@ -14,8 +17,15 @@ def reclone(repo_url, branch, work_dir):
     and clones given repository into that location.
     """
 
+    if path.commonpath([
+        settings.DATASET_TMP_ROOT,
+        path.realpath(work_dir),
+    ]) != settings.DATASET_TMP_ROOT:
+        raise SuspiciousOperation(
+            "Cannot reclone to a dir outside DATASET_TMP_ROOT")
+
     try:
-        rmdir(work_dir)
+        rmtree(work_dir)
     except FileNotFoundError:
         pass
 
