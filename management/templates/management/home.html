@@ -5,8 +5,8 @@
   {% if running_tasks %}
     <ul class="">
       {% for task in running_tasks %}
-        <li class="pv3 cf">
-          <article class="p-4 bg-dark-200">
+        <li class="">
+          <article class="p-4 bg-dark-500/20">
             {% include "indexing_task.html" with task=task %}
           </article>
       {% endfor %}

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="flex items-center bg-dark-200 p-4 gap-y-2 mb-2">
+  <div class="flex items-center bg-dark-500/20 p-4 gap-y-2 mb-2">
     <h2 class="font-bold">{{ dataset_id }}</h2>
     {% url "api_run_indexer" dataset_id as reindex_url %}
     &emsp;
@@ -16,8 +16,8 @@
 
   <ul class="">
     {% for task in history %}
-      <li class="pv3 cf">
-        <article class="p-4 bg-dark-200">
+      <li class="">
+        <article class="p-4 bg-dark-500/20">
           {% include "indexing_task.html" with task=task %}
         </article>
     {% endfor %}

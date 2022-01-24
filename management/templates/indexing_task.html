@@ -1,5 +1,5 @@
 <div class="flex flex-row mb-2">
-  <span class="text-xs font-mono px-4 py-2 gray bg-gray-100 truncate">
+  <span class="text-xs font-mono px-4 py-2 gray bg-gray-500/20 truncate">
     {{ task.task_id }}
   </span>
   {% if task.status != "PENDING" %}
@@ -7,7 +7,7 @@
         {% if task.status == "SUCCESS" %}bg-emerald-700 text-white
         {% elif task.status == "PROGRESS" %}bg-amber-700 text-white
         {% elif task.status == "FAILURE" %}bg-rose-700 text-white
-        {% else %}bg-gray-200 text-gray-700
+        {% else %}bg-gray-500/20
         {% endif %}">
       {{ task.status }}
     </span>
@@ -21,13 +21,14 @@
   {% endif %}
   {% if task.progress %}
     <progress
-      class="custom-process"
-      value="{{ task.progress.current }}" max="{{ task.progress.total }}"
+      class="custom-progress w-full"
+      value="{{ task.progress.current }}"
+      max="{{ task.progress.total }}"
       title="{{ task.progress.current }} of {{ task.progress.total }}">
     </progress>
   {% endif %}
   {% if task.action %}
-    <p class="mb-2 text-xs text-gray-700">{{ task.action }}</p>
+    <p class="mb-2 text-xs">{{ task.action }}</p>
   {% endif %}
   {% if task.progress %}
     {% url "api_stop_task" task.task_id as stop_task_url %}
