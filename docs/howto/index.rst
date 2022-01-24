@@ -8,5 +8,5 @@ How-to guides
    develop-locally
    run-in-production
    add-new-source
-   adjust-page-styling
+   style-web-pages
    adjust-citation-rendering
