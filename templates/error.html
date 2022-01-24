@@ -6,13 +6,14 @@
   {{ error_title|default:"Server error" }}
 {% endblock %}
 
-{% block content %}
-  <h2>{{ error_title|default:"Server error" }}</h2>
 
-  <p>
+{% block content %}
+  <h2 class="p-4 bg-dark-100 dark:bg-dark-800">{{ error_title|default:"Server error" }}</h2>
+
+  <p class="p-4">
     {{ error_description|default:"Something went wrong on our side." }}
 
-  <div class="pv5">
+  <div class="p-4">
     <h2 class="f5">Go to</h2>
     <ul class="list pl0">
       <li>
