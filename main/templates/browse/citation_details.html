@@ -9,7 +9,7 @@
     {{ docid.type }}/{{ docid.id }}
     —
   {% endwith %}
-  {% include "relaton/first_title.html" with title=data.title %}
+  {% include "relaton/smart_title.html" with bibitem=data %}
 {% endblock %}
 
 {% block content_grid_classes %}
@@ -61,7 +61,7 @@
   ">
     <div class="px-4 leading-tight">{{ data.type|as_list|join:", " }}</div>
     <h2 class="px-4 mt-2 font-serif font-thin dark:font-light tracking-tight dark:tracking-normal text-2xl smd:truncate z-20 relative">
-      {% include "relaton/first_title.html" with title=data.title %}
+      {% include "relaton/smart_title.html" with bibitem=data %}
     </h2>
   </header>
 
@@ -124,7 +124,13 @@
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
 
         {% for relation in data.relation|as_list %}
-          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content|default:relation.bibitem.docid.0.id tmpl="citation/docid_link.html" break_row=forloop.first %}
+          {% with formattedref=relation.bibitem.formattedref.content rel_docid=relation.bibitem.docid|as_list|first %}
+            {% with linked_id=rel_docid.id|default:formattedref %}
+              {% if linked_id %}
+                {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=linked_id tmpl="citation/docid_link.html" break_row=forloop.first %}
+              {% endif %}
+            {% endwith %}
+          {% endwith %}
         {% endfor %}
 
         {% if data.language %}

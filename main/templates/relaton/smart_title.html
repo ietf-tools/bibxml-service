@@ -1,0 +1,20 @@
+{% load relaton %}
+
+{% with own_title=bibitem.title|as_list|first relations=bibitem.relation|as_list %}
+  {% if own_title.content %}
+    {{ own_title.content|default:"(no title)" }}
+  {% elif relations|length > 0 %}
+    {{ bibitem.id }}
+    <small>
+    {% for relation in relations %}
+      {% ifchanged relation.type %}{{ relation.type|default:"relates to" }}{% endifchanged %}
+      {% with title=relation.bibitem.title|as_list|first docid=relation.bibitem.docid|as_list|first %}
+        {% if docid %}{{ docid.id }}{% endif %}{% if not forloop.last %}, {% endif %}
+        {% if relations|length < 2 %}
+          {{ title.content|default:"unknown title" }}
+        {% endif %}
+      {% endwith %}
+    {% endfor %}
+    </small>
+  {% endif %}
+{% endwith %}
