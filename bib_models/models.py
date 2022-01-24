@@ -2,7 +2,7 @@
 Some of Relaton models implemented as Pydantic models.
 """
 
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Any
 import datetime
 
 from pydantic import BaseModel, Extra
@@ -41,6 +41,9 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     script: Optional[Union[List[str], str]] = None
     date: Optional[Union[List[Date], Date]] = None
     link: Optional[Union[List[Link], Link]] = None
+
+    # TODO: Type BibliographicItem relations properly
+    relation: Optional[List[Any]] = None
 
     title: Optional[Union[List[Title], Title]] = None
     # edition: Optional[str] = None
