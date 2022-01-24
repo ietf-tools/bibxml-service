@@ -433,8 +433,5 @@ API_USER = 'ietf'
 API_SECRET = environ.get('API_SECRET')
 """Secret used to authenticate API requests and access to management GUI."""
 
-PATH_TO_DATA_DIR = environ.get('PATH_TO_DATA_DIR')
-"""Deprecated."""
-
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
 """Where to keep fetched source data and data generated during indexing."""
