@@ -228,7 +228,10 @@ def search_refs_relaton_field(
     #     field_queries)
 
     qs = RefData.objects.filter(id__in=final_query)
+
     if annotate_headline is not None:
+        # This annotation does not seem to cause perceptible impact
+        # on performance.
         query = SearchQuery(query, config='english', search_type='websearch')
         qs = qs.annotate(headline=SearchHeadline(
             Cast(annotate_headline, TextField()),
@@ -240,6 +243,7 @@ def search_refs_relaton_field(
             max_fragments=2,
             config='english',
         ))
+
     return qs.only('ref', 'dataset', 'body')[:limit]
 
 
