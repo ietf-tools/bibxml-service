@@ -47,7 +47,7 @@ if environ.get("SENTRY_DSN", None):
     import sentry_sdk
     import logging
     from sentry_sdk.integrations.django import DjangoIntegration
-    from sentry_sdk.integrations.django import LoggingIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
     sentry_warning_logging = LoggingIntegration(
          level=logging.INFO,
          event_level=logging.WARNING
