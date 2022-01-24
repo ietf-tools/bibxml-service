@@ -57,6 +57,7 @@ class RefData(models.Model):
         db_table = 'api_ref_data'
         unique_together = [['ref', 'dataset']]
         indexes = [
+            # TODO: Identify & remove unused indices
             GinIndex(
                 fields=['body'],
                 name='body_gin',
