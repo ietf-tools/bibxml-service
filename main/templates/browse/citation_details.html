@@ -124,7 +124,7 @@
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
 
         {% for relation in data.relation|as_list %}
-          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content tmpl="citation/docid_link.html" break_row=forloop.first %}
+          {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation.bibitem.formattedref.content|default:relation.bibitem.docid.0.id tmpl="citation/docid_link.html" break_row=forloop.first %}
         {% endfor %}
 
         {% if data.language %}
