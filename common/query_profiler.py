@@ -28,7 +28,6 @@ def middleware(get_response):
 
     def middleware(request):
         if not settings.DEBUG:
-            print("Profiling")
             profiler = QueryProfiler()
             request._queries = profiler.queries
 
