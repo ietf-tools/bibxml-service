@@ -2,7 +2,7 @@
 Some of Relaton models implemented as Pydantic models.
 """
 
-from typing import List, Union, Optional, Any
+from typing import List, Tuple, Union, Optional, Any
 import datetime
 
 from pydantic import BaseModel, Extra, validator
@@ -13,18 +13,30 @@ from .dataclasses import DocID, Title
 from .dataclasses import Contributor, Copyright, GenericStringValue
 
 
-EXTRA_DATE_FORMATS = ['%Y-%m', '%Y']
+EXTRA_DATE_FORMATS: List[Tuple[str, str]] = [
+    ('%Y-%m', '%B %Y'),
+    ('%Y', '%Y'),
+]
+"""A list of approximate formats as 2-tuples,
+first string of each is ``strptime`` to parse,
+second is ``strftime`` to format.
+
+Formats should be in order of decreasing specificity.
+
+Used by :func:`relaxed_date_parser()``.
+"""
 
 
 def relaxed_date_parser(v):
-    """Introduced in order to support very approximate dates.
+    """To be used as validator on bibliographic item’s pydantic models
+    wherever very approximate dates (no day) are possible.
+
     Tries pydantic’s own validation, which is considered failed
     if returned date is the epoch.
 
-    Tries ``strptime()`` on relaxed formats,
-    and returns back a string from ``strftime()``
-    if it succeeded (which is almost a no-op,
-    but at least we can know the failures)."""
+    Then tries ``strptime()`` on each of the :data:`EXTRA_DATE_FORMATS`,
+    and returns back a string from ``strftime()``.
+    """
 
     try:
         parsed = parse_date(v)
@@ -34,12 +46,16 @@ def relaxed_date_parser(v):
         failed = parsed == datetime.date(1970, 1, 1)
 
     if failed:
-        for f in EXTRA_DATE_FORMATS:
+        for in_f, out_f in EXTRA_DATE_FORMATS:
             try:
-                return datetime.datetime.strptime(v, f).date().strftime(f)
+                return (
+                    datetime.datetime.
+                    strptime(v, in_f).
+                    date().strftime(out_f)
+                )
             except ValueError:
                 continue
-        raise ValueError("Failed to coerce given string to date")
+        raise ValueError("Failed to parse given string as a date")
     else:
         return parsed
 
