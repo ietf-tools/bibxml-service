@@ -3,7 +3,7 @@
 import datetime
 from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
-from typing import Mapping, List, Union, Optional, Dict, Any
+from typing import Mapping, List, Optional
 from bib_models.models import BibliographicItem
 
 
@@ -50,7 +50,7 @@ class ExternalSourceRequest(BaseModel):
 # =============
 
 class SourcedBibliographicItem(BaseModel):
-    bibitem: Union[BibliographicItem, Dict[str, Any]]
+    bibitem: BibliographicItem
 
     validation_errors: Optional[List[str]] = None
 
