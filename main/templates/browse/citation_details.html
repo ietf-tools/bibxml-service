@@ -60,7 +60,11 @@
     overflow-hidden
   ">
     <div class="px-4 leading-tight">{{ data.type|as_list|join:", " }}</div>
-    <h2 class="px-4 mt-2 font-serif font-thin dark:font-light tracking-tight dark:tracking-normal text-2xl smd:truncate z-20 relative">
+    <h2 class="
+      px-4 mt-2
+      font-serif font-thin dark:font-light tracking-tight dark:tracking-normal text-2xl
+      line-clamp-3
+    ">
       {% include "relaton/smart_title.html" with bibitem=data %}
     </h2>
   </header>
