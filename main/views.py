@@ -152,6 +152,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
         return dict(
             **super().get_context_data(**kwargs),
             **shared_context,
+            total_indexed=RefData.objects.count(),
         )
 
 

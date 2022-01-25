@@ -4,6 +4,7 @@
     p-4 bg-dark-500/50 text-dark-200/50 text-xs
   ">
     {{ profiling.query_times|length }} database quer{{ profiling.query_times|pluralize:'y,ies' }}
+    {% if total_indexed %}against {{ total_indexed }} items{% endif %}
     took
     {% for time in profiling.query_times %}
       {% if forloop.last and profiling.query_times|length > 1 %}and&nbsp;{% endif %}{{ time }}{% if profiling.query_times|length > 2 and not forloop.last %}, {% endif %}{% endfor %}&nbsp;sec.
