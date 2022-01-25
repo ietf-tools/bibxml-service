@@ -33,7 +33,7 @@
       md:grid-flow-col
       md:grid-cols-8
       lg:grid-cols-[repeat(15,minmax(0,1fr))]
-      xl:container xl:mx-auto xl:place-content-center
+      xl:container xl:mx-auto
 
       md:thegrid-default-rows
       {% block container_grid_classes %}
@@ -81,7 +81,7 @@
         md:grid-flow-row
 
         {% block content_grid_classes %}
-          md:min-h-screen
+          md:h-screen
 
           {# Single column #}
           md:grid-cols-[100%]
