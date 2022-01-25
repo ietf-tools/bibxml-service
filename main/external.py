@@ -6,7 +6,7 @@ from simplejson import JSONDecodeError
 from main.exceptions import RefNotFoundError
 from sources.doi import get_bibitem
 from bib_models.dataclasses import DocID
-from .types import ExternalBibliographicItem
+from .types import ExternalBibliographicItem, CompositeSourcedBibliographicItem
 
 
 def get_doi_ref(doi: str) -> ExternalBibliographicItem:
@@ -18,7 +18,7 @@ def get_doi_ref(doi: str) -> ExternalBibliographicItem:
 
     with requests_cache.enabled():
         try:
-            doi: Union[ExternalBibliographicItem, None] = \
+            sourced_item: Union[ExternalBibliographicItem, None] = \
                 get_bibitem(DocID(
                     type='DOI',
                     id=doi,
@@ -30,8 +30,13 @@ def get_doi_ref(doi: str) -> ExternalBibliographicItem:
         except RuntimeError:
             raise
         else:
-            if not doi:
+            if not sourced_item:
                 raise RefNotFoundError(
                     "External source returned nothing",
                     doi)
-            return doi
+            return CompositeSourcedBibliographicItem.construct(
+                **sourced_item.bibitem.dict(),
+                sources={
+                    sourced_item.source.id: sourced_item,
+                },
+            )

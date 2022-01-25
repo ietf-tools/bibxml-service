@@ -132,7 +132,8 @@ def get_bibitem(docid: DocID) \
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(
-            id='crossref-doi',
+            id='crossref-api',
+            home_url="http://api.crossref.org",
         ),
         bibitem=bibitem,
         validation_errors=errors,

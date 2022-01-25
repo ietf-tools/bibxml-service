@@ -175,8 +175,14 @@ def browse_external_reference(request, dataset_id):
 
         if dataset_id == 'doi':
             try:
-                data = unpack_dataclasses(get_doi_ref(ref.strip()).dict())
+                _data = get_doi_ref(ref.strip()).dict()
+                data = unpack_dataclasses(_data)
             except RuntimeError as exc:
+                log.exception(
+                    "Failed to retrieve or unpack "
+                    "external bibliographic item %s from %s",
+                    ref,
+                    dataset_id)
                 messages.error(
                     request,
                     "Couldn’t retrieve citation: {}".format(
