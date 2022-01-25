@@ -17,7 +17,7 @@ from django.conf import settings
 # from sources import list_internal as list_internal_sources
 # from sources import InternalSource
 
-from management.datasets import get_source_meta
+from management.datasets import get_source_meta, get_indexed_object_meta
 from common.util import as_list
 from bib_models.models import BibliographicItem
 from bib_models.dataclasses import DocID
@@ -373,6 +373,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
         ref = refs[0]
 
         source = get_source_meta(ref.dataset)
+        obj = get_indexed_object_meta(ref.dataset, ref.ref)
         sourced_id = f'{ref.ref}@{source.id}'
 
         base.update(ref.body)
@@ -386,7 +387,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
             bibitem = BibliographicItem.construct(**ref.body)
             validation_errors = [str(e)]
         sources[sourced_id] = IndexedBibliographicItem(
-            ref=ref.ref,
+            indexed_object=obj,
             source=source,
             bibitem=bibitem,
             validation_errors=validation_errors,
@@ -397,6 +398,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
 
         for ref in refs:
             source = get_source_meta(ref.dataset)
+            obj = get_indexed_object_meta(ref.dataset, ref.ref)
             sourced_id = f'{ref.ref}@{source.id}'
 
             for _docid in ref.body.get('docid', []):
@@ -440,7 +442,7 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
                 validation_errors = [str(e)]
 
             sources[sourced_id] = IndexedBibliographicItem(
-                ref=ref.ref,
+                indexed_object=obj,
                 source=source,
                 bibitem=bibitem,
                 validation_errors=validation_errors,
@@ -546,6 +548,7 @@ def build_search_results(
                 bibitem_merger.merge(base, ref.body)
 
                 source = get_source_meta(ref.dataset)
+                obj = get_indexed_object_meta(ref.dataset, ref.ref)
                 sourced_id = f'{ref.ref}@{source.id}'
                 try:
                     bibitem = BibliographicItem(**ref.body)
@@ -554,7 +557,7 @@ def build_search_results(
                     bibitem = BibliographicItem.construct(**ref.body)
                     validation_errors = [str(e)]
                 sources[sourced_id] = IndexedBibliographicItem(
-                    ref=ref.ref,
+                    indexed_object=obj,
                     source=source,
                     bibitem=bibitem,
                     validation_errors=validation_errors,

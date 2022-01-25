@@ -24,7 +24,7 @@ class SourceMeta:
 
 @dataclass
 class IndexedSourceMeta(SourceMeta):
-    indexed_at: Optional[datetime.date] = None
+    pass
 
 
 @dataclass
@@ -54,9 +54,20 @@ class SourcedBibliographicItem(BaseModel):
     """Extra details about this sourcing, human-readable."""
 
 
+@dataclass
+class IndexedObject:
+    name: str
+    """Sometimes called “ref”. Filename, etc."""
+
+    external_url: Optional[str]
+    """URL, if indexable source makes objects accessible directly."""
+
+    indexed_at: Optional[datetime.date] = None
+    """When this object was indexed."""
+
+
 class IndexedBibliographicItem(SourcedBibliographicItem):
-    ref: str
-    """Ref in source dataset."""
+    indexed_object: Optional[IndexedObject]
 
     source: IndexedSourceMeta
 

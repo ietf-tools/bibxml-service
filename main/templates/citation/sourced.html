@@ -1,23 +1,27 @@
-{% if val.source.home_url %}
-  <a class="" title="Link to source file" href="{{ val.source.home_url }}/tree/main/data/{{ val.ref }}.yaml">
-    {{ val.ref }}</a>
-{% else %}
-  {{ val.ref }}
-{% endif %}
-&nbsp;
-<span class="whitespace-nowrap">
-  in source
-  {% if val.source.home_url %}
-    <a
-      class="whitespace-nowrap" title="Link to source’s page"
-      href="{{ val.source.home_url }}"
-    >
-      {{ val.source.id }}</a>
-  {% else %}
-    {{ val.source.id }}
-  {% endif %}
-  {% if val.source.issues_url %}
-    <a class="" title="Link to source’s issue tracker" href="{{ val.source.issues_url }}">
-      (issues)</a>
-  {% endif %}
-</span>
+{% with indexed_at=val.indexed_object.indexed_at %}
+  <span title="{% if indexed_at %}Last indexed at {{ indexed_at }}{% endif %}">
+    sourced
+    {% if val.indexed_object %}
+      {% if val.indexed_object.external_url %}
+        from&nbsp;<a title="Link to source file" href="{{ val.indexed_object.external_url }}"
+          >{{ val.indexed_object.name }}</a>
+      {% else %}
+        <span title="">{{ val.indexed_object.name }}</span>
+      {% endif %}
+    {% endif %}
+    <span class="whitespace-nowrap">
+      {% if val.source.home_url %}
+        {% if val.indexed_object %}in{% else %}from{% endif %}&nbsp;<a
+          class="whitespace-nowrap" title="Link to source’s page"
+          href="{{ val.source.home_url }}"
+          >{{ val.source.id }}</a>
+      {% else %}
+        {{ val.source.id }}
+      {% endif %}
+      {% if val.source.issues_url %}
+        <a class="" title="Link to source’s issue tracker" href="{{ val.source.issues_url }}"
+          >(issues)</a>
+      {% endif %}
+    </span>
+  </span>
+{% endwith %}
