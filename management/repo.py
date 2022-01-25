@@ -1,6 +1,6 @@
 """Utilities for dealing with Git."""
 
-from os import access, path, R_OK, sep
+from os import access, path, R_OK
 from shutil import rmtree
 from git import Repo  # type: ignore[attr-defined]
 from celery.utils.log import get_task_logger
