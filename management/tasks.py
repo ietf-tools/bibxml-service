@@ -165,4 +165,5 @@ def _fetch_and_index(task, dataset_id, refs=None):
         print("Indexing {}: Task failed to complete".format(dataset_id))
         raise
 
+
 fetch_and_index = app.task(bind=True)(_fetch_and_index)
