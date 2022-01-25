@@ -67,12 +67,10 @@ def _fetch_and_index(task, dataset_id, refs=None):
             },
         )
 
-        ensure_latest(
+        _, bibxml_changed = ensure_latest(
             bibxml_repo_url,
             bibxml_repo_branch,
             bibxml_work_dir_path)
-
-        bibxml_data_dir = path.join(bibxml_work_dir_path, 'data')
 
         # TODO: #25 Use relaton-bib-py to generate Relaton data
 
@@ -101,14 +99,16 @@ def _fetch_and_index(task, dataset_id, refs=None):
             },
         )
 
-        ensure_latest(
+        _, relaton_changed = ensure_latest(
             relaton_repo_url,
             relaton_repo_branch,
             relaton_work_dir_path)
 
-        relaton_data_dir = path.join(relaton_work_dir_path, 'data')
+        if bibxml_changed or relaton_changed:
+            bibxml_data_dir = path.join(bibxml_work_dir_path, 'data')
+            relaton_data_dir = path.join(relaton_work_dir_path, 'data')
 
-        update_status = (lambda total, indexed: task.update_state(
+            update_status = (lambda total, indexed: task.update_state(
                 state='PROGRESS',
                 meta={
                     **task_desc,
@@ -123,23 +123,31 @@ def _fetch_and_index(task, dataset_id, refs=None):
                         'current': indexed,
                     },
                 },
-            )
-        )
+            ))
 
-        total, indexed = index_dataset(
-            dataset_id,
-            bibxml_data_dir,
-            relaton_data_dir,
-            refs,
-            update_status)
+            total, indexed = index_dataset(
+                dataset_id,
+                bibxml_data_dir,
+                relaton_data_dir,
+                refs,
+                update_status)
 
-        return {
-            **task_desc,
-            'progress': {
-                'total': total,
-                'current': indexed,
-            },
-        }
+            return {
+                **task_desc,
+                'progress': {
+                    'total': total,
+                    'current': indexed,
+                },
+            }
+
+        else:
+            return {
+                **task_desc,
+                'progress': {
+                    'total': 0,
+                    'current': 0,
+                },
+            }
 
     except SystemExit:
         logger.exception(

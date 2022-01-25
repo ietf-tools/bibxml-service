@@ -1,5 +1,6 @@
 """Utilities for dealing with Git."""
 
+from typing import Tuple
 from os import access, path, R_OK
 from shutil import rmtree
 from git import Repo  # type: ignore[attr-defined]
@@ -38,7 +39,8 @@ def reclone(repo_url, branch, work_dir):
     return repo
 
 
-def ensure_latest(repo_url, branch, work_dir):
+def ensure_latest(repo_url: str, branch: str, work_dir: str) \
+        -> Tuple[Repo, bool]:
     """
     If specified working directory contains a Git repo
     matching provided configuration (URL and branch), performs a pull.
@@ -46,7 +48,10 @@ def ensure_latest(repo_url, branch, work_dir):
     Otherwise, removes working directory if it exists
     and clones the repository afresh.
 
-    :returns: GitPython’s Repo instance
+    :returns: a tuple with GitPython’s Repo instance
+              and a flag indicating whether head commit changed
+              (always True if reclone was required).
+    :rtype: (Repo, bool)
     """
 
     if all([path.isdir(work_dir),
@@ -60,6 +65,7 @@ def ensure_latest(repo_url, branch, work_dir):
                 repo.remotes.origin.url == repo_url,
                 repo.active_branch.name == branch]):
             try:
+                sha_before_pull = repo.head.commit.hexsha
                 repo.remotes.origin.fetch(branch, depth=1, update_shallow=True)
                 repo.head.reset(
                     'origin/{}'.format(branch),
@@ -68,11 +74,9 @@ def ensure_latest(repo_url, branch, work_dir):
             except:  # noqa: E722
                 logger.exception("Failed to fetch or check out branch")
                 raise
-
+            else:
+                return repo, repo.head.commit.hexsha != sha_before_pull
         else:
-            repo = reclone(repo_url, branch, work_dir)
-
+            return reclone(repo_url, branch, work_dir), True
     else:
-        repo = reclone(repo_url, branch, work_dir)
-
-    return repo
+        return reclone(repo_url, branch, work_dir), True
