@@ -12,7 +12,8 @@ from django.conf import settings
 logger = get_task_logger(__name__)
 
 
-def reclone(repo_url, branch, work_dir):
+def reclone(repo_url: str, branch: str, work_dir: str) \
+        -> Repo:
     """
     Wipes proposed ``work_dir``,
     and clones given repository into that location.
