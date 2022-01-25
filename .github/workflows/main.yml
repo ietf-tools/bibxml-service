@@ -34,7 +34,7 @@ jobs:
 
       - name: Build images
         run: |
-          docker build --no-cache --build-arg SNAPSHOT_HASH="`git rev-parse HEAD`" --build-arg SNAPSHOT_TIME="`git log -1 --format=%cd`" --platform=linux/amd64 -t bibxml .
+          docker build --no-cache --build-arg SNAPSHOT="`git describe --abbrev=0`" --platform=linux/amd64 -t bibxml .
 
           docker tag bibxml:latest 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
 
