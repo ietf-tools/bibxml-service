@@ -12,6 +12,8 @@ from bib_models.models import BibliographicItem
 
 @dataclass
 class SourceMeta:
+    """Describes a bibliographic data source."""
+
     id: str
     """Source ID."""
 
@@ -24,11 +26,13 @@ class SourceMeta:
 
 @dataclass
 class IndexedSourceMeta(SourceMeta):
+    """A source that can be indexed in full."""
     pass
 
 
 @dataclass
 class ExternalSourceMeta(SourceMeta):
+    """An external source, such as Crossref or Datatracker."""
     pass
 
 
@@ -81,14 +85,17 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
 
 
 class CompositeSourcedBibliographicItem(BibliographicItem):
-    """An item obtained by merging sourced items with the same ID."""
+    """An item obtained by merging bibliographic items
+    which were possibly obtained from different sources
+    but have one or more identifiers in common."""
 
     # sourced: List[SourcedBibliographicItem]
     # """Source-specific metadata."""
 
     sources: Mapping[str, SourcedBibliographicItem]
-    """Source-specific metadata.
-    Keys contain source ID and ref (e.g., ref@source-id),
+    """Sourced items.
+
+    Keys should contain source ID and ref (e.g., ref@source-id),
     since there can be multiple refs per source
     and refs can be non-unique across different sources.
     """
