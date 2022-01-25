@@ -69,6 +69,7 @@ services:
         if [ "$DEBUG" = "1" ]; then
           python manage.py runserver 0.0.0.0:8000
         else
+          python manage.py clear_cache &&
           hypercorn -b '0.0.0.0:8000' -w ${CPU_COUNT:-1} bibxml.asgi:application
         fi
     ports:
