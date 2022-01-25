@@ -3,6 +3,9 @@ FROM python:3-slim
 
 ENV PYTHONUNBUFFERED=1
 
+ARG SNAPSHOT
+ENV SNAPSHOT=$SNAPSHOT
+
 RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 
 # Remove for non-slim image
