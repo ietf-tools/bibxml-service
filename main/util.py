@@ -7,7 +7,6 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic.list import BaseListView
 from django.db.models.query import QuerySet
-from django.db.utils import ProgrammingError, DataError
 from django.conf import settings
 from django.core.cache import cache
 from django.http import Http404
@@ -18,6 +17,7 @@ from .models import RefData
 from .indexed import build_search_results
 from .indexed import search_refs_relaton_struct
 from .indexed import search_refs_relaton_field
+from .indexed import query_suppressing_user_input_error
 
 
 QUERY_FORMAT_LABELS = {
@@ -59,32 +59,6 @@ is_websearch: Callable[[str], bool] = (
         for exp in websearch_re)
 )
 """Returns True if given query looks like a web search style query."""
-
-
-def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
-        -> bool:
-    """The service allows the user to make complex queries directly
-    using PostgreSQL’s various JSON path and/or regular expression
-    matching functions.
-
-    As it appears impossible to validate a query in advance,
-    we allow PostgreSQL to throw and check the thrown exception
-    for certain substrings that point to input syntax issues.
-    Those can then be suppressed and user would be able to edit the query.
-
-    We do not want to accidentally suppress actual error states,
-    which would bubble up under the same exception classes.
-
-    Note that user input must obviously still be properly escaped.
-    Escaping is delegated to Django’s ORM, see :mod:`main.indexed`.
-    """
-
-    err = repr(exc)
-    return any((
-        "invalid regular expression" in err,
-        "syntax error" in err and "jsonpath input" in err,
-        "unexpected end of quoted string" in err and "jsonpath input" in err,
-    ))
 
 
 class BaseCitationSearchView(BaseListView):
@@ -371,24 +345,18 @@ class BaseCitationSearchView(BaseListView):
 
         handler = getattr(self, 'handle_%s_query' % self.query_format)
 
-        result_count: Union[int, None] = None
-        try:
-            qs = handler(query)
-            result_count = len(qs)
-            # print("got qs", [i.pk for i in qs])
-        except (ProgrammingError, DataError) as e:
-            print(repr(e))
-            if not is_benign_user_input_error(e):
-                raise
-            successful = False
+        qs = query_suppressing_user_input_error(lambda: handler(query))
+
+        input_error = qs is None
+        found_something = qs is not None and len(qs) > 0
+
+        if input_error:
             if self.show_all_by_default:
                 qs = RefData.objects.all()[:self.limit_to]
             else:
                 qs = RefData.objects.none()
-        else:
-            successful = result_count > 0
 
-        if not successful and self.query_format_allow_fallback:
+        if not found_something and self.query_format_allow_fallback:
             next_format = self.get_next_query_format(self.query_format)
             if next_format:
                 self.dispatch_parse_query(
@@ -398,10 +366,10 @@ class BaseCitationSearchView(BaseListView):
                     suppress_errors=True)
                 return self.dispatch_handle_query(self.query)
 
-        elif not successful:
+        elif not found_something:
             msg = (
                 "Query may have used incorrect syntax."
-                if result_count is None
+                if input_error
                 else "No bibliographic items were found matching the query.")
             can_try_other_formats = (
                 self.supported_query_formats.index(self.query_format)
@@ -421,7 +389,9 @@ class BaseCitationSearchView(BaseListView):
                     )
                     msg = (
                         f"{msg} "
-                        f"You may <a class=\"underline\" href=\"{url}\">retry the same query</a> "
+                        f"You may <a class=\"underline\" href=\"{url}\">"
+                        "retry the same query"
+                        "</a> "
                         "trying all available search methods."
                     )
             messages.error(self.request, msg)

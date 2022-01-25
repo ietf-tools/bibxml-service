@@ -1,7 +1,7 @@
 import re
 import logging
 import json
-from typing import cast as typeCast, Set, FrozenSet, Optional
+from typing import cast as typeCast, Set, FrozenSet, Optional, Callable
 from typing import Dict, List, Union, Tuple, Any
 
 from pydantic import ValidationError
@@ -12,6 +12,7 @@ from django.db.models.functions import Cast
 from django.db.models import TextField
 from django.db.models.query import QuerySet, Q
 from django.db.models.expressions import RawSQL
+from django.db.utils import ProgrammingError, DataError
 from django.conf import settings
 
 # from sources import list_internal as list_internal_sources
@@ -31,7 +32,50 @@ from .models import RefData
 log = logging.getLogger(__name__)
 
 
-def list_refs(dataset_id) -> QuerySet[RefData]:
+def query_suppressing_user_input_error(query: Callable[[], QuerySet[RefData]]) \
+        -> Union[QuerySet[RefData], None]:
+    """Evaluates provided query and tries to suppress any error
+    that may result from bad user input.
+    """
+    try:
+        qs = query()
+        len(qs)  # Evaluate
+    except (ProgrammingError, DataError) as e:
+        if not is_benign_user_input_error(e):
+            raise
+        else:
+            return None
+    else:
+        return qs
+
+
+def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
+        -> bool:
+    """The service allows the user to make complex queries directly
+    using PostgreSQL’s various JSON path and/or regular expression
+    matching functions.
+
+    As it appears impossible to validate a query in advance,
+    we allow PostgreSQL to throw and check the thrown exception
+    for certain substrings that point to input syntax issues.
+    Those can then be suppressed and user would be able to edit the query.
+
+    We do not want to accidentally suppress actual error states,
+    which would bubble up under the same exception classes.
+
+    Note that user input must obviously still be properly escaped.
+    Escaping is delegated to Django’s ORM, see :mod:`main.indexed`.
+    """
+
+    err = repr(exc)
+    return any((
+        "invalid regular expression" in err,
+        "syntax error" in err and "jsonpath input" in err,
+        "unexpected end of quoted string" in err and "jsonpath input" in err,
+    ))
+
+
+def list_refs(dataset_id: str) -> QuerySet[RefData]:
     return RefData.objects.filter(dataset__iexact=dataset_id)
 
 
@@ -348,7 +392,13 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
     """
 
     # Retrieve pre-indexed refs
-    refs = search_refs_for_docids(DocID(id, id_type) if id_type else id)
+    refs = query_suppressing_user_input_error(
+        lambda: search_refs_for_docids(DocID(id, id_type) if id_type else id)
+    ) or []
+
+    if len(refs) < 1:
+        raise RefNotFoundError("Not found in indexed sources by docid", id)
+
     docids = [
         DocID(id=docid['id'], type=docid['type'])
         for ref in refs
@@ -361,7 +411,12 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
             and (docid['id'] != id or docid['type'] != id_type))
     ]
 
-    refs = [*refs, *search_refs_for_docids(*docids)]
+    # Retrieve bibliographic items with intersecting identifiers
+    additional_refs = query_suppressing_user_input_error(
+        lambda: search_refs_for_docids(*docids)
+    ) or []
+
+    refs = [*refs, *additional_refs]
 
     base: Dict[str, Any] = {}
     # Merged bibitems
@@ -447,8 +502,6 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
                 bibitem=bibitem,
                 validation_errors=validation_errors,
             )
-    else:
-        raise RefNotFoundError("Not found in indexed sources by docid", id)
 
     composite: Dict[str, Any] = {
         **base,
