@@ -77,6 +77,14 @@ def ensure_latest(repo_url: str, branch: str, work_dir: str) \
             else:
                 return repo, repo.head.commit.hexsha != sha_before_pull
         else:
+            logger.warning(
+                "Invalid repo config in working directory for %s (%s), "
+                "must re-clone repo",
+                repo_url, work_dir)
             return reclone(repo_url, branch, work_dir), True
     else:
+        logger.warning(
+            "Missing or inaccessible working directory for %s (%s), "
+            "must re-clone repo",
+            repo_url, work_dir)
         return reclone(repo_url, branch, work_dir), True
