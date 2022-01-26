@@ -536,7 +536,7 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 def build_search_results(
     refs: QuerySet[RefData],
     order_by: Optional[str] = None,
-) -> List[IndexedBibliographicItem]:
+) -> List[CompositeSourcedBibliographicItem]:
     """Given a :class:`QuerySet` of :class:`RefData` entries,
     build a list of :class:`SourcedBibliographicItem` objects
     by merging ``RefData`` with intersecting document identifiers.
