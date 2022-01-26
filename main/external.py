@@ -54,7 +54,7 @@ def get_doi_ref(doi: str, strict: bool = True) -> ExternalBibliographicItem:
                 try:
                     return CompositeSourcedBibliographicItem(**params)
                 except ValidationError:
-                    log.warning(
+                    log.exception(
                         "Failed to validate externally fetched "
                         "composite sourced bibliographic item "
                         "%s "
