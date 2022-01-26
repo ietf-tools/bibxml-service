@@ -190,6 +190,7 @@ def create_author(contributor: Contributor) -> Element:
             org = None
 
     if org is not None:
+        # Organization
         org_el = E.organization(as_list(org.name)[0])
 
         if org.abbreviation:
@@ -197,6 +198,7 @@ def create_author(contributor: Contributor) -> Element:
 
         author_el.append(org_el)
 
+        # Address & postal
         contacts: List[Contact] = as_list(org.contact or [])
         postal_contacts = [
             c for c in contacts
