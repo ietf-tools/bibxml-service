@@ -195,6 +195,8 @@ def create_author(contributor: Contributor) -> Element:
         if org.abbreviation:
             org_el.set('abbrev', org.abbreviation)
 
+        author_el.append(org_el)
+
         contacts: List[Contact] = as_list(org.contact or [])
         postal_contacts = [
             c for c in contacts
