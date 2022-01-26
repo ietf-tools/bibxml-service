@@ -3,8 +3,6 @@
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
-from django.db.models.query import Q
-from django.conf import settings
 
 from pydantic import ValidationError
 
@@ -14,21 +12,9 @@ from bib_models.to_xml import to_xml_string
 
 from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
-from .indexed import get_indexed_ref_by_query
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref as _get_doi_ref
 from .exceptions import RefNotFoundError
-
-
-DEFAULT_LEGACY_REF_PREFIX = 'reference.'
-
-DEFAULT_LEGACY_REF_FORMATTER = (
-    lambda legacy_ref:
-    legacy_ref[len(DEFAULT_LEGACY_REF_PREFIX):])
-
-DEFAULT_LEGACY_QUERY_BUILDER = (
-    lambda legacy_ref:
-    Q(ref__iexact=DEFAULT_LEGACY_REF_FORMATTER(legacy_ref)))
 
 
 def get_ref(request, dataset_name, ref):
@@ -51,19 +37,47 @@ def get_ref(request, dataset_name, ref):
             return JsonResponse({"data": result})
 
 
+# TODO: Make ``get_doi_ref`` logic part of ``get_by_docid``
 def get_doi_ref(request, ref):
     format = request.GET.get('format', 'relaton')
+
     if format != 'relaton':
         return JsonResponse({
             "error": "BibXML format is not supported yet by this endpoint",
         }, status=500)
+
     parsed_ref = unquote_plus(ref)
+
     try:
         result = _get_doi_ref(parsed_ref)
+
+        if format == 'bibxml':
+            anchor = request.GET.get('anchor', None)
+            try:
+                xml_string = to_xml_string(result.bibitem, anchor=anchor)
+            except ValueError as err:
+                return JsonResponse({
+                    "error":
+                        "Unable to generate XML for item {}: "
+                        "unsuitable source data (err: {})".
+                        format(ref, str(err)),
+                }, status=500)
+            else:
+                return HttpResponse(
+                    xml_string,
+                    content_type="application/xml",
+                    charset="utf-8")
+
     except RefNotFoundError:
         return JsonResponse({
             "error": "Unable to find DOI ref {}".format(parsed_ref),
         }, status=404)
+
+    except ValueError:
+        return JsonResponse({
+            "error": "Unable to find DOI ref {}".format(parsed_ref),
+        }, status=404)
+
     else:
         return JsonResponse({"data": unpack_dataclasses(result.dict())})
 
@@ -112,65 +126,6 @@ def get_by_docid(request):
                     charset="utf-8")
         else:
             return JsonResponse({"data": unpack_dataclasses(citation.dict())})
-
-
-def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
-    legacy_ds_id_or_config = settings.LEGACY_DATASETS.get(
-        legacy_dataset_name.lower(),
-        None)
-
-    if legacy_ds_id_or_config:
-
-        if hasattr(legacy_ds_id_or_config, 'get'):
-            dataset_id = legacy_ds_id_or_config['dataset_id']
-            path_prefix = legacy_ds_id_or_config.get(
-                'path_prefix',
-                DEFAULT_LEGACY_REF_PREFIX)
-            ref_formatter = (
-                legacy_ds_id_or_config.get('ref_formatter', None) or
-                (lambda legacy_ref: legacy_reference[len(path_prefix):]))
-            query_builder = (
-                legacy_ds_id_or_config.get('query_builder', None) or
-                (lambda legacy_ref:
-                    Q(ref__iexact=ref_formatter(legacy_ref))))
-        else:
-            dataset_id = legacy_ds_id_or_config
-            ref_formatter = DEFAULT_LEGACY_REF_FORMATTER
-            query_builder = DEFAULT_LEGACY_QUERY_BUILDER
-
-        parsed_legacy_ref = unquote_plus(legacy_reference)
-        parsed_ref = ref_formatter(parsed_legacy_ref)
-
-        try:
-            if dataset_id == 'doi':
-                bibxml_repr = _get_doi_ref(parsed_ref, 'bibxml')
-            else:
-                bibxml_repr = get_indexed_ref_by_query(
-                    dataset_id,
-                    query_builder(parsed_legacy_ref),
-                    'bibxml')
-
-        except RefNotFoundError:
-            return JsonResponse({
-                "error":
-                    "Unable to find BibXML ref {} "
-                    "in legacy dataset {} (dataset {})".
-                    format(parsed_ref, legacy_dataset_name, dataset_id),
-            }, status=404)
-
-        else:
-            return HttpResponse(
-                bibxml_repr,
-                content_type="application/xml",
-                charset="utf-8")
-
-    else:
-        return JsonResponse({
-            "error":
-                "Unable to find ref {}: "
-                "legacy dataset {} is unknown".
-                format(legacy_reference, legacy_dataset_name),
-        }, status=404)
 
 
 class CitationSearchResultListView(BaseCitationSearchView):
