@@ -43,7 +43,7 @@ def parse_relaxed_date(v: str) -> Union[None, Tuple[datetime.date, str, str]]:
     return None
 
 
-def validate_relaxed_date(v):
+def validate_relaxed_date(v, optional=False):
     """To be used as validator on bibliographic item’s pydantic models
     wherever very approximate dates (no day) are possible.
 
@@ -53,6 +53,9 @@ def validate_relaxed_date(v):
     Then tries ``strptime()`` on each of the :data:`EXTRA_DATE_FORMATS`,
     and returns back a string from ``strftime()``.
     """
+
+    if optional and v is None:
+        return None
 
     try:
         parsed = parse_date(v)
@@ -135,7 +138,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
     @validator('revdate', pre=True)
     def validate_revdate(cls, v, **kwargs):
-        return validate_relaxed_date(v)
+        return validate_relaxed_date(v, optional=True)
 
 
 class Relation(BaseModel, extra=Extra.allow):
