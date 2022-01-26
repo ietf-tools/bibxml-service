@@ -229,7 +229,7 @@ def create_author(contributor: Contributor) -> Element:
             initials: List[GenericStringValue] = \
                 as_list(name.initial or [])
             author_el.set('initials', ' '.join([
-                i.content.strip('.')
+                i.content.replace('.', ' ').strip()
                 for i in initials
             ]))
 
