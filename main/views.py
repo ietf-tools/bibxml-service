@@ -114,7 +114,8 @@ def browse_citation_by_docid(request):
     try:
         citation = build_citation_for_docid(
             docid.strip(),
-            doctype.strip() if doctype else None)
+            doctype.strip() if doctype else None,
+            strict=False)
 
     except RefNotFoundError as e:
         query = docid
