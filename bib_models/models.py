@@ -2,7 +2,8 @@
 Some of Relaton models implemented as Pydantic models.
 """
 
-from typing import List, Tuple, Union, Optional, Any
+from __future__ import annotations
+from typing import List, Tuple, Union, Optional
 import datetime
 
 from pydantic import BaseModel, Extra, validator
@@ -95,8 +96,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     date: Optional[Union[List[Date], Date]] = None
     link: Optional[Union[List[Link], Link]] = None
 
-    # TODO: Type BibliographicItem relations properly
-    relation: Optional[List[Any]] = None
+    relation: 'Optional[List[Relation]]' = None
 
     title: Optional[Union[List[Title], Title]] = None
     # edition: Optional[str] = None
@@ -119,3 +119,12 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     @validator('revdate', pre=True)
     def validate_revdate(cls, v, **kwargs):
         return relaxed_date_parser(v)
+
+
+class Relation(BaseModel, extra=Extra.allow):
+    type: str
+    bibitem: BibliographicItem
+    description: Optional[GenericStringValue]
+
+
+BibliographicItem.update_forward_refs()
