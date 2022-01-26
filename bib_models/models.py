@@ -97,8 +97,14 @@ class Date:
 class BibliographicItem(BaseModel, extra=Extra.allow):
     """Relaton’s BibliographicItem expressed as a Pydantic model."""
 
+    # This seems awkward.
+    # All properties are optional, but in reality we can have
+    # either formattedref, or docid & the rest.
+
     formattedref: Optional[GenericStringValue] = None
+
     docid: Optional[Union[List[DocID], DocID]] = None
+
     docnumber: Optional[str] = None
     language: Optional[Union[List[str], str]] = None
     type: Optional[str] = None
