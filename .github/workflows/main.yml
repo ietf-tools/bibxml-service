@@ -50,7 +50,10 @@ jobs:
           curl -X POST \
           https://api.github.com/repos/ietf-ribose/bibxml-infrastructure/actions/workflows/db-migration.yml/dispatches \
           -H "Accept: application/vnd.github.v3+json" \
-          -u ${GH_USERNAME}:${GH_PAT}
+          -u ${GH_USERNAME}:${GH_PAT} \
+          --data '{
+            "ref": "main"
+          }'
 
       - name: Setup kubeconfig
         run: |
