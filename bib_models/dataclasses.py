@@ -22,6 +22,7 @@ class GenericStringValue:
 class Contact:
     city: Optional[str] = None
     country: Optional[str] = None
+    state: Optional[str] = None
 
 
 @dataclass
