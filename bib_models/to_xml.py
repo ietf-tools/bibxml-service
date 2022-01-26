@@ -1,0 +1,260 @@
+"""Utilities for converting :class:`bib_models.models.BibliographicItem`
+to BibXML/xml2rfc per RFC 7991.
+
+Conversion is very lossy.
+
+Primary API are :func:`to_xml()` and :func:`to_xml_string()`.
+"""
+
+import datetime
+from typing import List, Optional, Union, Callable
+from xml.etree.ElementTree import Element
+
+from lxml import etree, objectify
+
+from common.util import as_list
+from .models import BibliographicItem, Relation, parse_relaxed_date
+from .dataclasses import Contributor, PersonAffiliation, Organization
+from .dataclasses import GenericStringValue, Contact, DocID
+
+
+E = objectify.E
+
+
+AUTHOR_ROLES = set(('author', 'editor'))
+
+
+__all__ = (
+    'to_xml',
+    'to_xml_string',
+)
+
+
+def to_xml(item: BibliographicItem) -> Element:
+    """Converts a BibliographicItem to XML,
+    trying to follow RFC 7991.
+
+    Returned root element is either a ``<reference>``
+    or a ``<referencegroup>``.
+
+    :raises ValueError: if there are different issues
+                        with given item’s structure
+                        that make it unrenderable per RFC 7991.
+    """
+
+    titles = as_list(item.title or [])
+    relations: List[Relation] = as_list(item.relation or [])
+
+    constituents = [rel for rel in relations if rel.type == 'includes']
+
+    is_referencegroup = len(titles) < 1 and len(constituents) > 0
+    is_reference = len(titles) > 0
+
+    if is_reference:
+        root = create_reference(item)
+
+    elif is_referencegroup:
+        root = create_referencegroup([
+            ref.bibitem
+            for ref in constituents])
+
+    else:
+        raise ValueError(
+            "Able to construct neither <reference> nor <referencegroup>: "
+            "impossible combination of titles and relations")
+
+    objectify.deannotate(root)
+    etree.cleanup_namespaces(root)
+
+    return root
+
+
+def to_xml_string(item: BibliographicItem) -> str:
+    """
+    Passes given item through ``to_xml()``
+    and renders it to a string with pretty print.
+    """
+    return etree.tostring(to_xml(item), pretty_print=True)
+
+
+# References and reference groups
+# ===============================
+
+def create_referencegroup(items: List[BibliographicItem]) -> Element:
+    return E.referencegroup(*(
+        create_reference(item)
+        for item in items
+    ))
+
+
+def create_reference(item: BibliographicItem) -> Element:
+    titles = as_list(item.title or [])
+    if len(titles) < 1:
+        raise ValueError("Unable to create a <reference>: no titles")
+
+    contributors: List[Contributor] = as_list(item.contributor or [])
+    author_contributors: List[Contributor] = [
+        contrib
+        for contrib in contributors
+        if is_author(contrib)
+    ]
+
+    front = E.front(
+        E.title(titles[0].content),
+        *(create_author(contrib) for contrib in author_contributors),
+    )
+
+    published_date: Optional[datetime.date] = None
+    specificity: Optional[str] = None
+    for date in as_list(item.date or []):
+        if date.type == 'published':
+            if isinstance(date.value, str):
+                relaxed = parse_relaxed_date(date.value)
+                if relaxed:
+                    published_date = relaxed[0]
+                    specificity = relaxed[2]
+            else:
+                published_date = date.value
+                specificity = 'day'
+            break
+    if published_date and specificity:
+        date_el = E.date(year=published_date.strftime('%Y'))
+        if specificity in ['month', 'day']:
+            date_el.set('month', published_date.strftime('%B'))
+        if specificity == 'day':
+            date_el.set('day', str(published_date.day))
+        front.append(date_el)
+
+    abstracts = as_list(item.abstract or [])
+    if len(abstracts) > 0:
+        front.append(E.abstract(*(
+            E.t(p.strip())
+            for p in abstracts[0].content.split('\n')
+            if p.strip() != ''
+        )))
+
+    ref = E.reference(front)
+
+    docids: List[DocID] = as_list(item.docid or [])
+    for docid in docids:
+        series = [func(docid) for func in SERIES_EXTRACTORS]
+        for series_info in series:
+            if series_info is not None:
+                ref.append(series_info)
+
+    return ref
+
+
+# Authors and contributors
+# ========================
+
+is_author = (
+    lambda contrib:
+    len(set(as_list(contrib.role)) & AUTHOR_ROLES) > 0
+)
+
+
+def create_author(contributor: Contributor) -> Element:
+    if not is_author(contributor):
+        raise ValueError(
+            "Unable to construct <author>: incompatible roles")
+
+    if not contributor.organization and not contributor.person:
+        raise ValueError(
+            "Unable to construct <author>: "
+            "neither an organization nor a person")
+
+    author_el = E.author()
+
+    roles = as_list(contributor.role)
+
+    if 'editor' in roles:
+        author_el.set('role', 'editor')
+
+    org: Optional[Organization] = None
+    if contributor.organization:
+        org = contributor.organization
+    elif contributor.person:
+        affiliations: List[PersonAffiliation] = \
+            as_list(contributor.person.affiliation or [])
+        if len(affiliations) > 0:
+            org = affiliations[0].organization
+        else:
+            org = None
+
+    if org is not None:
+        org_el = E.organization(as_list(org.name)[0])
+
+        if org.abbreviation:
+            org_el.set('abbrev', org.abbreviation)
+
+        contacts: List[Contact] = as_list(org.contact or [])
+        postal_contacts = [
+            c for c in contacts
+            if c.country
+        ]
+        if len(postal_contacts) > 0 or org.url:
+            addr = E.address()
+
+            if len(postal_contacts) > 0:
+                contact = postal_contacts[0]
+                postal = E.postal(
+                    E.country(contact.country)
+                )
+                if contact.city:
+                    postal.append(E.city(contact.city))
+                addr.append(postal)
+
+            if org.url:
+                addr.append(E.uri(org.url))
+
+            author_el.append(addr)
+
+    if contributor.person:
+        name = contributor.person.name
+        if name.completename:
+            author_el.set('fullname', name.completename.content)
+        if name.surname:
+            author_el.set('surname', name.surname.content)
+        if name.initial:
+            initials: List[GenericStringValue] = \
+                as_list(name.initial or [])
+            author_el.set('initials', ' '.join([
+                i.content.strip('.')
+                for i in initials
+            ]))
+
+    return author_el
+
+
+# Extracting seriesInfo from docid
+# ================================
+
+def extract_doi_series(docid: DocID) -> Union[Element, None]:
+    if docid.type.lower() == 'doi':
+        return E.seriesInfo(name='DOI', value=docid.id)
+    return None
+
+
+def extract_rfc_series(docid: DocID) -> Union[Element, None]:
+    if docid.type.lower() == 'ietf' and docid.id.lower().startswith('rfc '):
+        return E.seriesInfo(
+            name='RFC',
+            value=docid.id.lower().split('rfc ')[-1],
+        )
+    return None
+
+
+def extract_id_series(docid: DocID) -> Union[Element, None]:
+    if docid.type.lower() == 'internet-draft':
+        return E.seriesInfo(name='Internet-Draft', value=docid.id)
+    return None
+
+
+SERIES_EXTRACTORS: List[
+    Callable[[DocID], Union[Element, None]]
+] = [
+    extract_doi_series,
+    extract_rfc_series,
+    extract_id_series,
+]
