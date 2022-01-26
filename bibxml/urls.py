@@ -1,10 +1,11 @@
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.cache import never_cache, cache_page
+from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
 
 from main import api as public_api, views as public_views
+from main import api_compat as compat_api
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
 
@@ -97,7 +98,7 @@ urlpatterns = [
         path(
             '<legacy_dataset_name>/<legacy_reference>.xml',
             never_cache(require_safe(
-                public_api.get_ref_by_legacy_path
+                compat_api.get_ref_by_legacy_path
             )),
             name='compat_api_get_ref_by_legacy_path',
         ),
