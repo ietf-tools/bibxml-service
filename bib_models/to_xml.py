@@ -30,12 +30,14 @@ __all__ = (
 )
 
 
-def to_xml(item: BibliographicItem) -> Element:
+def to_xml(item: BibliographicItem, anchor=None) -> Element:
     """Converts a BibliographicItem to XML,
     trying to follow RFC 7991.
 
     Returned root element is either a ``<reference>``
     or a ``<referencegroup>``.
+
+    :param str anchor: resulting root element ``anchor`` property.
 
     :raises ValueError: if there are different issues
                         with given item’s structure
@@ -63,18 +65,23 @@ def to_xml(item: BibliographicItem) -> Element:
             "Able to construct neither <reference> nor <referencegroup>: "
             "impossible combination of titles and relations")
 
+    if anchor:
+        root.set('anchor', anchor)
+
     objectify.deannotate(root)
     etree.cleanup_namespaces(root)
 
     return root
 
 
-def to_xml_string(item: BibliographicItem) -> str:
+def to_xml_string(item: BibliographicItem, **kwargs) -> str:
     """
     Passes given item through ``to_xml()``
     and renders it to a string with pretty print.
+
+    All kwargs are passed to ``to_xml()``.
     """
-    return etree.tostring(to_xml(item), pretty_print=True)
+    return etree.tostring(to_xml(item, **kwargs), pretty_print=True)
 
 
 # References and reference groups
