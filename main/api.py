@@ -65,7 +65,7 @@ def get_doi_ref(request, ref):
             "error": "Unable to find DOI ref {}".format(parsed_ref),
         }, status=404)
     else:
-        return JsonResponse({"data": result})
+        return JsonResponse({"data": unpack_dataclasses(result.dict())})
 
 
 def get_by_docid(request):
