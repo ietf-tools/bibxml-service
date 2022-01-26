@@ -14,6 +14,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: us-east-1
+      EKS_CLUSTER_NAME: bibxml-test-cluster
+      KUBECONFIG: /home/runner/.kube/config
 
     steps:
       - name: Configure AWS credentials
@@ -40,26 +42,35 @@ jobs:
 
           docker push 916411375649.dkr.ecr.us-east-1.amazonaws.com/bibxml:latest
 
-      - name: Setup kubeconfig
+      - name: Trigger db migration
         env:
-          EKS_CLUSTER_NAME: bibxml-test-cluster
+          GH_USERNAME: ${{ secrets.GH_USERNAME }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          curl -X POST \
+          https://api.github.com/repos/ietf-ribose/bibxml-infrastructure/actions/workflows/db-migration.yml/dispatches \
+          -H "Accept: application/vnd.github.v3+json" \
+          -u ${GH_USERNAME}:${GH_PAT}
+
+      - name: Setup kubeconfig
         run: |
           aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v1
 
+      - name: Wait for db migration job to complete or timeout after 300s
+        run: |
+          kubectl wait --for=condition=complete --timeout=300s job/db-migration
+
       - name: Rollout updates
-        env:
-          KUBECONFIG: /home/runner/.kube/config
+        if: always()
         run: |
           kubectl rollout restart deployment web
           kubectl rollout restart deployment celery
           kubectl rollout restart deployment flower
 
       - name: Check rollout statuses
-        env:
-          KUBECONFIG: /home/runner/.kube/config
         run: |
           kubectl rollout status deployment web
           kubectl rollout status deployment celery
