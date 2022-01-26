@@ -14,13 +14,14 @@ from .dataclasses import DocID, Title
 from .dataclasses import Contributor, Copyright, GenericStringValue
 
 
-EXTRA_DATE_FORMATS: List[Tuple[str, str]] = [
-    ('%Y-%m', '%B %Y'),
-    ('%Y', '%Y'),
+EXTRA_DATE_FORMATS: List[Tuple[str, str, str]] = [
+    ('%Y-%m', '%B %Y', 'month'),
+    ('%Y', '%Y', 'year'),
 ]
-"""A list of approximate formats as 2-tuples,
+"""A list of approximate formats as 3-tuples,
 first string of each is ``strptime`` to parse,
-second is ``strftime`` to format.
+second is ``strftime`` to format,
+third is specificity ("month" or "year").
 
 Formats should be in order of decreasing specificity.
 
@@ -28,7 +29,21 @@ Used by :func:`relaxed_date_parser()``.
 """
 
 
-def relaxed_date_parser(v):
+def parse_relaxed_date(v: str) -> Union[None, Tuple[datetime.date, str, str]]:
+    """Parses a relaxed date and returns a 3-tuple
+    containing date, formatted string, and specificity ("month" or "year").
+    """
+    for in_f, out_f, specificity in EXTRA_DATE_FORMATS:
+        try:
+            date = datetime.datetime.strptime(v, in_f).date()
+            return date, date.strftime(out_f), specificity
+        except ValueError:
+            continue
+
+    return None
+
+
+def validate_relaxed_date(v):
     """To be used as validator on bibliographic item’s pydantic models
     wherever very approximate dates (no day) are possible.
 
@@ -47,16 +62,12 @@ def relaxed_date_parser(v):
         failed = parsed == datetime.date(1970, 1, 1)
 
     if failed:
-        for in_f, out_f in EXTRA_DATE_FORMATS:
-            try:
-                return (
-                    datetime.datetime.
-                    strptime(v, in_f).
-                    date().strftime(out_f)
-                )
-            except ValueError:
-                continue
-        raise ValueError("Failed to parse given string as a date")
+        parsed_relaxed = parse_relaxed_date(v)
+        if parsed_relaxed is not None:
+            return parsed_relaxed[1]
+        raise ValueError(
+            "Failed to parse given string "
+            "even as an unspecific date")
     else:
         return parsed
 
@@ -80,7 +91,7 @@ class Date:
 
     @validator('value', pre=True)
     def validate_revdate(cls, v, **kwargs):
-        return relaxed_date_parser(v)
+        return validate_relaxed_date(v)
 
 
 class BibliographicItem(BaseModel, extra=Extra.allow):
@@ -118,7 +129,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
     @validator('revdate', pre=True)
     def validate_revdate(cls, v, **kwargs):
-        return relaxed_date_parser(v)
+        return validate_relaxed_date(v)
 
 
 class Relation(BaseModel, extra=Extra.allow):
