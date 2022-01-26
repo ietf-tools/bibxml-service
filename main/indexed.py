@@ -376,8 +376,10 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
     return refs
 
 
-def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
-        CompositeSourcedBibliographicItem:
+def build_citation_for_docid(
+        id: str,
+        id_type: Optional[str] = None,
+        strict: bool = True) -> CompositeSourcedBibliographicItem:
     """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
     that matched given document identifier (``docid.id`` value).
 
@@ -385,6 +387,13 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
 
     If multiple refs were found, their citation data are merged.
     (At most 10 found refs are considered, which is already atypically many.)
+
+    :param bool strict: by default is True, and item that fails validation
+                        will result in pydantic’s ``ValidationError`` raised.
+                        If set to False, item will be constructed anyway,
+                        but may contain unexpected data structure.
+                        This is OK for some cases
+                        (e.g., forgiving template rendering).
 
     :returns BibliographicItem: a :class:`bib_models.BibliographicItem`
                                 instance.
@@ -507,13 +516,18 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
         **base,
         'sources': sources,
     }
-    try:
+    if strict is not False:
         return CompositeSourcedBibliographicItem(**composite)
-    except ValidationError:
-        log.exception(
-            "Failed to validate composite sourced bibliographic item %s %s",
-            id, id_type)
-        return CompositeSourcedBibliographicItem.construct(**composite)
+    else:
+        try:
+            return CompositeSourcedBibliographicItem(**composite)
+        except ValidationError:
+            log.warning(
+                "Failed to validate composite sourced bibliographic item "
+                "%s %s "
+                "(suppressed with strict=False)",
+                id, id_type)
+            return CompositeSourcedBibliographicItem.construct(**composite)
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
