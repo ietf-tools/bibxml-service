@@ -8,9 +8,13 @@ from pydantic.dataclasses import dataclass
 
 
 @dataclass
-class GenericStringValue:
+class FormattedContent:
     content: str
     format: Optional[str] = None
+
+
+@dataclass
+class GenericStringValue(FormattedContent):
     script: Optional[Union[str, List[str]]] = None
     language: Optional[Union[str, List[str]]] = None
 
