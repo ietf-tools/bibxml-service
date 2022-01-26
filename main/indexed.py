@@ -522,7 +522,7 @@ def build_citation_for_docid(
         try:
             return CompositeSourcedBibliographicItem(**composite)
         except ValidationError:
-            log.warning(
+            log.exception(
                 "Failed to validate composite sourced bibliographic item "
                 "%s %s "
                 "(suppressed with strict=False)",
