@@ -64,6 +64,15 @@ paths:
           default: relaton
           enum: [bibxml, relaton]
 
+      - name: anchor
+        in: query
+        description: |
+          Only has effect when ``format`` is ``bibxml``.
+          If provided, the returned XML root element will have its
+          ``anchor`` attribute set to this value.
+        schema:
+          type: string
+
       responses:
         200:
           description: successful operation

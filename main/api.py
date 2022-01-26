@@ -95,8 +95,9 @@ def get_by_docid(request):
         }, status=500)
     else:
         if format == 'bibxml':
+            anchor = request.GET.get('anchor', None)
             try:
-                xml_string = to_xml_string(citation)
+                xml_string = to_xml_string(citation, anchor=anchor)
             except ValueError as err:
                 return JsonResponse({
                     "error":
