@@ -6,6 +6,8 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.db.models.query import Q
 from django.conf import settings
 
+from pydantic import ValidationError
+
 from common.pydantic import unpack_dataclasses
 from bib_models.models import BibliographicItem
 from bib_models.to_xml import to_xml_string
@@ -84,12 +86,29 @@ def get_by_docid(request):
                 "document ID {} (type {})".
                 format(docid, doctype or "unspecified"),
         }, status=404)
+    except ValidationError as err:
+        return JsonResponse({
+            "error":
+                "Unable to generate XML for item {} ({}): "
+                "malformed source data (err: {})".
+                format(docid, doctype or "unspecified", str(err)),
+        }, status=500)
     else:
         if format == 'bibxml':
-            return HttpResponse(
-                to_xml_string(citation),
-                content_type="application/xml",
-                charset="utf-8")
+            try:
+                xml_string = to_xml_string(citation)
+            except ValueError as err:
+                return JsonResponse({
+                    "error":
+                        "Unable to generate XML for item {} ({}): "
+                        "unsuitable source data (err: {})".
+                        format(docid, doctype or "unspecified", str(err)),
+                }, status=500)
+            else:
+                return HttpResponse(
+                    xml_string,
+                    content_type="application/xml",
+                    charset="utf-8")
         else:
             return JsonResponse({"data": unpack_dataclasses(citation.dict())})
 
