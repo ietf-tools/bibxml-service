@@ -86,6 +86,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     """Relaton’s BibliographicItem expressed as a Pydantic model."""
 
     docid: Union[List[DocID], DocID]
+    formattedref: Optional[GenericStringValue] = None
     docnumber: Optional[str] = None
     language: Optional[Union[List[str], str]] = None
     type: Optional[str] = None
