@@ -8,6 +8,7 @@ from django.conf import settings
 
 from common.pydantic import unpack_dataclasses
 from bib_models.models import BibliographicItem
+from bib_models.to_xml import to_xml_string
 
 from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
@@ -72,10 +73,6 @@ def get_by_docid(request):
     if not docid:
         return HttpResponseBadRequest("Missing document ID")
 
-    if format != 'relaton':
-        return HttpResponseBadRequest(
-            "Only Relaton format is supported for now by this endpoint")
-
     try:
         citation = build_citation_for_docid(
             docid.strip(),
@@ -88,13 +85,13 @@ def get_by_docid(request):
                 format(docid, doctype or "unspecified"),
         }, status=404)
     else:
-        # if format == 'bibxml':
-        #     return HttpResponse(
-        #         result,
-        #         content_type="application/xml",
-        #         charset="utf-8")
-        # else:
-        return JsonResponse({"data": unpack_dataclasses(citation.dict())})
+        if format == 'bibxml':
+            return HttpResponse(
+                to_xml_string(citation),
+                content_type="application/xml",
+                charset="utf-8")
+        else:
+            return JsonResponse({"data": unpack_dataclasses(citation.dict())})
 
 
 def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):

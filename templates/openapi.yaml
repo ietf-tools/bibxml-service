@@ -58,7 +58,7 @@ paths:
           If `bibxml` is requested, returns an application/xml response;
           otherwise application/json response with Relaton structure under `data` key.
 
-          (Note: `bibxml` is not supported yet by this endpoint.)
+          (Note: `bibxml` output is not yet fully featured in this endpoint.)
         schema:
           type: string
           default: relaton
