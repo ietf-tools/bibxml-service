@@ -258,10 +258,20 @@ def extract_id_series(docid: DocID) -> Union[Element, None]:
     return None
 
 
+def extract_w3c_series(docid: DocID) -> Union[Element, None]:
+    if docid.type.lower() == 'w3c':
+        return E.seriesInfo(
+            name='W3C',
+            value=docid.id.lower().split('w3c ')[-1],
+        )
+    return None
+
+
 SERIES_EXTRACTORS: List[
     Callable[[DocID], Union[Element, None]]
 ] = [
     extract_doi_series,
     extract_rfc_series,
     extract_id_series,
+    extract_w3c_series,
 ]
