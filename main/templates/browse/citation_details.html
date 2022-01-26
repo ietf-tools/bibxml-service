@@ -209,21 +209,17 @@
               {% include "_side_block_classes.html" %}
             "
             download="{{ docid.type }}-{{ docid.id }}.json"
-            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton">
-          Relaton&nbsp;JSON
-        </a>
+            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
+          >Relaton&nbsp;JSON</a>
 
       <li>
-        <span
+        <a
             class="
               {% include "_side_block_classes.html" %}
-              opacity-50
             "
-            download="{{ dataset_id }}-{{ ref }}.xml"
-            href="{# url "api_get_ref" dataset_id ref #}?format=bibxml">
-          BibXML
-          <span class="whitespace-nowrap">(temporarily unavailable)</span>
-        </span>
+            download="{{ docid.type }}-{{ docid.id }}.xml"
+            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=bibxml"
+          >BibXML&nbsp;(under&nbsp;development)</a>
     </ul>
   {% endwith %}
 
