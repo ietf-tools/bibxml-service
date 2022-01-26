@@ -507,19 +507,13 @@ def build_citation_for_docid(id: str, id_type: Optional[str] = None) -> \
         **base,
         'sources': sources,
     }
-    return CompositeSourcedBibliographicItem.construct(**composite)
-
-    # if any([len(s.validation_errors or []) > 0
-    #         for s in sources.values()]):
-    #     return CompositeSourcedBibliographicItem.construct(**composite)
-    # else:
-    #     try:
-    #         return CompositeSourcedBibliographicItem(**base)
-    #     except ValidationError:
-    #         log.exception(
-    #             "Failed to validate composite sourced bibliographic item %s",
-    #             id)
-    #         return CompositeSourcedBibliographicItem.construct(**composite)
+    try:
+        return CompositeSourcedBibliographicItem(**composite)
+    except ValidationError:
+        log.exception(
+            "Failed to validate composite sourced bibliographic item %s %s",
+            id, id_type)
+        return CompositeSourcedBibliographicItem.construct(**composite)
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
