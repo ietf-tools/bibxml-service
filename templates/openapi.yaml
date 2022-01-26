@@ -80,7 +80,10 @@ paths:
             application/xml:
               schema:
                 type: string
-                description: BibXML-formatted citation
+                description: |
+                  RFC 7991-formatted bibliographic item
+                  with ``<reference>`` or ``<referencegroup>``
+                  root element.
             application/json:
               schema:
                 $ref: '#/components/schemas/CitationDetailsResponse'
