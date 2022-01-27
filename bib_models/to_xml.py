@@ -158,7 +158,6 @@ def create_reference(item: BibliographicItem) -> Element:
         for s in series_
         if s.number and s.title
     ])
-    print(series)
     for series_info in series:
         if series_info is not None:
             ref.append(E.seriesInfo(
