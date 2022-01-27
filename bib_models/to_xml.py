@@ -135,9 +135,8 @@ def create_reference(item: BibliographicItem) -> Element:
     abstracts = as_list(item.abstract or [])
     if len(abstracts) > 0:
         front.append(E.abstract(*(
-            E.t(p.strip())
-            for p in abstracts[0].content.split('\n')
-            if p.strip() != ''
+            E.t(p)
+            for p in get_paragraphs(abstracts[0].content)
         )))
 
     ref = E.reference(front)
@@ -291,3 +290,33 @@ DOCID_SERIES_EXTRACTORS: List[
     extract_id_series,
     extract_w3c_series,
 ]
+
+
+# Extracting text from maybe-HTML abstracts
+# =========================================
+
+def get_paragraphs(val: str) -> List[str]:
+    try:
+        return get_paragraphs_html(val)
+    except (etree.XMLSyntaxError, ValueError):
+        return get_paragraphs_plain(val)
+
+
+def get_paragraphs_html(val: str) -> List[str]:
+    tree = etree.fromstring(f'<main>{val}</main>')
+    ps = [
+        p for p in tree.findall('p')
+        if (getattr(p, 'text', '') or '') != ''
+    ]
+    if len(ps) > 0:
+        return ps
+    else:
+        raise ValueError("No HTML text detected")
+
+
+def get_paragraphs_plain(val: str) -> List[str]:
+    return [
+        p.strip()
+        for p in val.split('\n')
+        if p.strip() != ''
+    ]
