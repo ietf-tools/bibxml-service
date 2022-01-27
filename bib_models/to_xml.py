@@ -304,7 +304,7 @@ def get_paragraphs(val: str) -> List[str]:
 def get_paragraphs_html(val: str) -> List[str]:
     tree = etree.fromstring(f'<main>{val}</main>')
     ps = [
-        p for p in tree.findall('p')
+        p.text for p in tree.findall('p')
         if (getattr(p, 'text', '') or '') != ''
     ]
     if len(ps) > 0:
