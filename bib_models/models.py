@@ -16,6 +16,7 @@ from .dataclasses import Contributor, Copyright, GenericStringValue
 
 EXTRA_DATE_FORMATS: List[Tuple[str, str, str]] = [
     ('%Y-%m', '%B %Y', 'month'),
+    ('%B %Y', '%B %Y', 'month'),
     ('%Y', '%Y', 'year'),
 ]
 """A list of approximate formats as 3-tuples,
