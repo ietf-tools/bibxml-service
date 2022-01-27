@@ -13,7 +13,7 @@ from xml.etree.ElementTree import Element
 from lxml import etree, objectify
 
 from common.util import as_list
-from .models import BibliographicItem, Relation, parse_relaxed_date
+from .models import BibliographicItem, Relation, Series, parse_relaxed_date
 from .dataclasses import Contributor, PersonAffiliation, Organization
 from .dataclasses import GenericStringValue, Contact, DocID
 
@@ -153,6 +153,13 @@ def create_reference(item: BibliographicItem) -> Element:
             func(docid)
             for func in DOCID_SERIES_EXTRACTORS
         ])
+    series_: List[Series] = as_list(item.series or [])
+    series = series | set([
+        (as_list(s.title)[0].content, s.number)
+        for s in series_
+        if s.number and s.title
+    ])
+    print(series)
     for series_info in series:
         if series_info is not None:
             ref.append(E.seriesInfo(
