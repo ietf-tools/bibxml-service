@@ -7,7 +7,7 @@ Primary API are :func:`to_xml()` and :func:`to_xml_string()`.
 """
 
 import datetime
-from typing import List, Optional, Union, Callable
+from typing import List, Optional, Union, Callable, Tuple, Set
 from xml.etree.ElementTree import Element
 
 from lxml import etree, objectify
@@ -147,11 +147,15 @@ def create_reference(item: BibliographicItem) -> Element:
         ref.set('target', links[0].content)
 
     docids: List[DocID] = as_list(item.docid or [])
+    series: Set[Union[None, Tuple[str, str]]] = set()
     for docid in docids:
-        series = [func(docid) for func in SERIES_EXTRACTORS]
-        for series_info in series:
-            if series_info is not None:
-                ref.append(series_info)
+        series = series | set([func(docid) for func in SERIES_EXTRACTORS])
+    for series_info in series:
+        if series_info is not None:
+            ref.append(E.seriesInfo(
+                name=series_info[0],
+                value=series_info[1],
+            ))
 
     return ref
 
@@ -245,38 +249,32 @@ def create_author(contributor: Contributor) -> Element:
 # Extracting seriesInfo from docid
 # ================================
 
-def extract_doi_series(docid: DocID) -> Union[Element, None]:
+def extract_doi_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'doi':
-        return E.seriesInfo(name='DOI', value=docid.id)
+        return 'DOI', docid.id
     return None
 
 
-def extract_rfc_series(docid: DocID) -> Union[Element, None]:
+def extract_rfc_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'ietf' and docid.id.lower().startswith('rfc '):
-        return E.seriesInfo(
-            name='RFC',
-            value=docid.id.lower().split('rfc ')[-1],
-        )
+        return 'RFC', docid.id.replace('.', ' ').split(' ')[-1]
     return None
 
 
-def extract_id_series(docid: DocID) -> Union[Element, None]:
+def extract_id_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'internet-draft':
-        return E.seriesInfo(name='Internet-Draft', value=docid.id)
+        return 'Internet-Draft', docid.id
     return None
 
 
-def extract_w3c_series(docid: DocID) -> Union[Element, None]:
+def extract_w3c_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'w3c':
-        return E.seriesInfo(
-            name='W3C',
-            value=docid.id.lower().split('w3c ')[-1],
-        )
+        return 'W3C', docid.id.replace('.', ' ').split('W3C ')[-1]
     return None
 
 
 SERIES_EXTRACTORS: List[
-    Callable[[DocID], Union[Element, None]]
+    Callable[[DocID], Union[Tuple[str, str], None]]
 ] = [
     extract_doi_series,
     extract_rfc_series,
