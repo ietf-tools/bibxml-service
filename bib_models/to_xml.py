@@ -149,7 +149,10 @@ def create_reference(item: BibliographicItem) -> Element:
     docids: List[DocID] = as_list(item.docid or [])
     series: Set[Union[None, Tuple[str, str]]] = set()
     for docid in docids:
-        series = series | set([func(docid) for func in SERIES_EXTRACTORS])
+        series = series | set([
+            func(docid)
+            for func in DOCID_SERIES_EXTRACTORS
+        ])
     for series_info in series:
         if series_info is not None:
             ref.append(E.seriesInfo(
@@ -273,7 +276,7 @@ def extract_w3c_series(docid: DocID) -> Union[Tuple[str, str], None]:
     return None
 
 
-SERIES_EXTRACTORS: List[
+DOCID_SERIES_EXTRACTORS: List[
     Callable[[DocID], Union[Tuple[str, str], None]]
 ] = [
     extract_doi_series,
