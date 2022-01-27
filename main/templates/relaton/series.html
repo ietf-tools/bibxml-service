@@ -1,6 +1,6 @@
 <span class="whitespace-nowrap">
   {% if val.formattedref %}
-    {{ val.formattedref }}
+    {% include "citation/series_search_link.html" with val=val.formattedref %}
   {% else %}
     {{ val.number }} in {% include "citation/series_search_link.html" with val=val.title.content %}
   {% endif %}
