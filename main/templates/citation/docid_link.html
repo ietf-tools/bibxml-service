@@ -1,4 +1,0 @@
-{% with query='{"docid": [{"id": "'|add:val|add:'"}]}' %}
-  <a class="link" href="{% url "search_citations" %}?query_format=json_struct&query={{ query|urlencode:"" }}">
-    {{ val }}</a>
-{% endwith %}
