@@ -98,6 +98,20 @@ class Date:
         return validate_relaxed_date(v)
 
 
+class Series(BaseModel):
+    formattedref: Optional[Union[GenericStringValue, str]] = None
+    title: Optional[Union[
+        GenericStringValue,
+        List[GenericStringValue]]] = None
+    abbrev: Optional[str] = None
+    place: Optional[str] = None
+    number: Optional[str] = None
+    organization: Optional[str] = None
+    run: Optional[str] = None
+    partnumber: Optional[str] = None
+    type: Optional[str] = 'main'
+
+
 class BibliographicItem(BaseModel, extra=Extra.allow):
     """Relaton’s BibliographicItem expressed as a Pydantic model."""
 
@@ -132,6 +146,8 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     contributor: Optional[List[Contributor]] = None
 
     place: Optional[Union[List[str], str]] = None
+
+    series: Optional[List[Series]] = None
 
     keyword: Optional[Union[List[str], str]] = None
 
