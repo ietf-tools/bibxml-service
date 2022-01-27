@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Dict, Callable
 from pathlib import Path
+import re
 from os import environ, path
 
 
@@ -252,6 +253,55 @@ DEFAULT_SEARCH_RESULT_LIMIT = 400
 
 If the user hits this limit, they are expected to provide
 a more precise query."""
+
+XML2RFC_DIR_TO_DOCID_TYPE: Dict[str, Callable[
+    [str, Dict[str, str]],
+    Dict[str, str]
+]] = {
+    'bibxml': lambda ref, criteria: {
+        'docid[*]': '@.type == "IETF"',
+        **criteria,
+    },
+    'bibxml-id': lambda ref, criteria: {
+        'docid[*]': '@.type == "Internet-Draft" && @.id like_regex "(?i)%s"'
+        % re.escape(ref.replace('I-D.', '').strip()),
+    },
+    'bibxml-w3c': lambda ref, criteria: {
+        'docid[*]': '@.type == "W3C"',
+        **criteria,
+    },
+    'bibxml-3gpp': lambda ref, criteria: {
+        'docid[*]': '@.type == "3GPP"',
+        **criteria,
+    },
+    'bibxml-ieee': lambda ref, criteria: {
+        'docid[*]': '@.type == "IEEE"',
+        **criteria,
+    },
+    'bibxml-doi': lambda ref, criteria: {
+        'docid[*]': '@.type == "DOI"',
+        **criteria,
+    },
+    'bibxml-nist': lambda ref, criteria: {
+        'docid[*]': '@.type == "NIST"',
+        **criteria,
+    },
+}
+XML2RFC_DIR_ALIASES = {
+    'bibxml2': 'bibxml-misc',
+    'bibxml3': 'bibxml-id',
+    'bibxml4': 'bibxml-w3c',
+    'bibxml5': 'bibxml-3gppp',
+    'bibxml6': 'bibxml-ieee',
+    'bibxml7': 'bibxml-doi',
+    'bibxml8': 'bibxml-iana',
+    'bibxml9': 'bibxml-rfcsubseries',
+}
+"""
+Maps an xml2rfc directory name to a lambda returning extra queries
+to be passed to :func:`main.indexed.search_refs_relaton_field()`
+used by :mod:`api_compat` logic.
+"""
 
 LEGACY_DATASETS = {
     'bibxml': 'rfcs',

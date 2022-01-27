@@ -1,3 +1,4 @@
+from typing import Dict, Callable
 import re
 from urllib.parse import unquote_plus
 
@@ -65,21 +66,33 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
 # ==================
 
 def get_xml2rfc_ref_v2(legacy_dataset_name: str, legacy_reference: str) -> str:
-    rough_docid = (
-        legacy_reference.lower().
+    ref_without_prefix = (
+        legacy_reference.
         replace('reference.', '').
-        replace('.', ' '))
+        replace('_reference.', ''))
+
+    rough_docid = ref_without_prefix.replace('.', ' ').replace('_', ' ')
+    basic_criteria = {
+        'docid[*]': '@.id like_regex "(?i)%s"' % re.escape(rough_docid),
+    }
+    ds_name = (
+        getattr(settings, 'XML2RFC_DIR_ALIASES', {}).
+        get(legacy_dataset_name, legacy_dataset_name)
+    )
+    extra_criteria: Callable[[str], Dict[str, str]] = (
+        getattr(settings, 'XML2RFC_DIR_TO_DOCID_TYPE', {}).
+        get(ds_name, lambda ref_without_prefix, criteria: criteria)
+    )
+
     refs = search_refs_relaton_field(
-        {
-            'docid': '@.id like_regex "(?i)%s"' % re.escape(rough_docid),
-        },
+        extra_criteria(ref_without_prefix, basic_criteria),
         limit=10,
         exact=True,
     )
     if len(refs) > 0:
         docid = as_list(refs[0].body['docid'])[0]
         bibitem = build_citation_for_docid(docid['id'], docid['type'])
-        return to_xml_string(bibitem, anchor=legacy_reference)
+        return to_xml_string(bibitem, anchor=ref_without_prefix)
     else:
         raise RefNotFoundError(
             "Unable to locate bibliographic item",
