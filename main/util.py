@@ -431,7 +431,7 @@ class BaseCitationSearchView(BaseListView):
     def handle_docid_regex_query(self, query: str) -> QuerySet[RefData]:
         return search_refs_relaton_field(
             {
-                'docid': '@.id like_regex "(?i)%s"' % re.escape(query),
+                'docid[*]': '@.id like_regex "(?i)%s"' % re.escape(query),
             },
             limit=self.limit_to,
             exact=True,
