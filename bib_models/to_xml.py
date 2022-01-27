@@ -142,6 +142,10 @@ def create_reference(item: BibliographicItem) -> Element:
 
     ref = E.reference(front)
 
+    links = as_list(item.link or [])
+    if len(links) > 0:
+        ref.set('target', links[0].content)
+
     docids: List[DocID] = as_list(item.docid or [])
     for docid in docids:
         series = [func(docid) for func in SERIES_EXTRACTORS]
