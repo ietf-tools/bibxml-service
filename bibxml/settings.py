@@ -287,6 +287,11 @@ XML2RFC_DIR_TO_DOCID_TYPE: Dict[str, Callable[
         **criteria,
     },
 }
+"""
+Maps an xml2rfc directory name to a lambda returning extra queries
+to be passed to :func:`main.indexed.search_refs_relaton_field()`
+used by :mod:`api_compat` logic.
+"""
 XML2RFC_DIR_ALIASES = {
     'bibxml2': 'bibxml-misc',
     'bibxml3': 'bibxml-id',
@@ -297,10 +302,8 @@ XML2RFC_DIR_ALIASES = {
     'bibxml8': 'bibxml-iana',
     'bibxml9': 'bibxml-rfcsubseries',
 }
-"""
-Maps an xml2rfc directory name to a lambda returning extra queries
-to be passed to :func:`main.indexed.search_refs_relaton_field()`
-used by :mod:`api_compat` logic.
+"""Maps alternative xml2rfc directory names to their descriptive
+canonical names.
 """
 
 LEGACY_DATASETS = {
