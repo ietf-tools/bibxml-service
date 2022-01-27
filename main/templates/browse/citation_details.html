@@ -139,6 +139,10 @@
           {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content break_row=forloop.first wide=1 %}
         {% endfor %}
 
+        {% if data.series %}
+          {% include "deflist/entry_list.html" with key="series" items=data.series|as_list tmpl="relaton/series.html" %}
+        {% endif %}
+
         {% if data.copyright %}
           {% include "deflist/entry_list.html" with key="copyright(s)" items=data.copyright|as_list tmpl="relaton/copyright.html" %}
         {% endif %}
