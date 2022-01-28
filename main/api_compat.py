@@ -1,8 +1,13 @@
-from typing import Dict, Callable
+import logging
+from typing import Dict, Callable, List, Iterable
 import re
 from urllib.parse import unquote_plus
 
-from django.http import HttpResponse, JsonResponse
+from django.urls import re_path
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_safe
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
+from django.http import HttpResponseServerError
 from django.conf import settings
 from django.db.models.query import Q
 
@@ -10,12 +15,73 @@ from pydantic import ValidationError
 
 from common.util import as_list
 from bib_models.to_xml import to_xml_string
+from .models import RefData
 from .indexed import search_refs_relaton_field
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref as _get_doi_ref
 from .exceptions import RefNotFoundError
 from .indexed import get_indexed_ref_by_query
 
+
+log = logging.getLogger(__name__)
+
+
+def make_xml2rfc_path_pattern(
+        dirnames: List[str],
+        fetcher_func: Callable[[str], Iterable[RefData]]):
+    return [
+        re_path(
+            r'(?P<xml2rfc_subpath>%s/'
+            r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
+            r')$'
+            % dirname,
+            never_cache(require_safe(
+                make_xml2rfc_path_handler(fetcher_func),
+            )),
+            name='xml2rfc_%s' % dirname)
+        for dirname in dirnames
+    ]
+
+
+def make_xml2rfc_path_handler(fetcher_func: Callable[
+    [str], Iterable[RefData]
+]):
+    """Creates a view function, given a fetcher function.
+
+    Fetcher function will receive a cleaned xml2rfc filename
+    (without the “reference.” or “_reference.” prefix,
+    without the .xml extension)
+    and and must return a :class:`main.models.RefData` queryset.
+
+    The automatically created view function handles filename
+    cleanup, constructing a :class:`BibliographicItem`
+    and converting it to XML string with proper anchor tag supplied.
+    """
+
+    def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
+        try:
+            item = fetcher_func(anchor)
+        except RefNotFoundError:
+            log.error("Item for xml2rfc path not found: %s", xml2rfc_subpath)
+            return HttpResponseNotFound(
+                "Item for xml2rfc path not found: %s" % xml2rfc_subpath)
+        except ValidationError:
+            log.exception(
+                "Item found for xml2rfc path did not validate: %s",
+                xml2rfc_subpath)
+            return HttpResponseServerError(
+                "Error constructing bibliographic item for given xml2rfc path")
+        else:
+            return HttpResponse(
+                to_xml_string(item, anchor=anchor),
+                content_type="application/xml",
+                charset="utf-8")
+
+    return handle_xml2rfc_path
+
+
+# Old method 2 (fuzzy)
+# ====================
 
 def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
     try:
@@ -61,9 +127,6 @@ def get_ref_by_legacy_path(request, legacy_dataset_name, legacy_reference):
             content_type="application/xml",
             charset="utf-8")
 
-
-# New method (fuzzy)
-# ==================
 
 def get_xml2rfc_ref_v2(legacy_dataset_name: str, legacy_reference: str) -> str:
     ref_without_prefix = (

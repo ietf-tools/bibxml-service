@@ -254,58 +254,6 @@ DEFAULT_SEARCH_RESULT_LIMIT = 400
 If the user hits this limit, they are expected to provide
 a more precise query."""
 
-XML2RFC_DIR_TO_DOCID_TYPE: Dict[str, Callable[
-    [str, Dict[str, str]],
-    Dict[str, str]
-]] = {
-    'bibxml': lambda ref, criteria: {
-        'docid[*]': '@.type == "IETF"',
-        **criteria,
-    },
-    'bibxml-id': lambda ref, criteria: {
-        'docid[*]': '@.type == "Internet-Draft" && @.id like_regex "(?i)%s"'
-        % re.escape(ref.replace('I-D.', '').strip()),
-    },
-    'bibxml-w3c': lambda ref, criteria: {
-        'docid[*]': '@.type == "W3C"',
-        **criteria,
-    },
-    'bibxml-3gpp': lambda ref, criteria: {
-        'docid[*]': '@.type == "3GPP"',
-        **criteria,
-    },
-    'bibxml-ieee': lambda ref, criteria: {
-        'docid[*]': '@.type == "IEEE"',
-        **criteria,
-    },
-    'bibxml-doi': lambda ref, criteria: {
-        'docid[*]': '@.type == "DOI"',
-        **criteria,
-    },
-    'bibxml-nist': lambda ref, criteria: {
-        'docid[*]': '@.type == "NIST"',
-        **criteria,
-    },
-}
-"""
-Maps an xml2rfc directory name to a lambda returning extra queries
-to be passed to :func:`main.indexed.search_refs_relaton_field()`
-used by :mod:`api_compat` logic.
-"""
-XML2RFC_DIR_ALIASES = {
-    'bibxml2': 'bibxml-misc',
-    'bibxml3': 'bibxml-id',
-    'bibxml4': 'bibxml-w3c',
-    'bibxml5': 'bibxml-3gppp',
-    'bibxml6': 'bibxml-ieee',
-    'bibxml7': 'bibxml-doi',
-    'bibxml8': 'bibxml-iana',
-    'bibxml9': 'bibxml-rfcsubseries',
-}
-"""Maps alternative xml2rfc directory names to their descriptive
-canonical names.
-"""
-
 LEGACY_DATASETS = {
     'bibxml': 'rfcs',
     'bibxml2': 'misc',
@@ -335,7 +283,10 @@ LEGACY_DATASETS = {
                 legacy_ref.replace('reference.', '').replace('.', '_'),
     },
 }
-"""Maps legacy dataset root as it appears under /public/rfc/
+"""
+.. note:: This setting has been obsoleted as of v2022.1.28
+
+Maps legacy dataset root as it appears under /public/rfc/
 to known dataset ID(s) or configurations.
 
 If legacy dataset name is mapped to a string,

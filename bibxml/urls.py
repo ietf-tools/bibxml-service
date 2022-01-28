@@ -5,9 +5,10 @@ from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
 
 from main import api as public_api, views as public_views
-from main import api_compat as compat_api
+from main.api_compat import make_xml2rfc_path_pattern
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
+from xml2rfc_compat import fetchers as xml2rfc_fetchers
 
 from . import views, error_views
 
@@ -95,13 +96,33 @@ urlpatterns = [
 
     # Compatibility API
     path('public/rfc/', include([
-        path(
-            '<legacy_dataset_name>/<legacy_reference>.xml',
-            never_cache(require_safe(
-                compat_api.get_ref_by_legacy_path
-            )),
-            name='compat_api_get_ref_by_legacy_path',
-        ),
+        *make_xml2rfc_path_pattern(
+            ['bibxml', 'bibxml-rfcs'],
+            xml2rfc_fetchers.rfcs),
+        *make_xml2rfc_path_pattern(
+            ['bibxml2', 'bibxml-misc'],
+            xml2rfc_fetchers.misc),
+        *make_xml2rfc_path_pattern(
+            ['bibxml3', 'bibxml-ids'],
+            xml2rfc_fetchers.internet_drafts),
+        *make_xml2rfc_path_pattern(
+            ['bibxml4', 'bibxml-w3c'],
+            xml2rfc_fetchers.w3c),
+        *make_xml2rfc_path_pattern(
+            ['bibxml5', 'bibxml-3gpp'],
+            xml2rfc_fetchers.threegpp),
+        *make_xml2rfc_path_pattern(
+            ['bibxml6', 'bibxml-ieee'],
+            xml2rfc_fetchers.ieee),
+        *make_xml2rfc_path_pattern(
+            ['bibxml7', 'bibxml-doi'],
+            xml2rfc_fetchers.doi),
+        *make_xml2rfc_path_pattern(
+            ['bibxml8', 'bibxml-iana'],
+            xml2rfc_fetchers.iana),
+        *make_xml2rfc_path_pattern(
+            ['bibxml9', 'bibxml-rfcsubseries'],
+            xml2rfc_fetchers.rfcsubseries),
     ])),
 
     # Main GUI
