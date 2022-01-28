@@ -257,6 +257,8 @@ def create_author(contributor: Contributor) -> Element:
 # Extracting seriesInfo from docid
 # ================================
 
+# According to idiomatic conventions observed in xml2rfc data.
+
 def extract_doi_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'doi':
         return 'DOI', docid.id
