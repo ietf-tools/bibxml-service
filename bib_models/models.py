@@ -94,7 +94,7 @@ class Date:
     value: Optional[Union[str, datetime.date]]
 
     @validator('value', pre=True)
-    def validate_revdate(cls, v, **kwargs):
+    def validate_value(cls, v, **kwargs):
         return validate_relaxed_date(v)
 
 
