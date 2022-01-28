@@ -139,7 +139,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
         None
 
     fetched: Optional[datetime.date] = None
-    revdate: Optional[Union[str, datetime.date]] = None
+    revdate: Optional[Union[str, datetime.date, List[Union[str, datetime.date]]]] = None
 
     biblionote: Optional[Union[List[BiblioNote], BiblioNote]] = None
 
@@ -155,6 +155,12 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
     @validator('revdate', pre=True)
     def validate_revdate(cls, v, **kwargs):
+        if isinstance(v, list):
+            return [
+                validate_relaxed_date(i)
+                for i in v
+                if i
+            ]
         return validate_relaxed_date(v, optional=True)
 
 
