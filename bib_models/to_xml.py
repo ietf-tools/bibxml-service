@@ -289,6 +289,13 @@ def extract_3gpp_tr_series(docid: DocID) -> Union[Tuple[str, str], None]:
     return None
 
 
+def extract_ieee_series(docid: DocID) -> Union[Tuple[str, str], None]:
+    if docid.type.lower() == 'ieee':
+        id, year = docid.id.replace('IEEE ', ' ').lower().strip().split('.')
+        return 'IEEE', '%s-%s' % (id.replace('-', '.'), year)
+    return None
+
+
 DOCID_SERIES_EXTRACTORS: List[
     Callable[[DocID], Union[Tuple[str, str], None]]
 ] = [
@@ -297,6 +304,7 @@ DOCID_SERIES_EXTRACTORS: List[
     extract_id_series,
     extract_w3c_series,
     extract_3gpp_tr_series,
+    extract_ieee_series,
 ]
 
 
