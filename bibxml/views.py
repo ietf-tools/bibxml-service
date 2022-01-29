@@ -1,17 +1,31 @@
+import textwrap
+
+import yaml
+
 from django.http import HttpResponseBadRequest
 from django.urls import reverse, NoReverseMatch
 from django.conf import settings
 from django.shortcuts import render
 
+from bib_models.models import BibliographicItem
 from main.indexed import list_doctypes
 
 
 def openapi_spec(request):
     """Serves machine-readable spec for main API."""
+
+    schemas = BibliographicItem.schema(
+        ref_template='#/components/schemas/{model}',
+    )['definitions']
+    bibitem_objects = textwrap.indent(
+        yaml.dump(schemas),
+        '    ')
+
     return render(request, 'openapi.yaml', dict(
         known_doctypes=list_doctypes(),
         known_dataset_ids=list(
             getattr(settings, 'KNOWN_DATASETS', [])),
+        pre_indented_bibliographic_item_definitions=bibitem_objects,
     ), content_type='text/x-yaml')
 
 

@@ -408,7 +408,7 @@ components:
       properties:
         data:
           type: object
-          $ref: '#/components/schemas/BibliographicItemObject'
+          $ref: '#/components/schemas/BibliographicItem'
 
     ErrorResponse:
       type: object
@@ -443,91 +443,7 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/BibliographicItemObject'
-
-    # TODO: Auto-generate structure from Pydantic models
-    BibliographicItemObject:
-      type: object
-      description: Bibliographic item in Relaton format
-      properties:
-        id:
-          type: string
-        date:
-          type: object
-          properties:
-            type:
-              type: string
-            value:
-              type: string
-          #required:
-          #- type
-          #- value
-        link:
-          type: object
-          properties:
-            type:
-              type: string
-            content:
-              type: string
-          #required:
-          #- type
-          #- content
-        type:
-          type: string
-        docid:
-          type: array
-          items:
-            type: object
-        place:
-          type: string
-        title:
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-              format:
-                type: string
-              script:
-                type: string
-              content:
-                type: string
-              language:
-                type: string
-            #required:
-            #- type
-            #- format
-            #- script
-            #- content
-            #- language
-        script:
-          type: string
-        doctype:
-          type: string
-        revdate:
-          type: string
-        contributor:
-          type: object
-          properties:
-            role:
-              type: string
-            organization:
-              type: object
-              properties:
-                name:
-                  type: string
-                abbreviation:
-                  type: string
-              #required:
-              #- name
-              #- abbreviation
-          #required:
-          #- role
-          #- organization
-      required:
-      - docid
-      - doctype
+            $ref: '#/components/schemas/BibliographicItem'
 
     IndexableDatasets:
       type: string
@@ -636,6 +552,8 @@ components:
             message:
               type: string
               description: Human-readable error message
+
+{{ pre_indented_bibliographic_item_definitions|safe }}
 
   securitySchemes:
     APIKeyAuth:
