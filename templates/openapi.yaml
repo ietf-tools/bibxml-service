@@ -73,6 +73,9 @@ paths:
         schema:
           type: string
 
+      security:
+      - DatatrackerAPIKeyAuth: []
+
       responses:
         200:
           description: successful operation
@@ -147,6 +150,9 @@ paths:
         External dataset support for this endpoint may be removed.
       operationId: getCitationByReferenceId
 
+      security:
+      - DatatrackerAPIKeyAuth: []
+
       responses:
         200:
           description: successful operation
@@ -211,6 +217,9 @@ paths:
           type: integer
         description: Page number, for cases with many matches.
       operationId: searchCitations
+
+      security:
+      - DatatrackerAPIKeyAuth: []
 
       responses:
         200:
@@ -634,3 +643,7 @@ components:
       type: apiKey
       in: header
       name: X-IETF-Token
+    DatatrackerAPIKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Datatracker-Token

@@ -9,6 +9,7 @@ from main.api_compat import make_xml2rfc_path_pattern
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
 from xml2rfc_compat import fetchers as xml2rfc_fetchers
+from datatracker import auth as dt_auth
 
 from . import views, error_views
 
@@ -52,21 +53,21 @@ urlpatterns = [
             )), name='json_schema'),
 
             # We let search results to be cached on a different level
-            path('search/<query>/', never_cache(require_safe(
+            path('search/<query>/', never_cache(require_safe(dt_auth.api(
                 public_api.CitationSearchResultListView.as_view()
-            )), name='api_search'),
+            ))), name='api_search'),
 
-            path('by-docid/', require_safe(
+            path('by-docid/', require_safe(dt_auth.api(
                 public_api.get_by_docid
-            ), name='api_get_by_docid'),
+            )), name='api_get_by_docid'),
 
             path('ref/', include([
-                path('doi/<ref>/', never_cache(require_safe(
+                path('doi/<ref>/', never_cache(require_safe(dt_auth.api(
                     public_api.get_doi_ref
-                )), name='api_get_doi_ref'),
-                path('<dataset_name>/<ref>/', never_cache(require_safe(
+                ))), name='api_get_doi_ref'),
+                path('<dataset_name>/<ref>/', never_cache(require_safe(dt_auth.api(
                     public_api.get_ref
-                )), name='api_get_ref'),
+                ))), name='api_get_ref'),
             ])),
 
             # Management endpoints
