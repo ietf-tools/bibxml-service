@@ -128,15 +128,14 @@ paths:
         in: query
         schema:
           type: string
-          enum: [json_repr, json_struct]
-          default: json_repr
+          enum:
+          {% for format in supported_search_query_formats %}
+          - {{ format }}
+          {% endfor %}
+          default: {{ supported_search_query_formats|first }}
         description: |
-          How to match the query.
-          - If `json_repr`, query string is matched against raw JSON-serialized representation
-            of bibliographic item’s Relaton representation. Some typical Web search operators are supported
-            (AND, OR, +, -, quotes).
-          - if `json_struct`, query string must be a valid JSON-serialized structure.
-            Bibliographic items which Relaton representations contain that structure will match.
+          Determines how to treat the query.
+          See search help on the <a href="/">main page</a>.
       - name: page
         in: query
         schema:

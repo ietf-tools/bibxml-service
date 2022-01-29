@@ -9,6 +9,7 @@ from django.shortcuts import render
 
 from bib_models.models import BibliographicItem
 from main.indexed import list_doctypes
+from main.api import CitationSearchResultListView
 
 
 def openapi_spec(request):
@@ -21,11 +22,14 @@ def openapi_spec(request):
         yaml.dump(schemas),
         '    ')
 
+    search_formats = CitationSearchResultListView.supported_query_formats
+
     return render(request, 'openapi.yaml', dict(
         known_doctypes=list_doctypes(),
         known_dataset_ids=list(
             getattr(settings, 'KNOWN_DATASETS', [])),
         pre_indented_bibliographic_item_definitions=bibitem_objects,
+        supported_search_query_formats=search_formats,
     ), content_type='text/x-yaml')
 
 
