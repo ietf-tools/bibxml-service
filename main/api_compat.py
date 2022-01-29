@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Callable, List, Iterable
+import functools
+from typing import Dict, Callable, List
 import re
 from urllib.parse import unquote_plus
 
@@ -14,8 +15,8 @@ from django.db.models.query import Q
 from pydantic import ValidationError
 
 from common.util import as_list
+from bib_models.models import BibliographicItem
 from bib_models.to_xml import to_xml_string
-from .models import RefData
 from .indexed import search_refs_relaton_field
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref as _get_doi_ref
@@ -28,7 +29,20 @@ log = logging.getLogger(__name__)
 
 def make_xml2rfc_path_pattern(
         dirnames: List[str],
-        fetcher_func: Callable[[str], Iterable[RefData]]):
+        fetcher_func: Callable[[str], BibliographicItem]):
+    """Constructs Django URL resolver patterns
+    for a given list of dirnames.
+
+    Each path is in the shape of
+    ``<dirname>/[_]reference.<anchor>.xml``,
+    and constructed view delegates bibliographic item
+    retrieval to provided fetcher function.
+
+    Fetcher function is passed the ``anchor`` kwarg,
+    for which it must return a :class:`BibliographicData` instance,
+    and is expected to raise either ``RefNotFoundError``
+    or pydantic’s ``ValidationError``.
+    """
     return [
         re_path(
             r'(?P<xml2rfc_subpath>%s/'
@@ -44,20 +58,21 @@ def make_xml2rfc_path_pattern(
 
 
 def make_xml2rfc_path_handler(fetcher_func: Callable[
-    [str], Iterable[RefData]
+    [str], BibliographicItem
 ]):
     """Creates a view function, given a fetcher function.
 
     Fetcher function will receive a cleaned xml2rfc filename
-    (without the “reference.” or “_reference.” prefix,
-    without the .xml extension)
-    and and must return a :class:`main.models.RefData` queryset.
+    (just the anchor, without the “reference.” or “_reference.” prefix
+    or the .xml extension)
+    and must return a :class:`BibliographicItem` instance.
 
     The automatically created view function handles filename
     cleanup, constructing a :class:`BibliographicItem`
     and converting it to XML string with proper anchor tag supplied.
     """
 
+    @functools.wraps(fetcher_func)
     def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
         try:
             item = fetcher_func(anchor)
