@@ -9,7 +9,7 @@ info:
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
-  version: 0.0.1
+  version: {{ snapshot }}
 
 servers:
 - url: /
