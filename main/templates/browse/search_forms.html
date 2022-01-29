@@ -22,7 +22,7 @@
         <li><strong>JSON path</strong> (json_path in API)
             query will be applied such that <code>$</code> is bibliographic item root:
             <pre class="text-xs py-2 overflow-x-auto">$.series != null && $.docid[*].type != "W3C" && $.series[*].title.content != "NIST"</pre>
-        <li><strong>JSON containment</strong> (json_struct in API):
+        <li><strong>JSON containment</strong> (json_struct in API)
             query must be a valid JSON structure,
             and items containing this structure will match:
             <pre class="text-xs py-2 overflow-x-auto">{"series": [{"title": {"content": "RFC"}}]}</pre>
