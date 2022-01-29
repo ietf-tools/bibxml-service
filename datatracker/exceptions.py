@@ -1,0 +1,2 @@
+class UnexpectedDatatrackerResponse(ValueError):
+    pass
