@@ -113,7 +113,7 @@ def browse_citation_by_docid(request):
 
     try:
         citation = build_citation_for_docid(
-            docid.strip(),
+            docid.strip().strip('.').strip('.xml'),
             doctype.strip() if doctype else None,
             strict=False)
 
