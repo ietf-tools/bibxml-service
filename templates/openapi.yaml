@@ -461,8 +461,7 @@ components:
       - nist
       description: |
         For up-to-date list of available datasets,
-        see bibxml-data-* repositories under ietf-ribose GitHub organization.
-        See also bibxml-indexer service README.
+        see relaton-data-* repositories under ietf-ribose GitHub organization.
 
     IndexerStatus:
       type: object
