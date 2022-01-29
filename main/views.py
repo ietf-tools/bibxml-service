@@ -32,11 +32,7 @@ log = logging.getLogger(__name__)
 shared_context = dict(
     supported_search_formats=[
         (format, QUERY_FORMAT_LABELS.get(format, format))
-        for format in [
-            'docid_regex',
-            'json_path',
-            'websearch',
-        ]
+        for format in BaseCitationSearchView.supported_query_formats
     ],
 )
 """Shared context passed to GUI templates."""
