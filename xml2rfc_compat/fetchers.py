@@ -1,4 +1,3 @@
-from typing import Iterable
 import re
 
 from bib_models.models import BibliographicItem
@@ -152,14 +151,3 @@ def _sort_by_id_draft_number(item: RefData):
         for docid in item.body['docid']
         if docid['type'] == 'Internet-Draft'][0]
     return the_id
-
-
-# def rfcs(ref: str) -> BibliographicItem:
-#     rfc_anchor_docid = ref.replace('.', '')
-#     return search_refs_relaton_field({
-#         'docid[*]':
-#             '@.type == "IETF" && '
-#             '@.scope == "anchor" && '
-#             '@.id == "%s"'
-#         % re.escape(rfc_anchor_docid),
-#     })
