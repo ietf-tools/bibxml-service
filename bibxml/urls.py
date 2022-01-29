@@ -65,6 +65,8 @@ urlpatterns = [
                 path('doi/<ref>/', never_cache(require_safe(dt_auth.api(
                     public_api.get_doi_ref
                 ))), name='api_get_doi_ref'),
+
+                # Obsolete
                 path('<dataset_name>/<ref>/', never_cache(require_safe(dt_auth.api(
                     public_api.get_ref
                 ))), name='api_get_ref'),
