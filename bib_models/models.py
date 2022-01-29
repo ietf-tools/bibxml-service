@@ -99,6 +99,9 @@ class Date:
 
 
 class Series(BaseModel):
+    # TODO: formattedref is exclusive with other properties,
+    # make this less awkward (using union types, for example).
+
     formattedref: Optional[Union[GenericStringValue, str]] = None
     title: Optional[Union[
         GenericStringValue,
@@ -115,9 +118,9 @@ class Series(BaseModel):
 class BibliographicItem(BaseModel, extra=Extra.allow):
     """Relaton’s BibliographicItem expressed as a Pydantic model."""
 
-    # This seems awkward.
-    # All properties are optional, but in reality we can have
-    # either formattedref, or docid & the rest.
+    # TODO: formattedref is exclusive with other properties,
+    # try making this less awkward if Relaton spec makes it clear
+    # which properties are mandatory in absence of formattedref.
 
     formattedref: Optional[GenericStringValue] = None
 
