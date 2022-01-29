@@ -3,18 +3,28 @@ Parts of Relaton BibliographicItem models implemented
 as simple Python dataclasses.
 """
 
+# NOTE: Docstrings for dataclasses and models below
+# may be used when rendering OpenAPI schemas,
+# where ReSTructuredText syntax is not
+# supported. Stick to plain text.
+
 from typing import TypedDict, Optional, Union, List
 from pydantic.dataclasses import dataclass
 
 
 @dataclass
 class FormattedContent:
+    """Relaton’s formatted string.
+    """
     content: str
     format: Optional[str] = None
 
 
 @dataclass
 class GenericStringValue(FormattedContent):
+    """Roughly corresponds to a combination
+    of Relaton’s localized & formatted string.
+    """
     script: Optional[Union[str, List[str]]] = None
     language: Optional[Union[str, List[str]]] = None
 
@@ -74,6 +84,8 @@ class Contributor:
 
 @dataclass
 class CopyrightOwner:
+    """Describes who or which organization owns the copyright.
+    """
     name: Union[List[str], str]
     url: Optional[str] = None
     abbreviation: Optional[str] = None
@@ -88,6 +100,7 @@ Copyright = TypedDict('Copyright', {
 
 @dataclass
 class DocID:
+    """Document identifier."""
     id: str
     type: str
     scope: Optional[str] = None

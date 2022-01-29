@@ -2,6 +2,11 @@
 Some of Relaton models implemented as Pydantic models.
 """
 
+# NOTE: Docstrings for dataclasses and models below
+# may be used when rendering OpenAPI schemas,
+# where ReSTructuredText syntax is not
+# supported. Stick to plain text.
+
 from __future__ import annotations
 from typing import List, Tuple, Union, Optional
 import datetime
@@ -85,11 +90,18 @@ class BiblioNote:
 @dataclass
 class Link:
     content: str
+    """Typically, an URL."""
+
     type: Optional[str] = None
 
 
 @dataclass
 class Date:
+    """A typed date.
+
+    Value can either be a fully-formed date,
+    or a low-specificity date like YYYY or YYYY-MM.
+    """
     type: str
     value: Optional[Union[str, datetime.date]]
 
@@ -99,8 +111,11 @@ class Date:
 
 
 class Series(BaseModel):
-    # TODO: formattedref is exclusive with other properties,
-    # make this less awkward (using union types, for example).
+    """Represents a series that given document belongs to.
+
+    Note: formattedref is exclusive with other properties.
+    """
+    # TODO: Don’t make all properties optional, use union types or something
 
     formattedref: Optional[Union[GenericStringValue, str]] = None
     title: Optional[Union[
@@ -116,11 +131,14 @@ class Series(BaseModel):
 
 
 class BibliographicItem(BaseModel, extra=Extra.allow):
-    """Relaton’s BibliographicItem expressed as a Pydantic model."""
+    """Relaton’s main model, bibliographic item.
 
-    # TODO: formattedref is exclusive with other properties,
-    # try making this less awkward if Relaton spec makes it clear
-    # which properties are mandatory in absence of formattedref.
+    Note: formattedref is exclusive with other properties.
+    """
+
+    # TODO: Don’t make all optional, use union types or something
+    # if Relaton spec makes it clear which properties
+    # are mandatory in absence of formattedref.
 
     formattedref: Optional[GenericStringValue] = None
 
