@@ -1,4 +1,4 @@
-{# Accepts htmlclass, control_htmlclass, tabindex, autofocus #}
+{# Accepts optional detailed, htmlclass, control_htmlclass, tabindex, autofocus, placeholder #}
 
 <form
   class="
@@ -14,10 +14,13 @@
     {% if autofocus %}autofocus{% endif %}
     name="query"
     type="text"
-    placeholder="Quick search…"
+    placeholder="{% if detailed %}Document ID or anything…{% else %}Quick search…{% endif %}"
     class="min-w-0 grow text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit {{ control_htmlclass }}"
   />
-  <button type="submit" class="button {{ control_htmlclass }}" title="Quick auto search">
+  <button type="submit" class="{% if detailed %}hidden md:!block{% else %}hidden{% endif %} button {{ control_htmlclass }}">
+    Quick search
+  </button>
+  <button type="submit" class="{% if detailed %}md:!hidden{% endif %} button {{ control_htmlclass }}" title="Quick auto search">
     {% include "_search_icon.html" only %}
   </button>
 </form>

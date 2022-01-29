@@ -1,9 +1,35 @@
 {# Accepts query, query_format, expanded #}
 
-{% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" autofocus="1" %}
+{% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" autofocus="1" detailed="1" %}
 
-<details {% if query_format or expanded %}open{% endif %} class="grow relative min-h-[10rem]">
-  <summary class="mb-1">Advanced search</summary>
+<div class="relative grow relative min-h-[10rem]">
+  <details>
+    <summary class="mb-1 cursor-pointer">Search help</summary>
+    <div class="
+      absolute inset-0 top-8 bg-sky-700 z-20 p-2 pl-3 md:pr-6 text-sm
+      overflow-y-auto
+    ">
+      <p class="mb-2">
+        Quick search will redirect to an item with a document ID as provided, if possible;
+        otherwise, search methods will be tried.
+      <ul>
+        <li><strong>docid substring</strong> (docid_regex in API): bibliographic items that include given substring
+            within any document identifier will match. Example:
+            <pre class="text-xs py-2 overflow-x-auto">31.111:Rel-6</pre>
+        <li><strong>websearch</strong> query will be applied across values of all bibliographic item fields;
+            some search operators are supported:
+            <pre class="text-xs py-2 overflow-x-auto">+nist "metropolitan area" -"wind damage"</pre>
+        <li><strong>JSON path</strong> (json_path in API)
+            query will be applied such that <code>$</code> is bibliographic item root:
+            <pre class="text-xs py-2 overflow-x-auto">$.series != null && $.docid[*].type != "W3C" && $.series[*].title.content != "NIST"</pre>
+        <li><strong>JSON containment</strong> (json_struct in API):
+            query must be a valid JSON structure,
+            and items containing this structure will match:
+            <pre class="text-xs py-2 overflow-x-auto">{"series": [{"title": {"content": "RFC"}}]}</pre>
+      </ul>
+    </div>
+  </details>
+
   <form
     method="GET"
     action="{% url "search_citations" %}"
@@ -16,7 +42,7 @@
     <textarea
       name="query"
       type="text"
-      placeholder="Search query…"
+      placeholder="Advanced search query…"
       class="
         grow
         w-full
@@ -59,4 +85,4 @@
       class="button"
     />
   </form>
-</details>
+</div>
