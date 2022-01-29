@@ -16,25 +16,26 @@ servers:
 
 paths:
 
-  /public/rfc/{legacy_dataset}/{legacy_reference}.xml:
+  /public/rfc/{directory_name}/{filename}.xml:
     parameters:
-    - name: legacy_dataset
+    - name: directory_name
       in: path
-      description: Legacy dataset ID
+      description: Directory name, as per xml2rfc web server’s content.
       required: true
       schema:
-        $ref: '#/components/schemas/AvailableLegacyDatasets'
-    - name: legacy_reference
+        type: string
+        example: bibxml4
+    - name: filename
       in: path
-      description: Legacy standard reference. Format is dependent on legacy dataset, but typically starts with `reference.*.` Special characters, such as forward slashes, must be URL-escaped.
+      description: Filename, as per xml2rfc web server’s content. Typically starts with “reference” or “_reference”.
       required: true
       schema:
-        example: reference.W3C.WD-SWBP-SKOS-CORE-GUIDE-20051102
+        example: reference.W3C.NOTE-XML-FRAG-REQ-19981123
         type: string
 
     get:
-      summary: Get citation by XML2RFC tools path
-      description: Returned citation is always in BibXML format. This endpoint returns raw XML response.
+      summary: Get a citation by xml2rfc tools path
+      description: This endpoint returns raw XML response.
       responses:
 
         200:
@@ -45,7 +46,7 @@ paths:
                 type: string
 
         404:
-          description: reference not found, or legacy dataset is not known
+          description: reference not found. At this time, there may be false negatives.
           content:
             application/json:
               schema:
@@ -54,15 +55,6 @@ paths:
 components:
 
   schemas:
-
-    AvailableLegacyDatasets:
-      type: string
-      enum:
-      {% for ds_id in legacy_dataset_ids %}
-      - {{ ds_id }}
-      {% endfor %}
-      description: |
-        Available legacy dataset IDs. This list is generated at runtime.
 
     ErrorResponse:
       type: object
