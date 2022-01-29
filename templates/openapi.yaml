@@ -21,10 +21,10 @@ paths:
 
   /by-docid/:
     get:
-      summary: Get citation by document ID
+      summary: Get bibliographic item by document ID
       description: >
-        Retrieve a citation by document identifier.
-      operationId: getCitationByDocId
+        Retrieve a bibliographic item by document identifier.
+      operationId: getBibItemByDocId
 
       parameters:
       - name: doctype
@@ -33,7 +33,7 @@ paths:
           Document type.
 
           Note that the schema lists _currently available types_
-          (present across indexed citations at the time of viewing this page),
+          (present across indexed bibliographic items at the time of viewing this page),
           other document types can be available at different points in time
           depending on index state.
         required: false
@@ -54,7 +54,7 @@ paths:
       - name: format
         in: query
         description: |
-          Format to return citation in.
+          Format to return bibliographic item in.
           If `bibxml` is requested, returns an application/xml response;
           otherwise application/json response with Relaton structure under `data` key.
 
@@ -89,10 +89,10 @@ paths:
                   root element.
             application/json:
               schema:
-                $ref: '#/components/schemas/CitationDetailsResponse'
+                $ref: '#/components/schemas/BibliographicItemResponse'
 
         404:
-          description: no citation found matching given document type and id
+          description: no bibliographic item found matching given document identifier type and id
           content:
             application/json:
               schema:
@@ -113,7 +113,7 @@ paths:
         Dataset ID.
 
         Note that the schema lists all registered datasets,
-        even those from which no citations have been indexed at the moment of viewing this page.
+        even those from which no bibliographic items are indexed at the moment of viewing this page.
       required: true
       schema:
         $ref: '#/components/schemas/AvailableDatasets'
@@ -131,22 +131,22 @@ paths:
       - name: format
         in: query
         description: |
-          Format to return citation in.
+          Format to return bibliographic item in.
           If `bibxml` is requested, returns an application/xml response;
           otherwise application/json response with Relaton structure under `data` key.
         schema:
           type: string
           default: relaton
           enum: [bibxml, relaton]
-      summary: Get citation by reference in source dataset
+      summary: Get bibliographic item by reference in source dataset
       description: |
         This endpoint allows you to retrieve a reference from given dataset.
 
         For external datasets, this always incurs an additional network request.
 
         NOTE: This endpoint may not be what you want to use, as datasets represent
-        internal sources of citation data. The /docid/… endpoint allows
-        you to get a citation by document type and ID, which may be more useful.
+        internal sources of bibliographic item data. The /docid/… endpoint allows
+        you to get a bibliographic item by document type and ID, which may be more useful.
         External dataset support for this endpoint may be removed.
       operationId: getCitationByReferenceId
 
@@ -160,10 +160,10 @@ paths:
             application/xml:
               schema:
                 type: string
-                description: BibXML-formatted citation
+                description: BibXML-formatted bibliographic item
             application/json:
               schema:
-                $ref: '#/components/schemas/CitationDetailsResponse'
+                $ref: '#/components/schemas/BibliographicItemResponse'
 
         404:
           description: reference not found in given dataset
@@ -191,9 +191,9 @@ paths:
         Search query string. Format depends on `query_format` parameter.
         Special characters, such as forward slashes, must be URL-escaped.
     get:
-      summary: Search citations
+      summary: Search bibliographic items
       description: |
-        Find citations across indexed (non-external) datasets that match given query.
+        Find bibliographic items across indexed (non-external) datasets that match given query.
 
         NOTE: as of now, this API may not return the latest and complete results at all times,
         as various source indexes could be cleared and/or be mid-indexation.
@@ -207,16 +207,16 @@ paths:
         description: |
           How to match the query.
           - If `json_repr`, query string is matched against raw JSON-serialized representation
-            of citation’s Relaton data. Some typical Web search operators are supported
+            of bibliographic item’s Relaton representation. Some typical Web search operators are supported
             (AND, OR, +, -, quotes).
           - if `json_struct`, query string must be a valid JSON-serialized structure.
-            Citations which Relaton data contains that structure will match.
+            Bibliographic items which Relaton representations contain that structure will match.
       - name: page
         in: query
         schema:
           type: integer
         description: Page number, for cases with many matches.
-      operationId: searchCitations
+      operationId: searchBibItems
 
       security:
       - DatatrackerAPIKeyAuth: []
@@ -227,7 +227,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CitationSearchResultResponse'
+                $ref: '#/components/schemas/SearchResponse'
 
         500:
           description: operation failed
@@ -268,7 +268,7 @@ paths:
     post:
       summary: (Re)index dataset
       description: |
-        Indexing dataset sources is required to enable searching across citation metadata.
+        Indexing dataset sources is required to enable searching across bibliographic item data.
         Currently, indexing is done manually.
         A call to this endpoint reindexes either the entire dataset or specified refs
         from dataset source(s).
@@ -403,12 +403,12 @@ components:
       - {{ ds_id }}
       {% endfor %}
 
-    CitationDetailsResponse:
+    BibliographicItemResponse:
       type: object
       properties:
         data:
           type: object
-          $ref: '#/components/schemas/CitationObject'
+          $ref: '#/components/schemas/BibliographicItemObject'
 
     ErrorResponse:
       type: object
@@ -423,7 +423,7 @@ components:
               type: string
               description: Human readable error message
 
-    CitationSearchResultResponse:
+    SearchResponse:
       type: object
       properties:
         meta:
@@ -433,7 +433,7 @@ components:
           properties:
             total:
               type: integer
-              description: Total number of citations found for this query.
+              description: Total number of bibliographic items found for this query.
             next:
               type: string
               description: Domain-relative URL to next batch of search results, if any.
@@ -443,13 +443,13 @@ components:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/CitationObject'
+            $ref: '#/components/schemas/BibliographicItemObject'
 
     # TODO:
     # need to verify structure
-    CitationObject:
+    BibliographicItemObject:
       type: object
-      description: Citation in Relaton format
+      description: Bibliographic item in Relaton format
       properties:
         id:
           type: string
