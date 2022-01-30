@@ -154,6 +154,9 @@ Integrations
 
     Endpoint for reporting metrics & errors to Sentry.
 
+
+.. _matomo-integration-env:
+
 Matomo
 ~~~~~~
 
