@@ -31,6 +31,7 @@ p {
   break-inside: avoid;
   margin-top: 0;
   margin-bottom: 0;
+  text-align: left;
 }
 p:not(.admonition-title) + p {
   text-indent: 2em;
