@@ -6,7 +6,7 @@ How-to guides
    :maxdepth: 1
 
    develop-locally
-   run-in-production
-   add-new-source
    style-web-pages
    adjust-citation-rendering
+   add-new-source
+   run-in-production
