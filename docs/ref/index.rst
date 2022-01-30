@@ -8,6 +8,5 @@ References
 
    glossary
    modules/index
-   settings
    env
    containers
