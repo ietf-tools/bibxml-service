@@ -9,4 +9,5 @@ How-to guides
    style-web-pages
    adjust-citation-rendering
    add-new-source
+   mark-releases
    run-in-production
