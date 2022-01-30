@@ -2,20 +2,67 @@
 Environment variable reference
 ==============================
 
-Environment variables read by Django
-====================================
+Environment variables read by web application
+=============================================
 
 The following variables are read from the environment
 (either by Compose from shell where you execute ``docker compose``
-or ``.env`` file, or by Django).
+or ``.env`` file, or by web application).
+
+Variables marked as required or accepted by Django
+are generally assigned to a member of :mod:`bibxml.settings`,
+they can either influence a Django’s own setting
+or service’s custom setting.
 
 .. seealso:: :func:`main.bibxml.check_settings()`
 
+.. seealso:: :doc:`/howto/develop-locally` for sample development environment
+
+
+Service info
+------------
+
+``SERVICE_NAME``
+    **required by Django** and Compose, pass-through
+
+    The official name of the service. Short.
+
+``CONTACT_EMAIL``
+    **required by Django** and Compose, pass-through
+
+    Email service operating team could be contacted via.
+    May be used for exception notifications and more.
+
 ``SNAPSHOT``
-    **required by Django**, provided by Compose
+    **required by Django**, provided by Compose, works as a Docker build arg.
 
     Version, taken from the latest Git tag.
-    Obtained via `git describe --abbrev=0`.
+    Can be obtained via `git describe --abbrev=0`.
+
+    .. note:: In CI like GHA, repositories are cloned without history
+              by default, in which case the above command will not
+              return the latest tag. Possible workarounds:
+
+              - Change clone behavior to full. This will make it slower.
+              - Use another method of obtaining the latest tag.
+
+                In case of GHA, the ``GITHUB_REF`` environment variable
+                provides the pushed ref.
+                You can set ``on: { push: { tags: ['*'] } }`` in your workflow,
+                meaning builds only happen on pushed tags and ``GITHUB_REF``
+                can be relied on to have tag name in it.
+                It can be extracted with something like
+                ``SNAPSHOT="${GITHUB_REF#refs/*/}"``.
+
+``SERVER_EMAIL`` 
+    accepted by Django and Compose, pass-through, recommended in production
+
+    For emails sent by the service directly,
+    this will be used as the “from” address.
+
+
+Web server
+----------
 
 ``HOST``
     **required by Django** and Compose, pass-through
@@ -36,6 +83,10 @@ or ``.env`` file, or by Django).
     accepted by Compose, recommended in production
 
     Determines the number of workers in the web container.
+
+
+Main database
+-------------
 
 ``DB_NAME``
     **required by Django** and Compose, pass-through
@@ -62,11 +113,19 @@ or ``.env`` file, or by Django).
 
     User password for PostgreSQL server authentication.
 
+
+Redis
+-----
+
 ``REDIS_HOST``
     **required by Django**, provided by Compose
 
 ``REDIS_PORT``
     **required by Django**, provided by Compose
+
+
+Security
+--------
 
 ``DJANGO_SECRET``
     **required by Django** and Compose, pass-through
@@ -78,28 +137,6 @@ or ``.env`` file, or by Django).
 
     Token for management GUI and API access.
 
-``SERVICE_NAME``
-    **required by Django** and Compose, pass-through
-
-    The official name of the service. Short.
-
-``CONTACT_EMAIL``
-    **required by Django** and Compose, pass-through
-
-    Email service operating team could be contacted via.
-    May be used for exception notifications and more.
-
-``SERVER_EMAIL`` 
-    accepted by Django and Compose, pass-through, recommended in production
-
-    For emails sent by the service directly,
-    this will be used as the “from” address.
-
-``SENTRY_DSN`` 
-    accepted by Django and Compose, pass-through
-
-    Endpoint for reporting metrics & errors to Sentry.
-
 ``DEBUG`` 
     accepted by Django and Compose, pass-through
 
@@ -108,12 +145,18 @@ or ``.env`` file, or by Django).
 
     .. important:: Don’t set in production.
 
-.. seealso:: :doc:`/howto/develop-locally` for sample development environment
 
-.. seealso:: :doc:`/ref/containers`
+Integrations
+------------
 
-Environment variables read by Django
-====================================
+``SENTRY_DSN`` 
+    accepted by Django and Compose, pass-through
+
+    Endpoint for reporting metrics & errors to Sentry.
+
+
+Environment variables passed through by Docker Compose
+======================================================
 
 See ``docker-compose.yml``
 container definitions, for example:
