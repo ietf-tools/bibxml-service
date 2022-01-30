@@ -26,13 +26,13 @@ class SourceMeta:
 
 @dataclass
 class IndexedSourceMeta(SourceMeta):
-    """A source that can be indexed in full."""
+    """Describes a source that can be indexed in full."""
     pass
 
 
 @dataclass
 class ExternalSourceMeta(SourceMeta):
-    """An external source, such as Crossref or Datatracker."""
+    """Describes an external source, such as Crossref or Datatracker."""
     pass
 
 
@@ -50,6 +50,14 @@ class ExternalSourceRequest(BaseModel):
 # =============
 
 class SourcedBibliographicItem(BaseModel):
+    """Represents a base for sourced bibliographic item,
+    including validation errors and sourcing-related details
+    specific to the item.
+
+    Generally do not instantiate directly,
+    use an appropriate subclass instead.
+    """
+
     bibitem: BibliographicItem
 
     validation_errors: Optional[List[str]] = None
@@ -60,6 +68,8 @@ class SourcedBibliographicItem(BaseModel):
 
 @dataclass
 class IndexedObject:
+    """Represents an object from an indexed source."""
+
     name: str
     """Sometimes called “ref”. Filename, etc."""
 
@@ -71,6 +81,8 @@ class IndexedObject:
 
 
 class IndexedBibliographicItem(SourcedBibliographicItem):
+    """A bibliographic item obtained from an indexed source."""
+
     indexed_object: Optional[IndexedObject]
 
     source: IndexedSourceMeta

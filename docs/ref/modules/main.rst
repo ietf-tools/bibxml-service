@@ -2,8 +2,17 @@
 ``main`` — citation retrieval API and GUI
 =========================================
 
+.. automodule:: main
+
 .. contents::
    :local:
+
+Helper types
+============
+
+.. automodule:: main.types
+   :members:
+   :show-inheritance:
 
 Views
 =====

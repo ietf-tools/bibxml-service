@@ -395,8 +395,7 @@ def build_citation_for_docid(
                         This is OK for some cases
                         (e.g., forgiving template rendering).
 
-    :returns BibliographicItem: a :class:`bib_models.BibliographicItem`
-                                instance.
+    :rtype: bib_models.models.BibliographicItem
     :raises RefNotFoundError: if no matching refs were found.
     """
 
@@ -538,7 +537,7 @@ def build_search_results(
     order_by: Optional[str] = None,
 ) -> List[CompositeSourcedBibliographicItem]:
     """Given a :class:`QuerySet` of :class:`RefData` entries,
-    build a list of :class:`SourcedBibliographicItem` objects
+    build a list of :class:`main.types.SourcedBibliographicItem` objects
     by merging ``RefData`` with intersecting document identifiers.
     """
 
