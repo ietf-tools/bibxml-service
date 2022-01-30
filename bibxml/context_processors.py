@@ -8,6 +8,12 @@ def service_meta(request):
     )
 
 
+def matomo(request):
+    return dict(
+        matomo=getattr(settings, 'MATOMO', None),
+    )
+
+
 def sources(request):
     return dict(
         known_datasets=settings.KNOWN_DATASETS,

@@ -1,6 +1,19 @@
 {% load static compress %}
 <!DOCTYPE html>
-<html lang="en" class="{% block root_html_class %}{% endblock %}" {% block root_html_attrs %}{% endblock %}>
+<html
+  lang="en"
+  class="{% block root_html_class %}{% endblock %}"
+  {% if matomo.url %}
+    data-matomo-url="{{ matomo.url }}"
+    {% if matomo.site_id %}
+      data-matomo-site-id="{{ matomo.site_id }}"
+    {% endif %}
+    {% if matomo.tm_container %}
+      data-matomo-tag-manager-container="{{ matomo.tm_container }}"
+    {% endif %}
+  {% endif %}
+  {% block root_html_attrs %}{% endblock %}
+>
   <head>
     <title>{% block title %}{{ service_name }}{% endblock %}</title>
 
@@ -11,6 +24,10 @@
 
     {% compress css %}
       <link type="text/css" rel="stylesheet" href="{% static "css/main.css" %}" />
+    {% endcompress %}
+
+    {% compress js %}
+      <script type="text/javascript" src="{% static "js/matomo.js" %}"></script>
     {% endcompress %}
 
     {% block extra_head %}{% endblock %}

@@ -105,6 +105,7 @@ TEMPLATES = [
                 'common.query_profiler.context_processor',
                 'bibxml.context_processors.service_meta',
                 'bibxml.context_processors.sources',
+                'bibxml.context_processors.matomo',
             ],
         },
     },
@@ -235,6 +236,28 @@ if environ.get('REDIS_HOST') and environ.get('REDIS_PORT'):
             'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
         }
     }
+
+
+# Matomo
+
+MATOMO = {
+    'url': environ.get("MATOMO_URL", None),
+    'site_id': environ.get("MATOMO_SITE_ID", None),
+    'tm_container': environ.get("MATOMO_TAG_MANAGER_CONTAINER", None),
+}
+"""
+Setting ``url`` and either ``site_id`` or ``tm_container``
+activates Matomo integration.
+
+- ``site_id`` is used for basic tracking integration.
+- If ``tm_container`` is set,
+  tag manager is used and ``site_id`` has no effect.
+
+  To integrate tag manager, set container
+  to the <CONTAINER> part of the “https://.../js/container_<CONTAINER>.js”
+  string, which you will find within the tag manager snippet obtained
+  from your Matomo dashboard.
+"""
 
 
 # Custom
