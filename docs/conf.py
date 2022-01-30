@@ -26,8 +26,7 @@ project = 'IETF BibXML service'
 copyright = '2022'
 author = 'Ribose under the IETF BibXML SOW'
 
-# The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = f"v{os.environ.get('SNAPSHOT', 'N/A') or 'N/A'}"
 
 
 # -- General configuration ---------------------------------------------------
