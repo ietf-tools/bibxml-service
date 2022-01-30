@@ -68,7 +68,7 @@ Styling error pages
 ===================
 
 There’s a gotcha with error pages, in that if you run
-with DEBUG (see :doc:`howto/develop-locally`)
+with DEBUG (see :doc:`/howto/develop-locally`)
 you won’t get “production-style” error pages (Django shows its own),
 and without DEBUG you will have to rebuild the image every time
 to see your error page styling take effect.
