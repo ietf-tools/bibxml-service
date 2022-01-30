@@ -48,7 +48,7 @@ def readable_openapi_spec(request, spec: str):
     try:
         path = reverse(spec)
     except NoReverseMatch:
-        raise HttpResponseBadRequest("Invalid spec")
+        return HttpResponseBadRequest("Invalid spec")
     else:
         return render(request, 'human_readable_openapi_spec.html', dict(
             spec_path=path,
