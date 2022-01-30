@@ -12,8 +12,9 @@ You will need Docker Desktop with Compose V2 support enabled.
    (the old-style conventional way of running under a venv isn’t).
 
    If you want to run this project directly,
-   search ``settings.py`` for ``environ`` occurrences
-   and ensure your shell exports the requisite variables.
+   see :doc:`/ref/env` for environment variables,
+   some of which are required by Django and need to be exported
+   in your shell before you start the development server.
 
 .. note::
 
