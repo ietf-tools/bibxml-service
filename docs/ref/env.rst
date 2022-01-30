@@ -154,6 +154,24 @@ Integrations
 
     Endpoint for reporting metrics & errors to Sentry.
 
+Matomo
+~~~~~~
+
+``MATOMO_URL`` 
+    accepted by Django and Compose, pass-through
+
+``MATOMO_SITE_ID`` 
+    accepted by Django and Compose, pass-through
+
+``MATOMO_TAG_MANAGER_CONTAINER``
+    accepted by Django and Compose, pass-through
+
+.. seealso::
+
+   - :data:`bibxml.settings.MATOMO`
+   - `Matomo tracker integration <https://developer.matomo.org/guides/tracking-javascript-guide>`_
+   - `MTM integration <https://developer.matomo.org/guides/tagmanager/embedding>`_
+
 
 Environment variables passed through by Docker Compose
 ======================================================
