@@ -80,6 +80,7 @@ primary_domain = 'py'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'django': ('https://docs.djangoproject.com/en/stable', 'https://docs.djangoproject.com/en/stable/_objects/'),
+    'simplejson': ('https://simplejson.readthedocs.io/en/stable/', 'https://simplejson.readthedocs.io/en/stable/objects.inv'),
 }
 
 
