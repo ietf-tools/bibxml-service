@@ -117,6 +117,11 @@ class BaseCitationSearchView(BaseListView):
     """How long to cache search results for. Results are cached as a list
     is constructed from query and query format. Default is one hour."""
 
+    metric_counter = None
+    """A Prometheus Counter instance accepting two labels,
+    ``query_format`` and ``got_results``.
+    """
+
     def get(self, request, *args, **kwargs):
         self.is_gui = hasattr(self, 'template_name')
 
@@ -349,6 +354,7 @@ class BaseCitationSearchView(BaseListView):
 
         input_error = qs is None
         found_something = qs is not None and len(qs) > 0
+        found_too_many = len(qs) >= self.limit_to
 
         if input_error:
             if self.show_all_by_default:
@@ -395,6 +401,18 @@ class BaseCitationSearchView(BaseListView):
                         "trying all available search methods."
                     )
             messages.error(self.request, msg)
+
+        if self.metric_counter:
+            if found_too_many:
+                got_results = 'too_many'
+            elif found_something:
+                got_results = 'yes'
+            else:
+                got_results = 'no'
+            self.metric_counter.labels(
+                self.query_format,
+                got_results,
+            ).inc()
 
         return qs
 
