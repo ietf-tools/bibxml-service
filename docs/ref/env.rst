@@ -73,6 +73,13 @@ Web server
     Currently, it is used in ``ALLOWED_HOSTS`` setting,
     as well as Crossref etiquette.
 
+``INTERNAL_HOSTNAMES``
+    accepted by Django and Compose, pass-through
+
+    Alternative hostnames which could be used by internal services
+    (e.g., in Compose configuration Prometheus refers to web container
+    by its Compose hostname, so Django needs to recognize it).
+
 ``PORT``
     required by Compose
 

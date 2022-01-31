@@ -39,8 +39,15 @@ if DEBUG:
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
 
+INTERNAL_HOSTNAMES = [
+    h.strip()
+    for h in environ.get("INTERNAL_HOSTNAMES", "").split(',')
+    if h.strip() != ''
+]
+
 ALLOWED_HOSTS = [
     environ.get("PRIMARY_HOSTNAME"),
+    *INTERNAL_HOSTNAMES,
 ]
 
 
