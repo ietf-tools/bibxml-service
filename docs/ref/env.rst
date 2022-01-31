@@ -79,11 +79,6 @@ Web server
     Docker Compose will make Web GUI available
     on the host OS under this port number.
 
-``CPU_COUNT``
-    accepted by Compose, recommended in production
-
-    Determines the number of workers in the web container.
-
 
 Main database
 -------------
