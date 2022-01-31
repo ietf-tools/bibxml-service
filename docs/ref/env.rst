@@ -64,8 +64,8 @@ Service info
 Web server
 ----------
 
-``HOST``
-    **required by Django** and Compose, pass-through
+``PRIMARY_HOSTNAME``
+    **required by Django** and (as ``HOST``) by Compose
 
     Hostname used for Web GUI.
     HTTP requests with mismatching Host header will result in an error.
@@ -94,7 +94,7 @@ Main database
     PostgreSQL database and user name.
 
 ``DB_USER``
-    **required by Django**, provided by Compose
+    **required by Django**, provided by Compose from ``DB_NAME``
 
     Username for PostgreSQL server authentication.
 
