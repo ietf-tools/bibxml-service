@@ -139,6 +139,8 @@ services:
       PYTHONUNBUFFERED: 1
     depends_on:
       - web-precheck
+    ports:
+      - "9080:9080"
 
   flower:
     image: mher/flower
