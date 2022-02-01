@@ -1,5 +1,7 @@
-"""Authentication uses token provided via API_SECRET Django setting,
-provisioned at deploy time.
+"""Authentication uses tokens provided
+via the :data:`bibxm.settings.API_SECRETS` Django setting.
+
+.. seealso:: :doc:`/topics/auth`
 """
 
 import functools

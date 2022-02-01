@@ -139,6 +139,8 @@ Security
 
     Token for management GUI and API access.
 
+    .. seealso:: :doc:`/topics/auth`
+
 ``EXTRA_API_SECRETS``
     accepted by Django and Compose, pass-through
 
