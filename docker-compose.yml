@@ -8,8 +8,8 @@ services:
   # Single instance only.
   db:
     build:
-      context: .
-      dockerfile: Dockerfile-pg
+      context: ops
+      dockerfile: db.Dockerfile
       args:
         POSTGRES_DB: ${DB_NAME:?missing DB name}
         POSTGRES_USER: ${DB_NAME:?err}
