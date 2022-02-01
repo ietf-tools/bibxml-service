@@ -161,3 +161,21 @@ services:
       - redis
     ports:
       - "9081:9808"
+
+  prometheus:
+    image: prom/prometheus
+    hostname: prometheus
+    build:
+      context: ops
+      dockerfile: prometheus.Dockerfile
+      args:
+        TARGET_HOSTS: "['web:8000', 'celery:9080', 'celery-exporter:9808']"
+        HTTP_BASIC_USERNAME: "ietf"
+        HTTP_BASIC_PASSWORD: "${API_SECRET:?missing API secret}"
+        JOB_NAME: "bibxml-service"
+    depends_on:
+      - web
+      - celery
+      - celery-exporter
+    ports:
+      - "9090:9090"
