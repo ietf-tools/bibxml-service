@@ -30,6 +30,114 @@ read its API specification and explore GUI.
    ref/index
    rfp-requirements
 
+Code layout
+===========
+
+.. parsed-literal::
+
+   ├── README.rst
+   │
+   ├── static/
+   │   │   Client-side CSS and JS.
+   │   ├── css
+   │   └── js
+   │
+   │   Post-processing client-side code:
+   ├── package.json
+   ├── package-lock.json
+   ├── babel.config.json
+   ├── postcss.config.js
+   ├── tailwind.config.js
+   ├── build/
+   │       Directory where build artifacts end up.
+   │
+   ├── docs/
+   │   ├── conf.py
+   │   ├── index.rst
+   │   │
+   │   │   Building documentation HTML:
+   │   ├── Dockerfile
+   │   ├── docker-compose.yml
+   │   ├── build/
+   │   │       Where built documentation ends up.
+   │   │
+   │   ├── _static
+   │   └── ...
+   │
+   ├── mypy.ini
+   │       mypy linting/type-checking configuration.
+   │
+   │   Operations-related:
+   ├── docker-compose.yml
+   ├── docker-compose.dev.yml
+   ├── Dockerfile
+   ├── wait-for-migrations.sh
+   ├── ops/
+   │   │
+   │   ├── db.Dockerfile
+   │   ├── load-postgres-extensions.sh
+   │   │
+   │   ├── grafana-\*.yml
+   │   │       Grafana data source and dashboard provisioning.
+   │   ├── grafana-dashboard-\*.json
+   │   │       Grafana dashboard configurations.
+   │   │
+   │   ├── prometheus-config.yml
+   │   │       Prometheus configuration template.
+   │   └── prometheus.Dockerfile
+   │
+   ├── requirements.txt
+   │       Python requirements.
+   │
+   ├── manage.py
+   │       Django project entry point.
+   │
+   ├── bibxml/
+   │   │   Django project main module.
+   │   │
+   │   ├── settings.py
+   │   │       Django settings.
+   │   ├── urls.py
+   │   │       Site URL configuration.
+   │   ├── ...
+   │   ├── asgi.py
+   │   └── wsgi.py
+   │
+   ├── templates/
+   │       General templates.
+   │
+   ├── bib_models/
+   │       Bibliographic item dataclasses/Pydantic models.
+   │
+   ├── main/
+   │   │   Retrieval GUI and API views and associated utilities.
+   │   │
+   │   └── models.py
+   │           Django model definitions for indexed bibliographic data.
+   │
+   ├── datatracker/
+   │       Datatracker integration: token validation, OAuth2.
+   │
+   ├── management/
+   │       Source management GUI and API.
+   │
+   ├── prometheus/
+   │       Prometheus metrics & export view.
+   │
+   ├── sources/
+   │   │   Logic specific to individual external sources.
+   │   │   (Refactoring from main/external is in progress.)
+   │   │
+   │   └── doi/
+   │
+   └── xml2rfc_compat/
+   │       xml2rfc tools style API support.
+   │       (Some of it also currently lives under main/api_compat.)
+   │
+   └── common/
+       ├── pydantic.py
+       ├── query_profiler.py
+       └── util.py
 
 
 Indices and tables
