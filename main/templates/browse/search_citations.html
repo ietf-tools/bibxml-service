@@ -3,8 +3,6 @@
 {% block title %}{{ block.super }} — Search: {{ query }}{% endblock %}
 
 {% block header_extras %}
-  {{ block.super }}
-
   <h2
     class="
       {% include "_side_block_classes.html" %}
@@ -31,6 +29,8 @@
   ">
     {% include "browse/paginator.html" with query=request.GET.query|urlencode page_obj=page_obj result_cap=result_cap %}
   </nav>
+
+  {{ block.super }}
 {% endblock %}
 
 {% block content %}
