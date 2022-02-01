@@ -12,4 +12,5 @@ Python module reference
    datatracker
    xml2rfc_compat
    sources
+   prometheus
    common
