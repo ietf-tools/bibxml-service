@@ -31,5 +31,5 @@ def get(endpoint: str, format='json') -> requests.Response:
     """
     return requests.post(
         f'{API_BASE}/{endpoint}',
-        params={'format': format},
+        params={'format': format} if format else None,
     )
