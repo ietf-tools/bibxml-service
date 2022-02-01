@@ -78,7 +78,24 @@ RFP requirement compliance
 
 13. .. todo:: Confirm this point.
 
-14. .. todo:: Complete logging setup.
+14. BibXML service does not aggregate access analytics itself,
+    but facilitates it in following ways:
+
+    - By exporting Prometheus counters for bibliographic item hits
+      under ``/metrics/``, with the same Basic HTTP auth that applies to management GUI.
+
+      As an example, the bundled Docker Compose runs a Prometheus instance
+      that imports BibXML service metrics
+      and a Grafana instance with two provisioned dashboards.
+
+    - By reporting to Sentry, if ``SENTRY_DSN`` environment variable is configured correctly.
+      Sentry’s main purpose is error tracking,
+      but its performance dashboard allows to view requests by path.
+
+    - By assigning a custom handler for ``api_access`` logger in ``settings.LOGGING``,
+      directing individual access events to somewhere that is aggregated as desired.
+
+      (Source code modification is required in this case.)
 
 15. Requests to BibXML service API,
     except for xml2rfc-style paths, require a valid Datatracker bibxml token
