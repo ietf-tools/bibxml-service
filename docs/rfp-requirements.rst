@@ -101,4 +101,6 @@ RFP requirement compliance
     except for xml2rfc-style paths, require a valid Datatracker bibxml token
     to be passed as ``X-Datatracker-Token`` HTTP header.
 
+    Datatracker OAuth2/OIDC flows are integrated in no-op mode.
+
 16. See :doc:`/howto/add-new-output-format`.
