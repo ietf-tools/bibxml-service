@@ -4,11 +4,19 @@
 
 .. automodule:: datatracker
 
-Authentication
-==============
+Developer token based authentication
+====================================
 
 .. automodule:: datatracker.auth
    :members:
+
+
+OAuth2/OIDC integration
+=======================
+
+.. automodule:: datatracker.oauth
+   :members:
+   :undoc-members:
 
 
 Exceptions
