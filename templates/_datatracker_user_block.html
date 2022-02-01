@@ -1,11 +1,15 @@
-{% if datatracker_user %}
+{% if datatracker_oauth_enabled %}
   <aside class="
     {% include "_side_block_classes.html" %}
     p-4 dark:text-dark-200/50 text-dark-800/50
   ">
-    Logged&nbsp;in
-    as&nbsp;<strong class="whitespace-nowrap">{{ datatracker_user.username|default:"N/A" }}</strong>
-    <br />
-    <a class="text-xs" href="{% url "datatracker_oauth_logout" %}">Log&nbsp;out</a>
+    {% if datatracker_user %}
+      Logged&nbsp;in
+      as&nbsp;<strong class="whitespace-nowrap">{{ datatracker_user.username|default:"N/A" }}</strong>
+      <br />
+      <a class="text-xs" href="{% url "datatracker_oauth_logout" %}">Log&nbsp;out</a>
+    {% else %}
+      <a class="whitespace-nowrap text-xs" href="{% url "datatracker_oauth_initiate" %}">Log in via Datatracker</a>
+    {% endif %}
   </aside>
 {% endif %}

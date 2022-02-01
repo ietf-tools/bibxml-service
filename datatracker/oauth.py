@@ -27,11 +27,17 @@ CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None)
 
 
 def context_processor(request):
+    ctx = dict(
+        datatracker_oauth_enabled=CLIENT_ID and CLIENT_SECRET,
+    )
+
     if OAUTH_USER_INFO_KEY in request:
         return dict(
             datatracker_user=request[OAUTH_USER_INFO_KEY],
+            **ctx,
         )
-    return dict()
+    else:
+        return ctx
 
 
 def log_out(request):
