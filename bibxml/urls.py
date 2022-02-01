@@ -11,6 +11,7 @@ from management import auth
 from xml2rfc_compat import fetchers as xml2rfc_fetchers
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth
+from prometheus.views import metrics as prometheus_metrics
 
 from . import views, error_views
 
@@ -28,6 +29,7 @@ default_ttl = (
 urlpatterns = [
 
     path('__debug__/', include('debug_toolbar.urls')),
+    path('metrics/', auth.basic(prometheus_metrics)),
 
     # API specs
     path('openapi.yaml', never_cache(require_safe(
