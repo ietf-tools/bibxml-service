@@ -354,7 +354,7 @@ class BaseCitationSearchView(BaseListView):
 
         input_error = qs is None
         found_something = qs is not None and len(qs) > 0
-        found_too_many = len(qs) >= self.limit_to
+        found_too_many = qs is not None and len(qs) >= self.limit_to
 
         if input_error:
             if self.show_all_by_default:
