@@ -79,6 +79,7 @@ services:
       INTERNAL_HOSTNAMES: "web"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
+      API_SECRET: "${API_SECRET:?missing API secret}"
       EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
       DB_HOST: db
       DB_PORT: 5432
@@ -98,7 +99,6 @@ services:
 
       # Indexer-specific
       # TODO: Some environment variables could be removed from web container, and only made available to celery
-      API_SECRET: "${API_SECRET:?missing API secret}"
       DATASET_TMP_ROOT: "/data/datasets"
       CELERY_BROKER_URL: "redis://redis:6379"
       CELERY_RESULT_BACKEND: "redis://redis:6379"
