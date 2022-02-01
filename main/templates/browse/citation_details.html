@@ -47,6 +47,8 @@
   ">
     {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" only %}
   </nav>
+
+  {{ block.super }}
 {% endblock %}
 
 {% block content %}
