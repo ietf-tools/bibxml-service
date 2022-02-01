@@ -157,6 +157,18 @@ Integrations
     Endpoint for reporting metrics & errors to Sentry.
 
 
+.. _datatracker-integration-env:
+
+Datatracker
+~~~~~~~~~~~
+
+``DATATRACKER_CLIENT_ID`` 
+    accepted by Django and Compose, pass-through
+
+``DATATRACKER_CLIENT_SECRET`` 
+    accepted by Django and Compose, pass-through
+
+
 .. _matomo-integration-env:
 
 Matomo

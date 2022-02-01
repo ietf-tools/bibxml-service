@@ -117,6 +117,7 @@ TEMPLATES = [
                 'bibxml.context_processors.service_meta',
                 'bibxml.context_processors.sources',
                 'bibxml.context_processors.matomo',
+                'datatracker.oauth.context_processor',
             ],
         },
     },

@@ -10,6 +10,7 @@ from management import api as mgmt_api, views as mgmt_views
 from management import auth
 from xml2rfc_compat import fetchers as xml2rfc_fetchers
 from datatracker import auth as dt_auth
+from datatracker import oauth as dt_oauth
 
 from . import views, error_views
 
@@ -134,6 +135,18 @@ urlpatterns = [
         path('', require_safe(
             public_views.home
         ), name='browse'),
+
+        path('datatracker-auth/', include([
+            path('', require_safe(never_cache(
+                dt_oauth.initiate
+            )), name='datatracker_oauth_initiate'),
+            path('callback/', require_safe(never_cache(
+                dt_oauth.handle_callback
+            )), name='datatracker_oauth_callback'),
+            path('log-out/', require_safe(never_cache(
+                dt_oauth.log_out
+            )), name='datatracker_oauth_logout'),
+        ])),
 
         path('management/', include([
             path('', require_safe(auth.basic(never_cache(
