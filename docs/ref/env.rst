@@ -142,6 +142,9 @@ Security
 
     .. seealso:: :doc:`/topics/auth`
 
+    Compose also uses it as admin password with Grafana container
+    (username is “ietf”).
+
 ``EXTRA_API_SECRETS``
     accepted by Django and Compose, pass-through
 
