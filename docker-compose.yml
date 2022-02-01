@@ -76,6 +76,7 @@ services:
       - "${PORT:?missing port to expose web service under}:8000"
     environment:
       PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
+      INTERNAL_HOSTNAMES: "web"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
       EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
@@ -119,6 +120,7 @@ services:
         celery -A management worker -l info -c 1
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
+      INTERNAL_HOSTNAMES: "celery"
       DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
