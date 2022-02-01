@@ -1,0 +1,6 @@
+apiVersion: 1
+version: ${SOURCE_VERSION}
+datasources:
+  - name: ${SOURCE_NAME}
+    type: prometheus
+    url: ${SOURCE}
