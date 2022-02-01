@@ -74,6 +74,7 @@ if environ.get("SENTRY_DSN", None):
 
 
 INSTALLED_APPS = [
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'main.app.Config',
@@ -84,6 +85,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'common.query_profiler.middleware',
@@ -94,6 +96,8 @@ MIDDLEWARE = [
 ]
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 ROOT_URLCONF = 'bibxml.urls'
 
@@ -265,6 +269,12 @@ activates Matomo integration.
   string, which you will find within the tag manager snippet obtained
   from your Matomo dashboard.
 """
+
+
+# Datatracker
+
+DATATRACKER_CLIENT_ID = environ.get("DATATRACKER_CLIENT_ID", '')
+DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '')
 
 
 # Custom
