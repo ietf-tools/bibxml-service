@@ -28,6 +28,8 @@ read its API specification and explore GUI.
    topics/index
    howto/index
    ref/index
+   rfp-requirements
+
 
 
 Indices and tables
