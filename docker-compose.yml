@@ -139,6 +139,7 @@ services:
       PYTHONUNBUFFERED: 1
     depends_on:
       - web-precheck
+      - redis
     ports:
       - "9080:9080"
 
