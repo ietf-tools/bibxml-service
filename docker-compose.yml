@@ -97,7 +97,6 @@ services:
       DATATRACKER_CLIENT_SECRET: ${DATATRACKER_CLIENT_SECRET}
       PYTHONUNBUFFERED: 1
 
-      # Indexer-specific
       # TODO: Some environment variables could be removed from web container, and only made available to celery
       DATASET_TMP_ROOT: "/data/datasets"
       CELERY_BROKER_URL: "redis://redis:6379"
@@ -141,8 +140,6 @@ services:
     depends_on:
       - web-precheck
 
-  # Can be run in multiple instances, but no reason for that.
-  # May be deprecated.
   flower:
     image: mher/flower
     hostname: flower
