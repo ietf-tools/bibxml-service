@@ -10,7 +10,7 @@ from .task_status import list_running_tasks
 
 shared_context = dict(
     # NOTE: Use this context only in auth-guarded views
-    api_secret=settings.API_SECRET,
+    api_secret=settings.API_SECRETS[0],
 )
 
 

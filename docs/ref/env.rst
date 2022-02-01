@@ -139,6 +139,14 @@ Security
 
     Token for management GUI and API access.
 
+``EXTRA_API_SECRETS``
+    accepted by Django and Compose, pass-through
+
+    Extra tokens, as a single comma-separated string.
+
+    Each will have the same effect and access privileges
+    as ``API_SECRET``.
+
 ``DEBUG`` 
     accepted by Django and Compose, pass-through
 

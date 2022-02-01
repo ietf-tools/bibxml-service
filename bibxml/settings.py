@@ -475,8 +475,17 @@ DATASET_SOURCE_OVERRIDES = {
 API_USER = 'ietf'
 """Username for HTTP Basic auth to access management GUI."""
 
-API_SECRET = environ.get('API_SECRET')
-"""Secret used to authenticate API requests and access to management GUI."""
+API_SECRETS = [
+    environ.get('API_SECRET'),
+    *[
+        s.strip()
+        for s in environ.get('EXTRA_API_SECRETS', '').split(',')
+        if s.strip() != ''
+    ],
+]
+"""Secrets used to authenticate API requests and access to management GUI.
+Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
+"""
 
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
 """Where to keep fetched source data and data generated during indexing.

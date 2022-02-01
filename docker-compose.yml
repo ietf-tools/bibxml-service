@@ -78,6 +78,7 @@ services:
       PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
+      EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: ${DB_NAME:?err}
@@ -121,6 +122,7 @@ services:
       DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
+      EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: ${DB_NAME:?err}

@@ -15,7 +15,7 @@ def api(viewfunc):
     def wrapper(request, *args, **kwargs):
         provided_secret = request.headers.get('x-ietf-token', None)
         if provided_secret is not None:
-            if provided_secret == settings.API_SECRET:
+            if provided_secret in settings.API_SECRETS:
                 return viewfunc(request, *args, **kwargs)
         return HttpResponseForbidden("Not authorized.")
 
@@ -31,7 +31,7 @@ def basic(viewfunc):
             auth_raw = bytes(auth[1], 'utf-8')
             auth = base64.b64decode(auth_raw).decode('utf-8')
             user, password = auth.split(':')
-            if user == settings.API_USER and password == settings.API_SECRET:
+            if user == settings.API_USER and password in settings.API_SECRETS:
                 return viewfunc(request, *args, **kwargs)
 
         response = HttpResponse()
