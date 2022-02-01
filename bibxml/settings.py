@@ -486,6 +486,8 @@ API_SECRETS = [
 ]
 """Secrets used to authenticate API requests and access to management GUI.
 Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
+
+.. seealso:: :doc:`/topics/auth`
 """
 
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
