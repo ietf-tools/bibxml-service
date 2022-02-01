@@ -1,4 +1,4 @@
-"""Authentication uses token validation with Datatracker.
+"""Authentication using Datatracker bibxml API developer tokens.
 """
 
 import logging
