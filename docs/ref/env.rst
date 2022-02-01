@@ -137,7 +137,8 @@ Security
 ``API_SECRET``
     **required by Django** and Compose, pass-through
 
-    Token for management GUI and API access.
+    Token for management GUI and API access,
+    as well as Prometheus metrics endpoint access.
 
     .. seealso:: :doc:`/topics/auth`
 
