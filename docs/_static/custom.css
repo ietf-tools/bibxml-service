@@ -36,3 +36,8 @@ p {
 p:not(.admonition-title) + p {
   text-indent: 2em;
 }
+
+pre, code {
+  font-size: 80%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
