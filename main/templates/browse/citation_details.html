@@ -199,33 +199,36 @@
 {% endblock %}
 
 {% block after_content %}
-  {% with data.docid|as_list|first as docid %}
-    <ul class="
-        {% include "_side_block_classes.html" %}
-        list-disc list-outside marker:text-sky-300 marker:content-['—_']
-        p-4 bg-dark-600 text-dark-300
-        text-xs
-    ">
-      <p>Get bibliographic item</p>
-      <li>
-        <a
-            class="
-              {% include "_side_block_classes.html" %}
-            "
-            download="{{ docid.type }}-{{ docid.id }}.json"
-            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
-          >Relaton&nbsp;JSON</a>
+  {% comment %}
+    Problematic, since API access is now requiring authentication.
+    {% with data.docid|as_list|first as docid %}
+      <ul class="
+          {% include "_side_block_classes.html" %}
+          list-disc list-outside marker:text-sky-300 marker:content-['—_']
+          p-4 bg-dark-600 text-dark-300
+          text-xs
+      ">
+        <p>Get bibliographic item</p>
+        <li>
+          <a
+              class="
+                {% include "_side_block_classes.html" %}
+              "
+              download="{{ docid.type }}-{{ docid.id }}.json"
+              href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
+            >Relaton&nbsp;JSON</a>
 
-      <li>
-        <a
-            class="
-              {% include "_side_block_classes.html" %}
-            "
-            download="{{ docid.type }}-{{ docid.id }}.xml"
-            href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=bibxml"
-          >BibXML&nbsp;(under&nbsp;development)</a>
-    </ul>
-  {% endwith %}
+        <li>
+          <a
+              class="
+                {% include "_side_block_classes.html" %}
+              "
+              download="{{ docid.type }}-{{ docid.id }}.xml"
+              href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=bibxml"
+            >BibXML&nbsp;(under&nbsp;development)</a>
+      </ul>
+    {% endwith %}
+  {% endcomment %}
 
   {% include "_profiling_block.html" %}
 {% endblock %}
