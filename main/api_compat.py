@@ -17,6 +17,7 @@ from pydantic import ValidationError
 from common.util import as_list
 from bib_models.models import BibliographicItem
 from bib_models.to_xml import to_xml_string
+from prometheus import metrics
 from .indexed import search_refs_relaton_field
 from .indexed import build_citation_for_docid
 from .external import get_doi_ref as _get_doi_ref
@@ -74,23 +75,32 @@ def make_xml2rfc_path_handler(fetcher_func: Callable[
 
     @functools.wraps(fetcher_func)
     def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
+        resp: HttpResponse
+        outcome: str
+
         try:
             item = fetcher_func(anchor)
         except RefNotFoundError:
             log.error("Item for xml2rfc path not found: %s", xml2rfc_subpath)
-            return HttpResponseNotFound(
+            outcome = 'not_found_no_fallback'
+            resp = HttpResponseNotFound(
                 "Item for xml2rfc path not found: %s" % xml2rfc_subpath)
         except ValidationError:
             log.exception(
                 "Item found for xml2rfc path did not validate: %s",
                 xml2rfc_subpath)
-            return HttpResponseServerError(
+            outcome = 'validation_error'
+            resp = HttpResponseServerError(
                 "Error constructing bibliographic item for given xml2rfc path")
         else:
-            return HttpResponse(
+            outcome = 'success'
+            resp = HttpResponse(
                 to_xml_string(item, anchor=anchor),
                 content_type="application/xml",
                 charset="utf-8")
+
+        metrics.xml2rfc_api_bibitem_hits.labels(xml2rfc_subpath, outcome).inc()
+        return resp
 
     return handle_xml2rfc_path
 

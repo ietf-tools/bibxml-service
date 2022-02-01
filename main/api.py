@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from common.pydantic import unpack_dataclasses
 from bib_models.models import BibliographicItem
 from bib_models.to_xml import to_xml_string
+from prometheus import metrics
 
 from .util import BaseCitationSearchView
 from .indexed import get_indexed_ref
@@ -89,22 +90,26 @@ def get_by_docid(request):
     if not docid:
         return HttpResponseBadRequest("Missing document ID")
 
+    resp: HttpResponse
+    outcome: str
     try:
         citation = build_citation_for_docid(
             docid.strip(),
             doctype.strip() if doctype else None)
     except RefNotFoundError:
-        return JsonResponse({
+        outcome = 'not_found'
+        resp = JsonResponse({
             "error":
                 "Unable to find bibliographic item matching "
                 "document ID {} (type {})".
                 format(docid, doctype or "unspecified"),
         }, status=404)
     except ValidationError as err:
-        return JsonResponse({
+        outcome = 'validation_error'
+        resp = JsonResponse({
             "error":
-                "Unable to generate XML for item {} ({}): "
-                "malformed source data (err: {})".
+                "Found item {} ({}), but source data doesn’t validate "
+                "(err: {})".
                 format(docid, doctype or "unspecified", str(err)),
         }, status=500)
     else:
@@ -113,27 +118,36 @@ def get_by_docid(request):
             try:
                 xml_string = to_xml_string(citation, anchor=anchor)
             except ValueError as err:
-                return JsonResponse({
+                outcome = 'serialization_error'
+                resp = JsonResponse({
                     "error":
                         "Unable to generate XML for item {} ({}): "
                         "unsuitable source data (err: {})".
                         format(docid, doctype or "unspecified", str(err)),
                 }, status=500)
             else:
-                return HttpResponse(
+                outcome = 'success'
+                resp = HttpResponse(
                     xml_string,
                     content_type="application/xml",
                     charset="utf-8")
         else:
-            return JsonResponse({"data": unpack_dataclasses(citation.dict())})
+            outcome = 'success'
+            resp = JsonResponse({"data": unpack_dataclasses(citation.dict())})
+
+    metrics.api_bibitem_hits.labels(docid, outcome, format).inc()
+
+    return resp
 
 
 class CitationSearchResultListView(BaseCitationSearchView):
     show_all_by_default = False
     query_in_path = True
+    metric_counter = metrics.api_search_hits
 
     def render_to_response(self, context):
-        meta = dict(total_records=len(self.object_list))
+        result_count = len(self.object_list)
+        meta = dict(total_records=result_count)
 
         page_obj = context['page_obj']
         if page_obj:

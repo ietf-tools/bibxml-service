@@ -16,6 +16,7 @@ from django.contrib import messages
 
 from bibxml import error_views
 from common.pydantic import unpack_dataclasses
+from prometheus import metrics
 
 from .exceptions import RefNotFoundError
 from .models import RefData
@@ -40,6 +41,8 @@ shared_context = dict(
 
 def home(request):
     """Serves main landing page."""
+
+    metrics.gui_home_page_hits.inc()
 
     non_empty_datasets = (
         RefData.objects.values_list('dataset', flat=True).
@@ -114,6 +117,15 @@ def browse_citation_by_docid(request):
             strict=False)
 
     except RefNotFoundError as e:
+        log.warning("Could not locate item by docid: %s, %s", docid, doctype)
+        metrics.gui_bibitem_hits.labels(docid, 'fallback_to_search').inc()
+
+        messages.info(
+            request,
+            "Could not find a bibliographic item "
+            f"exactly matching given document identifier (err: {e}), "
+            "trying search instead.")
+
         query = docid
         search_querydict = QueryDict('', mutable=True)
         search_querydict.update({
@@ -121,12 +133,6 @@ def browse_citation_by_docid(request):
             'allow_format_fallback': True,
             'bypass_cache': True,
         })
-        log.warning("Could not locate item by docid: %s, %s", docid, doctype)
-        messages.info(
-            request,
-            "Could not find a bibliographic item "
-            f"exactly matching given document identifier (err: {e}), "
-            "trying search instead.")
         return redirect('{}?{}'.format(
             reverse('search_citations'),
             search_querydict.urlencode(),
@@ -134,6 +140,7 @@ def browse_citation_by_docid(request):
 
     else:
         result = unpack_dataclasses(citation.dict())
+        metrics.gui_bibitem_hits.labels(docid, 'success').inc()
         return render(request, 'browse/citation_details.html', dict(
             data=result,
             **shared_context,
@@ -144,6 +151,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
     template_name = 'browse/search_citations.html'
+    metric_counter = metrics.gui_search_hits
 
     def get_context_data(self, **kwargs):
         return dict(
