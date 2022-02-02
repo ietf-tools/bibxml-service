@@ -11,6 +11,9 @@ in the shape of ``{ type: <document type>, id: <document ID> }``,
 where type can be e.g. “IEEE”, and document ID is a freeform string
 with shape depending on document type.
 
+.. seealso:: :mod:`bib_models` for implementation of bibliographic item classes
+             in Python with Pydantic validation.
+
 .. note::
 
    Currently, Relaton specification for bibliographic item object
