@@ -20,6 +20,10 @@ from .exceptions import RefNotFoundError
 
 # TODO: Make ``get_doi_ref`` logic part of ``get_by_docid``
 def get_doi_ref(request, ref):
+    """Retrieves a citation using DOI from Crossref.
+    ``format``, ``anchor`` handling equivalent to :func:`get_by_docid`.
+    """
+
     format = request.GET.get('format', 'relaton')
 
     if format != 'relaton' and format not in serializers.registry:
@@ -68,8 +72,14 @@ def get_doi_ref(request, ref):
 
 
 def get_by_docid(request):
+    """Obtains item by ``doctype`` and ``docid`` specified in GET query,
+    returns serialized using specified ``format`` (“relaton” by default).
 
+    ``format`` determines response content type.
+    (“accepts” header is ignored at this time.)
 
+    ``anchor``, if provided in GET query, is passed to serializer.
+    """
 
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
     format = request.GET.get('format', 'relaton')
@@ -137,6 +147,8 @@ def get_by_docid(request):
 
 
 class CitationSearchResultListView(BaseCitationSearchView):
+    """Allows to search bibliographic data via API."""
+
     show_all_by_default = False
     query_in_path = True
     metric_counter = metrics.api_search_hits
