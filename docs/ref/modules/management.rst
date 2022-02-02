@@ -2,8 +2,6 @@
 ``management`` — citation sourcing
 ==================================
 
-.. todo:: Complete management module reference.
-
 .. module:: management
 
 .. contents::
@@ -11,6 +9,12 @@
 
 Sourcing logic
 ==============
+
+``datasets`` — source discovery
+-------------------------------
+
+.. automodule:: management.datasets
+   :members:
 
 ``repo`` — working with Git repositories
 ----------------------------------------
@@ -40,4 +44,31 @@ These tasks are run using Celery worker.
 ----------------------------------
 
 .. automodule:: management.task_status
+   :members:
+
+``celery`` — Celery interface
+-----------------------------
+
+.. automodule:: management.celery
+   :members:
+
+Interface
+=========
+
+Management GUI
+--------------
+
+.. automodule:: management.views
+   :members:
+
+Management API
+--------------
+
+.. automodule:: management.api
+   :members:
+
+Authentication
+--------------
+
+.. automodule:: management.auth
    :members:
