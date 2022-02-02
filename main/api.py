@@ -74,6 +74,11 @@ def get_by_docid(request):
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
     format = request.GET.get('format', 'relaton')
 
+    if format != 'relaton' and format not in serializers.registry:
+        return JsonResponse({
+            "error": "Requested format is not supported",
+        }, status=400)
+
     if not docid:
         return JsonResponse({
             "error": "Missing document ID",
