@@ -27,6 +27,11 @@ CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None)
 
 
 def context_processor(request):
+    """Adds context variables:
+
+    - ``datatracker_oauth_enabled`` (boolean)
+    - ``datatracker_user``, currently authenticated user info
+    """
     ctx = dict(
         datatracker_oauth_enabled=CLIENT_ID and CLIENT_SECRET,
     )
@@ -41,6 +46,7 @@ def context_processor(request):
 
 
 def log_out(request):
+    """Removes Datatracker user info from session."""
     try:
         del request.session[OAUTH_USER_INFO_KEY]
     except KeyError:
