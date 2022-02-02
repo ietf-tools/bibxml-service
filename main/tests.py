@@ -15,8 +15,7 @@ class RefDataModelTests(TestCase):
     def setUp(self):
         self.ref_id = "ref_01"
         self.dataset_name = 'nist'
-        self.ref_type = "standart"
-        self.ref_body = {
+        self.ref_body: Dict[str, Any] = {
             "id": "ref_01",
             "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
             "date": {"type": "published", "value": "2000-01-01"},
@@ -34,10 +33,10 @@ class RefDataModelTests(TestCase):
         }
 
         self.ref1 = RefData.objects.create(
-            ref_id=self.ref_id,
+            ref=self.ref_id,
             dataset=self.dataset_name,
-            ref_type=self.ref_type,
             body=self.ref_body,
+            representations={},
         )
 
     def test_get_ref(self):
