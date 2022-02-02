@@ -25,32 +25,33 @@ Glossary
        May be given by publisher or issued by some third-party system.
 
        Contained in ``docid`` field of bibliographic item’s Relaton representation,
-       and is a pair ``{ type, id }``, where ``type`` is :term:`document type`
-       and determines the format of ``id``.
-
-       The order of document identifiers matters.
+       and is a pair ``{ type, id }``,
+       where ``docid.type`` is :term:`document identifier type`
+       and determines the format of :term:`docid.id`.
 
        A single document can have multiple identifiers (e.g., a DOI, an ISBN, etc.).
        Each identifier is expected to be universally unique to this document.
 
-       Multiple bibliographic items that share at least one document ID.
+   primary document identifier
+       An identifier the ``id`` of which is used when citing/linking to document.
+
+       Multiple bibliographic items that share at least one primary document ID
        are considered to be representing the same bibliographic item
        (see also :mod:`bib_models.merger`).
 
-       .. note:: Not all identifier types are standardized at this time.
-
-       .. todo:: Clarify whether bibliographic item with more than one document ID
-                 of the same *type* is a logically valid scenario.
+       DOI, ISBN are *not* primary identifiers.
 
    docid.id
        Shorthand for the ``id`` component of :term:`document identifier`.
 
-   document type
+   document identifier type
+   docid.type
        The ``type`` component of :term:`document identifier`,
        contained in ``docid[*].type`` field of citation’s Relaton representation.
 
-       Document type in Relaton is a somewhat murky concept.
-       It is sometimes used to reference a namespace or registry
+       Document identifier type in Relaton is a somewhat murky concept.
+       In case of a “primary” identifier, type tends to be used
+       to reference a namespace or registry
        (e.g., DOI, ISBN),
        and in other cases used to reference a publishing organization
        (e.g., IETF, IANA).
@@ -58,6 +59,7 @@ Glossary
        Examples: ``IETF``, ``IEEE``, ``DOI``.
 
    bibliographic data source
+   dataset
        Where BibXML service obtains bibliographic items to show the user
        as a result of a query.
 
@@ -65,23 +67,10 @@ Glossary
          with the same :term:`document identifier`.
        - One source can provide bibliographic items of more than one document type.
        
-       Citation source can be either an :term:`internal source`
+       Citation source can be either an :term:`indexable source`
        or an :term:`external source`.
 
-   internal source
-   indexed source
-       Primary, fast to access source
-       that returns bibliographic data in Relaton format
-       with minimal or no processing and supports structured search.
-
-       Itself is not an authoritative source and is ephemeral.
-       During indexing stage it retrieves and pre-processes data
-       from datasets (which are in turn compiled from authoritative sources).
-
-       Currently there is only one internal source
-       powered by PostgreSQL via Django ORM.
-
-   dataset
+   indexable source
        An external data source periodically compiled
        by Relaton-aware tools from authoritative sources.
        
@@ -91,18 +80,20 @@ Glossary
        A dataset has to be indexed in order for the data to become
        available from the internal source.
 
+       When user requests bibliographic data,
+       the service returns items discovered across indexed sources first.
+
+   indexed source
+       An indexable source that has been indexed.
+
    reference
    ref
-       Name of an entry in a :term:`dataset`.
+       Name of an entry in an :term:`indexed source`.
        Unique per dataset.
 
-       - Not the same as :term:`document identifier`.
-         Identifier can be considered part of public API,
-         while reference is more an implementation detail of BibXML service.
-       - If multiple references (typically from different datasets)
-         contain the same ``{ type, id }`` combination in their data,
-         those references are treated as representing
-         the same :term:`bibliographic item`.
+       Not the same as :term:`document identifier`.
+       Document identifier is part of public API,
+       while reference is more an implementation detail of BibXML service.
 
        References correspond to :class:`main.models.RefData` instances.
 
@@ -115,16 +106,20 @@ Glossary
        (Relaton or BibXML).
 
    indexing
-       The process of retrieving bibliographic data from a :term:`dataset`
+       The process of retrieving bibliographic data from an :term:`indexable source`
        and storing them in the database as :class:`main.models.RefData` instances.
 
        Involves cloning repositories and reading files therein.
 
+       See :mod:`management`.
+
    legacy dataset
-       A set of manually crafted XML files that [used to be]
+       Sometimes used to refer to a set of manually crafted XML files that [used to be]
        provided by xml2rfc tools web server.
 
    legacy path
    xml2rfc-style path
        A path that used to be handled by xml2rfc tools web server.
        (Normally points to an XML file.)
+
+       See :doc:`/topics/xml2rfc-compat`.
