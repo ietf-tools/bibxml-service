@@ -3,7 +3,7 @@ from django.db.utils import IntegrityError
 from django.conf import settings
 from django.urls import reverse
 
-from .models import RefData
+from main.models import RefData
 
 
 class RefDataModelTests(TestCase):
