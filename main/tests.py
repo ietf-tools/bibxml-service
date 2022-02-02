@@ -18,7 +18,7 @@ class RefDataModelTests(TestCase):
         self.ref_type = "standart"
         self.ref_body = {
             "id": "ref_01",
-            "docid": {"id": "ref_01", "type": "test_dataset_01"},
+            "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
             "date": {"type": "published", "value": "2000-01-01"},
             "doctype": "standart",
             "language": ["en"],
