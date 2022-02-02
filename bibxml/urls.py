@@ -5,10 +5,10 @@ from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
 
 from main import api as public_api, views as public_views
-from main.api_compat import make_xml2rfc_path_pattern
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
 from xml2rfc_compat import fetchers as xml2rfc_fetchers
+from xml2rfc_compat.urls import make_xml2rfc_path_pattern
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth
 from prometheus.views import metrics as prometheus_metrics

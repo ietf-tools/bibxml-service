@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from common.pydantic import unpack_dataclasses
 from bib_models.models import BibliographicItem
-from bib_models.to_xml import to_xml_string
+from bib_models import serializers
 from prometheus import metrics
 
 from .util import BaseCitationSearchView
@@ -42,48 +42,55 @@ def get_ref(request, dataset_name, ref):
 def get_doi_ref(request, ref):
     format = request.GET.get('format', 'relaton')
 
-    if format != 'relaton':
+    if format != 'relaton' and format not in serializers.registry:
         return JsonResponse({
-            "error": "BibXML format is not supported yet by this endpoint",
-        }, status=500)
+            "error": "Requested format is not supported",
+        }, status=400)
 
     parsed_ref = unquote_plus(ref)
 
     try:
-        result = _get_doi_ref(parsed_ref)
-
-        if format == 'bibxml':
-            anchor = request.GET.get('anchor', None)
-            try:
-                xml_string = to_xml_string(result.bibitem, anchor=anchor)
-            except ValueError as err:
-                return JsonResponse({
-                    "error":
-                        "Unable to generate XML for item {}: "
-                        "unsuitable source data (err: {})".
-                        format(ref, str(err)),
-                }, status=500)
-            else:
-                return HttpResponse(
-                    xml_string,
-                    content_type="application/xml",
-                    charset="utf-8")
+        bibitem = _get_doi_ref(parsed_ref).bibitem
 
     except RefNotFoundError:
         return JsonResponse({
             "error": "Unable to find DOI ref {}".format(parsed_ref),
         }, status=404)
 
-    except ValueError:
+    except ValidationError as err:
         return JsonResponse({
-            "error": "Unable to find DOI ref {}".format(parsed_ref),
-        }, status=404)
+            "error":
+                "Obtained source data doesn’t validate "
+                "(err: {})".
+                format(str(err)),
+        }, status=500)
 
     else:
-        return JsonResponse({"data": unpack_dataclasses(result.dict())})
+        if format == 'relaton':
+            return JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
+        else:
+            kwargs = dict(anchor=request.GET.get('anchor', None))
+            serializer = serializers.get(format)
+            try:
+                bibitem_serialized = serializer.serialize(bibitem, **kwargs)
+            except ValueError as err:
+                return JsonResponse({
+                    "error":
+                        "Unable to serialize item {}: "
+                        "unsuitable source data (err: {})".
+                        format(ref, str(err)),
+                }, status=500)
+            else:
+                return HttpResponse(
+                    bibitem_serialized,
+                    content_type=serializer.content_type,
+                    charset='utf-8')
 
 
 def get_by_docid(request):
+
+
+
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
     format = request.GET.get('format', 'relaton')
 
@@ -93,7 +100,7 @@ def get_by_docid(request):
     resp: HttpResponse
     outcome: str
     try:
-        citation = build_citation_for_docid(
+        bibitem = build_citation_for_docid(
             docid.strip(),
             doctype.strip() if doctype else None)
     except RefNotFoundError:
@@ -108,32 +115,34 @@ def get_by_docid(request):
         outcome = 'validation_error'
         resp = JsonResponse({
             "error":
-                "Found item {} ({}), but source data doesn’t validate "
+                "Found item {} ({}), but source data didn’t validate "
                 "(err: {})".
                 format(docid, doctype or "unspecified", str(err)),
         }, status=500)
     else:
-        if format == 'bibxml':
-            anchor = request.GET.get('anchor', None)
+        if format == 'relaton':
+            outcome = 'success'
+            resp = JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
+        else:
+            kwargs = dict(anchor=request.GET.get('anchor', None))
+            serializer = serializers.get(format)
             try:
-                xml_string = to_xml_string(citation, anchor=anchor)
+                bibitem_serialized = serializer.serialize(bibitem, **kwargs)
             except ValueError as err:
                 outcome = 'serialization_error'
                 resp = JsonResponse({
                     "error":
-                        "Unable to generate XML for item {} ({}): "
+                        "Unable to serialize item {} ({}) "
+                        "into requested format: "
                         "unsuitable source data (err: {})".
                         format(docid, doctype or "unspecified", str(err)),
                 }, status=500)
             else:
                 outcome = 'success'
                 resp = HttpResponse(
-                    xml_string,
-                    content_type="application/xml",
-                    charset="utf-8")
-        else:
-            outcome = 'success'
-            resp = JsonResponse({"data": unpack_dataclasses(citation.dict())})
+                    bibitem_serialized,
+                    content_type=serializer.content_type,
+                    charset='utf-8')
 
     metrics.api_bibitem_hits.labels(docid, outcome, format).inc()
 

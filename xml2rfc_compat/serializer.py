@@ -12,10 +12,11 @@ from xml.etree.ElementTree import Element
 
 from lxml import etree, objectify
 
+from bib_models.models import BibliographicItem, Relation, Series, parse_relaxed_date
+from bib_models.dataclasses import Contributor, PersonAffiliation, Organization
+from bib_models.dataclasses import GenericStringValue, Contact, DocID
+
 from common.util import as_list
-from .models import BibliographicItem, Relation, Series, parse_relaxed_date
-from .dataclasses import Contributor, PersonAffiliation, Organization
-from .dataclasses import GenericStringValue, Contact, DocID
 
 
 E = objectify.E
@@ -28,6 +29,16 @@ __all__ = (
     'to_xml',
     'to_xml_string',
 )
+
+
+def to_xml_string(item: BibliographicItem, **kwargs) -> str:
+    """
+    Passes given item through ``to_xml()``
+    and renders it to a string with pretty print.
+
+    All kwargs are passed to ``to_xml()``.
+    """
+    return etree.tostring(to_xml(item, **kwargs), pretty_print=True)
 
 
 def to_xml(item: BibliographicItem, anchor=None) -> Element:
@@ -72,16 +83,6 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
     etree.cleanup_namespaces(root)
 
     return root
-
-
-def to_xml_string(item: BibliographicItem, **kwargs) -> str:
-    """
-    Passes given item through ``to_xml()``
-    and renders it to a string with pretty print.
-
-    All kwargs are passed to ``to_xml()``.
-    """
-    return etree.tostring(to_xml(item, **kwargs), pretty_print=True)
 
 
 # References and reference groups

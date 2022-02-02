@@ -1,3 +1,10 @@
+"""Functions responsible for retrieving bibliographic items
+from xml2rfc anchors.
+
+Plug these functions into root URL configuration
+via :func:`urls.make_xml2rfc_path_pattern`.
+"""
+
 import re
 
 from bib_models.models import BibliographicItem
