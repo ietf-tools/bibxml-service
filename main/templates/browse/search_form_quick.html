@@ -12,6 +12,7 @@
   <input
     {% if tabindex %}tabindex="{{ tabindex }}"{% endif %}
     {% if autofocus %}autofocus{% endif %}
+    id="quickSearchQuery"
     name="query"
     type="text"
     placeholder="{% if detailed %}Document ID or anything…{% else %}Quick search…{% endif %}"
