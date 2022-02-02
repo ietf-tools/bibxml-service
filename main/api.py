@@ -18,26 +18,6 @@ from .external import get_doi_ref as _get_doi_ref
 from .exceptions import RefNotFoundError
 
 
-def get_ref(request, dataset_name, ref):
-    format = request.GET.get('format', 'relaton')
-    try:
-        result = get_indexed_ref(dataset_name, ref, format)
-    except RefNotFoundError:
-        return JsonResponse({
-            "error":
-                "Unable to find ref {} in dataset {}".
-                format(ref, dataset_name),
-        }, status=404)
-    else:
-        if format == 'bibxml':
-            return HttpResponse(
-                result,
-                content_type="application/xml",
-                charset="utf-8")
-        else:
-            return JsonResponse({"data": result})
-
-
 # TODO: Make ``get_doi_ref`` logic part of ``get_by_docid``
 def get_doi_ref(request, ref):
     format = request.GET.get('format', 'relaton')
@@ -201,3 +181,25 @@ def json_schema(request, ref: str):
         return HttpResponseBadRequest("Unknown ref")
 
     return SCHEMA_REFS[ref].schema_json(indent=2)
+
+
+def get_ref(request, dataset_name, ref):
+    """Internal: retrieve item from dataset by reference."""
+
+    format = request.GET.get('format', 'relaton')
+    try:
+        result = get_indexed_ref(dataset_name, ref, format)
+    except RefNotFoundError:
+        return JsonResponse({
+            "error":
+                "Unable to find ref {} in dataset {}".
+                format(ref, dataset_name),
+        }, status=404)
+    else:
+        if format == 'bibxml':
+            return HttpResponse(
+                result,
+                content_type="application/xml",
+                charset="utf-8")
+        else:
+            return JsonResponse({"data": result})
