@@ -4,6 +4,7 @@
 import logging
 import functools
 from simplejson import JSONDecodeError
+
 from django.http.response import HttpResponseForbidden
 
 from .request import post

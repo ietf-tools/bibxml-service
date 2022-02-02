@@ -96,10 +96,12 @@ def get_by_docid(request):
 
     resp: HttpResponse
     outcome: str
+
     try:
         bibitem = build_citation_for_docid(
             docid.strip(),
             doctype.strip() if doctype else None)
+
     except RefNotFoundError:
         outcome = 'not_found'
         resp = JsonResponse({
@@ -108,6 +110,7 @@ def get_by_docid(request):
                 "document ID {} (type {})".
                 format(docid, doctype or "unspecified"),
         }, status=404)
+
     except ValidationError as err:
         outcome = 'validation_error'
         resp = JsonResponse({
@@ -116,6 +119,7 @@ def get_by_docid(request):
                 "(err: {})".
                 format(docid, doctype or "unspecified", str(err)),
         }, status=500)
+
     else:
         if format == 'relaton':
             outcome = 'success'
