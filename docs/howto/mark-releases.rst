@@ -1,6 +1,6 @@
-=============
-Mark releases
-=============
+========================
+How to mark new releases
+========================
 
 To mark a new release, tag current commit with new version.
 

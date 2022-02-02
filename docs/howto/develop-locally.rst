@@ -1,6 +1,6 @@
-====================================
-Set up local development environment
-====================================
+===========================================
+How to set up local development environment
+===========================================
 
 You will need Docker Desktop with Compose V2 support enabled.
 
