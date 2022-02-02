@@ -75,7 +75,9 @@ def get_by_docid(request):
     format = request.GET.get('format', 'relaton')
 
     if not docid:
-        return HttpResponseBadRequest("Missing document ID")
+        return JsonResponse({
+            "error": "Missing document ID",
+        }, status=400)
 
     resp: HttpResponse
     outcome: str
