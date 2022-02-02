@@ -19,8 +19,8 @@ Dataclasses
 .. automodule:: bib_models.dataclasses
    :members:
 
-XML conversion
-==============
+Serialization method registry
+=============================
 
-.. automodule:: bib_models.to_xml
+.. automodule:: bib_models.serializers
    :members:
