@@ -47,5 +47,7 @@ def start_prometheus_exporter(*args, **kwargs):
          switch to eventlet/gevent pooling,
          and use the appropriate signal (possibly ``celeryd_init``)
          for Prometheus exporter service startup.
+
+       See :doc:`/howto/run-in-production` for more regarding production setup.
     """
     start_http_server(9080)
