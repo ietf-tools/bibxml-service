@@ -1,3 +1,11 @@
+"""When run as a web service,
+this module provides an API for adding tasks to the queue.
+
+When run as Celery worker, this module sets up
+Celery to discover Django settings and task queue,
+and a signal listener that runs a simple HTTP server in a thread
+to export Celery-level Prometheus metrics."""
+
 from __future__ import absolute_import
 
 import os
