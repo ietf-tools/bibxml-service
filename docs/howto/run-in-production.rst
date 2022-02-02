@@ -2,8 +2,12 @@
 How to run in production
 ========================
 
-.. todo:: Complete this section.
+General setup
+=============
 
+Please refer to container reference bundled in the Compose configuration
+(:doc:`/ref/containers`), which illustrates the way the service
+is intended to be run.
 
 HTTPS setup
 ===========
@@ -31,13 +35,39 @@ AWS CloudFront/ELB, CloudFlare.
      that can result in stale bibliographic data being displayed.
 
 
-.. todo:: Document environment variables that matter with HTTPS.
-
-.. todo:: CSP setup.
-
-
 Monitoring errors
 =================
 
 The service can report to a Sentry instance.
 It is recommended to provide ``SENTRY_DSN`` environment variable.
+
+
+Tracking metrics
+================
+
+Web service exports metrics in Prometheus format under ``/metrics/`` path.
+The path requires HTTP Basic authentication (see :doc:`/topics/auth`).
+
+Celery worker process also exports metrics under port 9080.
+
+
+Scaling
+=======
+
+It is possible to run multiple instances of the web service
+by spinning multiple containers.
+
+If you run multiple instances of the web container,
+make sure the Prometheus instance is able to discover all scaled containers
+and scrapes bibliographic data access and other metrics
+from all of them.
+
+.. important:: Do **not** increase the number of Hypercorn workers
+               per instance. Prometheus Python client metric export,
+               as implemented, will not work in multiprocessing scenarios.
+               The supported method of scaling is via increasing
+
+.. important:: Do **not** scale the number of async task workers
+               (nor containers).
+               Indexing tasks as currently implemented
+               are not intended to be run in parallel.
