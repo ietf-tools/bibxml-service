@@ -2,6 +2,9 @@
 Environment variable reference
 ==============================
 
+.. contents::
+   :local:
+
 Environment variables read by web application
 =============================================
 

@@ -2,6 +2,9 @@
 ``bib_models``: Bibliographic data classes
 ==========================================
 
+.. contents::
+   :local:
+
 .. automodule:: bib_models
 
 Pydantic models
