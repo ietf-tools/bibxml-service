@@ -52,7 +52,7 @@ class RefDataModelTests(TestCase):
         url = f'%s?docid={docid}' % reverse("api_get_by_docid")
         response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {"data": self.ref_body})
+        self.assertEqual(json.loads(response.content)['data']['id'], self.ref_body['id'])
 
     def test_not_found_ref(self):
         url = '%s?docid=NONEXISTENTKEY404' % reverse("api_get_by_docid")
@@ -78,9 +78,10 @@ class RefDataModelTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        found_obj = json.dumps(response.json().get("data")[0].get("body"))
+        found_obj = response.json().get("data")[0]
 
-        self.assertJSONEqual(found_obj, self.ref_body)
+        self.assertEqual(found_obj['id'], self.ref_body['id'])
+        self.assertEqual(found_obj['docid'], self.ref_body['docid'])
 
     def test_fail_search_ref(self):
         struct_query = json.dumps(
