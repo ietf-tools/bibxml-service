@@ -107,7 +107,10 @@ def get_dataset_task_history(dataset_name, limit=10) -> \
 
 def list_running_tasks() -> List[str]:
     jobs = app.control.inspect().active()
-    return [task['id'] for hostname in jobs for task in jobs[hostname]]
+    return [
+        task['id']
+        for hostname in (jobs or [])
+        for task in jobs.get(hostname, [])]
 
 
 def describe_indexing_task(tid: str) -> IndexingTaskDescription:
