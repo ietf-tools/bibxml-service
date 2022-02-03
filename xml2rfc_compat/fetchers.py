@@ -151,6 +151,18 @@ def rfcsubseries(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+def nist(ref: str) -> BibliographicItem:
+    results = search_refs_relaton_field({
+        'docid[*]': '@.id == "%s" && @.type == "NIST"'
+        % re.escape(ref),
+    }, limit=10, exact=True)
+
+    if len(results) > 0:
+        return BibliographicItem(**results[0].body)
+    else:
+        raise RefNotFoundError()
+
+
 def _sort_by_id_draft_number(item: RefData):
     """For sorting Internet Drafts."""
     the_id = [

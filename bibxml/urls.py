@@ -130,6 +130,9 @@ urlpatterns = [
         *make_xml2rfc_path_pattern(
             ['bibxml9', *get_xml2rfc_aliases('bibxml9')],
             xml2rfc_fetchers.rfcsubseries),
+        *make_xml2rfc_path_pattern(
+            ['bibxml-nist'],
+            xml2rfc_fetchers.nist),
     ])),
 
     # Main GUI
