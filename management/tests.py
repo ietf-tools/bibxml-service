@@ -39,6 +39,9 @@ class IndexerTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.real_dataset = list(settings.KNOWN_DATASETS)[0]
+        self.auth = {
+            'HTTP_X_IETF_TOKEN': 'test',
+        }
 
     def test_run_indexer(self):
         """
@@ -60,14 +63,14 @@ class IndexerTest(TestCase):
     #     self.assertEqual(response.status_code, 500)
     #     self.assertTrue(len(response.json()["error"]) > 0)
 
-    def test_reset_indexer(self):
-        url = reverse("api_reset_index", args=[self.real_dataset])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(RefData.objects.count() == 0)
-
     def test_indexer_status(self):
         url = reverse("api_indexer_status", args=[self.real_dataset])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(response.json()["tasks"]) > 0)
+
+    def test_reset_indexer(self):
+        url = reverse("api_reset_index", args=[self.real_dataset])
+        response = self.client.post(url, **self.auth)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(RefData.objects.count() == 0)
