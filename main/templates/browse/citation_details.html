@@ -117,15 +117,10 @@
 
         {% include "deflist/entry.html" with key="revdate" val=data.revdate|default:"—" %}
         {% include "deflist/entry.html" with key="fetched" val=data.fetched|default:"—" %}
-        {% for c in data.contributor|as_list %}
-          {% if c.organization %}
-            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.organization.abbreviation|default:c.organization.name|as_list|first break_row=forloop.first %}
-          {% elif c.person.name %}
-            {% include "deflist/entry.html" with key=c.role|default:"contributor"|as_list|join:", " val=c.person.name tmpl="relaton/person_name.html" break_row=forloop.first %}
-          {% else %}
-            {% include "deflist/entry_recursivedict.html" with key=c.role|default:"contributor"|as_list|join:", " val=c break_row=forloop.first %}
-          {% endif %}
-        {% endfor %}
+
+        {% if data.contributor %}
+          {% include "deflist/entry.html" with key="contributors" tmpl="relaton/contributors.html" val=data.contributor|as_list wide=True %}
+        {% endif %}
 
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
 

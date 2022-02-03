@@ -1,0 +1,17 @@
+{% load relaton %}
+<ul class="flex flex-row flex-wrap items-center">
+  {% for c in val %}
+    <li class="mr-2">
+      {% if c.role %}
+        <small class="text-xs opacity-50">{{ c.role|as_list|join:", " }}</small>
+      {% endif %}
+      {% if c.organization %}
+        {{ c.organization.abbreviation|default:c.organization.name|as_list|first }}
+      {% elif c.person.name %}
+        {% include "relaton/person_name.html" with val=c.person.name %}
+      {% else %}
+        {% include "deflist/entry_recursivedict.html" with key_sr_only=True key=c.role|default:"contributor"|as_list|join:", " val=c %}
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
