@@ -27,12 +27,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        SNAPSHOT: placeholder
     image: local/web-precheck:latest
     command:
       - /bin/sh
       - -c
       - |
-        export SNAPSHOT=$$(git describe --abbrev=0) &&
         python manage.py migrate &&
         python manage.py check --deploy
     environment:
