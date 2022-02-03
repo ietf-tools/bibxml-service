@@ -34,7 +34,12 @@ RFP requirement compliance
    Development team believes that Django remains among the best-documented
    OSS projects.
 
-3. .. todo:: Document rsync datastore
+3. .. todo:: Confirm specifics
+
+   The service does not currently expose data using rsync,
+   but source data used by the service is available
+   via repositories named after ``relaton-data-*`` pattern
+   within https://github.com/ietf-ribose/.
 
 4. Ephemeral storage used by the service includes PostgreSQL and Redis.
 
