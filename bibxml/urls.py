@@ -8,6 +8,7 @@ from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
 from xml2rfc_compat import fetchers as xml2rfc_fetchers
+from xml2rfc_compat.aliases import get_aliases as get_xml2rfc_aliases
 from xml2rfc_compat.urls import make_xml2rfc_path_pattern
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth
@@ -103,31 +104,31 @@ urlpatterns = [
     # Compatibility API
     path('public/rfc/', include([
         *make_xml2rfc_path_pattern(
-            ['bibxml', 'bibxml-rfcs'],
+            ['bibxml', *get_xml2rfc_aliases('bibxml')],
             xml2rfc_fetchers.rfcs),
         *make_xml2rfc_path_pattern(
-            ['bibxml2', 'bibxml-misc'],
+            ['bibxml2', *get_xml2rfc_aliases('bibxml2')],
             xml2rfc_fetchers.misc),
         *make_xml2rfc_path_pattern(
-            ['bibxml3', 'bibxml-ids'],
+            ['bibxml3', *get_xml2rfc_aliases('bibxml3')],
             xml2rfc_fetchers.internet_drafts),
         *make_xml2rfc_path_pattern(
-            ['bibxml4', 'bibxml-w3c'],
+            ['bibxml4', *get_xml2rfc_aliases('bibxml4')],
             xml2rfc_fetchers.w3c),
         *make_xml2rfc_path_pattern(
-            ['bibxml5', 'bibxml-3gpp'],
+            ['bibxml5', *get_xml2rfc_aliases('bibxml5')],
             xml2rfc_fetchers.threegpp),
         *make_xml2rfc_path_pattern(
-            ['bibxml6', 'bibxml-ieee'],
+            ['bibxml6', *get_xml2rfc_aliases('bibxml6')],
             xml2rfc_fetchers.ieee),
         *make_xml2rfc_path_pattern(
-            ['bibxml7', 'bibxml-doi'],
+            ['bibxml7', *get_xml2rfc_aliases('bibxml7')],
             xml2rfc_fetchers.doi),
         *make_xml2rfc_path_pattern(
-            ['bibxml8', 'bibxml-iana'],
+            ['bibxml8', *get_xml2rfc_aliases('bibxml8')],
             xml2rfc_fetchers.iana),
         *make_xml2rfc_path_pattern(
-            ['bibxml9', 'bibxml-rfcsubseries'],
+            ['bibxml9', *get_xml2rfc_aliases('bibxml9')],
             xml2rfc_fetchers.rfcsubseries),
     ])),
 

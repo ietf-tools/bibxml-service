@@ -502,3 +502,18 @@ Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
 """Where to keep fetched source data and data generated during indexing.
 Should be a directory. No trailing slash."""
+
+XML2RFC_COMPAT_DIR_ALIASES = {
+    'bibxml': ['bibxml-rfcs'],
+    'bibxml2': ['bibxml-misc'],
+    'bibxml3': ['bibxml-ids'],
+    'bibxml4': ['bibxml-w3c'],
+    'bibxml5': ['bibxml-3gpp'],
+    'bibxml6': ['bibxml-ieee'],
+    'bibxml7': ['bibxml-doi'],
+    'bibxml8': ['bibxml-iana'],
+    'bibxml9': ['bibxml-rfcsubseries'],
+}
+"""Maps dirname to a list of aliases to reflect
+IETF xml2rfc web server behavior.
+"""

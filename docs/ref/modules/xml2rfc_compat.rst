@@ -6,6 +6,12 @@
 
 .. seealso:: :doc:`/topics/xml2rfc-compat`
 
+Aliases
+=======
+
+.. automodule:: xml2rfc_compat.aliases
+   :members:
+
 URL pattern factory
 ===================
 
