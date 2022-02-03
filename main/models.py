@@ -41,7 +41,7 @@ class RefData(models.Model):
     of :term:`bibliographic item`
     (:class:`bib_models.BibliographicItem`)."""
 
-    representations = models.JSONField()
+    representations = models.JSONField(default=lambda: dict())
     """Contains alternative representations of the citation.
     A mapping of ``{ <format_id>: <freeform string> }``,
     where format is e.g. “bibxml”.
