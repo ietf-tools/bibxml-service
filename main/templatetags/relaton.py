@@ -9,7 +9,7 @@ register = template.Library()
 
 @register.filter
 def as_list(value):
-    """Returns the value as a list (see :func:`main.util.as_list`),
+    """Returns the value as a list (see :func:`common.util.as_list`),
     omitting any ``None`` values."""
 
     result: Any = base_as_list(value)
