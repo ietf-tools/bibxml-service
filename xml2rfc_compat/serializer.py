@@ -12,9 +12,11 @@ from xml.etree.ElementTree import Element
 
 from lxml import etree, objectify
 
-from bib_models.models import BibliographicItem, Relation, Series, parse_relaxed_date
+from bib_models.models import BibliographicItem, Relation, Series
+from bib_models.models import parse_relaxed_date
 from bib_models.dataclasses import Contributor, PersonAffiliation, Organization
 from bib_models.dataclasses import GenericStringValue, Contact, DocID
+from bib_models import serializers
 
 from common.util import as_list
 
@@ -31,6 +33,7 @@ __all__ = (
 )
 
 
+@serializers.register('bibxml', 'application/xml')
 def to_xml_string(item: BibliographicItem, **kwargs) -> str:
     """
     Passes given item through ``to_xml()``

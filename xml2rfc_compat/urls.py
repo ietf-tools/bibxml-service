@@ -1,6 +1,7 @@
 import logging
 import functools
 from typing import Callable, List
+from enum import Enum
 
 from django.urls import re_path
 from django.views.decorators.cache import never_cache
@@ -13,6 +14,8 @@ from prometheus import metrics
 from bib_models.models import BibliographicItem
 from sources.exceptions import RefNotFoundError
 
+from .aliases import unalias
+from .models import Xml2rfcItem
 from .serializer import to_xml_string
 
 
@@ -49,31 +52,43 @@ def make_xml2rfc_path_pattern(
     ]
 
 
+class Outcome(Enum):
+    """Describes the result of locating requested xml2rfc item
+    in indexed Relaton sources.
+    """
+    SUCCESS = 'success'
+    NOT_FOUND = 'not_found'
+    VALIDATION_ERROR = 'validation_error'
+    SERIALIZATION_ERROR = 'serialization_error'
+
+
 def _make_xml2rfc_path_handler(fetcher_func: Callable[
     [str], BibliographicItem
 ]):
     """Creates a view function, given a fetcher function.
 
-    Fetcher function will receive a cleaned xml2rfc filename
+    Fetcher function will receive full requested subpath
+    (not including the unchanging prefix)
+    and a cleaned xml2rfc filename
     (just the anchor, without the “reference.” or “_reference.” prefix
-    or the .xml extension)
+    or the .xml extension),
     and must return a :class:`BibliographicItem` instance.
 
     The automatically created view function handles filename
     cleanup, constructing a :class:`BibliographicItem`
-    and converting it to XML string with proper anchor tag supplied.
+    and serializing it into an XML string with proper anchor tag supplied.
     """
 
     @functools.wraps(fetcher_func)
     def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
         resp: HttpResponse
-        outcome: str
+        outcome: Outcome
 
         try:
             item = fetcher_func(anchor)
         except RefNotFoundError:
             log.error("Item for xml2rfc path not found: %s", xml2rfc_subpath)
-            outcome = 'not_found_no_fallback'
+            outcome = Outcome.NOT_FOUND
             resp = JsonResponse({
                 "error": {
                     "message":
@@ -85,7 +100,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
             log.exception(
                 "Item found for xml2rfc path did not validate: %s",
                 xml2rfc_subpath)
-            outcome = 'validation_error'
+            outcome = Outcome.VALIDATION_ERROR
             resp = JsonResponse({
                 "error": {
                     "message":
@@ -100,7 +115,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                 log.exception(
                     "Item found for xml2rfc path did not validate: %s",
                     xml2rfc_subpath)
-                outcome = 'serialization_error'
+                outcome = Outcome.SERIALIZATION_ERROR
                 resp = JsonResponse({
                     "error": {
                         "message":
@@ -109,13 +124,42 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                     }
                 }, status=500)
             else:
-                outcome = 'success'
+                outcome = Outcome.SUCCESS
                 resp = HttpResponse(
                     xml_repr,
                     content_type="application/xml",
                     charset="utf-8")
 
-        metrics.xml2rfc_api_bibitem_hits.labels(xml2rfc_subpath, outcome).inc()
-        return resp
+        if outcome != Outcome.SUCCESS:
+            requested_dirname = xml2rfc_subpath.split('/')[-2]
+            try:
+                actual_dirname = unalias(requested_dirname)
+            except ValueError:
+                fallback_item = None
+            else:
+                subpath = xml2rfc_subpath.replace(
+                    requested_dirname,
+                    actual_dirname,
+                    1)
+                try:
+                    fallback_item = Xml2rfcItem.objects.get(subpath=subpath)
+                except Xml2rfcItem.DoesNotExist:
+                    fallback_item = None
+
+            if fallback_item is not None:
+                metrics.xml2rfc_api_bibitem_hits.labels(
+                    xml2rfc_subpath,
+                    f'{outcome.name}_fallback',
+                ).inc()
+                return HttpResponse(
+                    fallback_item.xml_repr,
+                    content_type="application/xml",
+                    charset="utf-8")
+            else:
+                metrics.xml2rfc_api_bibitem_hits.labels(
+                    xml2rfc_subpath,
+                    outcome.name,
+                ).inc()
+                return resp
 
     return handle_xml2rfc_path
