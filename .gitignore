@@ -2,6 +2,7 @@
 /docs/build
 /env
 /node_modules
+/test-artifacts
 .env
 *.pyc
 http_cache.sqlite
