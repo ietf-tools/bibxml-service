@@ -14,7 +14,7 @@ class RefDataModelTests(TestCase):
 
     def test_fail_duplicate_ref(self):
         self.ref1 = RefData.objects.create(
-            ref="ref_01", dataset=self.dataset1_name, body=self.ref_body
+            ref="ref_01", dataset=self.dataset1_name, body=self.ref_body, representations={},
         )
 
         self.assertRaises(
@@ -23,14 +23,15 @@ class RefDataModelTests(TestCase):
             ref="ref_01",
             dataset=self.dataset1_name,
             body=self.ref_body,
+            representations={},
         )
 
     def test_same_ref_diff_datasets(self):
         self.ref1 = RefData.objects.create(
-            ref="ref_01", dataset=self.dataset1_name, body=self.ref_body
+            ref="ref_01", dataset=self.dataset1_name, body=self.ref_body, representations={},
         )
         self.ref2 = RefData.objects.create(
-            ref="ref_01", dataset=self.dataset2_name, body=self.ref_body
+            ref="ref_01", dataset=self.dataset2_name, body=self.ref_body, representations={},
         )
 
 
