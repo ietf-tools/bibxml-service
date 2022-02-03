@@ -3,5 +3,6 @@ build
 data
 node_modules
 test-artifacts
+__pycache__
 *.sqlite
 *.pyc
