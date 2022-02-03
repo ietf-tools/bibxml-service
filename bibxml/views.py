@@ -35,10 +35,11 @@ def openapi_spec(request):
 
 def legacy_openapi_spec(request):
     """Serves machine-readable spec for compatibility/legacy API."""
-    return render(request, 'openapi-legacy.yaml', dict(
-        legacy_dataset_ids=list(
-            getattr(settings, 'LEGACY_DATASETS', {}).keys()),
-    ), content_type='text/x-yaml')
+    return render(
+        request,
+        'openapi-legacy.yaml',
+        dict(),
+        content_type='text/x-yaml')
 
 
 def readable_openapi_spec(request, spec: str):
