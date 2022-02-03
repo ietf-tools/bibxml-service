@@ -8,7 +8,7 @@ ENV SNAPSHOT=$SNAPSHOT
 
 RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 
-# Remove for non-slim image
+# Could probably be removed for non-slim Python image
 RUN apt-get update && apt-get install -yq curl libpq-dev build-essential git
 
 # Install Node.
