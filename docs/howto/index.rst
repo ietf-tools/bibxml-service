@@ -13,4 +13,5 @@ How-to guides
    add-new-source
    add-new-output-format
    mark-releases
+   update-container-build
    run-in-production
