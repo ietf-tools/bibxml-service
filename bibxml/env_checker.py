@@ -44,10 +44,6 @@ def env_checker(**kwargs):
         lambda val: val.strip() != '',
         "default database server hostname must be specified",
     ), (
-        'DB_PORT',
-        lambda val: val.strip() != '',
-        "default database server port number must be specified",
-    ), (
         'DJANGO_SECRET',
         lambda val: val.strip() != '',
         "Django secret must be set",
