@@ -128,7 +128,7 @@ class BaseCitationSearchView(BaseListView):
         if not self.query_in_path:
             self.raw_query = request.GET.get('query', None)
         else:
-            self.raw_query = unquote_plus(kwargs.get('query', '')).strip()
+            self.raw_query = unquote_plus(kwargs.pop('query', '')).strip()
 
         if not self.raw_query and self.is_gui:
             messages.warning(
