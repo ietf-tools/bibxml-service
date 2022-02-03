@@ -19,10 +19,18 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
 RUN apt-get update
 RUN apt-get install -yq nodejs
 
-COPY . /code
+# Copy and install requirements separately to let Docker cache layers
+COPY requirements.txt /code/requirements.txt
+COPY package.json /code/package.json
+COPY package-lock.json /code/package-lock.json
+
 WORKDIR /code
 
-RUN ["npm", "install"]
 RUN ["pip", "install", "-r", "requirements.txt"]
+RUN ["npm", "install"]
+
+# Copy the rest of the codebase
+COPY . /code
+
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 RUN ["python", "manage.py", "compress"]
