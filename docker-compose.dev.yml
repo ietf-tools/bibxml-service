@@ -1,3 +1,8 @@
+# Meant to be used in conjunction (after) the main docker-compose.yml
+# in development environment:
+#
+# docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
 services:
   web:
     volumes:
