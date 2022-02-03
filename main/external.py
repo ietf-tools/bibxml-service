@@ -15,7 +15,7 @@ from .types import ExternalBibliographicItem, CompositeSourcedBibliographicItem
 log = logging.getLogger(__name__)
 
 
-def get_doi_ref(doi: str, strict: bool = True) -> ExternalBibliographicItem:
+def get_doi_ref(doi: str, strict: bool = True) -> CompositeSourcedBibliographicItem:
     """
     :param bool strict: same meaning
                         as in :func:`main.indexed.build_citation_for_docid()`.
