@@ -2,16 +2,17 @@
 Bundled container reference
 ===========================
 
-The bundled Docker Compose configuration runs the following containers.
-
+The bundled Docker Compose configurations run following containers.
 It’s intended as a reference, but could be used in production
-as long as relevant precautions are followed.
+as long as :doc:`relevant precautions </howto/run-in-production>` are followed.
 
-Below, ``<host>`` is used to signify the hostname under which you deploy
-the suite, in case of a local machine it’ll be localhost.
-The Compose configuration automatically binds services
-to host machine’s ports, so that you can explore services
-by pointing to ``<host>:port``.
+.. note::
+
+   Below, ``<host>`` is used to signify the hostname under which you deploy
+   the suite, in case of a local machine it’ll be localhost.
+   The Compose configuration automatically binds services
+   to host machine’s ports, so that you can explore services
+   by pointing to ``<host>:port``.
 
 
 Primary services

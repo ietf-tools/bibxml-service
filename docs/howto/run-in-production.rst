@@ -2,12 +2,23 @@
 How to run in production
 ========================
 
-General setup
-=============
+While bundled Compose configuration
+:doc:`configures containers </ref/containers>`
+to illustrate the way the service is intended to be operated,
+here are some external aspects and general notes.
 
-Please refer to container reference bundled in the Compose configuration
-(:doc:`/ref/containers`), which illustrates the way the service
-is intended to be run.
+Environment
+===========
+
+The service requires
+certain :doc:`environment variables </ref/env>`
+to be available at runtime.
+
+If you run via Compose, environment can be provided via ``.env`` file
+as a sibling of ``docker-compose.yml``.
+
+.. important:: No matter how you provide environment variables,
+               make sure ``DEBUG`` is not set in production.
 
 HTTPS setup
 ===========
@@ -71,6 +82,7 @@ If you run multiple instances of the web container,
 make sure the Prometheus instance is able to discover all scaled containers
 and scrapes bibliographic data access and other metrics
 from all of them.
+This is currently not handled by the bundled Compose configuration.
 
 .. important:: Do **not** increase the number of Hypercorn workers
                per instance. Prometheus Python client metric export,

@@ -115,12 +115,18 @@ Code layout
    ├── main/
    │   │   Retrieval GUI and API views and associated utilities.
    │   │
+   │   ├── templates/
+   │   │       Templates for browsing GUI.
    │   └── models.py
    │           Django model definitions for indexed bibliographic data.
    │
    ├── management/
    │   │   Management GUI and API views and associated utilities.
    │   │
+   │   ├── templates/
+   │   │       Templates for management GUI.
+   │  ...
+   │
    ├── datatracker/
    │       Datatracker integration: token validation, OAuth2.
    │
