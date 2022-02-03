@@ -35,7 +35,11 @@ paths:
 
     get:
       summary: Get bibliographic item by xml2rfc tools path
-      description: This endpoint returns raw XML response.
+      description: |
+        This endpoint returns raw XML response.
+        Returned bibliographic item is either obtained from a Relaton source,
+        or (if impossible to locate given anchor, and xml2rfc data is indexed)
+        from xml2rfc snapshot.
       responses:
 
         200:
