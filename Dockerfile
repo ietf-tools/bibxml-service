@@ -11,11 +11,13 @@ RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 # Remove for non-slim image
 RUN apt-get update && apt-get install -yq curl libpq-dev build-essential git
 
+# Install Node.
 # We need to have both Python (for backend Django code)
 # and Node (for Babel-based cross-browser frontend build).
 # Starting with Python image and adding Node is simpler.
-RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
-  apt-get update && apt-get install -yq nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
+RUN apt-get update
+RUN apt-get install -yq nodejs
 
 COPY . /code
 WORKDIR /code
