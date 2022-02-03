@@ -307,6 +307,9 @@ DEFAULT_SEARCH_RESULT_LIMIT = 400
 If the user hits this limit, they are expected to provide
 a more precise query."""
 
+DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
+"""Where to keep fetched source data and data generated during indexing.
+Should be a directory. No trailing slash."""
 
 RELATON_DATASETS = [
     'rfcs',
@@ -320,6 +323,17 @@ RELATON_DATASETS = [
     'nist',
 ]
 """Relaton sources. Must refer to existing GitHub repositories.
+"""
+
+DATASET_SOURCE_OVERRIDES = {
+    'ieee': {
+        'relaton_data': {
+            'repo_url': 'https://github.com/ietf-ribose/relaton-data-ieee',
+        },
+    },
+}
+"""Overrides dataset bibxml and/or relaton source.
+Supports partial override.
 """
 
 EXTERNAL_DATASETS = [
@@ -336,18 +350,6 @@ AUTHORITATIVE_DATASETS = [
 ]
 """A list of authoritative datasets.
 """
-
-
-# Further, specific to BibXML indexer
-
-DATASET_SOURCE_OVERRIDES = {
-    'ieee': {
-        'relaton_data': {
-            'repo_url': 'https://github.com/ietf-ribose/relaton-data-ieee',
-        },
-    },
-}
-"""Overrides dataset bibxml and/or relaton source. Supports partial override."""
 
 API_USER = 'ietf'
 """Username for HTTP Basic auth to access management GUI."""
@@ -366,9 +368,6 @@ Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
 .. seealso:: :doc:`/topics/auth`
 """
 
-DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
-"""Where to keep fetched source data and data generated during indexing.
-Should be a directory. No trailing slash."""
 
 XML2RFC_COMPAT_DIR_ALIASES = {
     'bibxml': ['bibxml-rfcs'],
