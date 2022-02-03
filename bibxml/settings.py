@@ -273,20 +273,28 @@ activates Matomo integration.
 # Datatracker
 
 DATATRACKER_CLIENT_ID = environ.get("DATATRACKER_CLIENT_ID", '')
+"""Datatracker client ID for OAuth2 integration."""
+
 DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '')
+"""Datatracker client secret for OAuth2 integration."""
 
 
 # Custom
 
 DEFAULT_CACHE_SECONDS = 21600
+"""How long to cache by default."""
 
 SEARCH_CACHE_SECONDS = 3600
+"""How long to cache search results for."""
 
 SNAPSHOT = environ.get("SNAPSHOT")
+"""Actual version of this service codebase at runtime."""
 
 SERVICE_NAME = environ.get("SERVICE_NAME")
+"""Service title (short phrase)."""
 
 HOSTNAME = environ.get("PRIMARY_HOSTNAME")
+"""Primary hostname the service is publicly deployed under."""
 
 
 # BibXML-specific
