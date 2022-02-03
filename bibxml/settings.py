@@ -239,9 +239,6 @@ REDIS_PORT = environ.get('REDIS_PORT', 0)
 
 # Caching
 
-DEFAULT_CACHE_SECONDS = 21600
-SEARCH_CACHE_SECONDS = 3600
-
 if environ.get('REDIS_HOST') and environ.get('REDIS_PORT'):
     CACHES = {
         'default': {
@@ -280,6 +277,10 @@ DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '')
 
 
 # Custom
+
+DEFAULT_CACHE_SECONDS = 21600
+
+SEARCH_CACHE_SECONDS = 3600
 
 SNAPSHOT = environ.get("SNAPSHOT")
 
