@@ -2,7 +2,12 @@
 How to set up local development environment
 ===========================================
 
-You will need Docker Desktop with Compose V2 support enabled.
+.. contents::
+   :local:
+
+You will need Docker and Docker Compose.
+Configuration entry point lives in ``docker-compose.yml``
+at the root of the repository.
 
 .. note::
 
