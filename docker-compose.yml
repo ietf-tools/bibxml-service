@@ -117,13 +117,14 @@ services:
       - |
         export SNAPSHOT=$$(git describe --abbrev=0) &&
         ./wait-for-migrations.sh &&
-        celery -A management worker -l info -c 1
+        celery -A sources.celery:app worker -l info -c 1
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
       INTERNAL_HOSTNAMES: "celery"
       DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
+      API_SECRET: "${API_SECRET:?missing API secret}"
       EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
       DB_HOST: db
       DB_PORT: 5432
@@ -143,59 +144,3 @@ services:
       - redis
     ports:
       - "9080:9080"
-
-  flower:
-    image: mher/flower
-    hostname: flower
-    environment:
-      CELERY_BROKER_URL: "redis://redis:6379"
-      CELERY_RESULT_BACKEND: "redis://redis:6379"
-    depends_on:
-      - celery
-    ports:
-      - "5555:5555"
-
-  celery-exporter:
-    image: danihodovic/celery-exporter
-    command: "--broker-url=redis://redis:6379"
-    depends_on:
-      - redis
-    ports:
-      - "9081:9808"
-
-  prometheus:
-    image: prom/prometheus
-    hostname: prometheus
-    build:
-      context: ops
-      dockerfile: prometheus.Dockerfile
-      args:
-        TARGET_HOSTS: "['web:8000', 'celery:9080', 'celery-exporter:9808']"
-        HTTP_BASIC_USERNAME: "ietf"
-        HTTP_BASIC_PASSWORD: "${API_SECRET:?missing API secret}"
-        JOB_NAME: "bibxml-service"
-    depends_on:
-      - web
-      - celery
-      - celery-exporter
-    ports:
-      - "9090:9090"
-
-  grafana:
-    image: grafana/grafana-oss
-    hostname: grafana
-    environment:
-      GF_SECURITY_ADMIN_USER: "ietf"
-      GF_SECURITY_ADMIN_PASSWORD: ${API_SECRET}
-      SOURCE_NAME: BibXML’s Prometheus
-      SOURCE: "http://prometheus:9090/"
-      SOURCE_VERSION: 1
-    volumes:
-      - ./ops/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
-      - ./ops/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
-      - ./ops/grafana-dashboard-gui-usage.json:/etc/dashboards/bibxml/gui_usage.json
-      - ./ops/grafana-dashboard-api-usage.json:/etc/dashboards/bibxml/api_usage.json
-    depends_on:
-      - prometheus
-    ports:
-      - "3000:3000"

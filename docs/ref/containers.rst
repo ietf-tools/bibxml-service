@@ -13,6 +13,12 @@ The Compose configuration automatically binds services
 to host machine’s ports, so that you can explore services
 by pointing to ``<host>:port``.
 
+
+Primary services
+================
+
+Defined in ``docker-compose.yml``.
+
 **web-precheck**
     Builds a base image with Python requirements,
     and launches Django management commands ``migrate`` and ``check --deploy``.
@@ -47,6 +53,35 @@ by pointing to ``<host>:port``.
                    once better parallelization is implemented,
                    a thread pool can be used after appropriate adjustments
                    to metric exporter.
+
+**db** (third-party)
+    Provides a PostgreSQL instance.
+
+    The instance does not store critical data.
+    It stores indexed bibliographic items
+    and Django session data (relied on by Datatracker OAuth flows).
+
+    .. important:: No accommodations are currently made
+                   for scaling PostgreSQL instance horizontally.
+
+**redis** (third-party)
+    Fast simple key-value store used as:
+    
+    - Celery task queue backend.
+
+      ``web`` container handles HTTP requests
+      and uses Celery client to add tasks to the queue;
+      ``celery`` container runs a Celery worker processing that queue.
+
+    - Django cache.
+
+
+Monitoring services
+===================
+
+Defined in ``docker-compose.monitor.yml``.
+
+.. seealso:: :doc:`/howto/run-in-production`
 
 **celery-exporter** (third-party)
     Exports Celery-level metrics (number of active tasks, etc.)
@@ -83,24 +118,3 @@ by pointing to ``<host>:port``.
 
     - When you open ``<host>:5555``, you should see current worker status
       and some task-related statistics.
-
-**db** (third-party)
-    Provides a PostgreSQL instance.
-
-    The instance does not store critical data.
-    It stores indexed bibliographic items
-    and Django session data (relied on by Datatracker OAuth flows).
-
-    .. important:: No accommodations are currently made
-                   for scaling PostgreSQL instance horizontally.
-
-**redis** (third-party)
-    Fast simple key-value store used as:
-    
-    - Celery task queue backend.
-
-      ``web`` container handles HTTP requests
-      and uses Celery client to add tasks to the queue;
-      ``celery`` container runs a Celery worker processing that queue.
-
-    - Django cache.

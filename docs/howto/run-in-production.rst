@@ -51,6 +51,16 @@ The path requires HTTP Basic authentication (see :doc:`/topics/auth`).
 Celery worker process also exports metrics under port 9080.
 
 
+.. note::
+
+   ``docker-compose.monitor.yml`` provides a configuration that runs
+   Prometheus, Grafana, Flower and Celery exporter utility image::
+   
+       docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
+   
+   .. seealso:: :doc:`/ref/containers`
+
+
 Scaling
 =======
 

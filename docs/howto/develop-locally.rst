@@ -88,6 +88,13 @@ for better development experience you can run the command this way instead::
 
 This will mount source code directory and enable hot reload on changes.
 
+If you want to run the service together with monitoring helper services,
+run this::
+
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.monitor.yml up
+
+.. seealso:: :doc:`/howto/run-in-production`
+
 
 Monitoring logs
 ---------------
