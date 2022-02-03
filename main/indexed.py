@@ -395,7 +395,7 @@ def build_citation_for_docid(
                         This is OK for some cases
                         (e.g., forgiving template rendering).
 
-    :rtype: bib_models.models.BibliographicItem
+    :rtype: bib_models.models.CompositeSourcedBibliographicItem
     :raises RefNotFoundError: if no matching refs were found.
     """
 
