@@ -21,7 +21,7 @@ services:
       - ..:/code
       - ./build:/build
   serve:
-    image: python:3
+    image: python:3-slim
     command: 
       - /bin/sh
       - -c
