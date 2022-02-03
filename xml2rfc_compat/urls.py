@@ -5,8 +5,7 @@ from typing import Callable, List
 from django.urls import re_path
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_safe
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
-from django.http import HttpResponseServerError
+from django.http import HttpResponse, JsonResponse
 
 from pydantic import ValidationError
 
