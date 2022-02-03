@@ -100,6 +100,6 @@ class RefDataModelTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        results_count = int(response.json().get("results").get("records"))
+        results_count = len(response.json().get("data"))
 
         self.assertEqual(results_count, 0)
