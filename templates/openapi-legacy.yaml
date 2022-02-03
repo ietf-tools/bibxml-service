@@ -46,7 +46,14 @@ paths:
                 type: string
 
         404:
-          description: reference not found. At this time, there may be false negatives.
+          description: reference not found. (At this time, there may be false negatives)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        500:
+          description: error retrieving or serializing item
           content:
             application/json:
               schema:
