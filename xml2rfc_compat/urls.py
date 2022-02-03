@@ -5,7 +5,7 @@ from typing import Callable, List
 from django.urls import re_path
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_safe
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 from django.http import HttpResponseServerError
 
 from pydantic import ValidationError
@@ -75,15 +75,25 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
         except RefNotFoundError:
             log.error("Item for xml2rfc path not found: %s", xml2rfc_subpath)
             outcome = 'not_found_no_fallback'
-            resp = HttpResponseNotFound(
-                "Item for xml2rfc path not found: %s" % xml2rfc_subpath)
+            resp = JsonResponse({
+                "error": {
+                    "message":
+                        "Item for xml2rfc path not found: %s"
+                        % xml2rfc_subpath,
+                }
+            }, status=404)
         except ValidationError:
             log.exception(
                 "Item found for xml2rfc path did not validate: %s",
                 xml2rfc_subpath)
             outcome = 'validation_error'
-            resp = HttpResponseServerError(
-                "Error constructing bibliographic item for given xml2rfc path")
+            resp = JsonResponse({
+                "error": {
+                    "message":
+                        "Error validating source bibliographic item "
+                        "Relaton data",
+                }
+            }, status=500)
         else:
             outcome = 'success'
             resp = HttpResponse(
