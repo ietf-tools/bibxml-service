@@ -6,6 +6,7 @@ How-to guides
    :maxdepth: 1
 
    develop-locally
+   run-tests
    style-web-pages
    adjust-citation-rendering
    adjust-xml2rfc-paths
