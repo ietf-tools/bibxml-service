@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  test-redis:
+    image: redis
+
+  test-db:
+    build:
+      context: ops
+      dockerfile: db.Dockerfile
+      args:
+        POSTGRES_DB: test
+        POSTGRES_USER: test
+        POSTGRES_PASSWORD: test
+
+  test:
+    image: local/test:latest
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+      args:
+        SNAPSHOT: ${SNAPSHOT:?err}
+    depends_on:
+      - test-db
+      - test-redis
+    volumes:
+      - ./test-artifacts:/code/test-artifacts
