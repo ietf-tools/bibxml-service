@@ -9,10 +9,10 @@ import re
 
 from bib_models.models import BibliographicItem
 from bib_models.dataclasses import DocID
-from sources.doi import get_bibitem as get_doi_bibitem
+from sources.exceptions import RefNotFoundError
+from doi.crossref import get_bibitem as get_doi_bibitem
 from main.models import RefData
-from main.indexed import search_refs_relaton_field
-from main.exceptions import RefNotFoundError
+from main.query import search_refs_relaton_field
 
 
 def rfcs(ref: str) -> BibliographicItem:

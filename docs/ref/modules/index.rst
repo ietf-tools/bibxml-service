@@ -7,10 +7,11 @@ Python module reference
 
    bib_models
    bibxml
+   sources
    main
    management
+   doi
    datatracker
    xml2rfc_compat
-   sources
    prometheus
    common

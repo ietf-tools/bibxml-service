@@ -11,6 +11,13 @@ DB query profiling
    :members:
 
 
+Working with Git repositories
+=============================
+
+.. automodule:: common.git
+   :members:
+
+
 Pydantic utilities
 ==================
 

@@ -1,3 +1,5 @@
+"""Responsible for Crossref interaction."""
+
 from typing import List, Dict, Any, Union
 
 from pydantic import ValidationError
@@ -12,8 +14,8 @@ from bib_models.dataclasses import Person, PersonAffiliation, PersonName
 from bib_models.dataclasses import GenericStringValue
 from bib_models.models import BibliographicItem, Link
 
-from main.types import ExternalBibliographicItem, ExternalSourceMeta
-from main.exceptions import RefNotFoundError
+from sources.types import ExternalBibliographicItem, ExternalSourceMeta
+from sources.exceptions import RefNotFoundError
 
 
 etiquette = Etiquette(

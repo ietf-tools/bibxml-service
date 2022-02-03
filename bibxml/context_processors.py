@@ -16,11 +16,11 @@ def matomo(request):
 
 def sources(request):
     return dict(
-        known_datasets=settings.KNOWN_DATASETS,
-        indexed_datasets=[
-            ds
-            for ds in settings.KNOWN_DATASETS
-            if ds not in settings.EXTERNAL_DATASETS],
+        known_datasets=[
+            *settings.RELATON_DATASETS,
+            *settings.EXTERNAL_DATASETS,
+        ],
+        relaton_datasets=settings.RELATON_DATASETS,
         external_datasets=settings.EXTERNAL_DATASETS,
         authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     )

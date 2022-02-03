@@ -4,8 +4,8 @@ from django.shortcuts import render
 from django.conf import settings
 from django.http.request import split_domain_port
 
-from .task_status import get_dataset_task_history, describe_indexing_task
-from .task_status import list_running_tasks
+from sources.task_status import get_dataset_task_history, describe_indexing_task
+from sources.task_status import list_running_tasks
 
 
 shared_context = dict(

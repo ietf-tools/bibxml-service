@@ -38,7 +38,7 @@ class RefDataModelTests(TestCase):
 class IndexerTest(TestCase):
     def setUp(self):
         self.client = Client()
-        self.real_dataset = list(settings.KNOWN_DATASETS)[0]
+        self.real_dataset = list(settings.RELATON_DATASETS)[0]
         self.auth = {
             'HTTP_X_IETF_TOKEN': 'test',
         }

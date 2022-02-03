@@ -4,10 +4,10 @@ from django.http import JsonResponse
 
 from celery.result import AsyncResult
 
-from .celery import app
-from .task_status import get_dataset_task_history, push_task
-from .index import reset_index_for_dataset
-from .tasks import fetch_and_index
+from sources.tasks import fetch_and_index
+from sources.celery import app
+from sources.task_status import get_dataset_task_history, push_task
+from sources import indexable
 
 
 def run_indexer(request, dataset_name):
@@ -34,11 +34,19 @@ def run_indexer(request, dataset_name):
 def reset_index(request, dataset_name):
     """Clears index for dataset."""
 
-    reset_index_for_dataset(dataset_name)
-
-    return JsonResponse({
-        "message": "Index for {} had been reset".format(dataset_name),
-    })
+    try:
+        source = indexable.registry[dataset_name]
+    except KeyError:
+        return JsonResponse({
+            "error": {
+                "message": "Index for {} had been reset".format(dataset_name),
+            }
+        })
+    else:
+        source.reset_index()
+        return JsonResponse({
+            "message": "Index for {} had been reset".format(dataset_name),
+        })
 
 
 def indexer_status(request, dataset_name):

@@ -30,3 +30,15 @@ Serializing per RFC 7991
 
 .. automodule:: xml2rfc_compat.serializer
    :members:
+
+Indexable source
+================
+
+.. automodule:: xml2rfc_compat.source
+   :members:
+
+Data model
+==========
+
+.. automodule:: xml2rfc_compat.models
+   :members:

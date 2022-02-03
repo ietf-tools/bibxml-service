@@ -109,26 +109,28 @@ Code layout
    ├── bib_models/
    │       Bibliographic item dataclasses/Pydantic models.
    │
+   ├── sources/
+   │       Bibliographic data sources
+   │
    ├── main/
    │   │   Retrieval GUI and API views and associated utilities.
    │   │
    │   └── models.py
    │           Django model definitions for indexed bibliographic data.
    │
+   ├── management/
+   │   │   Management GUI and API views and associated utilities.
+   │   │
    ├── datatracker/
    │       Datatracker integration: token validation, OAuth2.
-   │
-   ├── management/
-   │       Source management GUI and API.
    │
    ├── prometheus/
    │       Prometheus metrics & export view.
    │
-   ├── sources/
-   │   │   Logic specific to individual external sources.
-   │   │   (Refactoring from main/external is in progress.)
+   ├── doi/
+   │   │   DOI retrieval implementation.
    │   │
-   │   └── doi/
+   │   └── crossref.py
    │
    └── xml2rfc_compat/
    │       xml2rfc tools style API support.
@@ -137,6 +139,7 @@ Code layout
    └── common/
        ├── pydantic.py
        ├── query_profiler.py
+       ├── git.py
        └── util.py
 
 

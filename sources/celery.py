@@ -4,7 +4,8 @@ this module provides an API for adding tasks to the queue.
 When run as Celery worker, this module sets up
 Celery to discover Django settings and task queue,
 and a signal listener that runs a simple HTTP server in a thread
-to export Celery-level Prometheus metrics."""
+to export Celery-level Prometheus metrics.
+"""
 
 from __future__ import absolute_import
 
@@ -15,7 +16,7 @@ from prometheus_client import start_http_server
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bibxml.settings')
 
-app = Celery('bibxml-indexer')
+app = Celery('bibxml-indexable-sources')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.conf.task_track_started = True
 app.autodiscover_tasks()

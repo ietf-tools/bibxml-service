@@ -1,3 +1,5 @@
+"""Retrieving bibliographic items from indexed Relaton sources."""
+
 import re
 import logging
 import json
@@ -18,22 +20,24 @@ from django.conf import settings
 # from sources import list_internal as list_internal_sources
 # from sources import InternalSource
 
-from management.datasets import get_source_meta, get_indexed_object_meta
 from common.util import as_list
 from bib_models.models import BibliographicItem
 from bib_models.dataclasses import DocID
 from bib_models.merger import bibitem_merger
+from sources.exceptions import RefNotFoundError
+from sources.types import IndexedBibliographicItem
+from sources.types import CompositeSourcedBibliographicItem
 
-from .types import IndexedBibliographicItem, CompositeSourcedBibliographicItem
-from .exceptions import RefNotFoundError
+from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
 
 
 log = logging.getLogger(__name__)
 
 
-def query_suppressing_user_input_error(query: Callable[[], QuerySet[RefData]]) \
-        -> Union[QuerySet[RefData], None]:
+def query_suppressing_user_input_error(
+    query: Callable[[], QuerySet[RefData]],
+) -> Union[QuerySet[RefData], None]:
     """Evaluates provided query and tries to suppress any error
     that may result from bad user input.
     """

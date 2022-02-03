@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.app.Config',
     'management.app.Config',
+    'xml2rfc_compat.app.Config',
     'compressor',
     'debug_toolbar',
 ]
@@ -118,6 +119,7 @@ TEMPLATES = [
                 'bibxml.context_processors.sources',
                 'bibxml.context_processors.matomo',
                 'datatracker.oauth.context_processor',
+                'sources.indexable.context_processor',
             ],
         },
     },
@@ -439,8 +441,7 @@ Where:
    as if that citation does not exist.
 """
 
-# TODO: Extract KNOWN_DATASETS from environment
-KNOWN_DATASETS = [
+RELATON_DATASETS = [
     'rfcs',
     'ids',
     'rfcsubseries',
@@ -450,9 +451,8 @@ KNOWN_DATASETS = [
     'ieee',
     'iana',
     'nist',
-    'doi',
 ]
-"""A list of known dataset IDs.
+"""Relaton sources. Must refer to existing GitHub repositories.
 """
 
 EXTERNAL_DATASETS = [

@@ -12,12 +12,13 @@ from django.core.cache import cache
 from django.http import Http404
 from django.contrib import messages
 
-from .types import CompositeSourcedBibliographicItem
+from sources.types import CompositeSourcedBibliographicItem
+
 from .models import RefData
-from .indexed import build_search_results
-from .indexed import search_refs_relaton_struct
-from .indexed import search_refs_relaton_field
-from .indexed import query_suppressing_user_input_error
+from .query import build_search_results
+from .query import search_refs_relaton_struct
+from .query import search_refs_relaton_field
+from .query import query_suppressing_user_input_error
 
 
 QUERY_FORMAT_LABELS = {

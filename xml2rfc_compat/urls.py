@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from prometheus import metrics
 from bib_models.models import BibliographicItem
-from main.exceptions import RefNotFoundError
+from sources.exceptions import RefNotFoundError
 
 from .serializer import to_xml_string
 

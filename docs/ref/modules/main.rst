@@ -1,30 +1,34 @@
-=========================================
-``main`` — citation retrieval API and GUI
-=========================================
+========================================================
+``main`` — Relaton sources; bibliographic data retrieval
+========================================================
 
 .. automodule:: main
 
 .. contents::
    :local:
 
-Helper types
-============
+Relaton source implementation
+=============================
 
-.. automodule:: main.types
+.. automodule:: main.sources
+   :members:
+
+Retrieval interfaces
+====================
+
+GUI
+---
+
+.. automodule:: main.views
    :members:
    :show-inheritance:
 
-Views
-=====
+API
+---
 
-.. module:: main.views
-
-.. autofunction:: main.views.home
-
-Browsing citations by :term:`document identifier`
--------------------------------------------------
-
-.. autofunction:: main.views.browse_citation_by_docid
+.. automodule:: main.api
+   :members:
+   :show-inheritance:
 
 Utility/generic views
 ---------------------
@@ -39,22 +43,21 @@ Template tags
 .. automodule:: main.templatetags.relaton
    :members:
 
+Querying indexed sources
+========================
+
+.. automodule:: main.query
+   :members:
+
+Helper types
+============
+
+.. automodule:: main.types
+   :members:
+   :show-inheritance:
+
 Models
 ======
 
 .. autoclass:: main.models.RefData
-   :members:
-
-``indexed``: querying sourced citations
-=======================================
-
-.. automodule:: main.indexed
-   :members:
-
-.. autoexception:: main.exceptions.RefNotFoundError
-
-``external``: querying external citation sources
-================================================
-
-.. automodule:: main.external
    :members:

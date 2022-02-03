@@ -1,3 +1,5 @@
+"""Obtaining bibliographic items by DOI."""
+
 import logging
 from typing import Union
 
@@ -6,17 +8,24 @@ import requests_cache
 from simplejson import JSONDecodeError
 from pydantic import ValidationError
 
-from main.exceptions import RefNotFoundError
-from sources.doi import get_bibitem
 from bib_models.dataclasses import DocID
-from .types import ExternalBibliographicItem, CompositeSourcedBibliographicItem
+from sources.exceptions import RefNotFoundError
+from sources.types import ExternalBibliographicItem
+from sources.types import CompositeSourcedBibliographicItem
+
+from .crossref import get_bibitem
 
 
 log = logging.getLogger(__name__)
 
 
-def get_doi_ref(doi: str, strict: bool = True) -> CompositeSourcedBibliographicItem:
+def get_doi_ref(
+    doi: str,
+    strict: bool = True,
+) -> CompositeSourcedBibliographicItem:
     """
+    Obtains an item by DOI.
+
     :param bool strict: same meaning
                         as in :func:`main.indexed.build_citation_for_docid()`.
     :returns: a :class:`bib_models.models.BibliographicItem` instance

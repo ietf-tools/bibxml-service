@@ -17,12 +17,12 @@ from django.contrib import messages
 from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
+from sources.exceptions import RefNotFoundError
+from doi import get_doi_ref
 
-from .exceptions import RefNotFoundError
 from .models import RefData
-from .indexed import get_indexed_ref, list_refs
-from .indexed import build_citation_for_docid
-from .external import get_doi_ref
+from .query import get_indexed_ref, list_refs
+from .query import build_citation_for_docid
 from .util import BaseCitationSearchView
 from .util import QUERY_FORMAT_LABELS
 
@@ -52,7 +52,7 @@ def home(request):
 
     browsable_datasets = [
         ds_id
-        for ds_id in settings.KNOWN_DATASETS
+        for ds_id in settings.RELATON_DATASETS
         if ds_id in non_empty_datasets]
 
     return render(request, 'browse/home.html', dict(
