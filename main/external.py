@@ -19,7 +19,7 @@ def get_doi_ref(doi: str, strict: bool = True) -> ExternalBibliographicItem:
     """
     :param bool strict: same meaning
                         as in :func:`main.indexed.build_citation_for_docid()`.
-    :returns: a :class`bib_models.BibliographicItem` instance
+    :returns: a :class`bib_models.models.BibliographicItem` instance
     :rtype BibliographicItem:
     :raises RefNotFoundError: reference not found
     """
