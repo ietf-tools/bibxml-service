@@ -1,3 +1,5 @@
+from typing import Dict, Any
+from urllib.parse import quote_plus
 import json
 
 from django.test import TestCase
@@ -38,35 +40,40 @@ class RefDataModelTests(TestCase):
             body=self.ref_body,
             representations={},
         )
+        import datatracker.auth
+        datatracker.auth.token_is_valid = lambda key: True
+
+        self.api_headers = {
+            'HTTP_X_DATATRACKER_TOKEN': 'test',
+        }
 
     def test_get_ref(self):
-        url = reverse(
-            "api_get_ref", kwargs={"lib": self.dataset_name, "ref": self.ref_id}
-        )
-        response = self.client.get(url)
+        docid = self.ref_body['docid'][0]['id']
+        url = f'%s?docid={docid}' % reverse("api_get_by_docid")
+        response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(response.content, {"data": self.ref_body})
 
     def test_not_found_ref(self):
-        url = reverse(
-            "api_get_ref",
-            kwargs={"lib": self.dataset_name, "ref": "NOTEXISTSKEY404"},
-        )
-        response = self.client.get(url)
+        url = '%s?docid=NONEXISTENTKEY404' % reverse("api_get_by_docid")
+        response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 404)
         self.assertTrue(len(response.json()["error"]) > 0)
 
     def test_success_search_ref(self):
-        url = reverse("api_search")
-        response = self.client.post(
+        struct_query = json.dumps(
+            {
+                "doctype": "standart", "id": "ref_01",
+            }
+        )
+        url = '%s?query_format=json_struct' % reverse(
+            "api_search",
+            args=[quote_plus(struct_query)],
+        )
+        response = self.client.get(
             url,
-            json.dumps(
-                {
-                    "dataset": self.dataset_name,
-                    "fields": {"doctype": "standart", "id": "ref_01"},
-                }
-            ),
             content_type="application/json",
+            **self.api_headers,
         )
 
         self.assertEqual(response.status_code, 200)
@@ -76,16 +83,19 @@ class RefDataModelTests(TestCase):
         self.assertJSONEqual(found_obj, self.ref_body)
 
     def test_fail_search_ref(self):
-        url = reverse("api_search")
-        response = self.client.post(
+        struct_query = json.dumps(
+            {
+                "doctype": "standart", "id": "NONEXISTENTID404",
+            }
+        )
+        url = '%s?query_format=json_struct' % reverse(
+            "api_search",
+            args=[quote_plus(struct_query)],
+        )
+        response = self.client.get(
             url,
-            json.dumps(
-                {
-                    "dataset": self.dataset_name,
-                    "fields": {"doctype": "standart", "id": "NOTEXISTSKEY404"},
-                }
-            ),
             content_type="application/json",
+            **self.api_headers,
         )
 
         self.assertEqual(response.status_code, 200)
