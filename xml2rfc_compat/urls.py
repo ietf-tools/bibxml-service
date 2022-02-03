@@ -95,11 +95,26 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                 }
             }, status=500)
         else:
-            outcome = 'success'
-            resp = HttpResponse(
-                to_xml_string(item, anchor=anchor),
-                content_type="application/xml",
-                charset="utf-8")
+            try:
+                xml_repr = to_xml_string(item, anchor=anchor)
+            except ValueError:
+                log.exception(
+                    "Item found for xml2rfc path did not validate: %s",
+                    xml2rfc_subpath)
+                outcome = 'serialization_error'
+                resp = JsonResponse({
+                    "error": {
+                        "message":
+                            "Error serializing obtained bibliographic item "
+                            "into XML",
+                    }
+                }, status=500)
+            else:
+                outcome = 'success'
+                resp = HttpResponse(
+                    xml_repr,
+                    content_type="application/xml",
+                    charset="utf-8")
 
         metrics.xml2rfc_api_bibitem_hits.labels(xml2rfc_subpath, outcome).inc()
         return resp
