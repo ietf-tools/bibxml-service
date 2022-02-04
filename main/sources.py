@@ -107,10 +107,10 @@ def register_relaton_source(source_id: str):
             locate_bibxml_source_repo(source_id),
         ],
     )({
-        'indexer': (lambda work_dirs, refs, on_progress, on_error: index_dataset(
+        'indexer': (lambda dirs, refs, on_progress, on_error: index_dataset(
             source_id,
-            path.join(work_dirs[1], 'data'),
-            path.join(work_dirs[0], 'data'),
+            path.join(dirs[1], 'data'),
+            path.join(dirs[0], 'data'),
             refs,
             on_progress,
             on_error,
