@@ -1,0 +1,20 @@
+{% load relaton %}
+{% if val.role %}
+  <small class="text-xs opacity-50">{{ val.role|as_list|join:", " }}</small>
+{% endif %}
+
+{% if val.organization %}
+  {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
+    <a class="link" href="{{ link }}">
+      {{ val.organization.abbreviation|default:val.organization.name|as_list|first }}
+    </a>
+  {% endwith %}
+{% elif val.person.name %}
+  {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=person.name.completename.content,person.name.surname.content,person.name.forename[*].content' %}
+    <a class="link" href="{{ link }}">
+      {% include "relaton/person_name.html" with val=val.person.name %}
+    </a>
+  {% endwith %}
+{% else %}
+  {% include "deflist/entry_recursivedict.html" with key_sr_only=True key=val.role|default:"contributor"|as_list|join:", " val=c %}
+{% endif %}
