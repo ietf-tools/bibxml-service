@@ -126,9 +126,9 @@
 
         {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
 
-        {% for relation in data.relation|as_list %}
-            {% include "deflist/entry.html" with key=relation.description.content|default:relation.type|default:"relates to" val=relation tmpl="relaton/relation.html" break_row=forloop.first %}
-        {% endfor %}
+        {% if data.relation %}
+          {% include "deflist/entry_list.html" with key="relations" items=data.relation|as_list tmpl="relaton/relation.html" %}
+        {% endif %}
 
         {% if data.language %}
           {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
