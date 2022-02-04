@@ -112,9 +112,7 @@
         {% include "deflist/entry.html" with key="edition" val=data.edition|default:"—" %}
 
         {% if data.date %}
-          {% for date in data.date|as_list %}
-            {% include "deflist/entry.html" with key=date.type val=date.value break_row=forloop.first %}
-          {% endfor %}
+          {% include "deflist/entry_list.html" with key="dates" tmpl="relaton/date.html" items=data.date|as_list %}
         {% endif %}
 
         {% include "deflist/entry.html" with key="revdate" val=data.revdate|default:"—" %}
