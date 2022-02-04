@@ -20,7 +20,7 @@
       {% if query|length > 30 %}
         !text-xs
       {% endif %}
-    ">{{ query|default:"N/A" }}</pre>
+    ">{{ query|default:request.GET.query|default:"N/A" }}</pre>
   </h2>
 
   <nav class="
