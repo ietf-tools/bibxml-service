@@ -6,7 +6,7 @@
   {% endif %}
 {% endwith %}
 
-{% with formattedref=val.bibitem.formattedref.content rel_docid=val.bibitem.docid|as_list|first rel_title=val.bibitem.title|as_list|first %}
+{% with formattedref=val.bibitem.formattedref.content|default:val.bibitem.formattedref rel_docid=val.bibitem.docid|as_list|first rel_title=val.bibitem.title|as_list|first %}
   {% with linked_id=rel_docid.id|default:formattedref %}
     {% if linked_id %}
       {% include "citation/docid_search_link.html" with val=linked_id %}
