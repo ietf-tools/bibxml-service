@@ -1,6 +1,7 @@
 """View functions for citation browse GUI."""
 
 import logging
+from math import log as log_, floor
 from urllib.parse import unquote_plus
 
 from django.db.models.query import QuerySet
@@ -49,6 +50,13 @@ def home(request):
         distinct())
 
     total_indexed_citations = RefData.objects.count()
+    units = ('', 'k', 'M', 'G', 'T', 'P')
+    factor = 1000.0
+    magnitude = int(floor(log_(max(abs(total_indexed_citations), 1), factor)))
+    total_indexed_human = '%.2f%s' % (
+        total_indexed_citations / factor**magnitude,
+        units[magnitude],
+    )
 
     browsable_datasets = [
         ds_id
@@ -57,7 +65,7 @@ def home(request):
 
     return render(request, 'browse/home.html', dict(
         **shared_context,
-        total_indexed_citations=total_indexed_citations,
+        total_indexed_human=total_indexed_human,
         browsable_datasets=browsable_datasets,
     ))
 
