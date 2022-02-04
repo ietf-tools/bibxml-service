@@ -1,4 +1,5 @@
-{% with query='{"docid": [{"id": "'|add:val|add:'"}]}' %}
-  <a class="link" href="{% url "search_citations" %}?query_format=json_struct&query={{ query|urlencode:"" }}"
+{% load relaton %}
+{% with link=val|substruct_search_link:'{"docid": [{"id": %s}]}' %}
+  <a class="link" href="{{ link }}"
     >{{ val }}</a>
 {% endwith %}
