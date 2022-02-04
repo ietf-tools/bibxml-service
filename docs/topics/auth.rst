@@ -16,6 +16,8 @@ and are used in ways described below.
 
 Note: the service does not track activity per token API secret token.
 
+.. seealso:: :mod:`management.auth`
+
 HTTP header token
 -----------------
 
@@ -56,6 +58,8 @@ For example::
       -Hx-datatracker-token:<your_token> \
       -X GET \
       "<instance_url>/api/v1/by-docid/?docid=RFC8126"
+
+.. seealso:: :mod:`datatracker.auth`
 
 OpenID Connect
 --------------
