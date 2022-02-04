@@ -1,6 +1,7 @@
 import logging
 import functools
-from typing import Callable, List
+import re
+from typing import Callable, List, Union
 from enum import Enum
 
 from django.urls import re_path
@@ -130,29 +131,21 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                     content_type="application/xml",
                     charset="utf-8")
 
-        if outcome != Outcome.SUCCESS:
-            requested_dirname = xml2rfc_subpath.split('/')[-2]
-            try:
-                actual_dirname = unalias(requested_dirname)
-            except ValueError:
-                fallback_item = None
-            else:
-                subpath = xml2rfc_subpath.replace(
-                    requested_dirname,
-                    actual_dirname,
-                    1)
-                try:
-                    fallback_item = Xml2rfcItem.objects.get(subpath=subpath)
-                except Xml2rfcItem.DoesNotExist:
-                    fallback_item = None
+        if outcome == Outcome.SUCCESS:
+            return resp
 
-            if fallback_item is not None:
+        else:
+            fallback: Union[str, None] = _obtain_fallback_xml(
+                xml2rfc_subpath,
+                anchor)
+
+            if fallback is not None:
                 metrics.xml2rfc_api_bibitem_hits.labels(
                     xml2rfc_subpath,
                     f'{outcome.name}_fallback',
                 ).inc()
                 return HttpResponse(
-                    fallback_item.xml_repr,
+                    fallback,
                     content_type="application/xml",
                     charset="utf-8")
             else:
@@ -163,3 +156,38 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                 return resp
 
     return handle_xml2rfc_path
+
+
+def _obtain_fallback_xml(subpath: str, anchor: str) -> Union[str, None]:
+    """Obtains XML fallback for given subpath, if possible."""
+
+    requested_dirname = subpath.split('/')[-2]
+    try:
+        actual_dirname = unalias(requested_dirname)
+    except ValueError:
+        return None
+    else:
+        subpath = subpath.replace(
+            requested_dirname,
+            actual_dirname,
+            1)
+        try:
+            xml_repr = Xml2rfcItem.objects.get(subpath=subpath).xml_repr
+        except Xml2rfcItem.DoesNotExist:
+            return None
+        else:
+            return _replace_anchor(xml_repr, anchor)
+
+
+def _replace_anchor(xml_repr: str, anchor: str) -> str:
+    """Replace the top-level anchor property with provided anchor.
+
+    Intended to be used with fallback XML that can possibly have
+    malformed anchors.
+
+    .. note:: Does not add anchor if it’s missing,
+              and does not validate/deserialize given XML."""
+
+    anchor_regex = re.compile(r'anchor=\"([^\"]*)\"')
+
+    return anchor_regex.sub(r'anchor="%s"' % anchor, xml_repr, count=1)
