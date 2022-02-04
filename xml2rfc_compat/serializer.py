@@ -297,7 +297,7 @@ def extract_3gpp_tr_series(docid: DocID) -> Union[Tuple[str, str], None]:
 
 def extract_ieee_series(docid: DocID) -> Union[Tuple[str, str], None]:
     if docid.type.lower() == 'ieee':
-        id, year, *_ = docid.id.replace('IEEE ', ' ').lower().strip().split('.')
+        id, year, *_ = docid.id.split(' ')[-1].lower().strip().split('.')
         return 'IEEE', '%s-%s' % (id.replace('-', '.'), year)
     return None
 
