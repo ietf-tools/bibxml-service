@@ -141,7 +141,7 @@
         {% endif %}
 
         {% if data.copyright %}
-          {% include "deflist/entry_list.html" with key="copyright(s)" items=data.copyright|as_list tmpl="relaton/copyright.html" %}
+          {% include "deflist/entry_list.html" with key="copyrights" items=data.copyright|as_list tmpl="relaton/copyright.html" %}
         {% endif %}
         {% if data.keyword %}
           {% include "deflist/entry_list.html" with key="keywords" items=data.keyword|as_list inline=1 %}
