@@ -51,9 +51,11 @@
   {{ block.super }}
 {% endblock %}
 
-{% block content %}
-  {{ block.super }}
+{% block before_container %}
+  {% include "_messages.html" with wrapper_htmlclass="bg-dark-700 xl:bg-transparent" %}
+{% endblock %}
 
+{% block content %}
   <header class="
     md:col-span-2 md:row-span-4 xl:row-span-2 py-4 md:pr-16
     sticky top-0
