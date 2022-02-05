@@ -2,7 +2,7 @@
 
 {% block content %}
   <div>
-    <h2 class="text-lg tracking-tight">Running task(s)</h2>
+    <h2 class="text-lg tracking-tight">Indexing tasks in&nbsp;progress</h2>
     {% if running_tasks %}
       <ul class="">
         {% for task in running_tasks %}
@@ -11,7 +11,7 @@
         {% endfor %}
       </ul>
     {% else %}
-      None.
+      <p>None.</p>
     {% endif %}
   </div>
 
