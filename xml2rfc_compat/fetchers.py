@@ -90,7 +90,7 @@ def w3c(ref: str) -> BibliographicItem:
 
 
 def threegpp(ref: str) -> BibliographicItem:
-    docid = ref.replace('3GPP.', '')
+    docid = ref.replace('SDO-3GPP.', '').replace('3GPP.', '')
 
     results = search_refs_relaton_field({
         'docid[*]': '@.type == "3GPP" && @.id like_regex "%s"'
