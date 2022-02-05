@@ -7,6 +7,8 @@
 Aliases are defined via :data:`bibxml.settings.XML2RFC_COMPAT_DIR_ALIASES`
 setting.
 """
+from typing import List
+
 from django.conf import settings
 
 
@@ -16,7 +18,7 @@ __all__ = ('ALIASES', )
 ALIASES = getattr(settings, 'XML2RFC_COMPAT_DIR_ALIASES', {})
 
 
-def get_aliases(dirname: str) -> str:
+def get_aliases(dirname: str) -> List[str]:
     """Get aliases for given directory."""
 
     return ALIASES.get(dirname, [])
