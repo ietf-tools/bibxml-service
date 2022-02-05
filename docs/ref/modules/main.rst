@@ -30,10 +30,10 @@ API
    :members:
    :show-inheritance:
 
-Utility/generic views
----------------------
+Base search view & utilities
+----------------------------
 
-.. automodule:: main.util
+.. automodule:: main.search
    :members:
    :show-inheritance:
 

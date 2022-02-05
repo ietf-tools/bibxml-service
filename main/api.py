@@ -14,7 +14,7 @@ from prometheus import metrics
 
 from doi import get_doi_ref as _get_doi_ref
 
-from .util import BaseCitationSearchView
+from .search import BaseCitationSearchView
 from .query import get_indexed_ref
 from .query import build_citation_for_docid
 

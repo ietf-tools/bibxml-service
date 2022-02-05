@@ -24,8 +24,8 @@ from doi import get_doi_ref
 from .models import RefData
 from .query import get_indexed_ref, list_refs
 from .query import build_citation_for_docid
-from .util import BaseCitationSearchView
-from .util import QUERY_FORMAT_LABELS
+from .search import BaseCitationSearchView
+from .search import QUERY_FORMAT_LABELS
 
 
 log = logging.getLogger(__name__)
