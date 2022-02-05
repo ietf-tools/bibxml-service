@@ -135,6 +135,18 @@ urlpatterns = [
             xml2rfc_fetchers.nist),
     ])),
 
+    # Management GUI
+    path('management/', include([
+        path('', require_safe(auth.basic(never_cache(
+            mgmt_views.manage
+        ))), name='manage'),
+        path('<dataset_id>/', include([
+            path('', require_safe(auth.basic(never_cache(
+                mgmt_views.manage_dataset
+            ))), name='manage_dataset'),
+        ])),
+    ])),
+
     # Main GUI
     path('', include([
 
@@ -152,17 +164,6 @@ urlpatterns = [
             path('log-out/', require_safe(never_cache(
                 dt_oauth.log_out
             )), name='datatracker_oauth_logout'),
-        ])),
-
-        path('management/', include([
-            path('', require_safe(auth.basic(never_cache(
-                mgmt_views.manage
-            ))), name='manage'),
-            path('<dataset_id>/', include([
-                path('', require_safe(auth.basic(never_cache(
-                    mgmt_views.manage_dataset
-                ))), name='manage_dataset'),
-            ])),
         ])),
 
         path('get-bibliographic-item/', never_cache(require_safe(
