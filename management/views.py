@@ -14,7 +14,7 @@ shared_context = dict(
 )
 
 
-def manage(request):
+def home(request):
     running_tasks = [
         describe_indexing_task(tid)
         for tid in list_running_tasks()

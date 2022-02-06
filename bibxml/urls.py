@@ -138,7 +138,7 @@ urlpatterns = [
     # Management GUI
     path('management/', include([
         path('', require_safe(auth.basic(never_cache(
-            mgmt_views.manage
+            mgmt_views.home
         ))), name='manage'),
         path('<dataset_id>/', include([
             path('', require_safe(auth.basic(never_cache(
