@@ -14,7 +14,11 @@ from doi.crossref import get_bibitem as get_doi_bibitem
 from main.models import RefData
 from main.query import search_refs_relaton_field
 
+from .urls import register_fetcher
+from .aliases import get_aliases
 
+
+@register_fetcher('bibxml')
 def rfcs(ref: str) -> BibliographicItem:
     rfc_anchor_docid = ref.replace('.', '')
 
@@ -32,6 +36,7 @@ def rfcs(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml2')
 def misc(ref: str) -> BibliographicItem:
     results = search_refs_relaton_field({
         'docid[*]': '@.id == "%s"'
@@ -44,6 +49,7 @@ def misc(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml3')
 def internet_drafts(ref: str) -> BibliographicItem:
     # E.g., draft-abarth-cookie-07
     option1 = (
@@ -75,6 +81,7 @@ def internet_drafts(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml4')
 def w3c(ref: str) -> BibliographicItem:
     docid = ref.replace('W3C.', 'W3C ')
 
@@ -89,6 +96,7 @@ def w3c(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml5')
 def threegpp(ref: str) -> BibliographicItem:
     docid = ref.replace('SDO-3GPP.', '').replace('3GPP.', '')
 
@@ -103,6 +111,7 @@ def threegpp(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml6')
 def ieee(ref: str) -> BibliographicItem:
     rough_docid = ref.replace('.', ' ').replace('-', ' ').replace('_', ' ')
     parts = rough_docid.split(' ')
@@ -119,6 +128,7 @@ def ieee(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml7')
 def doi(ref: str) -> BibliographicItem:
     docid = DocID(type='DOI', id=ref)
     result = get_doi_bibitem(docid)
@@ -128,6 +138,7 @@ def doi(ref: str) -> BibliographicItem:
         return result.bibitem
 
 
+@register_fetcher('bibxml8')
 def iana(ref: str) -> BibliographicItem:
     results = search_refs_relaton_field({
         'docid[*]': '@.type == "IANA" && @.id like_regex "(?i)%s"'
@@ -139,6 +150,7 @@ def iana(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml9')
 def rfcsubseries(ref: str) -> BibliographicItem:
     series, num = ref.split('.')
     results = search_refs_relaton_field({
@@ -151,6 +163,7 @@ def rfcsubseries(ref: str) -> BibliographicItem:
         raise RefNotFoundError()
 
 
+@register_fetcher('bibxml-nist')
 def nist(ref: str) -> BibliographicItem:
     results = search_refs_relaton_field({
         'docid[*]': '@.id == "%s" && @.type == "NIST"'

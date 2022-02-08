@@ -7,9 +7,10 @@ from django.views.decorators.http import require_POST, require_safe
 from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
-from xml2rfc_compat import fetchers as xml2rfc_fetchers
-from xml2rfc_compat.aliases import get_aliases as get_xml2rfc_aliases
-from xml2rfc_compat.urls import make_xml2rfc_path_pattern
+from xml2rfc_compat import views as xml2rfc_views
+# TODO: Register xml2rfc fetchers in app config
+from xml2rfc_compat import fetchers  # Imported for registration side-effect
+from xml2rfc_compat.urls import get_urls as get_xml2rfc_urls
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth
 from prometheus.views import metrics as prometheus_metrics
@@ -102,38 +103,7 @@ urlpatterns = [
     ])),
 
     # Compatibility API
-    path('public/rfc/', include([
-        *make_xml2rfc_path_pattern(
-            ['bibxml', *get_xml2rfc_aliases('bibxml')],
-            xml2rfc_fetchers.rfcs),
-        *make_xml2rfc_path_pattern(
-            ['bibxml2', *get_xml2rfc_aliases('bibxml2')],
-            xml2rfc_fetchers.misc),
-        *make_xml2rfc_path_pattern(
-            ['bibxml3', *get_xml2rfc_aliases('bibxml3')],
-            xml2rfc_fetchers.internet_drafts),
-        *make_xml2rfc_path_pattern(
-            ['bibxml4', *get_xml2rfc_aliases('bibxml4')],
-            xml2rfc_fetchers.w3c),
-        *make_xml2rfc_path_pattern(
-            ['bibxml5', *get_xml2rfc_aliases('bibxml5')],
-            xml2rfc_fetchers.threegpp),
-        *make_xml2rfc_path_pattern(
-            ['bibxml6', *get_xml2rfc_aliases('bibxml6')],
-            xml2rfc_fetchers.ieee),
-        *make_xml2rfc_path_pattern(
-            ['bibxml7', *get_xml2rfc_aliases('bibxml7')],
-            xml2rfc_fetchers.doi),
-        *make_xml2rfc_path_pattern(
-            ['bibxml8', *get_xml2rfc_aliases('bibxml8')],
-            xml2rfc_fetchers.iana),
-        *make_xml2rfc_path_pattern(
-            ['bibxml9', *get_xml2rfc_aliases('bibxml9')],
-            xml2rfc_fetchers.rfcsubseries),
-        *make_xml2rfc_path_pattern(
-            ['bibxml-nist'],
-            xml2rfc_fetchers.nist),
-    ])),
+    path(settings.XML2RFC_PATH_PREFIX, include(get_xml2rfc_urls())),
 
     # Management GUI
     path('management/', include([

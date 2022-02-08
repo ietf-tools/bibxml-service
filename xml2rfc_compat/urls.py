@@ -1,7 +1,7 @@
 import logging
 import functools
 import re
-from typing import Callable, List, Union
+from typing import Callable, List, Union, Dict
 from enum import Enum
 
 from django.urls import re_path
@@ -15,12 +15,33 @@ from prometheus import metrics
 from bib_models.models import BibliographicItem
 from sources.exceptions import RefNotFoundError
 
-from .aliases import unalias
 from .models import Xml2rfcItem
+from .aliases import unalias, get_aliases
 from .serializer import to_xml_string
 
 
 log = logging.getLogger(__name__)
+
+
+fetcher_registry: Dict[str, Callable[[str], BibliographicItem]] = {}
+
+
+def get_urls():
+    return [
+        pattern
+        for dirname, fetcher_func in fetcher_registry.items()
+        for pattern in make_xml2rfc_path_pattern(
+            [dirname, *get_aliases(dirname)],
+            fetcher_func)
+    ]
+    return fetcher_registry.values()
+
+
+def register_fetcher(dirname: str):
+    def register(fetcher_func: Callable[[str], BibliographicItem]):
+        fetcher_registry[dirname] = fetcher_func
+        return fetcher_func
+    return register
 
 
 def make_xml2rfc_path_pattern(
