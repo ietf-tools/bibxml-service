@@ -166,6 +166,7 @@ def handle_callback(request):
                 try:
                     session_with_token = OAuth2Session(
                         CLIENT_ID,
+                        state=request.session[OAUTH_STATE_KEY],
                         token=token)
                     user_info = session_with_token.get(
                         provider.userinfo_endpoint).json()
