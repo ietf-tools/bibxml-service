@@ -141,6 +141,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bibxml.wsgi.application'
 
+CSRF_USE_SESSIONS = True
+
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
     SESSION_COOKIE_DOMAIN = 'localhost'
