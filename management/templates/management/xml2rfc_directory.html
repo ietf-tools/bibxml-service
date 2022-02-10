@@ -147,7 +147,10 @@
               >
                 <span class="grow">{{ item.format_filename }}</span>
               </a>
-              <span class="resolution opacity-80 {{ row_htmlclass }}">
+              <span
+                class="resolution opacity-80 {{ row_htmlclass }}"
+                title="Effective method used to resolve this path. In green if it matches the preferred method (“auto” by default, “manual” if manual map is specified)."
+              >
                 {# Filled by JS. #}
               </span>
             </article>
