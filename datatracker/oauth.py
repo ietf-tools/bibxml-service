@@ -166,7 +166,7 @@ def handle_callback(request):
                     include_client_id=True,
                     code=request.GET.get('code'),
                     authorization_response=auth_response,
-                    kwargs=dict(redirect_uri=redirect_uri))
+                    redirect_uri=redirect_uri)
             except Exception as err:
                 log.exception("Datatracker OAuth: failed to retrieve token")
                 messages.error(
