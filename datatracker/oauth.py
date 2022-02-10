@@ -47,6 +47,29 @@ def context_processor(request):
         return ctx
 
 
+def get_client(request):
+    """Returns either a OAuth2Session, or None.
+
+    The session can be used to perform authenticated operations.
+    """
+
+    def token_updater(token):
+        request.session[OAUTH_TOKEN_KEY] = token
+    if OAUTH_TOKEN_KEY in request.session:
+        session = OAuth2Session(
+            CLIENT_ID,
+            scope=['openid'],
+            token=request.session[OAUTH_TOKEN_KEY])
+        provider = get_provider_info()
+        try:
+            session.get(provider.userinfo_endpoint).json()
+        except Exception:
+            # Most likely, token expired.
+            return None
+    else:
+        return None
+
+
 def log_out(request):
     """Removes Datatracker user info from session."""
     try:
