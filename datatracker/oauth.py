@@ -69,9 +69,12 @@ def initiate(request):
             "integration is not configured")
         return redirect('/')
     provider = get_provider_info()
-    redirect_uri = request.build_absolute_uri(
-        reverse('datatracker_oauth_callback'),
-    )
+
+    # We do not use Django’s request.build_absolute_uri here,
+    # since origin may be accessed over plain HTTP.
+    path = reverse('datatracker_oauth_callback')
+    redirect_uri = f'https://{settings.HOSTNAME}{path}'
+
     if redirect_uri != settings.DATATRACKER_REDIRECT_URI:
         messages.error(
             request,
