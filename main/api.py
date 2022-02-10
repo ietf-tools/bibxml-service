@@ -35,7 +35,7 @@ def get_doi_ref(request, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
-        bibitem = _get_doi_ref(parsed_ref).bibitem
+        bibitem = list(_get_doi_ref(parsed_ref).sources.values())[0].bibitem
 
     except RefNotFoundError:
         return JsonResponse({
