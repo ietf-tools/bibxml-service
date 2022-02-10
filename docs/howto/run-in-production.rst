@@ -23,8 +23,9 @@ as a sibling of ``docker-compose.yml``.
 HTTPS setup
 ===========
 
-BibXML service is intended to be run
-behind a load balancer (reverse proxy, CDN)
+The service relies on being accessed via HTTPS URLs.
+
+It is expected to be run from behind a load balancer (reverse proxy, CDN)
 that terminates SSL and talks to BibXML in plain HTTP.
 
 Typical choices include an Nginx frontend,
