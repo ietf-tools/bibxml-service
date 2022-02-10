@@ -68,7 +68,12 @@ def initiate(request):
             "integration is not configured")
         return redirect('/')
     provider = get_provider_info()
-    session = OAuth2Session(CLIENT_ID)
+    session = OAuth2Session(
+        CLIENT_ID,
+        redirect_uri=request.build_absolute_uri(
+            reverse('datatracker_oauth_callback'),
+        ),
+    )
     auth_url, state = session.authorization_url(provider.authorization_endpoint)
     request.session[OAUTH_STATE_KEY] = state
     return redirect(auth_url, permanent=False)
