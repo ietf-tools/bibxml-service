@@ -1,0 +1,81 @@
+{% extends "management/base.html" %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  xml2rfc path overview 
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:grid-cols-2
+{% endblock %}
+
+{% block content %}
+  {% for dir in available_paths %}
+    <article class="{% include "_list_item_classes.html" %} leading-tight">
+      <div class="{% include "_list_item_inner_classes.html" %} px-4 overflow-hidden">
+        <a class="link font-bold" href="{% url "manage_xml2rfc_directory" dir.name %}"
+          >{{ dir.name }}</a>
+        {% if dir.aliases %}
+          &emsp;
+          <span>
+            <span class="text-xs">aliased as</span>
+            {% for alias in dir.aliases %}
+              {{ alias }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </span>
+        {% endif %}
+        <br />
+        <span class="text-xs">
+          <span>{{ dir.total_count }} indexed</span>,
+          <span>{{ dir.manually_mapped_count }} manually mapped</span>
+        </span>
+        <br />
+        <span class="text-xs">
+          {% if dir.fetcher_name %}
+            Auto resolver: <code class="font-monospace">{{ dir.fetcher_name }}()</code>
+          {% else %}
+            Not automatically resolved.
+          {% endif %}
+        </span>
+      </div>
+    </article>
+  {% endfor %}
+
+  {{ block.super }}
+
+  <div class="p-4 leading-tight md:col-span-2 flex flex-col space-y-2 md:overflow-hidden">
+    <div>
+      Export current mappings:
+      <a
+        class="link whitespace-nowrap"
+        href="{% url "manage_xml2rfc_export_manual_map" %}"
+        download="bibxml-service-xml2rfc-path-map.json"
+      >
+        Download JSON
+      </a>
+    </div>
+    <form
+      method="POST"
+      enctype="multipart/form-data"
+      action="{% url "manage_xml2rfc_import_manual_map" %}"
+    >
+      {% csrf_token %}
+      <div class="
+        flex flex-col space-y-2
+        md:flex-row md:flex-nowrap
+        md:items-center
+        md:whitespace-nowrap
+        md:overflow-hidden
+        md:space-x-2
+      ">
+        <input type="file" name="map_json" class="grow" />
+        <label for="importClearCheckbox">
+          <input type="checkbox" class="text-sky-600" name="clear" id="importClearCheckbox" />
+          Delete existing
+        </label>
+        <button type="submit" class="button py-2">Import mappings</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

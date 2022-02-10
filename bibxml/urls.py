@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST, require_safe
 from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
+from xml2rfc_compat import views as xml2rfc_views
 # TODO: Register xml2rfc fetchers in app config
 from xml2rfc_compat import fetchers  # Imported for registration side-effect
 from xml2rfc_compat.urls import get_urls as get_xml2rfc_urls
@@ -109,10 +110,41 @@ urlpatterns = [
         path('', require_safe(auth.basic(never_cache(
             mgmt_views.home
         ))), name='manage'),
-        path('<dataset_id>/', include([
+
+        path('indexable-sources/', include([
             path('', require_safe(auth.basic(never_cache(
-                mgmt_views.manage_dataset
-            ))), name='manage_dataset'),
+                mgmt_views.datasets
+            ))), name='manage_indexable_sources'),
+            path('<dataset_id>/', include([
+                path('', require_safe(auth.basic(never_cache(
+                    mgmt_views.dataset
+                ))), name='manage_indexable_source'),
+            ])),
+        ])),
+
+        path('xml2rfc-compat/', include([
+            path('', require_safe(auth.basic(never_cache(
+                xml2rfc_views.DirectoryOverview.as_view(
+                    template_name='management/xml2rfc.html',
+                )
+            ))), name='manage_xml2rfc'),
+            path('import-map/', require_POST(auth.basic(
+                xml2rfc_views.import_manual_map,
+            )), name='manage_xml2rfc_import_manual_map'),
+            path('export-map/', require_safe(auth.basic(
+                xml2rfc_views.export_manual_map,
+            )), name='manage_xml2rfc_export_manual_map'),
+            path('edit-manual-map/<path:subpath>/', require_POST(auth.basic(
+                xml2rfc_views.edit_manual_map,
+            )), name='manage_xml2rfc_directory_map_path'),
+            path('delete-manual-map/<path:subpath>/', require_POST(auth.basic(
+                xml2rfc_views.delete_manual_map,
+            )), name='manage_xml2rfc_directory_unmap_path'),
+            path('<path:subpath>/', require_safe(auth.basic(never_cache(
+                xml2rfc_views.ExploreDirectory.as_view(
+                    template_name='management/xml2rfc_directory.html',
+                )
+            ))), name='manage_xml2rfc_directory'),
         ])),
     ])),
 

@@ -1,0 +1,30 @@
+{% extends "management/base.html" %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  Indexable sources
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:grid-cols-2
+{% endblock %}
+
+{% block content %}
+  {{ block.super }}
+
+  {% for dataset in datasets %}
+    <article class="{% include "_list_item_classes.html" %} leading-tight">
+      <div class="block {% include "_list_item_inner_classes.html" %} px-4 overflow-hidden">
+        <a class="link font-bold" href="{% url "manage_indexable_source" dataset.name %}"
+          >{{ dataset.name }}</a>
+          &emsp;
+          <span class="whitespace-nowrap text-sm">{{ dataset.item_count }} currently indexed</span>
+        <br />
+        <span class="truncate text-xs">
+          {{ dataset.status }}
+        </span>
+      </div>
+    </article>
+  {% endfor %}
+{% endblock %}

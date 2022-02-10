@@ -1,0 +1,161 @@
+{% extends "management/base.html" %}
+
+{% load cache %}
+
+{% block root_html_attrs %}
+  {{ block.super }}
+  {% if selected_item.subpath %}
+    data-xml2rfc-selected-path="{{ selected_item.subpath }}"
+  {% endif %}
+  data-xml2rfc-global-prefix="{{ global_prefix }}"
+  data-xml2rfc-dirname="{{ dirname }}"
+  data-xml2rfc-cache-key="{{ cache_key }}"
+{% endblock %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  {{ dir }}
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:!flex
+  flex-col
+  md:h-screen
+  md:overflow-hidden
+{% endblock %}
+
+{% block before_container %}{% endblock %}
+
+{% block content %}
+  <div class="flex-none">
+    {{ block.super }}
+  </div>
+
+  <div class="flex-1 md:flex flex-row-reverse md:overflow-hidden">
+
+  {% if selected_item %}
+    <div class="flex-1 md:flex flex-col md:overflow-hidden p-4 bg-sky-600 text-sky-100">
+      <h3 class="tracking-tight leading-tight mb-2">
+        <span class="font-semibold">{{ selected_item.format_filename }}</span>
+        <span class="whitespace-nowrap">
+          is
+          {% if selected_item_map.manual.config %}
+            manually mapped
+          {% else %}
+            not manually mapped
+          {% endif %}
+          (?)
+        </span>
+      </h3>
+
+      <div class="mb-2 md:flex flex-row items-center space-x-2 flex-nowrap">
+        <form
+          method="POST"
+          action="{% url "manage_xml2rfc_directory_map_path" selected_item.subpath %}"
+          id="editManualMapForm"
+          class="flex flex-row"
+        >
+          {% csrf_token %}
+          <input
+            type="text"
+            class="grow input-on-blue"
+            name="docid"
+            value="{{ selected_item_map.manual.config|default:"" }}"
+            placeholder="Enter docid.id…"
+          />
+          <button type="submit" class="button">
+            {% if selected_item_map.manual.config %}
+              Remap
+            {% else %}
+              Map
+            {% endif %}
+          </button>
+        </form>
+        <form
+          method="POST"
+          action="{% url "manage_xml2rfc_directory_unmap_path" selected_item.subpath %}"
+          id="deleteManualMapForm"
+        >
+          {% csrf_token %}
+          <button type="submit" class="button" title="Remove manual map & use automatic resolution">
+            Unmap
+          </button>
+        </form>
+      </div>
+
+      <div class="text-xs">
+        {% if selected_item_map.manual.config %}
+          {% if not selected_item_map.manual.item %}
+            <p>
+              No document matches the mapped document identifier, so fallback will be used if possible.
+              The document with provided identifier
+              either is not indexed at this time or does not exist in available data sources.
+          {% endif %}
+        {% else %}
+          {% if not selected_item_map.automatic_item %}
+            <p>
+              This path does not seem to resolve automatically, so fallback will be used if possible.
+              You can map a citeable document identifier to this path by hand above.
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <div id="resolutionTest" class="text-sm grow md:flex flex-col md:overflow-hidden">
+      </div>
+
+    </div>
+  {% endif %}
+
+  {% with row_htmlclass="whitespace-nowrap py-1 px-3" %}
+    <div class="
+      flex-1
+      md:overflow-hidden
+      md:flex
+      flex-col
+    ">
+      <div class="p-4 leading-tight tracking-tight bg-sky-700 text-sky-100">
+        <a
+          class=""
+          href="{% url "manage_xml2rfc" %}"
+        >/{{ global_prefix }}</a><a
+          class="font-semibold"
+          href="{% url "manage_xml2rfc_directory" dirname %}"
+        >{{ dirname }}/</a>
+      </div>
+      <div
+        id="xml2rfcPathScrollView"
+        class="
+          grow md:overflow-hidden md:overflow-y-auto
+          tracking-tight text-sm
+          bg-white dark:bg-dark-800 dark:text-inherit
+        "
+        {% if items|length > 9000 %}
+          data-load-js-browser-this-is-too-many-items='[{% for item in items %}"{{ item.subpath }}"{% if not forloop.last %},{% endif %}{% endfor %}]'
+        {% endif %}
+      >
+        {% cache 3600 xml2rfc_directory_listing1 cache_key %}
+          {% for item in items|slice:":9000" %}
+            <article
+              class="flex flex-row flex-nowrap hover:bg-sky-500/40"
+              title="{{ item.subpath }}"
+              data-xml2rfc-path="{{ item.subpath }}"
+            >
+              <a
+                class="grow truncate {{ row_htmlclass }}"
+                href="{% url "manage_xml2rfc_directory" item.subpath %}"
+              >
+                <span class="grow">{{ item.format_filename }}</span>
+              </a>
+              <span class="resolution opacity-80 {{ row_htmlclass }}">
+                {# Filled by JS. #}
+              </span>
+            </article>
+          {% endfor %}
+        {% endcache %}
+      </div>
+    </div>
+  {% endwith %}
+
+  </div>
+{% endblock %}

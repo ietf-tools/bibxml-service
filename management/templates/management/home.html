@@ -1,8 +1,11 @@
 {% extends "management/base.html" %}
 
+{% block before_container %}
+  {% include "_messages.html" %}
+{% endblock %}
+
 {% block content %}
-  <div>
-    <h2 class="text-lg tracking-tight">Indexing tasks in&nbsp;progress</h2>
+  <div class="p-4 md:overflow-y-auto md:row-span-3">
     {% if running_tasks %}
       <ul class="">
         {% for task in running_tasks %}
@@ -11,25 +14,7 @@
         {% endfor %}
       </ul>
     {% else %}
-      <p>None.</p>
+      <p>No indexing tasks are currently in progress.</p>
     {% endif %}
-  </div>
-
-  <div>
-    <h2 class="text-lg tracking-tight">See also</h2>
-    <ul class="">
-      <li>
-        <a href="{% url "browse" %}" target="_blank" class="link">
-          Public-facing service &rarr;
-        </a>
-      <li>
-        <a href="{% url "api_index" %}" target="_blank" class="link">
-          API reference &rarr;
-        </a>
-      <li>
-        <a href="//{{ task_monitor_host }}" target="_blank" class="link">
-          Worker dashboard at {{ task_monitor_host }} &rarr;
-        </a>
-    </ul>
   </div>
 {% endblock %}

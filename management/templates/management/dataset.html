@@ -1,9 +1,17 @@
-{% extends "management/base.html" %}
+{% extends "management/datasets.html" %}
 
 {% block title %}
   {{ block.super }}
   —
   {{ dataset_id }}
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:!block
+  p-4
+  h-screen
+  overflow-y-auto
+  space-y-2
 {% endblock %}
 
 {% block content %}
