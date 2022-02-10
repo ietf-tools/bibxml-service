@@ -130,12 +130,12 @@
           tracking-tight text-sm
           bg-white dark:bg-dark-800 dark:text-inherit
         "
-        {% if items|length > 9000 %}
+        {% if items|length > 6000 %}
           data-load-js-browser-this-is-too-many-items='[{% for item in items %}"{{ item.subpath }}"{% if not forloop.last %},{% endif %}{% endfor %}]'
         {% endif %}
       >
         {% cache 3600 xml2rfc_directory_listing1 cache_key %}
-          {% for item in items|slice:":9000" %}
+          {% for item in items|slice:":6000" %}
             <article
               class="flex flex-row flex-nowrap hover:bg-sky-500/40"
               title="{{ item.subpath }}"
