@@ -166,8 +166,7 @@ def handle_callback(request):
                 log.exception("Datatracker OAuth: failed to retrieve token")
                 messages.error(
                     request,
-                    f"Failed to fetch token ({err}, "
-                    f"used auth response {auth_response})")
+                    f"Failed to fetch token ({err})")
             else:
                 request.session[OAUTH_TOKEN_KEY] = token
 
