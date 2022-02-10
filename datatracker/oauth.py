@@ -185,7 +185,7 @@ def handle_callback(request):
                 user_info = session_with_token.get(
                     provider.userinfo_endpoint).json()
             except Exception as err:
-                log.exception("Datatracker OAuth: failed to retrieve user info")
+                log.exception("Datatracker OAuth: failed to get user info")
                 messages.error(
                     request,
                     f"Failed to fetch user info ({err})")
