@@ -116,6 +116,9 @@ def register_relaton_source(source_id: str):
             on_error,
         )),
         'reset_index': (lambda: reset_index_for_dataset(source_id)),
+        'count_indexed': (
+            lambda: RefData.objects.filter(dataset=source_id).count()
+        ),
     })
 
 

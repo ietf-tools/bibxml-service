@@ -77,5 +77,6 @@ indexable.register_git_source(
     [('https://github.com/ietf-ribose/bibxml-data-archive', 'main')],
 )({
     'indexer': index_xml2rfc_source,
+    'count_indexed': Xml2rfcItem.objects.count,
     'reset_index': (lambda: Xml2rfcItem.objects.all().delete()),
 })

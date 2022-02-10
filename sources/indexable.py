@@ -56,6 +56,9 @@ class IndexableSource:
     (number of found items, number of indexed items).
     """
 
+    count_indexed: Callable[[], int]
+    """A function that returns the number of indexed items for this source."""
+
     reset_index: Callable[[], None]
     """A function that wipes all indexed data for this source.
     Takes no arguments and returns nothing."""
@@ -98,6 +101,9 @@ class IndexableSourceToRegister(TypedDict, total=True):
     It should raise an exception if the source had not been indexed
     due to a problem.
     """
+
+    count_indexed: Callable[[], int]
+    """A function that returns the number of indexed items for this source."""
 
     reset_index: Callable[[], None]
     """A function that wipes all indexed data for this source.
@@ -217,6 +223,7 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
         indexable_source = IndexableSource(
             index=handle_index,
             reset_index=index_info['reset_index'],
+            count_indexed=index_info['count_indexed'],
         )
 
         registry[source_id] = indexable_source
