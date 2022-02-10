@@ -42,6 +42,16 @@ and understand how it works first.
 It is also not recommended to spread styling across new CSS files
 and maintain a single convention within this project.
 
+.. important::
+
+   Never construct Tailwind class strings dynamically.
+
+   Tailwind needs to “see” the entire class, such as ``bg-rose-600``,
+   appear in your code.
+   If you write ``bg-{{ classes.warning }}-600`` in a template
+   or ``text-${classes.warning}-100`` in JS,
+   the build won’t include relevant style rules.
+
 Not seeing your changes
 -----------------------
 
