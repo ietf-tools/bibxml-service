@@ -4,9 +4,9 @@
 {% endif %}
 
 {% if val.organization %}
-  {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
+  {% with org_name=val.organization.name|as_list|first link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
     <a class="link" href="{{ link }}">
-      {{ val.organization.abbreviation|default:val.organization.name|as_list|first }}
+      {{ val.organization.abbreviation|default:org_name|default:"N/A" }}
     </a>
   {% endwith %}
 {% elif val.person.name %}
