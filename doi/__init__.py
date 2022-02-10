@@ -28,8 +28,7 @@ def get_doi_ref(
 
     :param bool strict: same meaning
                         as in :func:`main.indexed.build_citation_for_docid()`.
-    :returns: a :class:`bib_models.models.BibliographicItem` instance
-    :rtype BibliographicItem:
+    :rtype: sources.types.CompositeSourcedBibliographicItem
     :raises RefNotFoundError: reference not found
     """
 

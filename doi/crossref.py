@@ -39,8 +39,15 @@ ALT_TITLES = [
 
 def get_bibitem(docid: DocID, strict: bool = True) \
         -> Union[ExternalBibliographicItem, None]:
-    """Retrieves DOI information from CrossRef
-    and deserializes into a :class:`bib_models.BibliographicItem` instance."""
+    """Retrieves DOI information from Crossref and deserializes it
+    into a :class:`sources.types.ExternalBibliographicItem` instance.
+
+    :returns None: if no match was returned from Crossref.
+    :rtype: None or sources.types.ExternalBibliograhpicItem
+    :raises ValueError: wrong docid.type (not DOI).
+    :raises pydantic.ValidationError:
+        strict is True and Relaton data failed to validate.
+    """
 
     if docid.type != 'DOI':
         raise ValueError(
