@@ -1,3 +1,7 @@
+"""Implements a registry of xml2rfc-style path resolver (fetcher) functions
+and provides utilities for constructing patterns
+fit for inclusion in site’s root URL configuration."""
+
 import logging
 import functools
 import re
@@ -24,9 +28,18 @@ log = logging.getLogger(__name__)
 
 
 fetcher_registry: Dict[str, Callable[[str], BibliographicItem]] = {}
+"""Maps xml2rfc subdirectory name to a function
+that returns a bibliographic item."""
 
 
 def get_urls():
+    """Returns a list of URL patterns suitable for inclusion
+    in site’s root URL configuration.
+
+    Fetcher functions should have been all registered prior
+    to calling this function.
+    """
+
     return [
         pattern
         for dirname, fetcher_func in fetcher_registry.items()
