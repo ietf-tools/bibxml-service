@@ -16,29 +16,31 @@
     const itemCount = itemPaths.length;
     const itemPathEntries = [...itemPaths.entries()];
 
+    // Relative is important, the remaining ones are useful for small viewports (mobile)
     scrollView.classList.add('relative', 'max-h-screen', 'overflow-y-auto');
 
+    // Keep the first child as template
     const firstItem = scrollView.children[0];
     const itemHeight = firstItem.offsetHeight;
     const templateItem = firstItem.cloneNode(true);
     delete templateItem.dataset.xml2rfcPath;
 
+    // Clear scroll view and add a height-forcing div
     scrollView.innerHTML = '';
     const heightExpander = document.createElement('div');
     heightExpander.style.height = `${itemCount * itemHeight}px`;
     scrollView.appendChild(heightExpander);
 
-    let itemWindow = null;
-    let cleanUpWatcher = null;
-
+    // If item is selected, scroll the outer element to make it appear in view
+    // before initializing item window
     if (selectedPath) {
       const selectedItemIdx = itemPaths.indexOf(selectedPath);
       if (selectedItemIdx >= 0) {
         scrollView.scrollTop = (selectedItemIdx * itemHeight);
       }
     }
-    refreshItemWindow();
 
+    // Automatically refresh window on each subsequent scroll
     let scrollTimeout = null;
     function handleScrollDebounced() {
       if (scrollTimeout) { window.clearTimeout(scrollTimeout); }
@@ -46,29 +48,48 @@
     }
     scrollView.addEventListener('scroll', handleScrollDebounced);
 
+
+    // Window refresh
+
+    let itemWindow = null;
+    let cleanUpWatcher = null;
+
+    // Call it in the beginning
+    refreshItemWindow();
+
     function refreshItemWindow() {
+      // Clean up previous window and xml2rfc resolver-watcher
       if (itemWindow !== null) {
         scrollView.removeChild(itemWindow);
       }
-
       cleanUpWatcher?.();
 
+      // Add item window to main scroll view
       itemWindow = scrollView.appendChild(document.createElement('div'));
+
+      // Determine which items to show
       const firstIdx = Math.floor(scrollView.scrollTop / itemHeight);
       const lastIdx = firstIdx + Math.ceil(scrollView.offsetHeight / itemHeight) + 1;
       if (lastIdx + 1 >= itemCount) {
         lastIdx = itemCount - 1;
       }
-      itemWindow.classList.add('absolute', 'left-0', 'right-0');
+
+      // Position window absolutely within the large scroll view,
+      // depending on which item is first in view
       itemWindow.style.top = `${firstIdx * itemHeight}px`;
 
+      itemWindow.classList.add('absolute', 'left-0', 'right-0');
+
+      // For each item to show, create element and append it to item window
       for (const [, path] of itemPathEntries.filter(([idx, ]) => idx >= firstIdx && idx <= lastIdx)) {
         const el = itemWindow.appendChild(makeItem(path));
         if (path === selectedPath) {
+          // If this item happens to be selected, make it look so
           markPathElAsSelected(el);
         }
       }
 
+      // Set up xml2rfc resolver-watcher for items in this window
       cleanUpWatcher = window.xml2rfcResolver.watchElements(
         storage,
         itemWindow.children,
@@ -78,6 +99,8 @@
 
       return itemWindow;
     }
+
+    // Constructing items from template
 
     function makeItem(path) {
       const newItem = templateItem.cloneNode(true);
