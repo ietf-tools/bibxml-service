@@ -152,8 +152,7 @@ def handle_callback(request):
                 token = session.fetch_token(
                     provider.token_endpoint,
                     client_secret=CLIENT_SECRET,
-                    authorization_response=auth_response,
-                )
+                    authorization_response=auth_response)
             except RuntimeError as err:
                 messages.error(
                     request,
