@@ -7,14 +7,12 @@
 {% block content %}
   <div class="p-4 md:overflow-y-auto md:row-span-3">
     {% if running_tasks %}
-      <ul class="">
+      <ul class="mb-2">
         {% for task in running_tasks %}
           <li class="">
             {% include "indexing_task.html" with task=task %}
         {% endfor %}
       </ul>
-    {% else %}
-      <p>No indexing tasks are currently in progress.</p>
     {% endif %}
   </div>
 {% endblock %}
