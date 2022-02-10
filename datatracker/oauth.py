@@ -133,7 +133,7 @@ def handle_callback(request):
         session = OAuth2Session(
             CLIENT_ID,
             state=request.session[OAUTH_STATE_KEY])
-    except RuntimeError as err:
+    except Exception as err:
         messages.error(
             request,
             f"Failed to instantiate OAuth2 session ({err})")
@@ -153,7 +153,7 @@ def handle_callback(request):
                     provider.token_endpoint,
                     client_secret=CLIENT_SECRET,
                     authorization_response=auth_response)
-            except RuntimeError as err:
+            except Exception as err:
                 messages.error(
                     request,
                     f"Failed to fetch token ({err}, "
@@ -167,7 +167,7 @@ def handle_callback(request):
                         token=token)
                     user_info = session_with_token.get(
                         provider.userinfo_endpoint).json()
-                except RuntimeError as err:
+                except Exception as err:
                     messages.error(
                         request,
                         f"Failed to fetch user info ({err})")
