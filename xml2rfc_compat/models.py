@@ -8,6 +8,27 @@ dir_subpath_regex = (
     r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
     r')$'
 )
+class ManualPathMap(models.Model):
+    """Maps an xml2rfc path to a search query.
+
+    Search is defined by ``query`` and ``query_format``.
+    Ideally, search query should unambiguously return one item,
+    so ``json_struct`` matching with docid specified is best.
+
+    We don’t map to DB-specific primary key values,
+    because those may change.
+    """
+
+    xml2rfc_subpath = models.CharField(
+        max_length=255,
+        db_index=True,
+        unique=True)
+    """Corresponds to the :any:`Xml2rfcItem.subpath`."""
+
+    docid = models.CharField(max_length=255, db_index=True)
+    """Document ID (``docid.id``) to map this path to."""
+
+
 class Xml2rfcItem(models.Model):
     """Represents an item at xml2rfc web server."""
 
