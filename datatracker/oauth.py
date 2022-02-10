@@ -142,6 +142,7 @@ def handle_callback(request):
         session = OAuth2Session(
             CLIENT_ID,
             scope=['openid'],
+            redirect_uri=redirect_uri,
             state=request.session[OAUTH_STATE_KEY])
     except Exception as err:
         log.exception("Datatracker OAuth: failed to instantiate session")
@@ -165,8 +166,7 @@ def handle_callback(request):
                     client_secret=CLIENT_SECRET,
                     include_client_id=True,
                     code=request.GET.get('code'),
-                    authorization_response=auth_response,
-                    redirect_uri=redirect_uri)
+                    authorization_response=auth_response)
             except Exception as err:
                 log.exception("Datatracker OAuth: failed to retrieve token")
                 messages.error(
