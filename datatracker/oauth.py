@@ -136,6 +136,16 @@ def handle_callback(request):
             "please try again.")
         return redirect('/')
 
+    try:
+        redirect_uri = _get_redirect_uri()
+    except ImproperlyConfigured as err:
+        messages.error(
+            request,
+            "Couldn’t authenticate with Datatracker: "
+            "misconfigured redirect URI "
+            f"({err})")
+        return redirect('/')
+
     provider = get_provider_info()
 
     try:
@@ -150,48 +160,40 @@ def handle_callback(request):
             request,
             f"Failed to instantiate OAuth2 session ({err})")
     else:
+        auth_response = f'{redirect_uri}?{request.GET.urlencode()}'
         try:
-            redirect_uri = _get_redirect_uri()
-        except ImproperlyConfigured as err:
+            token = session.fetch_token(
+                provider.token_endpoint,
+                client_secret=CLIENT_SECRET,
+                include_client_id=True,
+                code=request.GET.get('code'),
+                authorization_response=auth_response)
+        except Exception as err:
+            log.exception("Datatracker OAuth: failed to retrieve token")
             messages.error(
                 request,
-                "Couldn’t authenticate with Datatracker: "
-                "misconfigured redirect URI "
-                f"({err})")
+                f"Failed to fetch token ({err})")
         else:
-            auth_response = f'{redirect_uri}?{request.GET.urlencode()}'
+            request.session[OAUTH_TOKEN_KEY] = token
+
             try:
-                token = session.fetch_token(
-                    provider.token_endpoint,
-                    client_secret=CLIENT_SECRET,
-                    include_client_id=True,
-                    code=request.GET.get('code'),
-                    authorization_response=auth_response)
+                session_with_token = OAuth2Session(
+                    CLIENT_ID,
+                    scope=['openid'],
+                    state=request.session[OAUTH_STATE_KEY],
+                    token=token)
+                user_info = session_with_token.get(
+                    provider.userinfo_endpoint).json()
             except Exception as err:
-                log.exception("Datatracker OAuth: failed to retrieve token")
+                log.exception("Datatracker OAuth: failed to retrieve user info")
                 messages.error(
                     request,
-                    f"Failed to fetch token ({err})")
+                    f"Failed to fetch user info ({err})")
             else:
-                request.session[OAUTH_TOKEN_KEY] = token
-
-                try:
-                    session_with_token = OAuth2Session(
-                        CLIENT_ID,
-                        state=request.session[OAUTH_STATE_KEY],
-                        token=token)
-                    user_info = session_with_token.get(
-                        provider.userinfo_endpoint).json()
-                except Exception as err:
-                    log.exception("Datatracker OAuth: failed to retrieve user info")
-                    messages.error(
-                        request,
-                        f"Failed to fetch user info ({err})")
-                else:
-                    request.session[OAUTH_USER_INFO_KEY] = user_info
-                    messages.success(
-                        request,
-                        "You have authenticated via Datatracker")
+                request.session[OAUTH_USER_INFO_KEY] = user_info
+                messages.success(
+                    request,
+                    "You have authenticated via Datatracker")
 
     return redirect('/')
 
