@@ -19,8 +19,8 @@ from prometheus import metrics
 from bib_models.models import BibliographicItem
 from sources.exceptions import RefNotFoundError
 
-from .models import Xml2rfcItem
 from .aliases import unalias, get_aliases
+from .models import Xml2rfcItem, dir_subpath_regex
 from .serializer import to_xml_string
 
 
@@ -75,10 +75,7 @@ def make_xml2rfc_path_pattern(
     """
     return [
         re_path(
-            r'(?P<xml2rfc_subpath>%s/'
-            r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
-            r')$'
-            % dirname,
+            dir_subpath_regex % dirname,
             never_cache(require_safe(
                 _make_xml2rfc_path_handler(fetcher_func),
             )),

@@ -8,6 +8,12 @@ dir_subpath_regex = (
     r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
     r')$'
 )
+
+
+def get_dir_subpath_regex(dirname: str):
+    return re.compile(dir_subpath_regex % dirname)
+
+
 class ManualPathMap(models.Model):
     """Maps an xml2rfc path to a search query.
 
