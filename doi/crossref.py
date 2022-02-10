@@ -15,7 +15,6 @@ from bib_models.dataclasses import GenericStringValue
 from bib_models.models import BibliographicItem, Link
 
 from sources.types import ExternalBibliographicItem, ExternalSourceMeta
-from sources.exceptions import RefNotFoundError
 
 
 etiquette = Etiquette(
@@ -44,7 +43,7 @@ def get_bibitem(docid: DocID) \
     and deserializes into a :class:`bib_models.BibliographicItem` instance."""
 
     if docid.type != 'DOI':
-        raise RefNotFoundError(
+        raise ValueError(
             "DOI source requires DOI docid.type",
             repr(docid))
 
