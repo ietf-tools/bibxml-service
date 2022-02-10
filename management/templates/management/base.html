@@ -37,7 +37,7 @@
     "
     href="{% url "manage_indexable_sources" %}"
   >
-    Indexable&nbsp;sources
+    Source&nbsp;indexing
   </a>
 
   <a class="
@@ -49,22 +49,15 @@
 {% endblock %}
 
 {% block after_content %}
-  <a class="
+  <div class="
     {% include "_side_block_classes.html" %}
-    block p-4
-    whitespace-nowrap
+    p-4
     dark:text-dark-200/50 text-dark-700/50 
-  " href="{% url "browse" %}">
-    Public-facing service &rarr;
-  </a>
-
-  <a class="
-    {% include "_side_block_classes.html" %}
-    block p-4
-    dark:text-dark-200/50 text-dark-700/50 
-  " href="{% url "api_index" %}">
-    API reference &rarr;
-  </a>
+  ">
+    <a class="whitespace-nowrap" href="{% url "browse" %}">Public-facing service</a>
+    <br />
+    <a class="whitespace-nowrap" href="{% url "api_index" %}">API reference</a>
+  </div>
 
   {% if monitoring.flower %}
     <a class="
