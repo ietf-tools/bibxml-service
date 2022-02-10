@@ -7,7 +7,6 @@ from django.views.decorators.http import require_POST, require_safe
 from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
-from xml2rfc_compat import views as xml2rfc_views
 # TODO: Register xml2rfc fetchers in app config
 from xml2rfc_compat import fetchers  # Imported for registration side-effect
 from xml2rfc_compat.urls import get_urls as get_xml2rfc_urls
