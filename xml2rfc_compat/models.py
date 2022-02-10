@@ -1,3 +1,4 @@
+import re
 from django.db import models
 
 
@@ -15,3 +16,15 @@ class Xml2rfcItem(models.Model):
 
     xml_repr = models.TextField()
     """Contents of the file, XML as a string."""
+
+    def format_filename(self):
+        dirname = self.subpath.split('/')[0]
+        return self.subpath.replace(f'{dirname}/', '', 1)
+
+    def format_anchor(self):
+        dirname = self.subpath.split('/')[0]
+        match = re.match(get_dir_subpath_regex(dirname), self.subpath)
+        if match:
+            return match.group('anchor')
+        else:
+            return self.subpath
