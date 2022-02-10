@@ -7,6 +7,7 @@ import logging
 from pydantic import BaseModel, Extra
 from requests_oauthlib import OAuth2Session
 from simplejson import JSONDecodeError
+from requests.exceptions import SSLError
 
 from django.urls import reverse
 from django.contrib import messages
@@ -139,7 +140,7 @@ def get_provider_info():
             'openid/.well-known/openid-configuration',
             format=None,
         ).json()
-    except JSONDecodeError:
+    except (JSONDecodeError, SSLError):
         log.exception(
             "Invalid response from Datatracker’s OAuth provider spec, "
             "falling back to hard-coded data")
