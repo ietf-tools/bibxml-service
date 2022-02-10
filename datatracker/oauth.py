@@ -99,7 +99,7 @@ def initiate(request):
             f"({err})")
         return redirect('/')
     else:
-        session = OAuth2Session(CLIENT_ID, redirect_uri=redirect_uri)
+        session = OAuth2Session(CLIENT_ID, scope=['openid'], redirect_uri=redirect_uri)
         auth_url, state = session.authorization_url(
             provider.authorization_endpoint)
         request.session[OAUTH_STATE_KEY] = state
