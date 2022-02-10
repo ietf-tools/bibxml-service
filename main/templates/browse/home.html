@@ -65,7 +65,7 @@
     {% include "browse/search_forms.html" with expanded=1 query=request.GET.query query_format=request.GET.query_format|default:"websearch" %}
   </div>
 
-  <div class="md:col-span-4 overflow-hidden md:flex flex-col flex-nowrap p-4 md:justify-center ">
+  <div class="md:col-span-3 overflow-hidden md:flex flex-col flex-nowrap p-4 md:justify-center ">
     <form
       class="
         w-full flex
@@ -77,7 +77,7 @@
       <input
         name="ref"
         type="text"
-        placeholder="DOI lookup via Crossref"
+        placeholder="DOI…"
         class="min-w-0 grow text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit"
       />
       <button type="submit" class="button">
