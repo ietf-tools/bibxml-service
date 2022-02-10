@@ -153,6 +153,7 @@ def handle_callback(request):
                 token = session.fetch_token(
                     provider.token_endpoint,
                     client_secret=CLIENT_SECRET,
+                    include_client_id=True,
                     authorization_response=auth_response)
             except Exception as err:
                 messages.error(
