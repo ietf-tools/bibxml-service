@@ -1,7 +1,7 @@
 """Obtaining bibliographic items by DOI."""
 
 import logging
-from typing import Union
+from typing import Union, Dict, Any
 
 import requests
 import requests_cache
@@ -51,7 +51,7 @@ def get_doi_ref(
                 raise RefNotFoundError(
                     "External source returned nothing",
                     doi)
-            params = {
+            params: Dict[str, Any] = {
                 **sourced_item.bibitem.dict(),
                 'sources': {
                     sourced_item.source.id: sourced_item,
