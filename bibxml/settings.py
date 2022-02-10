@@ -384,7 +384,7 @@ XML2RFC_COMPAT_DIR_ALIASES = {
 IETF xml2rfc web server behavior.
 """
 
-XML2RFC_PATH_PREFIX = 'public/rfc'
+XML2RFC_PATH_PREFIX = 'public/rfc/'
 """Global prefix relative to which all xml2rfc-style paths are treated.
 This prefix is subtracted from further resolution.
 
