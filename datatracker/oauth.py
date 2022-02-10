@@ -72,6 +72,13 @@ def initiate(request):
     redirect_uri = request.build_absolute_uri(
         reverse('datatracker_oauth_callback'),
     )
+    if redirect_uri != settings.DATATRACKER_REDIRECT_URI:
+        messages.error(
+            request,
+            "Couldn’t authenticate with Datatracker: "
+            f"calculated redirect URI {redirect_uri} "
+            f"does not match required {settings.DATATRACKER_REDIRECT_URI}")
+        return redirect('/')
     session = OAuth2Session(CLIENT_ID, redirect_uri=redirect_uri)
     auth_url, state = session.authorization_url(provider.authorization_endpoint)
     request.session[OAUTH_STATE_KEY] = state

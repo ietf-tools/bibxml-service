@@ -280,6 +280,11 @@ DATATRACKER_CLIENT_ID = environ.get("DATATRACKER_CLIENT_ID", '')
 DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '')
 """Datatracker client secret for OAuth2 integration."""
 
+DATATRACKER_REDIRECT_URI = environ.get(
+    "DATATRACKER_REDIRECT_URI",
+    'https://dev.bibxml.org/datatracker-auth/callback/')
+"""Redirect URI configured on Datatracker side."""
+
 
 # Custom
 
