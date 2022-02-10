@@ -19,20 +19,6 @@
     {% include "browse/paginator.html" with page_obj=page_obj %}
   </nav>
 
-  <div class="
-    {% include "_side_block_classes.html" %}
-    bg-slate-600 text-slate-100 p-4 text-sm leading-tight
-  ">
-    <ul class="flex flex-row flex-wrap">
-      {% for ds_id in relaton_datasets %}
-        <li class="mr-2">
-          <a class="{% if dataset_id == ds_id %}font-bold{% endif %}" href="{% url "browse_dataset" ds_id %}">
-            {{ ds_id }}
-          </a>
-      {% endfor %}
-    </ul>
-  </div>
-
   <nav class="
     {% include "_side_block_classes.html" %}
     overflow-hidden bg-sky-600 text-sky-100 flex flex-col flex-nowrap p-4
