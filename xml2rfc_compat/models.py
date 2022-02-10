@@ -2,7 +2,6 @@ import re
 from django.db import models
 
 
-
 dir_subpath_regex = (
     r'(?P<xml2rfc_subpath>%s/'
     r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
