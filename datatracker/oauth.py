@@ -38,9 +38,9 @@ def context_processor(request):
         datatracker_oauth_enabled=CLIENT_ID and CLIENT_SECRET,
     )
 
-    if OAUTH_USER_INFO_KEY in request:
+    if OAUTH_USER_INFO_KEY in request.session:
         return dict(
-            datatracker_user=request[OAUTH_USER_INFO_KEY],
+            datatracker_user=request.session[OAUTH_USER_INFO_KEY],
             **ctx,
         )
     else:
