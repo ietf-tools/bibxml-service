@@ -151,6 +151,7 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
         person=Person(
             affiliation=[PersonAffiliation(
                 organization=Organization(
+                    # NOTE: DOI seems to supply abbreviation as name.
                     name=[aff['name']],
                     contact=[],
                     url=None,
