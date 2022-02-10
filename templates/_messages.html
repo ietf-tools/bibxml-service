@@ -1,9 +1,6 @@
 {% if messages %}
   {% for message in messages %}
-    <div class="
-      snap-start p-2 flex overflow-hidden {{ wrapper_htmlclass }}
-    ">
-      <div class="p-2 xl:p-4 rounded flex-1
+      <div class="snap-start p-2 xl:p-4 flex-1
           shadow md:overflow-y-auto
           {% if "error" in message.tags %}
             border-rose-500
@@ -29,6 +26,5 @@
         </svg>
         <span class="grow">{{ message|safe }}</span>
       </div>
-    </div>
   {% endfor %}
 {% endif %}
