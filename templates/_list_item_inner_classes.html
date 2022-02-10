@@ -1,0 +1,21 @@
+{# Classes for a block element which is a direct child of item in list #}
+{# (See _list_item_classes.html) #}
+
+{% if forloop.last %}
+  snap-end
+{% endif %}
+py-4
+place-self-stretch
+
+bg-white
+dark:bg-dark-800 dark:text-inherit
+
+md:min-h-[max(5rem,12.5vh)]
+xl:min-h-[max(5rem,6.25vh)]
+ring-0
+ring-sky-300
+dark:ring-sky-700
+ring-inset
+
+hover:ring-4
+focus-within:ring-4

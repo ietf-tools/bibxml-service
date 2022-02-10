@@ -2,68 +2,8 @@
 
 {% load relaton %}
 
-<article
-  class="
-    {% if not forloop.last %}
-      snap-start
-    {% endif %}
-    overflow-hidden
-
-    outline-2
-    outline-dark-300
-    outline-offset-[-4px]
-    outline-sky-300
-    dark:outline-sky-500
-
-    hover:overflow-visible
-    focus-within:overflow-visible
-    hover:z-20
-    focus-within:z-10
-
-    shadow
-    shadow-dark-500
-    dark:shadow-dark-900
-    hover:shadow-none
-
-    relative
-    after:absolute
-      after:bottom-0
-      after:w-full
-      after:h-8
-      after:bg-gradient-to-t
-      after:from-[white]
-        after:[--tw-gradient-stops:var(--tw-gradient-from),rgb(255_255_255/0)]
-      dark:after:from-dark-800
-        dark:after:[--tw-gradient-stops:var(--tw-gradient-from),theme('colors.dark700transparentfix')]
-    hover:after:!hidden
-    focus-within:after:!hidden
-
-    bibitem-in-list
-  "
->
-  <div
-    class="
-      {% if forloop.last %}
-        snap-end
-      {% endif %}
-      py-4
-      place-self-stretch
-
-      bg-white
-      dark:bg-dark-800 dark:text-inherit
-
-      md:min-h-[max(5rem,12.5vh)]
-      xl:min-h-[max(5rem,6.25vh)]
-      ring-0
-      ring-sky-300
-      dark:ring-sky-700
-      ring-inset
-
-      hover:ring-4
-      focus-within:ring-4
-    "
-  >
-
+<article class="{% include "_list_item_classes.html" %} bibitem-in-list">
+  <div class="{% include "_list_item_inner_classes.html" %}">
     <p class="px-4 mb-1 bibitem-title font-serif tracking-tight leading-tight">
       {% include "relaton/smart_title.html" with bibitem=data %}
     </p>
@@ -82,6 +22,5 @@
     {% if data.headline %}
       <div class="px-4 text-xs leading-tight">{{ data.headline|safe }}</div>
     {% endif %}
-
   </div>
 </article>

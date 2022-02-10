@@ -1,0 +1,36 @@
+{# Classes for item in listings within <main> element, together with snap and dark styles. #}
+{# Expects forloop #}
+
+{% if forloop and not forloop.last %}
+  snap-start
+{% endif %}
+overflow-hidden
+
+outline-2
+outline-dark-300
+outline-offset-[-4px]
+outline-sky-300
+dark:outline-sky-500
+
+hover:overflow-visible
+focus-within:overflow-visible
+hover:z-20
+focus-within:z-10
+
+shadow
+shadow-dark-500
+dark:shadow-dark-900
+hover:shadow-none
+
+relative
+after:absolute
+  after:bottom-0
+  after:w-full
+  after:h-8
+  after:bg-gradient-to-t
+  after:from-[white]
+    after:[--tw-gradient-stops:var(--tw-gradient-from),rgb(255_255_255/0)]
+  dark:after:from-dark-800
+    dark:after:[--tw-gradient-stops:var(--tw-gradient-from),theme('colors.dark700transparentfix')]
+hover:after:!hidden
+focus-within:after:!hidden
