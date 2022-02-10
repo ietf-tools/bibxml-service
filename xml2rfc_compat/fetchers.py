@@ -15,7 +15,6 @@ from main.models import RefData
 from main.query import search_refs_relaton_field
 
 from .urls import register_fetcher
-from .aliases import get_aliases
 
 
 @register_fetcher('bibxml')
