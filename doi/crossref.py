@@ -37,7 +37,7 @@ ALT_TITLES = [
 ]
 
 
-def get_bibitem(docid: DocID) \
+def get_bibitem(docid: DocID, strict: bool = True) \
         -> Union[ExternalBibliographicItem, None]:
     """Retrieves DOI information from CrossRef
     and deserializes into a :class:`bib_models.BibliographicItem` instance."""
@@ -124,12 +124,14 @@ def get_bibitem(docid: DocID) \
     )
 
     errors = []
-
-    try:
+    if strict:
         bibitem = BibliographicItem(**data)
-    except ValidationError as e:
-        errors.append(str(e))
-        bibitem = BibliographicItem.construct(**data)
+    else:
+        try:
+            bibitem = BibliographicItem(**data)
+        except ValidationError as e:
+            errors.append(str(e))
+            bibitem = BibliographicItem.construct(**data)
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(
