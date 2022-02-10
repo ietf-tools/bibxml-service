@@ -119,17 +119,17 @@ def handle_callback(request):
             authorization_response=reverse('datatracker_oauth_callback'),
         )
     except RuntimeError as err:
-        messages.error(f"Failed to fetch token ({err})")
+        messages.error(request, f"Failed to fetch token ({err})")
     else:
         request.session[OAUTH_TOKEN_KEY] = token
 
         try:
             user_info = session.get(provider.userinfo_endpoint).json()
         except RuntimeError as err:
-            messages.error(f"Failed to fetch user info ({err})")
+            messages.error(request, f"Failed to fetch user info ({err})")
         else:
             request.session[OAUTH_USER_INFO_KEY] = user_info
-            messages.success("You have authenticated via Datatracker")
+            messages.success(request, "You have authenticated via Datatracker")
 
     return redirect('/')
 
