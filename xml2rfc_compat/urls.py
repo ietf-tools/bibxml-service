@@ -5,8 +5,7 @@ fit for inclusion in site’s root URL configuration."""
 import logging
 import functools
 import re
-from typing import Callable, List, Union, Dict
-from enum import Enum
+from typing import Callable, List, Union, Dict, Tuple, TypedDict, cast
 
 from django.urls import re_path
 from django.views.decorators.cache import never_cache
@@ -18,6 +17,7 @@ from pydantic import ValidationError
 from prometheus import metrics
 from bib_models.models import BibliographicItem
 from sources.exceptions import RefNotFoundError
+from main.query import build_citation_for_docid
 
 from .aliases import unalias, get_aliases
 from .models import Xml2rfcItem, dir_subpath_regex
@@ -51,6 +51,14 @@ def get_urls():
 
 
 def register_fetcher(dirname: str):
+    """Parametrized decorator that returns a registering function
+    for resolver/fetcher function for given ``dirname``.
+
+    Fetcher function is passed the ``anchor`` kwarg,
+    for which it must return a :class:`BibliographicData` instance,
+    and is expected to raise either ``RefNotFoundError``
+    or pydantic’s ``ValidationError``.
+    """
     def register(fetcher_func: Callable[[str], BibliographicItem]):
         fetcher_registry[dirname] = fetcher_func
         return fetcher_func
@@ -67,11 +75,6 @@ def make_xml2rfc_path_pattern(
     ``<dirname>/[_]reference.<anchor>.xml``,
     and constructed view delegates bibliographic item
     retrieval to provided fetcher function.
-
-    Fetcher function is passed the ``anchor`` kwarg,
-    for which it must return a :class:`BibliographicData` instance,
-    and is expected to raise either ``RefNotFoundError``
-    or pydantic’s ``ValidationError``.
     """
     return [
         re_path(
@@ -84,20 +87,93 @@ def make_xml2rfc_path_pattern(
     ]
 
 
-class Outcome(Enum):
-    """Describes the result of locating requested xml2rfc item
-    in indexed Relaton sources.
+def resolve_manual_map(subpath: str) -> Tuple[
+    Union[str, None],
+    Union[BibliographicItem, None],
+    Union[str, None],
+]:
+    """Returns a 3-tuple of mapping configuration, resolved item,
+    and error as a string, any can be None.
+    Does not throw.
     """
-    SUCCESS = 'success'
-    NOT_FOUND = 'not_found'
-    VALIDATION_ERROR = 'validation_error'
-    SERIALIZATION_ERROR = 'serialization_error'
+    mapped_docid: Union[str, None]
+    resolved_item: Union[BibliographicItem, None]
+    error: Union[str, None]
+    try:
+        manual_map = ManualPathMap.objects.get(xml2rfc_subpath=subpath)
+    except ManualPathMap.DoesNotExist:
+        mapped_docid = None
+        resolved_item = None
+        error = "not found"
+    else:
+        mapped_docid = manual_map.docid
+        try:
+            resolved_item = build_citation_for_docid(cast(str, mapped_docid))
+        except ValidationError:
+            log.exception(
+                "Unable to validate item manually mapped to xml2rfc path %s "
+                "via docid %s",
+                subpath,
+                mapped_docid)
+            error = "validation problem"
+            resolved_item = None
+        except RefNotFoundError:
+            log.exception(
+                "Unable to resolve an item for xml2rfc path %s, "
+                "despite it being manually mapped via docid %s",
+                subpath,
+                mapped_docid)
+            error = "not found"
+            resolved_item = None
+        else:
+            error = None
+
+    return mapped_docid, resolved_item, error
+
+
+def resolve_automatically(
+    subpath: str,
+    anchor: str,
+    fetcher_func: Callable[[str], BibliographicItem],
+) -> Tuple[
+    str,
+    Union[BibliographicItem, None],
+    Union[str, None],
+]:
+    item: Union[BibliographicItem, None]
+    error: Union[str, None]
+    try:
+        item = fetcher_func(anchor)
+    except RefNotFoundError:
+        log.exception(
+            "Unable to resolve xml2rfc path automatically: %s",
+            subpath)
+        error = "not found"
+        item = None
+    except ValidationError:
+        log.exception(
+            "Item found for xml2rfc path did not validate: %s",
+            subpath)
+        error = "validation problem"
+        item = None
+    else:
+        error = None
+
+    return fetcher_func.__name__, item, error
+
+
+class ResolutionOutcome(TypedDict, total=True):
+    config: str
+    error: str
 
 
 def _make_xml2rfc_path_handler(fetcher_func: Callable[
     [str], BibliographicItem
 ]):
     """Creates a view function, given a fetcher function.
+
+    Fetcher function will only be called if manual map was not found
+    or did not resolve successfully.
 
     Fetcher function will receive full requested subpath
     (not including the unchanging prefix)
@@ -114,77 +190,87 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
     @functools.wraps(fetcher_func)
     def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
         resp: HttpResponse
-        outcome: Outcome
+        item: Union[BibliographicItem, None]
+        xml_repr: Union[str, None]
 
-        try:
-            item = fetcher_func(anchor)
-        except RefNotFoundError:
-            log.error("Item for xml2rfc path not found: %s", xml2rfc_subpath)
-            outcome = Outcome.NOT_FOUND
-            resp = JsonResponse({
-                "error": {
-                    "message":
-                        "Item for xml2rfc path not found: %s"
-                        % xml2rfc_subpath,
-                }
-            }, status=404)
-        except ValidationError:
-            log.exception(
-                "Item found for xml2rfc path did not validate: %s",
-                xml2rfc_subpath)
-            outcome = Outcome.VALIDATION_ERROR
-            resp = JsonResponse({
-                "error": {
-                    "message":
-                        "Error validating source bibliographic item "
-                        "Relaton data",
-                }
-            }, status=500)
+        methods = ["manual", "auto", "fallback"]
+        method_results: Dict[str, ResolutionOutcome] = {}
+
+        mapped_docid, item, error = resolve_manual_map(xml2rfc_subpath)
+        if mapped_docid:
+            method_results['manual'] = dict(
+                config=mapped_docid,
+                error='' if item else (error or "no error information"),
+            )
+
+        if not item:
+            func_name, item, error = resolve_automatically(
+                xml2rfc_subpath,
+                anchor,
+                fetcher_func)
+            method_results['auto'] = dict(
+                config=func_name,
+                error='' if item else (error or "no error information"),
+            )
+
+        if item:
+            xml_repr = to_xml_string(item, anchor=anchor)
         else:
-            try:
-                xml_repr = to_xml_string(item, anchor=anchor)
-            except ValueError:
-                log.exception(
-                    "Item found for xml2rfc path did not validate: %s",
-                    xml2rfc_subpath)
-                outcome = Outcome.SERIALIZATION_ERROR
-                resp = JsonResponse({
-                    "error": {
-                        "message":
-                            "Error serializing obtained bibliographic item "
-                            "into XML",
-                    }
-                }, status=500)
-            else:
-                outcome = Outcome.SUCCESS
-                resp = HttpResponse(
-                    xml_repr,
-                    content_type="application/xml",
-                    charset="utf-8")
-
-        if outcome == Outcome.SUCCESS:
-            return resp
-
-        else:
-            fallback: Union[str, None] = _obtain_fallback_xml(
+            xml_repr = _obtain_fallback_xml(
                 xml2rfc_subpath,
                 anchor)
+            method_results['fallback'] = dict(
+                config='',
+                error='' if xml_repr else "not indexed",
+            )
 
-            if fallback is not None:
+        if xml_repr:
+            if item:
                 metrics.xml2rfc_api_bibitem_hits.labels(
                     xml2rfc_subpath,
-                    f'{outcome.name}_fallback',
+                    'success',
                 ).inc()
-                return HttpResponse(
-                    fallback,
-                    content_type="application/xml",
-                    charset="utf-8")
             else:
                 metrics.xml2rfc_api_bibitem_hits.labels(
                     xml2rfc_subpath,
-                    outcome.name,
+                    'success_fallback',
                 ).inc()
-                return resp
+            resp = HttpResponse(
+                xml_repr,
+                content_type="application/xml",
+                charset="utf-8")
+
+        else:
+            metrics.xml2rfc_api_bibitem_hits.labels(
+                xml2rfc_subpath,
+                'not_found',
+            ).inc()
+            resp = JsonResponse({
+                "error": {
+                    "message":
+                        "Error resolving bibliographic item. "
+                        "Tried methods: %s"
+                        % ', '.join([
+                            '{0} ({config}): {error}'.format(
+                                method,
+                                **method_results[method])
+                            for method in methods
+                            if method in method_results
+                        ])
+                }
+            }, status=404)
+
+        resp.headers['X-Resolution-Methods'] = ';'.join(methods)
+        resp.headers['X-Resolution-Outcomes'] = ';'.join([
+            (
+                '{config},{error}'.format(**method_results[method])
+                if method in method_results
+                else ''
+            )
+            for method in methods
+        ])
+
+        return resp
 
     return handle_xml2rfc_path
 
