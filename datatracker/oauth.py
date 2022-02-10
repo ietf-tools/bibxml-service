@@ -161,6 +161,7 @@ def handle_callback(request):
                     provider.token_endpoint,
                     client_secret=CLIENT_SECRET,
                     include_client_id=True,
+                    code=request.GET.get('code'),
                     authorization_response=auth_response)
             except Exception as err:
                 log.exception("Datatracker OAuth: failed to retrieve token")
