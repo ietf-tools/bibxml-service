@@ -288,10 +288,10 @@ activates Matomo integration.
 
 # Datatracker
 
-DATATRACKER_CLIENT_ID = environ.get("DATATRACKER_CLIENT_ID", '')
+DATATRACKER_CLIENT_ID = environ.get("DATATRACKER_CLIENT_ID", '').strip()
 """Datatracker client ID for OAuth2 integration."""
 
-DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '')
+DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '').strip()
 """Datatracker client secret for OAuth2 integration."""
 
 DATATRACKER_REDIRECT_URI = environ.get(
