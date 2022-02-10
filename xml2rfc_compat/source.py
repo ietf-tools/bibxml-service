@@ -7,7 +7,6 @@ from django.db import transaction
 from sources import indexable
 
 from .models import Xml2rfcItem
-from .aliases import get_aliases
 
 
 def index_xml2rfc_source(
