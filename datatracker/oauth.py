@@ -53,7 +53,7 @@ def log_out(request):
         del request.session[OAUTH_USER_INFO_KEY]
     except KeyError:
         pass
-    return redirect('/')
+    return redirect(request.headers.get('referer', '/'))
 
 
 # Flow views
@@ -92,7 +92,7 @@ def initiate(request):
             request,
             "Couldn’t authenticate with Datatracker: "
             "integration is not configured")
-        return redirect('/')
+        return redirect(request.headers.get('referer', '/'))
 
     provider = get_provider_info()
     try:
@@ -103,7 +103,7 @@ def initiate(request):
             "Couldn’t authenticate with Datatracker: "
             "misconfigured redirect URI "
             f"({err})")
-        return redirect('/')
+        return redirect(request.headers.get('referer', '/'))
     else:
         session = OAuth2Session(
             CLIENT_ID,
@@ -124,7 +124,7 @@ def handle_callback(request):
             request,
             "Couldn’t authenticate with Datatracker: "
             "integration is not configured")
-        return redirect('/')
+        return redirect(request.headers.get('referer', '/'))
 
     if OAUTH_STATE_KEY not in request.session:
         log.warning(
@@ -134,7 +134,7 @@ def handle_callback(request):
             request,
             "Couldn’t authenticate with Datatracker, "
             "please try again.")
-        return redirect('/')
+        return redirect(request.headers.get('referer', '/'))
 
     try:
         redirect_uri = _get_redirect_uri()
@@ -195,7 +195,7 @@ def handle_callback(request):
                     request,
                     "You have authenticated via Datatracker")
 
-    return redirect('/')
+    return redirect(request.headers.get('referer', '/'))
 
 
 # Provider info
