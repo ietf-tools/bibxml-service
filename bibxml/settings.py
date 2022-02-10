@@ -23,6 +23,20 @@ LOGGING = {
     },
 }
 
+
+# Service info (custom)
+# =====================
+
+SNAPSHOT = environ.get("SNAPSHOT")
+"""Actual version of this service codebase at runtime."""
+
+SERVICE_NAME = environ.get("SERVICE_NAME")
+"""Service title (short phrase)."""
+
+HOSTNAME = environ.get("PRIMARY_HOSTNAME")
+"""Primary hostname the service is publicly deployed under."""
+
+
 # Basic Django settings
 # =====================
 
@@ -46,7 +60,7 @@ INTERNAL_HOSTNAMES = [
 ]
 
 ALLOWED_HOSTS = [
-    environ.get("PRIMARY_HOSTNAME"),
+    HOSTNAME,
     *INTERNAL_HOSTNAMES,
 ]
 
@@ -66,7 +80,7 @@ if environ.get("SENTRY_DSN", None):
                 event_level=logging.WARNING,
             ),
         ],
-        server_name=environ.get("PRIMARY_HOSTNAME"),
+        server_name=HOSTNAME,
         # Can be adjusted in production to reduce overhead.
         traces_sample_rate=1.0,
         send_default_pii=False,
@@ -158,7 +172,7 @@ USE_TZ = True
 
 # Email
 
-EMAIL_SUBJECT_PREFIX = f"[Django at {environ.get('PRIMARY_HOSTNAME', '')}] "
+EMAIL_SUBJECT_PREFIX = f"[Django at {HOSTNAME}] "
 
 if environ.get("SERVER_EMAIL", None):
     SERVER_EMAIL = environ.get("SERVER_EMAIL")
@@ -293,15 +307,6 @@ DEFAULT_CACHE_SECONDS = 21600
 
 SEARCH_CACHE_SECONDS = 3600
 """How long to cache search results for."""
-
-SNAPSHOT = environ.get("SNAPSHOT")
-"""Actual version of this service codebase at runtime."""
-
-SERVICE_NAME = environ.get("SERVICE_NAME")
-"""Service title (short phrase)."""
-
-HOSTNAME = environ.get("PRIMARY_HOSTNAME")
-"""Primary hostname the service is publicly deployed under."""
 
 
 # BibXML-specific
