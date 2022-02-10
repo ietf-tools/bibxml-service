@@ -20,7 +20,7 @@ from sources.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
 from .aliases import unalias, get_aliases
-from .models import Xml2rfcItem, dir_subpath_regex
+from .models import Xml2rfcItem, dir_subpath_regex, ManualPathMap
 from .serializer import to_xml_string
 
 
