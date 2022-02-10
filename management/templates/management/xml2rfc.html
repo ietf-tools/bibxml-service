@@ -11,6 +11,48 @@
 {% endblock %}
 
 {% block content %}
+  {% include "_messages.html" with htmlclass="md:col-span-2" %}
+
+  <div class="
+    p-4
+    md:col-start-1
+    bg-sky-600 text-sky-100
+    leading-tight
+    md:row-span-2
+    flex flex-col space-y-2 md:overflow-hidden
+  ">
+    <div>
+      <a
+        class="text-center py-1 button block hover:no-underline whitespace-nowrap"
+        href="{% url "manage_xml2rfc_export_manual_map" %}"
+        download="bibxml-service-xml2rfc-path-map.json"
+      >
+        Export mappings
+      </a>
+    </div>
+    <form
+      method="POST"
+      enctype="multipart/form-data"
+      action="{% url "manage_xml2rfc_import_manual_map" %}"
+    >
+      {% csrf_token %}
+      <div class="
+        flex flex-col
+        space-y-2
+      ">
+        <input id="importFile" type="file" name="map_json" class="m-0" accept=".json" />
+        <button type="submit" class="grow button py-1">Import mappings</button>
+        <label
+          for="importClearCheckbox"
+          class="flex flex-row flex-nowrap items-center space-x-2"
+          title="Deletes any previously existing mappings. If import succeeds, only imported mappings will exist."
+        >
+          <input type="checkbox" class="text-sky-600" name="clear" id="importClearCheckbox" />
+          <span class="whitespace-nowrap">Delete existing</span>
+        </label>
+      </div>
+    </form>
+  </div>
   {% for dir in available_paths %}
     <article class="{% include "_list_item_classes.html" %} leading-tight">
       <div class="{% include "_list_item_inner_classes.html" %} px-4 overflow-hidden">
@@ -41,41 +83,4 @@
       </div>
     </article>
   {% endfor %}
-
-  {{ block.super }}
-
-  <div class="p-4 leading-tight md:col-span-2 flex flex-col space-y-2 md:overflow-hidden">
-    <div>
-      Export current mappings:
-      <a
-        class="link whitespace-nowrap"
-        href="{% url "manage_xml2rfc_export_manual_map" %}"
-        download="bibxml-service-xml2rfc-path-map.json"
-      >
-        Download JSON
-      </a>
-    </div>
-    <form
-      method="POST"
-      enctype="multipart/form-data"
-      action="{% url "manage_xml2rfc_import_manual_map" %}"
-    >
-      {% csrf_token %}
-      <div class="
-        flex flex-col space-y-2
-        md:flex-row md:flex-nowrap
-        md:items-center
-        md:whitespace-nowrap
-        md:overflow-hidden
-        md:space-x-2
-      ">
-        <input type="file" name="map_json" class="grow" />
-        <label for="importClearCheckbox">
-          <input type="checkbox" class="text-sky-600" name="clear" id="importClearCheckbox" />
-          Delete existing
-        </label>
-        <button type="submit" class="button py-2">Import mappings</button>
-      </div>
-    </form>
-  </div>
 {% endblock %}
