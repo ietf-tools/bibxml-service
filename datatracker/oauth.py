@@ -18,6 +18,15 @@ from django.conf import settings
 from . import request
 
 
+__all__ = (
+    'get_client',
+    'context_processor',
+    'initiate',
+    'handle_callback',
+    'log_out',
+)
+
+
 log = logging.getLogger(__name__)
 
 OAUTH_STATE_KEY = 'oauth_state'
