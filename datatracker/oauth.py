@@ -162,7 +162,11 @@ def handle_callback(request):
                 request.session[OAUTH_TOKEN_KEY] = token
 
                 try:
-                    user_info = session.get(provider.userinfo_endpoint).json()
+                    session_with_token = OAuth2Session(
+                        CLIENT_ID,
+                        token=token)
+                    user_info = session_with_token.get(
+                        provider.userinfo_endpoint).json()
                 except RuntimeError as err:
                     messages.error(
                         request,
