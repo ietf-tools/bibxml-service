@@ -69,7 +69,7 @@ def _get_redirect_uri() -> str:
     path = reverse('datatracker_oauth_callback')
     redirect_uri = f'https://{settings.HOSTNAME}{path}'
 
-    if redirect_uri != settings.DATATRACKER_REDIRECT_URI:
+    if redirect_uri == settings.DATATRACKER_REDIRECT_URI:
         return redirect_uri
     else:
         raise ImproperlyConfigured(
