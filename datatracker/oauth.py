@@ -132,6 +132,7 @@ def handle_callback(request):
     try:
         session = OAuth2Session(
             CLIENT_ID,
+            scope=['openid'],
             state=request.session[OAUTH_STATE_KEY])
     except Exception as err:
         messages.error(
