@@ -110,18 +110,26 @@ def handle_callback(request):
         return redirect('/')
 
     provider = get_provider_info()
+
     session = OAuth2Session(CLIENT_ID, request.session[OAUTH_STATE_KEY])
-    token = session.fetch_token(
-        provider.token_endpoint,
-        client_secret=CLIENT_SECRET,
-        authorization_response=reverse('datatracker_oauth_callback'),
-    )
-    request.session[OAUTH_TOKEN_KEY] = token
+    try:
+        token = session.fetch_token(
+            provider.token_endpoint,
+            client_secret=CLIENT_SECRET,
+            authorization_response=reverse('datatracker_oauth_callback'),
+        )
+    except RuntimeError as err:
+        messages.error(f"Failed to fetch token ({err})")
+    else:
+        request.session[OAUTH_TOKEN_KEY] = token
 
-    user_info = session.get(provider.userinfo_endpoint).json()
-    request.session[OAUTH_USER_INFO_KEY] = user_info
-
-    messages.success("You have authenticated via Datatracker")
+        try:
+            user_info = session.get(provider.userinfo_endpoint).json()
+        except RuntimeError as err:
+            messages.error(f"Failed to fetch user info ({err})")
+        else:
+            request.session[OAUTH_USER_INFO_KEY] = user_info
+            messages.success("You have authenticated via Datatracker")
 
     return redirect('/')
 
