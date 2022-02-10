@@ -38,7 +38,7 @@ def get_doi_ref(
                 get_bibitem(DocID(
                     type='DOI',
                     id=doi,
-                ))
+                ), strict=strict)
         except requests.exceptions.ConnectionError:
             raise RuntimeError("Error connecting to external source")
         except JSONDecodeError:
