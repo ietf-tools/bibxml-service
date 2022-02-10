@@ -109,8 +109,8 @@
   async function resolvePath (path, detailed, compare) {
     const result = await axios.get(`/${path}`);
 
-    const methodsTried = result.headers['x-resolution-methods'].split(';');
-    const rawMethodOutcomes = result.headers['x-resolution-outcomes'].split(';');
+    const methodsTried = result.headers['x-resolution-methods']?.split(';') ?? [];
+    const rawMethodOutcomes = result.headers['x-resolution-outcomes']?.split(';') ?? [];
 
     const methodOutcomes = [];
     for (const [idx, methodName] of methodsTried.entries()) {
@@ -189,7 +189,7 @@
 
   function formatResolutionOutcome(container, primaryMeth, succeededMeth) {
     clearResolution(container);
-    if (succeededMeth !== 'fallback' && primaryMeth === succeededMeth) {
+    if (succeededMeth !== 'fallback' && primaryMeth === succeededMeth && succeededMeth !== null) {
       container.classList.add(...resolutionHTMLClasses.success);
     } else if (succeededMeth === 'fallback') {
       container.classList.add(...resolutionHTMLClasses.warning);
