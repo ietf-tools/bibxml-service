@@ -10,6 +10,7 @@ from simplejson import JSONDecodeError
 from requests.exceptions import SSLError
 
 from django.urls import reverse
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.conf import settings
@@ -58,6 +59,24 @@ def log_out(request):
 # Flow views
 # ==========
 
+def _get_redirect_uri() -> str:
+    """Returns redirect URI without query string.
+
+    :raises ImproperlyConfigured: mismatching redirect URI in integration.
+    """
+    # We do not use Django’s request.build_absolute_uri here,
+    # since origin may be accessed over plain HTTP.
+    path = reverse('datatracker_oauth_callback')
+    redirect_uri = f'https://{settings.HOSTNAME}{path}'
+
+    if redirect_uri != settings.DATATRACKER_REDIRECT_URI:
+        return redirect_uri
+    else:
+        raise ImproperlyConfigured(
+            f"Calculated redirect URI {redirect_uri} "
+            f"does not match required {settings.DATATRACKER_REDIRECT_URI}")
+
+
 def initiate(request):
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
@@ -68,24 +87,23 @@ def initiate(request):
             "Couldn’t authenticate with Datatracker: "
             "integration is not configured")
         return redirect('/')
+
     provider = get_provider_info()
-
-    # We do not use Django’s request.build_absolute_uri here,
-    # since origin may be accessed over plain HTTP.
-    path = reverse('datatracker_oauth_callback')
-    redirect_uri = f'https://{settings.HOSTNAME}{path}'
-
-    if redirect_uri != settings.DATATRACKER_REDIRECT_URI:
+    try:
+        redirect_uri = _get_redirect_uri()
+    except ImproperlyConfigured as err:
         messages.error(
             request,
             "Couldn’t authenticate with Datatracker: "
-            f"calculated redirect URI {redirect_uri} "
-            f"does not match required {settings.DATATRACKER_REDIRECT_URI}")
+            "misconfigured redirect URI "
+            f"({err})")
         return redirect('/')
-    session = OAuth2Session(CLIENT_ID, redirect_uri=redirect_uri)
-    auth_url, state = session.authorization_url(provider.authorization_endpoint)
-    request.session[OAUTH_STATE_KEY] = state
-    return redirect(auth_url, permanent=False)
+    else:
+        session = OAuth2Session(CLIENT_ID, redirect_uri=redirect_uri)
+        auth_url, state = session.authorization_url(
+            provider.authorization_endpoint)
+        request.session[OAUTH_STATE_KEY] = state
+        return redirect(auth_url, permanent=False)
 
 
 def handle_callback(request):
@@ -111,25 +129,48 @@ def handle_callback(request):
 
     provider = get_provider_info()
 
-    session = OAuth2Session(CLIENT_ID, request.session[OAUTH_STATE_KEY])
     try:
-        token = session.fetch_token(
-            provider.token_endpoint,
-            client_secret=CLIENT_SECRET,
-            authorization_response=reverse('datatracker_oauth_callback'),
-        )
+        session = OAuth2Session(CLIENT_ID, request.session[OAUTH_STATE_KEY])
     except RuntimeError as err:
-        messages.error(request, f"Failed to fetch token ({err})")
+        messages.error(
+            request,
+            f"Failed to instantiate OAuth2 session ({err})")
     else:
-        request.session[OAUTH_TOKEN_KEY] = token
-
         try:
-            user_info = session.get(provider.userinfo_endpoint).json()
-        except RuntimeError as err:
-            messages.error(request, f"Failed to fetch user info ({err})")
+            redirect_uri = _get_redirect_uri()
+        except ImproperlyConfigured as err:
+            messages.error(
+                request,
+                "Couldn’t authenticate with Datatracker: "
+                "misconfigured redirect URI "
+                f"({err})")
         else:
-            request.session[OAUTH_USER_INFO_KEY] = user_info
-            messages.success(request, "You have authenticated via Datatracker")
+            auth_response = f'{redirect_uri}?{request.GET.urlencode()}'
+            try:
+                token = session.fetch_token(
+                    provider.token_endpoint,
+                    client_secret=CLIENT_SECRET,
+                    authorization_response=auth_response,
+                )
+            except RuntimeError as err:
+                messages.error(
+                    request,
+                    f"Failed to fetch token ({err}, "
+                    f"used auth response {auth_response})")
+            else:
+                request.session[OAUTH_TOKEN_KEY] = token
+
+                try:
+                    user_info = session.get(provider.userinfo_endpoint).json()
+                except RuntimeError as err:
+                    messages.error(
+                        request,
+                        f"Failed to fetch user info ({err})")
+                else:
+                    request.session[OAUTH_USER_INFO_KEY] = user_info
+                    messages.success(
+                        request,
+                        "You have authenticated via Datatracker")
 
     return redirect('/')
 
