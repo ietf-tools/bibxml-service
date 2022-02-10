@@ -1,0 +1,26 @@
+<div class="snap-start p-2 xl:p-4 flex-1
+    shadow md:overflow-y-auto
+    {% if "error" in tags %}
+      border-rose-500
+      shadow-rose-500
+      bg-rose-300 text-rose-900
+      dark:bg-rose-700 dark:text-rose-100 dark:shadow-rose-900/80
+    {% elif "success" in tags %}
+      border-emerald-500
+      shadow-emerald-500
+      bg-emerald-300 text-emerald-900
+      dark:bg-emerald-700 dark:text-emerald-100 dark:shadow-emerald-900/80
+    {% else %}
+      border-amber-500
+      shadow-amber-500
+      bg-amber-200 text-amber-900
+      dark:bg-amber-700 dark:text-amber-100 dark:shadow-amber-900/80
+    {% endif %}
+    flex flex-row items-start gap-2
+    {{ htmlclass }}">
+  <svg class="h-4 w-4 m-1 shrink-0" data-icon="info" viewBox="0 0 32 32" style="fill: currentcolor">
+    <title>info icon</title>
+    <path d="M16 0 A16 16 0 0 1 16 32 A16 16 0 0 1 16 0 M19 15 L13 15 L13 26 L19 26 z M16 6 A3 3 0 0 0 16 12 A3 3 0 0 0 16 6"></path>
+  </svg>
+  <span class="grow">{{ message|safe }}</span>
+</div>
