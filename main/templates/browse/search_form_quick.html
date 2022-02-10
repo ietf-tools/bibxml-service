@@ -17,7 +17,7 @@
     name="query"
     type="text"
     placeholder="{% if detailed %}Document ID or anything…{% else %}Quick search…{% endif %}"
-    class="min-w-0 grow text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit {{ control_htmlclass }}"
+    class="min-w-0 grow input-on-blue {{ control_htmlclass }}"
   />
   <button type="submit" class="{% if detailed %}hidden md:!block{% else %}hidden{% endif %} button {{ control_htmlclass }}">
     Quick search

@@ -168,6 +168,9 @@ input, button, select, textarea {
 
   .button {
     @apply inline-block p-2 px-4 bg-sky-700 text-sky-100;
+
+  .input-on-blue {
+    @apply text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit;
   }
 
   a:hover {
