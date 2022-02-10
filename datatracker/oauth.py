@@ -72,6 +72,12 @@ def _get_redirect_uri() -> str:
     if redirect_uri == settings.DATATRACKER_REDIRECT_URI:
         return redirect_uri
     else:
+        log.exception(
+            "Datatracker OAuth: "
+            "Calculated redirect URI %s "
+            "does not match required %s",
+            redirect_uri,
+            settings.DATATRACKER_REDIRECT_URI)
         raise ImproperlyConfigured(
             f"Calculated redirect URI {redirect_uri} "
             f"does not match required {settings.DATATRACKER_REDIRECT_URI}")
@@ -135,6 +141,7 @@ def handle_callback(request):
             scope=['openid'],
             state=request.session[OAUTH_STATE_KEY])
     except Exception as err:
+        log.exception("Datatracker OAuth: failed to instantiate session")
         messages.error(
             request,
             f"Failed to instantiate OAuth2 session ({err})")
@@ -156,6 +163,7 @@ def handle_callback(request):
                     include_client_id=True,
                     authorization_response=auth_response)
             except Exception as err:
+                log.exception("Datatracker OAuth: failed to retrieve token")
                 messages.error(
                     request,
                     f"Failed to fetch token ({err}, "
@@ -171,6 +179,7 @@ def handle_callback(request):
                     user_info = session_with_token.get(
                         provider.userinfo_endpoint).json()
                 except Exception as err:
+                    log.exception("Datatracker OAuth: failed to retrieve user info")
                     messages.error(
                         request,
                         f"Failed to fetch user info ({err})")
