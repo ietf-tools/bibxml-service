@@ -2,7 +2,9 @@
   {% if datatracker_user %}
     <aside class="
       {% include "_side_block_classes.html" %}
-      p-4 dark:text-dark-200/50 text-dark-800/50
+      p-4
+      bg-indigo-700 text-indigo-100
+      dark:bg-indigo-900 dark:text-indigo-200
     ">
       Logged&nbsp;in
       as&nbsp;<strong class="whitespace-nowrap">{{ datatracker_user.username|default:"N/A" }}</strong>
@@ -14,7 +16,9 @@
       class="
         block
         {% include "_side_block_classes.html" %}
-        p-4 dark:text-dark-200/50 text-dark-800/50
+        p-4
+        bg-indigo-700 text-indigo-100
+        dark:bg-indigo-900 dark:text-indigo-200
       "
       href="{% url "datatracker_oauth_initiate" %}"
     >
@@ -22,4 +26,3 @@
     </a>
   {% endif %}
 {% endif %}
-

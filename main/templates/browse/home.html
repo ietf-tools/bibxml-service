@@ -15,30 +15,21 @@
 {% endblock %}
 
 {% block header_extras %}
-  <a
-    class="
-      {% include "_side_block_classes.html" %}
-      block p-4 bg-lime-600 text-lime-100 tracking-tight
-      leading-tight
-    "
-    href="{% url "api_index" %}"
-  >
-    API&nbsp;reference&nbsp
-  </a>
-
-  <a
-    class="
-      {% include "_side_block_classes.html" %}
-      block p-4 bg-lime-600/70 text-lime-100 dark:text-dark-700 tracking-tight
-      leading-tight
-    "
-    href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}"
-  >
-    Compatibility
-    API&nbsp;reference&nbsp
-  </a>
-  
   {{ block.super }}
+
+  <div
+    class="
+      {% include "_side_block_classes.html" %}
+      p-4
+      dark:bg-lime-700 dark:text-lime-300
+      bg-lime-600 text-lime-100
+    "
+  >
+    <a href="{% url "api_index" %}">API&nbsp;specification</a>
+    &emsp;
+    <a href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}"
+    >Compat.&nbsp;API&nbsp;specification</a>
+  </div>
 {% endblock %}
 
 
