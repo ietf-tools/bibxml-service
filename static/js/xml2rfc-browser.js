@@ -1,40 +1,20 @@
 (function () {
 
-  // Scroll to selected path if any
-
   const TAILWIND_SM_BREAKPOINT_PX = 640;
-
-  const selectedPath = document.documentElement.dataset['xml2rfc-selected-path'];
-
-  if (selectedPath) {
-    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    if (vw > TAILWIND_SM_BREAKPOINT_PX) {
-      const el = document.querySelector(`[data-xml2rfc-path="${selectedPath}"]`);
-      if (el) {
-        el.parentNode.scrollTop = el.offsetTop - el.parentNode.offsetTop
-        markAsSelected(el);
-      }
-    }
-  }
-
-  function markAsSelected(el) {
-    el.classList.add('bg-sky-800');
-    el.classList.add('text-white');
-  }
-
-  const dirname = document.documentElement.dataset['xml2rfc-dirname'];
-  const globalPrefix = document.documentElement.dataset['xml2rfc-global-prefix'];
 
   const pageCacheKey = document.documentElement.dataset['xml2rfc-cache-key'];
   // Is used to invalidate cached path resolution data whenever manual mappings change.
 
-  const allPathEls = document.querySelectorAll('[data-xml2rfc-path]');
+  const dirname = document.documentElement.dataset['xml2rfc-dirname'];
+  const globalPrefix = document.documentElement.dataset['xml2rfc-global-prefix'];
+  const selectedPath = document.documentElement.dataset['xml2rfc-selected-path'];
 
+  const allPathEls = document.querySelectorAll('[data-xml2rfc-path]');
   const scrollView = document.getElementById('xml2rfcPathScrollView');
 
   if (dirname && pageCacheKey && scrollView && globalPrefix && allPathEls.length > 0) {
 
-    // Set up listing
+    // Set up item listing
 
     const cacheKey = `path-resolution-${pageCacheKey}`;
     const cache = window.getCache(cacheKey, {});
@@ -51,6 +31,17 @@
       );
     } else {
       window.xml2rfcResolver.watchElements(cache, allPathEls, scrollView, globalPrefix);
+      if (selectedPath) {
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        if (vw > TAILWIND_SM_BREAKPOINT_PX) {
+          const el = document.querySelector(`[data-xml2rfc-path="${selectedPath}"]`);
+          if (el) {
+            // Scroll to selected path if any
+            el.parentNode.scrollTop = el.offsetTop - el.parentNode.offsetTop
+            markAsSelected(el);
+          }
+        }
+      }
     }
 
 
@@ -173,6 +164,12 @@
       testButton.addEventListener('click', handleTestClick);
       testEl.appendChild(testButton);
     }
+  }
+
+  /** Make item look selected. */
+  function markAsSelected(el) {
+    el.classList.add('bg-sky-800');
+    el.classList.add('text-white');
   }
 
 })();
