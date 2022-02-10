@@ -130,7 +130,9 @@ def handle_callback(request):
     provider = get_provider_info()
 
     try:
-        session = OAuth2Session(CLIENT_ID, request.session[OAUTH_STATE_KEY])
+        session = OAuth2Session(
+            CLIENT_ID,
+            state=request.session[OAUTH_STATE_KEY])
     except RuntimeError as err:
         messages.error(
             request,
