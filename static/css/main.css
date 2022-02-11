@@ -65,6 +65,9 @@ input, button, select, textarea {
     @apply text-sky-800 no-underline dark:text-sky-200;
   }
 
+  /* TODO: Use nesting for this */
+  /* NOTE: Do not specify any general “item-in-list” styling here,
+     this only applies to bibitems */
   article.bibitem-in-list .bibitem-title {
     @apply md:truncate;
   }
