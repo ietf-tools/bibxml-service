@@ -228,13 +228,13 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                 error='' if xml_repr else "not indexed",
             )
 
+        metric_label: str
+
         if xml_repr:
             if item:
-                metrics.xml2rfc_api_bibitem_hits.labels(
-                    xml2rfc_subpath,
-                    'success',
-                ).inc()
+                metric_label = 'success'
             else:
+                metric_label = 'success_fallback'
                 metrics.xml2rfc_api_bibitem_hits.labels(
                     xml2rfc_subpath,
                     'success_fallback',
@@ -245,6 +245,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                 charset="utf-8")
 
         else:
+            metric_label = 'not_found'
             metrics.xml2rfc_api_bibitem_hits.labels(
                 xml2rfc_subpath,
                 'not_found',
@@ -263,6 +264,13 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
                         ])
                 }
             }, status=404)
+
+        # Do not increment the metric if it comes from an internal tool.
+        if request.headers.get('x-requested-with', None) != 'xml2rfcResolver':
+            metrics.xml2rfc_api_bibitem_hits.labels(
+                xml2rfc_subpath,
+                metric_label,
+            ).inc()
 
         resp.headers['X-Resolution-Methods'] = ';'.join(methods)
         resp.headers['X-Resolution-Outcomes'] = ';'.join([

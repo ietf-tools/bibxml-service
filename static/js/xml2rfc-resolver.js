@@ -107,7 +107,9 @@
    * { xml2rfcXML: string | null }
    */
   async function resolvePath (path, detailed, compare) {
-    const result = await axios.get(`/${path}`);
+    const result = await axios.get(`/${path}`, { headers: {
+      'X-Requested-With': 'xml2rfcResolver',
+    } });
 
     const methodsTried = result.headers['x-resolution-methods']?.split(';') ?? [];
     const rawMethodOutcomes = result.headers['x-resolution-outcomes']?.split(';') ?? [];
