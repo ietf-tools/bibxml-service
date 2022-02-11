@@ -220,7 +220,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
         if item:
             xml_repr = to_xml_string(item, anchor=anchor)
         else:
-            xml_repr = _obtain_fallback_xml(
+            xml_repr = obtain_fallback_xml(
                 xml2rfc_subpath,
                 anchor)
             method_results['fallback'] = dict(
@@ -287,7 +287,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
     return handle_xml2rfc_path
 
 
-def _obtain_fallback_xml(subpath: str, anchor: str) -> Union[str, None]:
+def obtain_fallback_xml(subpath: str, anchor: str) -> Union[str, None]:
     """Obtains XML fallback for given subpath, if possible."""
 
     requested_dirname = subpath.split('/')[-2]

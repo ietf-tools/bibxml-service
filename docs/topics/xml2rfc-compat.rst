@@ -64,6 +64,8 @@ storing path and associated XML data in the DB without further validation.
 The ``anchor`` property in obtained fallback XML
 is replaced with effective anchor at during request.
 
+.. seealso:: :func:`xml2rfc_compat.urls.obtain_fallback_xml()`
+
 Tracked metrics
 ===============
 
