@@ -141,7 +141,6 @@ Code layout
    │
    └── xml2rfc_compat/
    │       xml2rfc tools style API support.
-   │       (Some of it also currently lives under main/api_compat.)
    │
    └── common/
        ├── pydantic.py
