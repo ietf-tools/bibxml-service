@@ -8,6 +8,7 @@ from simplejson import JSONDecodeError
 from django.http.response import HttpResponseForbidden
 
 from .request import post
+from .oauth import get_client
 from .exceptions import UnexpectedDatatrackerResponse
 
 
@@ -16,12 +17,18 @@ log = logging.getLogger(__name__)
 
 def api(viewfunc):
     """Header-based auth decorator for Django views.
-    Use for API endpoints that require Datatracker’s bibxml API key.
+    Use for API endpoints that require Datatracker authentication.
+
     Token is expected to be given under ``X-Datatracker-Token`` HTTP header.
+
+    If token is not provided,
+    but current session contains a valid Datatracker token,
+    it counts as well.
     """
     @functools.wraps(viewfunc)
     def wrapper(request, *args, **kwargs):
         provided_secret = request.headers.get('x-datatracker-token', None)
+
         if provided_secret is not None:
             try:
                 authenticated = token_is_valid(provided_secret)
@@ -36,6 +43,10 @@ def api(viewfunc):
                     return viewfunc(request, *args, **kwargs)
                 else:
                     return HttpResponseForbidden("Invalid Datatracker token")
+
+        elif get_client(request):
+            return viewfunc(request, *args, **kwargs)
+
         return HttpResponseForbidden("Missing Datatracker token")
 
     return wrapper
