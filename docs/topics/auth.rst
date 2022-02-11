@@ -7,6 +7,34 @@ Authentication
 
 BibXML service uses multiple authentication mechanisms.
 
+Datatracker-based auth
+======================
+
+HTTP header token
+-----------------
+
+Applies to bibliographic data retrieval APIs.
+
+A valid Datatracker developer’s token (of “bibxml” type)
+is expected to be passed in ``X-Datatracker-Token`` HTTP header.
+For example::
+
+    curl -sS \
+      -Hcontent-type:application/json \
+      -Hx-datatracker-token:<your_token> \
+      -X GET \
+      "<instance_url>/api/v1/by-docid/?docid=RFC8126"
+
+.. seealso:: :mod:`datatracker.auth`
+
+OpenID Connect
+--------------
+
+Users can authenticate with Datatracker
+via OAuth2/OpenID Connect.
+
+.. seealso:: :mod:`datatracker.oauth`
+
 Internal auth
 =============
 
@@ -40,31 +68,3 @@ Applies to management GUI endpoints and Prometheus metrics endpoint.
 Username for Basic authentication is always ``ietf``,
 and any of the tokens provided via the environment can be used
 as the password.
-
-Datatracker-based auth
-======================
-
-HTTP header token
------------------
-
-Applies to bibliographic data retrieval APIs.
-
-A valid Datatracker developer’s token (of “bibxml” type)
-is expected to be passed in ``X-Datatracker-Token`` HTTP header.
-For example::
-
-    curl -sS \
-      -Hcontent-type:application/json \
-      -Hx-datatracker-token:<your_token> \
-      -X GET \
-      "<instance_url>/api/v1/by-docid/?docid=RFC8126"
-
-.. seealso:: :mod:`datatracker.auth`
-
-OpenID Connect
---------------
-
-Users can authenticate with Datatracker
-via OAuth2/OpenID Connect.
-
-.. seealso:: :mod:`datatracker.oauth`
