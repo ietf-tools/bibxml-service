@@ -61,6 +61,9 @@ def get_client(request):
 
     Session is guaranteed to be authenticated,
     and can be used to perform authenticated operations.
+
+    As a side effect, if session is not authenticated,
+    clears OAuth data from session.
     """
 
     if OAUTH_TOKEN_KEY in request.session:
