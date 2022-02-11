@@ -35,9 +35,7 @@ Glossary
    primary document identifier
        An identifier the ``id`` of which is used when citing/linking to document.
 
-       Multiple bibliographic items that share at least one primary document ID
-       are considered to be representing the same bibliographic item
-       (see also :mod:`bib_models.merger`).
+       Such an identifier is shown without its identifier type.
 
        DOI, ISBN are *not* primary identifiers.
 
