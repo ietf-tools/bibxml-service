@@ -19,6 +19,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
 RUN apt-get update
 RUN apt-get install -yq nodejs
 
+# Install requirements for building docs
+RUN pip install sphinx
+
 # Copy and install requirements separately to let Docker cache layers
 COPY requirements.txt /code/requirements.txt
 COPY package.json /code/package.json
@@ -28,9 +31,6 @@ WORKDIR /code
 
 RUN ["pip", "install", "-r", "requirements.txt"]
 RUN ["npm", "install"]
-
-# Install requirements for building docs
-RUN pip install sphinx
 
 # Copy the rest of the codebase
 COPY . /code
