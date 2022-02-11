@@ -44,7 +44,7 @@ def api(viewfunc):
                 else:
                     return HttpResponseForbidden("Invalid Datatracker token")
 
-        elif get_client(request):
+        elif get_client(request) is not None:
             return viewfunc(request, *args, **kwargs)
 
         return HttpResponseForbidden("Missing Datatracker token")
