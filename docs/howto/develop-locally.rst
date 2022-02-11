@@ -62,15 +62,21 @@ Building base image
 Building documentation
 ======================
 
-Make sure to build base image first (see above).
+In production (without DEBUG and dev Compose config),
+the documentation is made available under `/static/docs/index.html`.
 
-1. Under ``docs/``, run ``docker compose up``.
+To build & work on documentation locally, you need to take
+a few more steps.
 
-2. Documentation is built in HTML under ``docs/build/html``,
-   and is rebuilt whenever project files change
+1. First, make sure to build the base image (see previous sections).
+
+2. Under ``docs/``, run ``docker compose up``.
+
+3. HTML documentation is served under ``localhost:8001``,
+   and files are under ``docs/build/html``.
+
+4. Documentation is continuously rebuilt whenever project files change,
    until you stop the container.
-
-3. HTML documentation is served under ``localhost:8001``.
 
 
 Running the service

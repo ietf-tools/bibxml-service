@@ -29,8 +29,16 @@ WORKDIR /code
 RUN ["pip", "install", "-r", "requirements.txt"]
 RUN ["npm", "install"]
 
+# Install requirements for building docs
+RUN pip install sphinx
+
 # Copy the rest of the codebase
 COPY . /code
 
+RUN mkdir -p /code/build/static
+
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 RUN ["python", "manage.py", "compress"]
+
+# Build docs
+RUN sphinx-build -a -E -n -v -b html /code/docs/ /code/build/static/docs
