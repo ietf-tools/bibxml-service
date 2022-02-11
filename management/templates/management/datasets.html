@@ -19,18 +19,18 @@
         <a class="link font-bold" href="{% url "manage_indexable_source" dataset.name %}"
           >{{ dataset.name }}</a>
           &emsp;
-          <span class="whitespace-nowrap text-sm">{{ dataset.item_count }} currently indexed</span>
-        <br />
-        <span class="text-xs break-all">
           {% if dataset.task_progress %}
             <progress
-              class="custom-progress grow bg-sky-600 w-full"
+              class="custom-progress grow bg-sky-600 h-2"
               value="{{ dataset.task_progress.current }}"
               max="{{ dataset.task_progress.total }}"
               title="{{ dataset.task_progress.current }} of {{ dataset.task_progress.total }}">
             </progress>
-            <br />
+          {% else %}
+            <span class="whitespace-nowrap text-sm">{{ dataset.item_count }} currently indexed</span>
           {% endif %}
+        <br />
+        <span class="text-xs break-all">
           {{ dataset.status }}
         </span>
       </div>
