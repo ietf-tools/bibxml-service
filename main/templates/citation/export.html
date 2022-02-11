@@ -9,8 +9,8 @@
         >{{ format }}</a>,
     {% endfor %}
     <a
-        class="link"
         download="{{ docid.type }}-{{ docid.id }}.json"
+        class="link opacity-50"
         href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
       >JSON</a>
   {% else %}
