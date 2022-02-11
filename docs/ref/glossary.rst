@@ -121,3 +121,7 @@ Glossary
        (Normally points to an XML file.)
 
        See :doc:`/topics/xml2rfc-compat`.
+
+   xml2rfc anchor
+      Part of the filename in an :term:`xml2rfc-style path`
+      without “reference” or “_reference” prefix and file extension.

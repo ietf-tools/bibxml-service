@@ -47,9 +47,15 @@ RFP requirement compliance
    (serialized to YAML) bibliographic data are used. Those sources are used
    to populate PostgreSQL database at runtime.
 
-5. xml2rfc-style paths are supported, where requested path is used
+5. xml2rfc-style paths are supported. Requested path is used
    to construct a query against Relaton bibliographic item JSON,
    and obtained item is returned serialized in XML.
+
+   A manual map to a document identifier, if present,
+   overrides automatic resolution.
+
+   Fallback to data indexed from xml2rfc mirror Git repository
+   is used as last resort.
 
    Refer to :doc:`/topics/xml2rfc-compat` for details.
 
