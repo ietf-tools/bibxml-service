@@ -12,7 +12,7 @@ from typing import List
 from django.conf import settings
 
 
-__all__ = ('ALIASES', )
+__all__ = ('ALIASES', 'get_aliases', 'unalias')
 
 
 ALIASES = getattr(settings, 'XML2RFC_COMPAT_DIR_ALIASES', {})
