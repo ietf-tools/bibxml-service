@@ -94,7 +94,7 @@ def resolve_manual_map(subpath: str) -> Tuple[
 ]:
     """Returns a 3-tuple of mapping configuration, resolved item,
     and error as a string, any can be None.
-    Does not throw.
+    Does not raise exceptions.
     """
     mapped_docid: Union[str, None]
     resolved_item: Union[BibliographicItem, None]
