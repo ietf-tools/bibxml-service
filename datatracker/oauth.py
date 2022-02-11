@@ -256,32 +256,36 @@ def get_provider_info():
         log.exception(
             "Invalid response from Datatracker’s OAuth provider spec, "
             "falling back to hard-coded data")
-        data = {
-            "issuer": "https://datatracker.ietf.org/api/openid",
-            "authorization_endpoint": "https://datatracker.ietf.org/api/openid/authorize",
-            "token_endpoint": "https://datatracker.ietf.org/api/openid/token",
-            "userinfo_endpoint": "https://datatracker.ietf.org/api/openid/userinfo",
-            "end_session_endpoint": "https://datatracker.ietf.org/api/openid/end-session",
-            "introspection_endpoint": "https://datatracker.ietf.org/api/openid/introspect",
-            "response_types_supported": [
-              "code",
-              "id_token",
-              "id_token token",
-              "code token",
-              "code id_token",
-              "code id_token token"
-            ],
-            "jwks_uri": "https://datatracker.ietf.org/api/openid/jwks",
-            "id_token_signing_alg_values_supported": [
-              "HS256",
-              "RS256"
-            ],
-            "subject_types_supported": [
-              "public"
-            ],
-            "token_endpoint_auth_methods_supported": [
-              "client_secret_post",
-              "client_secret_basic"
-            ],
-        }
-    return ProviderInfo(**data)
+        return DEFAULT_PROVIDER_INFO
+    else:
+        return ProviderInfo(**data)
+
+
+DEFAULT_PROVIDER = ProviderInfo(**{
+    "issuer": "https://datatracker.ietf.org/api/openid",
+    "authorization_endpoint": "https://datatracker.ietf.org/api/openid/authorize",
+    "token_endpoint": "https://datatracker.ietf.org/api/openid/token",
+    "userinfo_endpoint": "https://datatracker.ietf.org/api/openid/userinfo",
+    "end_session_endpoint": "https://datatracker.ietf.org/api/openid/end-session",
+    "introspection_endpoint": "https://datatracker.ietf.org/api/openid/introspect",
+    "response_types_supported": [
+      "code",
+      "id_token",
+      "id_token token",
+      "code token",
+      "code id_token",
+      "code id_token token"
+    ],
+    "jwks_uri": "https://datatracker.ietf.org/api/openid/jwks",
+    "id_token_signing_alg_values_supported": [
+      "HS256",
+      "RS256"
+    ],
+    "subject_types_supported": [
+      "public"
+    ],
+    "token_endpoint_auth_methods_supported": [
+      "client_secret_post",
+      "client_secret_basic"
+    ],
+})
