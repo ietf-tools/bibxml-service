@@ -14,14 +14,7 @@ def get_dir_subpath_regex(dirname: str):
 
 
 class ManualPathMap(models.Model):
-    """Maps an xml2rfc path to a search query.
-
-    Search is defined by ``query`` and ``query_format``.
-    Ideally, search query should unambiguously return one item,
-    so ``json_struct`` matching with docid specified is best.
-
-    We don’t map to DB-specific primary key values,
-    because those may change.
+    """Maps an xml2rfc path to a document identifier iD.
     """
 
     xml2rfc_subpath = models.CharField(
