@@ -140,6 +140,10 @@ def resolve_automatically(
     Union[BibliographicItem, None],
     Union[str, None],
 ]:
+    """Returns a 3-tuple of resolver function name, resolved item,
+    and error as a string, any can be None.
+    Does not raise exceptions.
+    """
     item: Union[BibliographicItem, None]
     error: Union[str, None]
     try:
