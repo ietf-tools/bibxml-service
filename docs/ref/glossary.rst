@@ -75,11 +75,11 @@ Glossary
        Currently delivered as a Git repository of certain structure
        with Relaton citation data serialized to YAML files.
 
-       A dataset has to be indexed in order for the data to become
-       available from the internal source.
+       An indexable source has to be indexed in order for the data to become
+       retrievable using this service.
 
        When user requests bibliographic data,
-       the service returns items discovered across indexed sources first.
+       this service returns items discovered across indexed sources first.
 
    indexed source
        An indexable source that has been indexed.
