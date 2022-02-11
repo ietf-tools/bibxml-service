@@ -21,7 +21,16 @@
           &emsp;
           <span class="whitespace-nowrap text-sm">{{ dataset.item_count }} currently indexed</span>
         <br />
-        <span class="truncate text-xs">
+        <span class="text-xs break-all">
+          {% if dataset.task_progress %}
+            <progress
+              class="custom-progress grow bg-sky-600 w-full"
+              value="{{ dataset.task_progress.current }}"
+              max="{{ dataset.task_progress.total }}"
+              title="{{ dataset.task_progress.current }} of {{ dataset.task_progress.total }}">
+            </progress>
+            <br />
+          {% endif %}
           {{ dataset.status }}
         </span>
       </div>

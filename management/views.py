@@ -1,6 +1,6 @@
 """View functions for management GUI."""
 
-from typing import List, Union
+from typing import List, Union, Optional
 from dataclasses import dataclass
 
 from django.shortcuts import render
@@ -12,7 +12,7 @@ from main.models import RefData
 from sources.task_status import get_dataset_task_history
 from sources.task_status import describe_indexing_task
 from sources.task_status import list_running_tasks
-from sources.task_status import IndexingTaskDescription
+from sources.task_status import IndexingTaskDescription, TaskProgress
 from sources import indexable
 
 
@@ -42,6 +42,7 @@ class IndexableSourceStatus:
     name: str
     status: str
     item_count: str
+    task_progress: Optional[TaskProgress]
 
 
 def datasets(request):
@@ -68,6 +69,7 @@ def datasets(request):
         sources.append(IndexableSourceStatus(
             name=source_id,
             status=status,
+            task_progress=task['progress'] if task and 'progress' in task else None,
             item_count=str(source.count_indexed()),
         ))
 
