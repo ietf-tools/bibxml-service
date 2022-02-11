@@ -1,5 +1,5 @@
 """Authentication uses tokens provided
-via the :data:`bibxm.settings.API_SECRETS` Django setting.
+via the :data:`bibxml.settings.API_SECRETS` Django setting.
 
 .. seealso:: :doc:`/topics/auth`
 """
