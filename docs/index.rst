@@ -29,6 +29,7 @@ read its API specification and explore GUI.
    howto/index
    ref/index
    rfp-requirements
+   evolution
 
 Code layout
 ===========
