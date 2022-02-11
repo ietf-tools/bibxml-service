@@ -63,9 +63,6 @@ def get_client(request):
     and can be used to perform authenticated operations.
     """
 
-    def token_updater(token):
-        request.session[OAUTH_TOKEN_KEY] = token
-
     if OAUTH_TOKEN_KEY in request.session:
         session = OAuth2Session(
             CLIENT_ID,
