@@ -79,6 +79,8 @@ def get_client(request):
             # Most likely, token expired.
             clear_session(request)
             return None
+        else:
+            return session
     else:
         return None
 
