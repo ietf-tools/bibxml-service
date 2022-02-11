@@ -1,25 +1,25 @@
 {% for docid in ids %}
-  <span class="first:font-semibold bibitem-docid relative" title="{{ docid.type|default:"Untyped identifier" }}">
+  <span class="bibitem-docid relative" {% if docid.primary %}title="{{ docid.id }} (citeable identifier)"{% endif %}>
     {% if as_links and docid.id and docid.type and not docid.scope %}
+      {% if show_type and not docid.primary %}
+        <span class="text-xs opacity-50">
+          {{ docid.type }}:
+        </span>
+      {% endif %}
       <a
         tabindex="{% if forloop.first and tabindex %}{{ tabindex }}{% else %}-1{% endif %}"
         href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}{% if request.GET.query %}&query={{ request.GET.query|urlencode:"" }}{% if query_format %}&query_format={{ query_format }}{% endif %}{% if page_obj %}&page={{ page_obj.number }}{% endif %}{% endif %}"
-        class="bibitem-docid-id">
+        class="bibitem-docid-id {% if docid.primary %}font-semibold{% endif %}">
         {{ docid.id }}</a>
-      {% if show_type %}
-        <span class="text-xs">
+    {% else %}
+      {% if show_type and not docid.primary and docid.type %}
+        <span class="text-xs opacity-50">
           {{ docid.type }}
         </span>
       {% endif %}
-    {% else %}
-      <span class="bibitem-docid-id">
+      <span class="bibitem-docid-id {% if docid.primary %}font-semibold{% endif %}">
         {{ docid.id }}
       </span>
-      {% if show_type %}
-        <span class="text-xs">
-          {{ docid.type|default:"(untyped):" }}
-        </span>
-      {% endif %}
     {% endif %}
   </span>
 {% endfor %}

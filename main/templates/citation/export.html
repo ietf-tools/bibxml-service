@@ -1,0 +1,17 @@
+{% load relaton %}
+{% with docid=val %}
+  {% if datatracker_user %}
+    <a
+        class="link"
+        download="{{ docid.type }}-{{ docid.id }}.xml"
+        href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=bibxml"
+      >BibXML</a>,
+    <a
+        class="link"
+        download="{{ docid.type }}-{{ docid.id }}.json"
+        href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
+      >JSON</a>
+  {% else %}
+    —
+  {% endif %}
+{% endwith %}
