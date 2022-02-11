@@ -74,6 +74,7 @@ def get_client(request):
             session.get(provider.userinfo_endpoint).json()
         except Exception:
             # Most likely, token expired.
+            del request.session[OAUTH_TOKEN_KEY]
             return None
     else:
         return None
