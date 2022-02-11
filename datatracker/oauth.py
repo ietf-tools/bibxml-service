@@ -69,7 +69,7 @@ def get_client(request):
             CLIENT_ID,
             scope=['openid'],
             token=request.session[OAUTH_TOKEN_KEY])
-        provider = get_provider_info()
+        provider = get_provider()
         try:
             session.get(provider.userinfo_endpoint).json()
         except Exception:
@@ -126,7 +126,7 @@ def initiate(request):
             "integration is not configured")
         return redirect(request.headers.get('referer', '/'))
 
-    provider = get_provider_info()
+    provider = get_provider()
     try:
         redirect_uri = _get_redirect_uri()
     except ImproperlyConfigured as err:
@@ -178,7 +178,7 @@ def handle_callback(request):
             f"({err})")
         return redirect('/')
 
-    provider = get_provider_info()
+    provider = get_provider()
 
     try:
         session = OAuth2Session(
@@ -246,7 +246,7 @@ class ProviderInfo(BaseModel, extra=Extra.ignore):
     token_endpoint_auth_methods_supported: List[str]
 
 
-def get_provider_info():
+def get_provider():
     try:
         data = request.get(
             'openid/.well-known/openid-configuration',
