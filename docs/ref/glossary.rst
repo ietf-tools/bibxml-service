@@ -125,3 +125,6 @@ Glossary
    xml2rfc anchor
       Part of the filename in an :term:`xml2rfc-style path`
       without “reference” or “_reference” prefix and file extension.
+
+      It also appears as the “anchor” attribute on the ``<reference>``
+      element in returned XML.
