@@ -227,6 +227,7 @@ def handle_callback(request):
                     provider.userinfo_endpoint).json()
             except Exception as err:
                 log.exception("Datatracker OAuth: failed to get user info")
+                clear_session(request)
                 messages.error(
                     request,
                     f"Failed to fetch user info ({err})")
