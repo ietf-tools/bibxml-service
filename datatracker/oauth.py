@@ -70,6 +70,7 @@ def get_client(request):
         session = OAuth2Session(
             CLIENT_ID,
             scope=['openid'],
+            redirect_uri=_get_redirect_uri(),
             token=request.session[OAUTH_TOKEN_KEY])
         provider = get_provider()
         try:
