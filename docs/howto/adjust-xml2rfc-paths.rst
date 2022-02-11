@@ -25,6 +25,12 @@ from up-to-date sources.
 
   Use that identifier when creating a mapping.
 
+  .. note::
+  
+     Manual maps will be lost if the database is completely wiped.
+     Use management GUI to export or import mappings to/from a JSON file
+     to protect against that scenario.
+
 .. seealso::
 
    - :doc:`/topics/xml2rfc-compat`

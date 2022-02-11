@@ -33,13 +33,6 @@ instances. The management GUI provides an utility for managing these mappings.
 
 .. seealso:: :func:`xml2rfc_compat.urls.resolve_manual_map()`
 
-.. note::
-
-   Manual maps will be lost if the database is completely wiped.
-
-   Use management GUI to export or import mappings to/from a JSON file
-   to protect against that scenario.
-
 Fetcher functions
 =================
 
