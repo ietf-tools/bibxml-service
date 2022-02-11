@@ -1,11 +1,13 @@
 {% load relaton %}
 {% with docid=val %}
   {% if datatracker_user %}
-    <a
-        class="link"
-        download="{{ docid.type }}-{{ docid.id }}.xml"
-        href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=bibxml"
-      >BibXML</a>,
+    {% for format in available_serialization_formats %}
+      <a
+          class="link"
+          download="{{ docid.id }}.xml"
+          href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
+        >{{ format }}</a>,
+    {% endfor %}
     <a
         class="link"
         download="{{ docid.type }}-{{ docid.id }}.json"
