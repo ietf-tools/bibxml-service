@@ -74,18 +74,23 @@ def get_client(request):
             session.get(provider.userinfo_endpoint).json()
         except Exception:
             # Most likely, token expired.
-            del request.session[OAUTH_TOKEN_KEY]
+            clear_session(request)
             return None
     else:
         return None
 
 
-def log_out(request):
+def clear_session(request):
     """Removes Datatracker user info from session."""
     try:
+        del request.session[OAUTH_TOKEN_KEY]
         del request.session[OAUTH_USER_INFO_KEY]
     except KeyError:
         pass
+
+
+def log_out(request):
+    clear_session(request)
     return redirect(request.headers.get('referer', '/'))
 
 
