@@ -12,10 +12,16 @@ Aliases
 .. automodule:: xml2rfc_compat.aliases
    :members:
 
-URL pattern factory
-===================
+URL patterns
+============
 
 .. automodule:: xml2rfc_compat.urls
+   :members:
+
+Management views
+================
+
+.. automodule:: xml2rfc_compat.views
    :members:
 
 Fetcher functions
@@ -37,8 +43,8 @@ Indexable source
 .. automodule:: xml2rfc_compat.source
    :members:
 
-Data model
-==========
+Data models
+===========
 
 .. automodule:: xml2rfc_compat.models
    :members:
