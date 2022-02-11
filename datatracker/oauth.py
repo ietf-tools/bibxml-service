@@ -259,7 +259,7 @@ def get_provider():
         log.exception(
             "Invalid response from Datatracker’s OAuth provider spec, "
             "falling back to hard-coded data")
-        return DEFAULT_PROVIDER_INFO
+        return DEFAULT_PROVIDER
     else:
         return ProviderInfo(**data)
 
