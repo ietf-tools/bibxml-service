@@ -70,6 +70,8 @@ Tracked metrics
 ===============
 
 :data:`prometheus.metrics.xml2rfc_api_bibitem_hits`
-    incremented on each request. The ``outcome`` label
-    reports 'success', 'not_found_fallback' if fallback was required,
+    incremented on each request (unless X-Requested-With header is xml2rfcResolver:
+    this is used by xml2rfc path resolutoion management tool to avoid
+    skewing the metric).
+    The ``outcome`` label reports 'success', 'not_found_fallback' if fallback was required,
     or 'not_found_no_fallback' if fallback failed.
