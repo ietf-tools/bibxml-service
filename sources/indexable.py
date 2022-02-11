@@ -197,7 +197,7 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
                     source_id)
                 on_index_progress = (lambda total, indexed: on_progress(
                     'indexing using data in {}'
-                    .format(', '.join(work_dir_paths)),
+                    .format(', '.join(repo[0] for repo in repos)),
                     total,
                     indexed,
                 ))
