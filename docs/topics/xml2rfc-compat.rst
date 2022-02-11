@@ -5,6 +5,9 @@ xml2rfc tools web API compatibility
 Pre-existing :term:`xml2rfc paths <xml2rfc-style path>`
 are maintained in the following way.
 
+.. seealso:: If you have cases where paths are resolved incorrectly,
+             :doc:`/howto/adjust-xml2rfc-paths`.
+
 Resolution
 ==========
 
@@ -22,14 +25,13 @@ However, that function is not necessarily called.
 3. If no bibliographic item can be located, URL handler falls back
    to pre-indexed xml2rfc web server data.
 
-.. seealso:: If you have cases where fetcher cannot locate a bib item,
-             :doc:`/howto/adjust-xml2rfc-paths`.
-
 Manual mapping
 ==============
 
 Manual maps are stored in the DB as :class:`xml2rfc_compat.models.ManualPathMap`
 instances. The management GUI provides an utility for managing these mappings.
+
+.. seealso:: :func:`xml2rfc_compat.urls.resolve_manual_map()`
 
 .. note::
 
@@ -41,14 +43,15 @@ instances. The management GUI provides an utility for managing these mappings.
 Fetcher functions
 =================
 
-Fetcher functions are defined in :mod:`xml2rfc_compat.fetchers`.
-
 Fetcher functions are associated with subdirectories
 (e.g., ``bibxml9``) via :func:`xml2rfc_compat.urls.register_fetcher`.
 
-Each fetcher function accepts an anchor,
-which would be an xml2rfc filename base (a.k.a. anchor),
+Each fetcher function accepts an :term:`xml2rfc anchor`
 and returns a :class:`bib_models.models.BibliographicItem` instance.
+
+Fetcher functions are currently defined in :mod:`xml2rfc_compat.fetchers`.
+
+.. seealso:: :func:`xml2rfc_compat.urls.resolve_automatically()`
 
 Fallback
 ========
