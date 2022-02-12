@@ -49,13 +49,6 @@ Querying indexed sources
 .. automodule:: main.query
    :members:
 
-Helper types
-============
-
-.. automodule:: main.types
-   :members:
-   :show-inheritance:
-
 Models
 ======
 
