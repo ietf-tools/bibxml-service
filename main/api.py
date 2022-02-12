@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from pydantic import ValidationError
 
 from common.pydantic import unpack_dataclasses
-from bib_models.models import BibliographicItem
+from bib_models.models.bibdata import BibliographicItem
 from bib_models import serializers
 from sources.exceptions import RefNotFoundError
 from prometheus import metrics

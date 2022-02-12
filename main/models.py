@@ -39,7 +39,7 @@ class RefData(models.Model):
     body = models.JSONField()
     """Contains canonical Relaton representation
     of :term:`bibliographic item`
-    (:class:`bib_models.BibliographicItem`)."""
+    (:class:`bib_models.models.bibdata.BibliographicItem`)."""
 
     representations = models.JSONField(default=lambda: dict())
     """Contains alternative representations of the citation.

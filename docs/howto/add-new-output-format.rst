@@ -7,7 +7,7 @@ Default serialization method is Relaton JSON.
 There is support for pluggable additional serialization methods.
 
 1. Define a serializer function. It must accept
-   a :class:`bib_models.models.BibliographicItem` instance
+   a :class:`bib_models.models.bibdata.BibliographicItem` instance
    as a positional argument, arbitrary keyword arguments
    (which it may use or not), and return an utf8-encoded string.
 
@@ -15,7 +15,7 @@ There is support for pluggable additional serialization methods.
 
        from typing import Tuple
        from bib_models import serializers
-       from bib_models.models import BibliographicItem
+       from bib_models import BibliographicItem
 
        @serializers.register('foobar', 'application/x-foobar')
        def to_foobar(item: BibliographicItem, **kwargs) -> str:

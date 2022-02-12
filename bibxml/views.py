@@ -7,7 +7,7 @@ from django.urls import reverse, NoReverseMatch
 from django.conf import settings
 from django.shortcuts import render
 
-from bib_models.models import BibliographicItem
+from bib_models.models.bibdata import BibliographicItem
 from main.query import list_doctypes
 from main.api import CitationSearchResultListView
 

@@ -40,7 +40,7 @@ Fetcher functions are associated with subdirectories
 (e.g., ``bibxml9``) via :func:`xml2rfc_compat.urls.register_fetcher`.
 
 Each fetcher function accepts an :term:`xml2rfc anchor`
-and returns a :class:`bib_models.models.BibliographicItem` instance.
+and returns a :class:`bib_models.models.bibdata.BibliographicItem` instance.
 
 Fetcher functions are currently defined in :mod:`xml2rfc_compat.fetchers`.
 

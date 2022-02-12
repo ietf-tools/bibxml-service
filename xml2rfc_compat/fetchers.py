@@ -7,8 +7,7 @@ via :func:`.urls.make_xml2rfc_path_pattern`.
 
 import re
 
-from bib_models.models import BibliographicItem
-from bib_models.dataclasses import DocID
+from bib_models.models.bibdata import BibliographicItem, DocID
 from sources.exceptions import RefNotFoundError
 from doi.crossref import get_bibitem as get_doi_bibitem
 from main.models import RefData

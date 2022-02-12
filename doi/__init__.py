@@ -8,7 +8,7 @@ import requests_cache
 from simplejson import JSONDecodeError
 from pydantic import ValidationError
 
-from bib_models.dataclasses import DocID
+from bib_models import DocID
 from sources.exceptions import RefNotFoundError
 from sources.types import ExternalBibliographicItem
 from sources.types import CompositeSourcedBibliographicItem

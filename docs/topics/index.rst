@@ -6,6 +6,6 @@ Topic guides
    :maxdepth: 2
 
    auth
-   citation-format
+   relaton-format
    sourcing
    xml2rfc-compat

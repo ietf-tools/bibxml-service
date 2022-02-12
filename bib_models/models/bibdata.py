@@ -8,77 +8,36 @@ Some of Relaton models implemented as Pydantic models.
 # supported. Stick to plain text.
 
 from __future__ import annotations
-from typing import List, Tuple, Union, Optional
+from typing import List, Union, Optional
 import datetime
 
 from pydantic import BaseModel, Extra, validator
-from pydantic.datetime_parse import parse_date
 from pydantic.dataclasses import dataclass
 
-from .dataclasses import DocID, Title
-from .dataclasses import Contributor, Copyright, GenericStringValue
+from .copyrights import Copyright
+from .strings import Title, GenericStringValue
+from .people import Person
+from .orgs import Organization
+from .links import Link
+from .dates import Date, validate_relaxed_date
 
 
-EXTRA_DATE_FORMATS: List[Tuple[str, str, str]] = [
-    ('%Y-%m', '%B %Y', 'month'),
-    ('%B %Y', '%B %Y', 'month'),
-    ('%Y', '%Y', 'year'),
-]
-"""A list of approximate formats as 3-tuples,
-first string of each is ``strptime`` to parse,
-second is ``strftime`` to format,
-third is specificity ("month" or "year").
+@dataclass
+class DocID:
+    """Typed document identifier."""
 
-Formats should be in order of decreasing specificity.
+    id: str
+    type: str
 
-Used by :func:`relaxed_date_parser()``.
-"""
-
-
-def parse_relaxed_date(v: str) -> Union[None, Tuple[datetime.date, str, str]]:
-    """Parses a relaxed date and returns a 3-tuple
-    containing date, formatted string, and specificity ("month" or "year").
-    """
-    for in_f, out_f, specificity in EXTRA_DATE_FORMATS:
-        try:
-            date = datetime.datetime.strptime(v, in_f).date()
-            return date, date.strftime(out_f), specificity
-        except ValueError:
-            continue
-
-    return None
-
-
-def validate_relaxed_date(v, optional=False):
-    """To be used as validator on bibliographic item’s pydantic models
-    wherever very approximate dates (no day) are possible.
-
-    Tries pydantic’s own validation, which is considered failed
-    if returned date is the epoch.
-
-    Then tries ``strptime()`` on each of the :data:`EXTRA_DATE_FORMATS`,
-    and returns back a string from ``strftime()``.
+    primary: Optional[bool] = None
+    """An identifier the ``id`` of which can be used
+    when citing/linking to the document.
     """
 
-    if optional and v is None:
-        return None
-
-    try:
-        parsed = parse_date(v)
-    except ValueError:
-        failed = True
-    else:
-        failed = parsed == datetime.date(1970, 1, 1)
-
-    if failed:
-        parsed_relaxed = parse_relaxed_date(v)
-        if parsed_relaxed is not None:
-            return parsed_relaxed[1]
-        raise ValueError(
-            "Failed to parse given string "
-            "even as an unspecific date")
-    else:
-        return parsed
+    scope: Optional[str] = None
+    """
+    .. todo:: Clarify the meaning of scope.
+    """
 
 
 @dataclass
@@ -87,37 +46,18 @@ class BiblioNote:
     type: Optional[str] = None
 
 
-@dataclass
-class Link:
-    content: str
-    """Typically, an URL."""
-
-    type: Optional[str] = None
-
-
-@dataclass
-class Date:
-    """A typed date.
-
-    Value can either be a fully-formed date,
-    or a low-specificity date like YYYY or YYYY-MM.
-    """
-    type: str
-    value: Optional[Union[str, datetime.date]]
-
-    @validator('value', pre=True)
-    def validate_value(cls, v, **kwargs):
-        return validate_relaxed_date(v)
-
-
 class Series(BaseModel):
-    """Represents a series that given document belongs to.
+    """A series that given document belongs to.
 
     Note: formattedref is exclusive with other properties.
     """
     # TODO: Don’t make all properties optional, use union types or something
 
     formattedref: Optional[Union[GenericStringValue, str]] = None
+    """References a bibliographic item via a primary ID.
+    Exclusive with other properties.
+    """
+
     title: Optional[Union[
         GenericStringValue,
         List[GenericStringValue]]] = None
@@ -128,6 +68,15 @@ class Series(BaseModel):
     run: Optional[str] = None
     partnumber: Optional[str] = None
     type: Optional[str] = 'main'
+
+
+@dataclass
+class Contributor:
+    """Anyone who helped create or publish the document."""
+
+    role: Union[List[str], str]
+    person: Optional[Person] = None
+    organization: Optional[Organization] = None
 
 
 class BibliographicItem(BaseModel, extra=Extra.allow):
@@ -141,6 +90,12 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     # are mandatory in absence of formattedref.
 
     formattedref: Optional[GenericStringValue] = None
+    """References a bibliographic item via a primary ID.
+    Exclusive with other properties.
+
+    Tends to be used, for example, when this bibliographic item
+    is used as :data:`.Relation.bibitem`.
+    """
 
     docid: Optional[Union[List[DocID], DocID]] = None
 
@@ -176,6 +131,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
     @validator('revdate', pre=True)
     def validate_revdate(cls, v, **kwargs):
+        """Validates ``revdate``, allowing it to be unspecific."""
         if isinstance(v, list):
             return [
                 validate_relaxed_date(i)
@@ -186,9 +142,16 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
 
 class Relation(BaseModel, extra=Extra.allow):
+    """Indicates a relationship from given bibliographic item to another.
+    """
     type: str
+    """Describes the relationship."""
+
     bibitem: BibliographicItem
+    """Relationship target."""
+
     description: Optional[GenericStringValue]
+    """Describes the relationship in more detail."""
 
 
 BibliographicItem.update_forward_refs()

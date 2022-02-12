@@ -4,7 +4,8 @@ import datetime
 from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
 from typing import Mapping, List, Optional
-from bib_models.models import BibliographicItem
+
+from bib_models.models.bibdata import BibliographicItem
 
 
 # Sources

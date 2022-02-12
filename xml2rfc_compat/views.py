@@ -23,7 +23,7 @@ from django.core.cache import cache
 from django.contrib import messages
 
 from sources import indexable
-from bib_models.models import BibliographicItem
+from bib_models.models.bibdata import BibliographicItem
 
 from .aliases import get_aliases
 from .models import ManualPathMap, Xml2rfcItem

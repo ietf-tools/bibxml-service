@@ -1,4 +1,4 @@
-"""Utilities for converting :class:`bib_models.models.BibliographicItem`
+"""Utilities for converting :class:`bib_models.models.bibdata.BibliographicItem`
 to BibXML/xml2rfc per RFC 7991.
 
 Conversion is very lossy.
@@ -12,10 +12,10 @@ from xml.etree.ElementTree import Element
 
 from lxml import etree, objectify
 
-from bib_models.models import BibliographicItem, Relation, Series
-from bib_models.models import parse_relaxed_date
-from bib_models.dataclasses import Contributor, PersonAffiliation, Organization
-from bib_models.dataclasses import GenericStringValue, Contact, DocID
+from bib_models import BibliographicItem, Relation, Series
+from bib_models.models.dates import parse_relaxed_date
+from bib_models import Contributor, PersonAffiliation, Organization
+from bib_models import GenericStringValue, Contact, DocID
 from bib_models import serializers
 
 from common.util import as_list

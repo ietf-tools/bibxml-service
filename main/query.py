@@ -21,8 +21,7 @@ from django.conf import settings
 # from sources import InternalSource
 
 from common.util import as_list
-from bib_models.models import BibliographicItem
-from bib_models.dataclasses import DocID
+from bib_models.models.bibdata import BibliographicItem, DocID
 from bib_models.merger import bibitem_merger
 from sources.exceptions import RefNotFoundError
 from sources.types import IndexedBibliographicItem

@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from pydantic import ValidationError
 
 from prometheus import metrics
-from bib_models.models import BibliographicItem
+from bib_models.models.bibdata import BibliographicItem
 from sources.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
@@ -55,7 +55,7 @@ def register_fetcher(dirname: str):
     for resolver/fetcher function for given ``dirname``.
 
     Fetcher function is passed the ``anchor`` kwarg,
-    for which it must return a :class:`BibliographicData` instance,
+    for which it must return a :class:`bib_models.models.bibdata.BibliographicItem` instance,
     and is expected to raise either ``RefNotFoundError``
     or pydantic’s ``ValidationError``.
     """
