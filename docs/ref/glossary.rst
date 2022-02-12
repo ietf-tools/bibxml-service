@@ -25,7 +25,7 @@ Glossary
        May be given by publisher or issued by some third-party system.
 
        Contained in ``docid`` field of bibliographic item’s Relaton representation,
-       and is a pair ``{ type, id }``,
+       and is a pair ``{ type, id, [primary] }``,
        where ``docid.type`` is :term:`document identifier type`
        and determines the format of :term:`docid.id`.
 
@@ -33,11 +33,15 @@ Glossary
        Each identifier is expected to be universally unique to this document.
 
    primary document identifier
-       An identifier the ``id`` of which is used when citing/linking to document.
+       :data:`bib_models.models.bibdata.DocID.primary` in Python.
 
-       Such an identifier is shown without its identifier type.
+       This service displays primary identifiers without identifier types,
+       since types tend to be self-explanatory for them.
 
-       DOI, ISBN are *not* primary identifiers.
+       The :term:`docid.id` value of a primary identifier ID
+       uses format more or less similar to NIST’s PubID
+       (possibly the only strongly standardized identifier format).
+       It always starts with a prefix that denotes schema/document family.
 
    docid.id
        Shorthand for the ``id`` component of :term:`document identifier`.
@@ -45,10 +49,11 @@ Glossary
    document identifier type
    docid.type
        The ``type`` component of :term:`document identifier`,
-       contained in ``docid[*].type`` field of citation’s Relaton representation.
+       contained in ``docid[*].type`` field of bibliographic item’s Relaton representation
+       (:data:`bib_models.models.bibdata.DocID.type` in Python).
 
        Document identifier type in Relaton is a somewhat murky concept.
-       In case of a “primary” identifier, type tends to be used
+       In case of a :term:`primary document identifier`, its type tends to be used
        to reference a namespace or registry
        (e.g., DOI, ISBN),
        and in other cases used to reference a publishing organization
