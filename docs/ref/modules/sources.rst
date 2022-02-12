@@ -42,7 +42,7 @@ Managing indexing tasks
    :members:
 
 ``task_status``: Task status helper
------------------------------
+-----------------------------------
 
 .. automodule:: sources.task_status
    :members:
