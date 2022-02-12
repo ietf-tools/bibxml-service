@@ -52,6 +52,12 @@ Views
 Deployment helpers
 ==================
 
+``env_checker``
+---------------
+
+.. automodule:: bibxml.env_checker
+   :members:
+
 ``asgi``
 --------
 

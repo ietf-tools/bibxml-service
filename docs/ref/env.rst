@@ -17,7 +17,7 @@ are generally assigned to a member of :mod:`bibxml.settings`,
 they can either influence a Django’s own setting
 or service’s custom setting.
 
-.. seealso:: :func:`main.bibxml.check_settings()`
+.. seealso:: :func:`bibxml.env_checker.env_checker()`
 
 .. seealso:: :doc:`/howto/develop-locally` for sample development environment
 
