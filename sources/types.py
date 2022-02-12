@@ -90,6 +90,8 @@ class IndexedBibliographicItem(SourcedBibliographicItem):
 
 
 class ExternalBibliographicItem(SourcedBibliographicItem):
+    """Externally sourced bibliographic item."""
+
     requests: List[ExternalSourceRequest]
     """Requests incurred
     when retrieving info from this source."""
