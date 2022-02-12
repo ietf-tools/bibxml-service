@@ -10,15 +10,12 @@ This project uses Docker, Django and PostgreSQL.
 Quick start
 -----------
 
-Please refer to `“Building documentation” section <docs/howto/develop-locally.rst#building-documentation>`_
-to get a well-formatted HTML version of the docs.
+Please refer to the `local development environment setup <https://dev.bibxml.org/static/docs/howto/develop-locally.html>`_
+section of the documentation.
 
-It will have a how-to page on setting up BibXML service for development locally,
-as well as running in production.
-
-You can browse documentation `on GitHub <docs/index.rst>`_,
+You can browse documentation `in this repository <docs/index.rst>`_,
 but as it makes use of Sphinx-specific directives unsupported by GitHub
-it is recommended to build the documentation into HTML.
+it is recommended to `build documentation into HTML <docs/howto/develop-locally.rst#building-documentation>`_ first.
 This can be done using Docker without any other dependencies.
 
 Credits
