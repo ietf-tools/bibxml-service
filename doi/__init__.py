@@ -27,9 +27,9 @@ def get_doi_ref(
     Obtains an item by DOI.
 
     :param bool strict: same meaning
-                        as in :func:`main.indexed.build_citation_for_docid()`.
+                        as in :func:`main.query.build_citation_for_docid()`.
     :rtype: sources.types.CompositeSourcedBibliographicItem
-    :raises RefNotFoundError: reference not found
+    :raises sources.exceptions.RefNotFoundError: reference not found
     """
 
     with requests_cache.enabled():

@@ -102,7 +102,7 @@ def smart_query(request):
 def browse_citation_by_docid(request):
     """
     Reads ``docid`` (and optionally ``doctype``) from GET query,
-    uses :func:`main.indexed.build_citation_for_docid`
+    uses :func:`main.query.build_citation_for_docid`
     to get a bibliographic item and in case of success
     renders the citation details template.
 

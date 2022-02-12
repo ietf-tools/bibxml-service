@@ -20,7 +20,7 @@ def _fetch_and_index(task, dataset_id: str, refs=None):
     :param refs: a list of items to index,
                  if not provided the entire dataset is indexed
 
-    :rtype: IndexingTaskCeleryMeta
+    :rtype: sources.task_status.IndexingTaskCeleryMeta
     """
 
     try:

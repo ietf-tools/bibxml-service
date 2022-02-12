@@ -43,7 +43,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
     into a :class:`sources.types.ExternalBibliographicItem` instance.
 
     :returns None: if no match was returned from Crossref.
-    :rtype: None or sources.types.ExternalBibliograhpicItem
+    :rtype: None or sources.types.ExternalBibliographicItem
     :raises ValueError: wrong docid.type (not DOI).
     :raises pydantic.ValidationError:
         strict is True and Relaton data failed to validate.

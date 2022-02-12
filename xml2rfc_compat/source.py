@@ -18,7 +18,7 @@ def index_xml2rfc_source(
     """
     Indexes data from an xml2rfc web server mirror repository.
 
-    Uses :class:`models.Xml2rfcItem` to store indexed data.
+    Uses :class:`.models.Xml2rfcItem` to store indexed data.
     """
 
     on_progress = on_progress or (lambda total, indexed: None)

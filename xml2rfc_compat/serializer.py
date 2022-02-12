@@ -3,7 +3,7 @@ to BibXML/xml2rfc per RFC 7991.
 
 Conversion is very lossy.
 
-Primary API are :func:`to_xml()` and :func:`to_xml_string()`.
+Primary API are :func:`.to_xml()` and :func:`.to_xml_string()`.
 """
 
 import datetime

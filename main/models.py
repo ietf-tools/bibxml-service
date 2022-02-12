@@ -24,7 +24,7 @@ class RefData(models.Model):
         help_text="Internal dataset ID.")
     """
     Which dataset given citation was indexed from.
-    Matches dataset ID in :any:`settings.KNOWN_DATASETS`.
+    Matches indexable source ID in :any:`settings.RELATON_DATASETS`.
     """
 
     ref = models.CharField(

@@ -68,7 +68,8 @@ def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
     which would bubble up under the same exception classes.
 
     Note that user input must obviously still be properly escaped.
-    Escaping is delegated to Django’s ORM, see :mod:`main.indexed`.
+    Escaping is delegated to Django’s ORM,
+    see e.g. :func:`.search_refs_relaton_field`.
     """
 
     err = repr(exc)
@@ -205,7 +206,7 @@ def search_refs_relaton_field(
 
               { '': '$.docid[*].id like_regex "(?i)rfc"' }
 
-    :rtype: Queryset[RefData]
+    :rtype: django.db.models.query.Queryset[RefData]
     """
     if len(field_queries) < 1:
         return RefData.objects.none()
@@ -399,8 +400,8 @@ def build_citation_for_docid(
                         This is OK for some cases
                         (e.g., forgiving template rendering).
 
-    :rtype: bib_models.models.CompositeSourcedBibliographicItem
-    :raises RefNotFoundError: if no matching refs were found.
+    :rtype: sources.types.CompositeSourcedBibliographicItem
+    :raises sources.exceptions.RefNotFoundError: if no matching refs were found.
     """
 
     # Retrieve pre-indexed refs
@@ -540,8 +541,9 @@ def build_search_results(
     refs: QuerySet[RefData],
     order_by: Optional[str] = None,
 ) -> List[CompositeSourcedBibliographicItem]:
-    """Given a :class:`QuerySet` of :class:`RefData` entries,
-    build a list of :class:`main.types.SourcedBibliographicItem` objects
+    """Given a :class:`django.db.models.query.QuerySet`
+    of :class:`.models.RefData` entries,
+    build a list of :class:`.types.SourcedBibliographicItem` objects
     by merging ``RefData`` with intersecting document identifiers.
     """
 
