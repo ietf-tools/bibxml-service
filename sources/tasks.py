@@ -13,8 +13,8 @@ from .task_status import IndexingTaskCeleryMeta
 logger = get_task_logger(__name__)
 
 
-def _fetch_and_index(task, dataset_id: str, refs=None):
-    """(Re)indexes given indexable source.
+def fetch_and_index_task(task, dataset_id: str, refs=None):
+    """(Re)indexes indexable source with given ID.
 
     :param str dataset_id: source ID used during registration.
     :param refs: a list of items to index,
@@ -84,4 +84,4 @@ def _fetch_and_index(task, dataset_id: str, refs=None):
         }
 
 
-fetch_and_index = app.task(bind=True)(_fetch_and_index)
+fetch_and_index = app.task(bind=True)(fetch_and_index_task)
