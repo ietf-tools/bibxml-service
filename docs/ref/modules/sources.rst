@@ -19,12 +19,14 @@
 
 .. automodule:: sources.types
    :members:
+   :show-inheritance:
 
 Exceptions
 ==========
 
 .. automodule:: sources.exceptions
    :members:
+   :show-inheritance:
 
 Managing indexing tasks
 =======================
