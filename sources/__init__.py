@@ -1,4 +1,10 @@
-"""This module implements pluggable bibliographic data sources.
+"""This module implements pluggable data sources.
+
+Currently, it only takes care of Git-based indexable sources
+(see :func:`sources.indexable.register_git_source`).
+
+It provides types that focus on bibliographic data sourcing,
+but generally a registered indexable source can index any data.
 """
 
 import redis
