@@ -1,6 +1,6 @@
 import re
 import json
-from typing import Any, List, Callable, Union
+from typing import Any, List, Callable, Union, cast
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -99,7 +99,7 @@ class BaseCitationSearchView(BaseListView):
     """Query format obtained from request,
     one of :attr:`supported_query_formats`."""
 
-    query_format_allow_fallback = None
+    query_format_allow_fallback: Union[bool, None] = None
     """If True, and given query is unsuccessful, will try the next format.
     Can be overridden with ``allow_format_callback`` GET parameter."""
 
@@ -220,8 +220,8 @@ class BaseCitationSearchView(BaseListView):
 
     def get_search_query_context_data(self, **kwargs):
         query_format_label = QUERY_FORMAT_LABELS.get(
-            self.query_format,
-            self.query_format,
+            cast(str, self.query_format),
+            cast(str, self.query_format),
         ) if self.query_format else None
 
         return dict(
