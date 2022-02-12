@@ -72,6 +72,8 @@ html_css_files = [
 
 autodoc_member_order = 'bysource'
 
+autodoc_class_signature = 'separated'
+
 
 primary_domain = 'py'
 
