@@ -5,7 +5,7 @@ Currently, only serialization
 into various utf-8 strings is supported.
 """
 
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict
 from dataclasses import dataclass
 
 
