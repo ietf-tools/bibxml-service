@@ -38,7 +38,7 @@ Managing indexing tasks
 ``tasks``: Celery task definitions
 ----------------------------------
 
-.. automodule:: sources.task
+.. automodule:: sources.tasks
    :members:
 
 ``task_status``: Task status helper
