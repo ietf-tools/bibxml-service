@@ -1,13 +1,9 @@
-=================
-Citation sourcing
-=================
+===========================
+Bibliographic data sourcing
+===========================
 
 BibXML service deals with two types
-of :term:`citation sources <citation source>`.
-
-All citations indexed from internal/static sources can be searched,
-while external citations can be retrieved individually by exact references
-(incurring an extra server-to-server network request).
+of :term:`bibliographic data sources <bibliographic data source>`.
 
 Internal sources
 ================
@@ -27,7 +23,7 @@ making citations searchable over API and GUI.
 
 .. seealso::
 
-   - :func:`management.tasks._fetch_and_index`
+   - :func:`sources.tasks.fetch_and_index_task`
    - :class:`main.models.RefData`
 
 External sources
@@ -39,8 +35,9 @@ in bulk and in Relaton format.
 - An external source allows to request an individual citation by document ID.
 - It may or may not provide search across available citations.
 
-Currently, only DOI (via Crossref API) is supported as external source.
+Currently, only DOI (via Crossref API) is supported as external source,
+and source registration does not support external sources.
 
 .. seealso::
 
-   - :func:`main.external.get_doi_ref`
+   - :func:`doi.get_doi_ref`
