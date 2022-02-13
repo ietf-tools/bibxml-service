@@ -18,6 +18,19 @@ BibXML service uses multiple authentication mechanisms.
 
 - Internal GET API endpoints do not require authentication.
 
+.. note::
+  
+   The project is not set up to use Django’s contrib user authentication.
+   At this time, it’s unclear what the roadmap is and what authentication
+   mechanism should look like in the end.
+
+.. important::
+
+   **Do not** expose management view functions without the ``auth.basic()`` decorator.
+   Management templates are passed API secret
+   and include it to enable the user to trigger certain API endpoints
+   (such as source reindexing) via client-side JS.
+
 Public-side auth
 ================
 
