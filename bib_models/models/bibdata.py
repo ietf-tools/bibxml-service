@@ -22,6 +22,16 @@ from .links import Link
 from .dates import Date, validate_relaxed_date
 
 
+__all__ = (
+    'DocID',
+    'BibliographicItem',
+    'Relation',
+    'Contributor',
+    'Series',
+    'BiblioNote',
+)
+
+
 @dataclass
 class DocID:
     """Typed document identifier."""
