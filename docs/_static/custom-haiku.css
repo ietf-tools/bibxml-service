@@ -1,0 +1,115 @@
+/* References */
+
+a.reference.external .viewcode-link .pre {
+  font-weight: normal;
+  opacity: 0.5;
+}
+
+a.reference.external .viewcode-link .pre::after {
+  content: " (GitHub)";
+  margin-right: 1em;
+}
+
+/*
+  Hide external link if internal source link is available.
+  Sadly, Sphinx doesn’t make internal links available for variables.
+*/
+a.reference.internal + a.reference.external {
+  display: none;
+}
+.py.data:not(:first-of-type) a.reference.external {
+  display: none;
+}
+
+
+/* Typography */
+body {
+  min-width: unset;
+  max-width: 50rem;
+}
+
+body > div.content {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 15px;
+  line-height: 22px;
+}
+
+ul, ol {
+  margin: 0;
+}
+ul {
+  padding: 0;
+}
+ol {
+  padding-left: 2rem;
+}
+
+body > div.content ul > li,
+body > div.content ol > li {
+  line-height: inherit;
+  margin: 0;
+}
+body > div.content ul > li {
+  background-position: 0 .55em;
+  padding-left: 2rem;
+}
+
+div.header h1 {
+  white-space: nowrap;
+}
+
+p {
+  break-inside: avoid;
+  margin-top: 0;
+  margin-bottom: 0;
+  text-align: left;
+}
+
+p:not(.admonition-title) + p {
+  text-indent: 2rem;
+}
+
+pre, code, span.pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+pre {
+  font-size: 80%;
+  line-height: 1.4;
+}
+:not(.reference):not(.toc-backref):not(h1) > code:not(.py),
+dl > dt > code:not(.py) {
+  padding: .15em .5em;
+}
+span.pre {
+  letter-spacing: -.025em;
+}
+section > .py > dd {
+  font-size: 90%;
+  line-height: 1.4;
+}
+
+div.topic {
+  margin: 1.5em 0;
+}
+
+dl {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+section > .py > dt {
+  font-size: 90%;
+}
+
+
+
+/* Admonitions */
+
+.admonition.note {
+  padding-left: 15px;
+  background-image: none;
+}
+.admonition.important {
+  padding-left: 15px;
+  background-color: #ffddbb;
+}

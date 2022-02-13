@@ -67,7 +67,9 @@ extlinks = {
 }
 
 html_css_files = [
-    'custom.css',
+    'custom-haiku.css',
+]
+html_js_files = [
 ]
 
 autodoc_member_order = 'bysource'
