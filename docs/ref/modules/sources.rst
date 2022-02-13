@@ -13,6 +13,11 @@
 
 .. automodule:: sources.indexable
    :members:
+   :show-inheritance:
+   :exclude-members: registry, __init__
+
+.. autodata:: sources.indexable.registry
+   :no-value:
 
 ``types``: Bibliographic data sourcing types
 ============================================
@@ -20,6 +25,7 @@
 .. automodule:: sources.types
    :members:
    :show-inheritance:
+   :exclude-members: __init__
 
 Exceptions
 ==========

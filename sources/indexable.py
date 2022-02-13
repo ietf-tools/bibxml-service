@@ -17,6 +17,16 @@ from common.git import ensure_latest
 from . import cache
 
 
+__all__ = (
+    'register_git_source',
+    'IndexableSourceToRegister',
+    'context_processor',
+    'get_work_dir_path',
+    'registry',
+    'IndexableSource',
+)
+
+
 log = get_task_logger(__name__)
 """Celery task logger.
 Log events are expected only when ran in Celery context.
@@ -26,7 +36,7 @@ Log events are expected only when ran in Celery context.
 @dataclass
 class IndexableSource:
     """
-    Represents an indexable source.
+    Represents a registered indexable source.
 
     An instance of this class will be automatically created
     when you use the :func:`register_git_source` decorator.

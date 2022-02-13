@@ -8,13 +8,12 @@ Overview
 
 BibXML service provides access to citations
 and a mechanism to read internal & external citation sources.
+To understand how this service works,
+it is recommended to read its API specification and explore GUI.
+(If needed, see :doc:`set it up locally</howto/develop-locally>`.)
 
 Below documentation aims to be relevant
 to BibXML service maintainers, developers and operators.
-
-To understand how this service works,
-it is recommended to :doc:`set it up locally</howto/develop-locally>`,
-read its API specification and explore GUI.
 
 .. seealso::
 
