@@ -10,6 +10,8 @@ __all__ = ('Organization', )
 
 @dataclass
 class Organization:
+    """Describes an organization."""
+
     name: Union[List[str], str]
     contact: Optional[List[Contact]] = None
     url: Optional[str] = None

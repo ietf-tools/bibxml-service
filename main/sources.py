@@ -1,3 +1,15 @@
+"""
+Implements indexing logic
+and registers :term:`indexable sources <indexable source>`
+of bibliographic data
+based on the list in :data:`bibxml.settings.RELATON_DATASETS`
+using :func:`sources.indexable.register_git_source()`.
+
+Each of the repositories is expected to follow certain structure
+with Relaton bibliographic item data serialized to YAML files
+under ``/data/`` directory under repository root
+(see :func:`.index_dataset()` for indexing logic).
+"""
 import glob
 from os import path
 from typing import Tuple
@@ -58,6 +70,8 @@ def get_indexed_object_meta(dataset_id: str, ref: str) -> IndexedObject:
 
 def locate_bibxml_source_repo(dataset_id: str):
     """
+    .. note:: Deprecated, as we now generate bibxml on the fly.
+
     :param dataset_id: dataset ID as string
     :returns: 2-tuple of strings (repo_url, repo_branch)
     """
@@ -76,8 +90,6 @@ def locate_bibxml_source_repo(dataset_id: str):
 
 def locate_relaton_source_repo(dataset_id: str):
     """
-    .. note:: Deprecated when ``relaton-bib-py`` generates Relaton data.
-
     :param dataset_id: dataset ID as string
     :returns: tuple (repo_url, repo_branch)
     """
@@ -137,7 +149,7 @@ yaml.SafeLoader.yaml_implicit_resolvers = {
 
 def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                   on_progress=None, on_error=None) -> Tuple[int, int]:
-    """Indexes dataset.
+    """Indexes Relaton data into :class:`~.models.RefData` instances.
 
     :param ds_id: dataset ID as a string
     :param bibxml_path: path to BibXML source files

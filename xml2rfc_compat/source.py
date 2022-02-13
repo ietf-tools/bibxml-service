@@ -1,7 +1,7 @@
 """
 Registers an indexable source representing paths
 available via xml2rfc web server for fallback
-during data migration.
+during migration from xml2rfc-style API.
 """
 
 import glob

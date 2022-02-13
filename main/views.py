@@ -1,4 +1,4 @@
-"""View functions for citation browse GUI."""
+"""View functions for citation retrieval GUI."""
 
 import logging
 from math import log as log_, floor

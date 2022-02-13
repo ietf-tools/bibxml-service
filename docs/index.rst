@@ -6,8 +6,11 @@
 Overview
 ========
 
-BibXML service provides access to citations
-and a mechanism to read internal & external citation sources.
+BibXML service consumes bibliographic data sources and
+provides web interfaces (API and GUI and xml2rfc tools style paths)
+to query bibliographic data and to manage data source indexing.
+It also provides bibliographic data accessible via xml2rfc tools style paths,
+and provides a GUI to manage xml2rfc path resolution.
 To understand how this service works,
 it is recommended to read its API specification and explore GUI.
 (If needed, see :doc:`set it up locally</howto/develop-locally>`.)

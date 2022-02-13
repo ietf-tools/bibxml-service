@@ -34,14 +34,21 @@ __all__ = (
 
 @dataclass
 class DocID:
-    """Typed document identifier."""
+    """Typed :term:`document identifier`.
+
+    May be given by publisher or issued by some third-party system.
+    """
 
     id: str
+
     type: str
+    """:term:`document identifier type`.
+    Determines the format of the ``id`` field.
+    """
 
     primary: Optional[bool] = None
-    """An identifier the ``id`` of which can be used
-    when citing/linking to the document.
+    """If ``True``, this identifier is considered
+    a :term:`primary document identifier`.
     """
 
     scope: Optional[str] = None
@@ -52,12 +59,20 @@ class DocID:
 
 @dataclass
 class BiblioNote:
+    """Bibliographic note."""
+
     content: str
+    """Note content."""
+
     type: Optional[str] = None
+    """The class of the note associated with the bibliographic item.
+    May be used to differentiate rendering of notes in bibliographies.
+    """
 
 
 class Series(BaseModel):
-    """A series that given document belongs to.
+    """
+    A series that given document belongs to.
 
     Note: formattedref is exclusive with other properties.
     """
@@ -90,7 +105,8 @@ class Contributor:
 
 
 class BibliographicItem(BaseModel, extra=Extra.allow):
-    """Relaton’s main model, bibliographic item.
+    """
+    Relaton’s main model, bibliographic item.
 
     Note: formattedref is exclusive with other properties.
     """
@@ -152,7 +168,8 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
 
 
 class Relation(BaseModel, extra=Extra.allow):
-    """Indicates a relationship from given bibliographic item to another.
+    """
+    Indicates a relationship from given bibliographic item to another.
     """
     type: str
     """Describes the relationship."""

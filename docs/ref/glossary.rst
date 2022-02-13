@@ -4,12 +4,9 @@ Glossary
 
 .. glossary::
 
-   document
-       In context of BibXML, refers to a standard.
-
    bibliographic item
        Document metadata describing a document. Used when e.g. citing.
-       Corresponds to ``BibliographicItem`` in Relaton models.
+       Corresponds to :class:`bib_models.models.bibdata.BibliographicItem` instance.
 
        In BibXML service, data for a single bibliographic item can be provided
        by multiple sources.
@@ -22,35 +19,42 @@ Glossary
    document identifier
        Identifier of a document.
 
-       May be given by publisher or issued by some third-party system.
+       A document can have multiple identifiers (e.g., a DOI, an ISBN, etc.),
+       and sometimes a single identifier can be shared by multiple documents
+       (however, such an ambiguous identifier
+       should not be :term:`primary <primary document identifier>`,
+       or it should be reported as a data integrity issue).
 
-       Contained in ``docid`` field of bibliographic item’s Relaton representation,
-       and is a pair ``{ type, id, [primary] }``,
-       where ``docid.type`` is :term:`document identifier type`
-       and determines the format of :term:`docid.id`.
-
-       A single document can have multiple identifiers (e.g., a DOI, an ISBN, etc.).
-       Each identifier is expected to be universally unique to this document.
+       Identifiers are listed
+       under :data:`BibliographicItem.docid <bib_models.models.bibdata.BibliographicItem.docid>`,
+       and each identifier is a :class:`bib_models.models.bibdata.DocID` instance in Python.
 
    primary document identifier
-       :data:`bib_models.models.bibdata.DocID.primary` in Python.
+       Main characteristics of a primary identifier:
+
+       - Its ``id`` can be used to unambiguously reference the document.
+       - A primary identifier is expected to be
+         universally unique to this document.
 
        This service displays primary identifiers without identifier types,
-       since types tend to be self-explanatory for them.
+       as types tend to be self-explanatory.
 
-       The :term:`docid.id` value of a primary identifier ID
+       The :data:`~bib_models.models.bibdata.DocID.id` value of a primary identifier
        uses format more or less similar to NIST’s PubID
        (possibly the only strongly standardized identifier format).
        It always starts with a prefix that denotes schema/document family.
 
+       In Python, such identifiers have their :data:`~bib_models.models.bibdata.DocID.primary`
+       attribute set to ``True``.
+
    docid.id
-       Shorthand for the ``id`` component of :term:`document identifier`.
+       Refers to :data:`bib_models.models.bibdata.DocID.id`.
 
    document identifier type
    docid.type
        The ``type`` component of :term:`document identifier`,
        contained in ``docid[*].type`` field of bibliographic item’s Relaton representation
-       (:data:`bib_models.models.bibdata.DocID.type` in Python).
+       (field :data:`~bib_models.models.bibdata.DocID.type` in Python).
 
        Document identifier type in Relaton is a somewhat murky concept.
        In case of a :term:`primary document identifier`, its type tends to be used
@@ -70,58 +74,51 @@ Glossary
          with the same :term:`document identifier`.
        - One source can provide bibliographic items of more than one document type.
        
-       Citation source can be either an :term:`indexable source`
+       Bibliographic data can come from an :term:`indexable source`
        or an :term:`external source`.
 
    indexable source
-       An external data source periodically compiled
-       by Relaton-aware tools from authoritative sources.
-       
-       Currently delivered as a Git repository of certain structure
-       with Relaton citation data serialized to YAML files.
-
-       An indexable source has to be indexed in order for the data to become
+       An external data source periodically compiled by external tools
+       from authoritative source(s).
+       Has to be indexed in order for the data to become
        retrievable using this service.
 
-       When user requests bibliographic data,
-       this service returns items discovered across indexed sources first.
+       An indexable source must be registered and associated with
+       the function that handles the indexing via
+       :func:`sources.indexable.register_git_source()`.
+       After that, it appears in management GUI and API
+       and its indexing can be queued.
+
+       Currently, an indexable source must be a Git repository.
+
+       Examples: Relaton sources registered in :mod:`main.sources`;
+       xml2rfc mirror data source registered in :mod:`xml2rfc_compat.source`.
 
    indexed source
-       An indexable source that has been indexed.
+       An :term:`indexable source` that has been indexed.
 
    reference
    ref
        Name of an entry in an :term:`indexed source`.
-       Unique per dataset.
+       Unique per source.
 
-       Not the same as :term:`document identifier`.
-       Document identifier is part of public API,
-       while reference is more an implementation detail of BibXML service.
-
-       References correspond to :class:`main.models.RefData` instances.
+       In case of Relaton sources, references
+       correspond to :class:`main.models.RefData` instances.
 
    external source
    external dataset
-       Citation source that allows to retrieve individual bibliographic items
-       given :term:`document identifier` (type and ID).
+       A :term:`bibliographic data source`
+       that allows to retrieve individual bibliographic items
+       given :term:`document identifier`.
        Retrieval incurs a network request to external service
-       and the cost of on-the-fly conversion to the requested format
-       (Relaton or BibXML).
+       and the cost of on-the-fly conversion to Relaton and optionally requested
+       serialization format.
 
-   indexing
-       The process of retrieving bibliographic data from an :term:`indexable source`
-       and storing them in the database as :class:`main.models.RefData` instances.
+       Example: Crossref is an external source that allows to look up
+       bibliographic items via DOI (see :mod:`doi`).
 
-       Involves cloning repositories and reading files therein.
-
-       See :mod:`management`.
-
-   legacy dataset
-       Sometimes used to refer to a set of manually crafted XML files that [used to be]
-       provided by xml2rfc tools web server.
-
-   legacy path
    xml2rfc-style path
+   legacy path
        A path that used to be handled by xml2rfc tools web server.
        (Normally points to an XML file.)
 
@@ -141,7 +138,7 @@ Glossary
 
       Fetcher function is passed the ``anchor`` argument as a string,
       for which it must return
-      a :class:`bib_models.models.bibdata.BibliographicItem` instance,
+      a :class:`~bib_models.models.bibdata.BibliographicItem` instance,
       and is expected to raise either :class:`sources.exceptions.RefNotFoundError`
       or :class:`pydantic.ValidationError`.
 
