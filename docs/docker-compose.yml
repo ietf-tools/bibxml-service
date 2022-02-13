@@ -9,7 +9,7 @@ services:
       - |
         cd /code &&
         rm -rf /build/html/* &&
-        pip install sphinx watchdog &&
+        pip install watchdog &&
         export SNAPSHOT=$$(git describe --abbrev=0) &&
         sphinx-build -a -E -n -v -b dirhtml /code/docs/ /build/html &&
         watchmedo shell-command \
