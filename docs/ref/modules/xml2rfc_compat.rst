@@ -1,13 +1,16 @@
-=======================================================
-``xml2rfc_compat``: xml2rfc path & format compatibility
-=======================================================
+========================================================
+``xml2rfc_compat``: xml2rfc compatibility implementation
+========================================================
 
 .. automodule:: xml2rfc_compat
 
-.. seealso:: :doc:`/topics/xml2rfc-compat`
+.. seealso:: :doc:`/topics/xml2rfc-compat` topic
 
-Aliases
-=======
+.. contents::
+   :local:
+
+Directory name aliases
+======================
 
 .. automodule:: xml2rfc_compat.aliases
    :members:
@@ -23,6 +26,7 @@ Management views
 
 .. automodule:: xml2rfc_compat.views
    :members:
+   :show-inheritance:
 
 Fetcher functions
 =================
@@ -47,4 +51,5 @@ Data models
 ===========
 
 .. automodule:: xml2rfc_compat.models
+   :show-inheritance:
    :members:

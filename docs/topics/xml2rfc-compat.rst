@@ -1,6 +1,9 @@
-===================================
-xml2rfc tools web API compatibility
-===================================
+===========================
+xml2rfc tools compatibility
+===========================
+
+.. contents::
+   :local:
 
 Pre-existing :term:`xml2rfc paths <xml2rfc-style path>`
 are maintained in the following way.
@@ -8,46 +11,57 @@ are maintained in the following way.
 .. seealso:: If you have cases where paths are resolved incorrectly,
              :doc:`/howto/adjust-xml2rfc-paths`.
 
-Resolution
-==========
+.. _xml2rfc-path-resolution-algorithm:
 
-Only a path for which a fetcher function is registered will be handled.
-However, that function is not necessarily called.
+xml2rfc-style path resolution algorithm
+=======================================
 
-1. Each incoming request is first checked if a manual mapping exists.
-   If so, bibliographic item with mapped docid
+Root URL configuration includes xml2rfc-style paths via 
+:func:`xml2rfc_compat.urls.get_urls()`.
+Each path is handled the following way:
+
+1. A manual mapping is looked up for requested path.
+   If found, bibliographic item with mapped docid
    is attempted to be retrieved and returned as XML.
    
-2. If the above fails, the path is passed to the registered fetcher function
+2. If the above fails, the path is passed to registered fetcher function,
    which parses the anchor, performs necessary DB queries and is expected
    to return a ``BibliographicItem``.
    
 3. If no bibliographic item can be located, URL handler falls back
    to pre-indexed xml2rfc web server data.
 
+.. note::
+
+   Only a path for which an :term:`xml2rfc fetcher` is registered will be handled,
+   even though that fetcher function is not necessarily called.
+
+.. seealso:: :func:`xml2rfc_compat.urls.make_xml2rfc_path_pattern()`
+
 Manual mapping
-==============
+--------------
 
 Manual maps are stored in the DB as :class:`xml2rfc_compat.models.ManualPathMap`
 instances. The management GUI provides an utility for managing these mappings.
 
+A map associates given xml2rfc path with a :term:`docid.id`.
+When that path is requested, this service looks up that identifier
+in :term:`bibliographic data sources <bibliographic data source>`.
+
 .. seealso:: :func:`xml2rfc_compat.urls.resolve_manual_map()`
 
 Fetcher functions
-=================
+-----------------
 
-Fetcher functions are associated with subdirectories
+:term:`Fetcher functions <xml2rfc fetcher>` are associated with subdirectories
 (e.g., ``bibxml9``) via :func:`xml2rfc_compat.urls.register_fetcher`.
-
-Each fetcher function accepts an :term:`xml2rfc anchor`
-and returns a :class:`bib_models.models.bibdata.BibliographicItem` instance.
 
 Fetcher functions are currently defined in :mod:`xml2rfc_compat.fetchers`.
 
 .. seealso:: :func:`xml2rfc_compat.urls.resolve_automatically()`
 
 Fallback
-========
+--------
 
 If manual map is not present or failed, and fetcher function failed,
 fallback document is attempted to be used.

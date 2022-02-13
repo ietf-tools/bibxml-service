@@ -1,3 +1,9 @@
+"""
+Registers an indexable source representing paths
+available via xml2rfc web server for fallback
+during data migration.
+"""
+
 import glob
 import os
 from typing import List, Union, Callable, Tuple

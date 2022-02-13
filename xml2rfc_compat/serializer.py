@@ -36,10 +36,8 @@ __all__ = (
 @serializers.register('bibxml', 'application/xml')
 def to_xml_string(item: BibliographicItem, **kwargs) -> str:
     """
-    Passes given item through ``to_xml()``
-    and renders it to a string with pretty print.
-
-    All kwargs are passed to ``to_xml()``.
+    Passes given item and any kwargs through to :func:`.to_xml()`,
+    and renders the obtained XML element as a string with pretty print.
     """
     return etree.tostring(to_xml(item, **kwargs), pretty_print=True)
 

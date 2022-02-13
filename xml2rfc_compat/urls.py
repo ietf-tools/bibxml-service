@@ -38,6 +38,9 @@ def get_urls():
 
     Fetcher functions should have been all registered prior
     to calling this function.
+
+    URL patterns are associated with functions that handle
+    xml2rfc paths according to :ref:`xml2rfc-path-resolution-algorithm`.
     """
 
     return [
@@ -52,12 +55,8 @@ def get_urls():
 
 def register_fetcher(dirname: str):
     """Parametrized decorator that returns a registering function
-    for resolver/fetcher function for given ``dirname``.
-
-    Fetcher function is passed the ``anchor`` kwarg,
-    for which it must return a :class:`bib_models.models.bibdata.BibliographicItem` instance,
-    and is expected to raise either ``RefNotFoundError``
-    or pydantic’s ``ValidationError``.
+    for :term:`xml2rfc fetcher function` to be associated with given top-level
+    xml2rfc directory name.
     """
     def register(fetcher_func: Callable[[str], BibliographicItem]):
         fetcher_registry[dirname] = fetcher_func
@@ -69,12 +68,13 @@ def make_xml2rfc_path_pattern(
         dirnames: List[str],
         fetcher_func: Callable[[str], BibliographicItem]):
     """Constructs Django URL resolver patterns
-    for a given list of dirnames.
+    for a given list of top-level xml2rfc directory names
+    and :term:`xml2rfc fetcher function`.
 
-    Each path is in the shape of
-    ``<dirname>/[_]reference.<anchor>.xml``,
-    and constructed view delegates bibliographic item
-    retrieval to provided fetcher function.
+    Each generated URL pattern is in the shape of
+    ``<dirname>/[_]reference.<xml2rfc anchor>.xml``,
+    and constructed view handles bibliographic item resolution
+    according to :ref:`xml2rfc-path-resolution-algorithm`.
     """
     return [
         re_path(
@@ -174,25 +174,41 @@ class ResolutionOutcome(TypedDict, total=True):
 def _make_xml2rfc_path_handler(fetcher_func: Callable[
     [str], BibliographicItem
 ]):
-    """Creates a view function, given a fetcher function.
+    """Creates a view function, given a :term:`xml2rfc fetcher`.
 
     Fetcher function will only be called if manual map was not found
     or did not resolve successfully.
 
-    Fetcher function will receive full requested subpath
-    (not including the unchanging prefix)
-    and a cleaned xml2rfc filename
-    (just the anchor, without the “reference.” or “_reference.” prefix
-    or the .xml extension),
-    and must return a :class:`BibliographicItem` instance.
-
     The automatically created view function handles filename
-    cleanup, constructing a :class:`BibliographicItem`
+    cleanup, constructing a :class:`bib_models.models.bibdata.BibliographicItem`
     and serializing it into an XML string with proper anchor tag supplied.
     """
 
     @functools.wraps(fetcher_func)
     def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
+        """The view function to handle given xml2rfc-style path.
+
+        Inspects ``X-Requested-With`` header, and does not increment
+        access metric if it’s the internal ``xml2rfcResolver`` tool.
+
+        In case of success, returns an ``application/xml`` response
+        with custom headers:
+
+        ``X-Resolution-Methods``
+            semicolon-separated string of resolution methods tried.
+
+        ``X-Resolution-Outcome``
+            semicolon-separated string of resolution outcomes.
+            Each tried outcome is a comma-separated string
+            “method configuration,error info”.
+
+            Substrings can be empty, e.g. if method was not tried,
+            there was no error, not configuration, etc.
+
+        In case of failure (and no fallback available),
+        returns an ``application/json`` response with error description.
+        """
+
         resp: HttpResponse
         item: Union[BibliographicItem, None]
         xml_repr: Union[str, None]

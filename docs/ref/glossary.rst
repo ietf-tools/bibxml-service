@@ -125,7 +125,7 @@ Glossary
        A path that used to be handled by xml2rfc tools web server.
        (Normally points to an XML file.)
 
-       See :doc:`/topics/xml2rfc-compat`.
+       See :doc:`/topics/xml2rfc-compat` and :data:`xml2rfc_compat.models.dir_subpath_regex`.
 
    xml2rfc anchor
       Part of the filename in an :term:`xml2rfc-style path`
@@ -133,3 +133,16 @@ Glossary
 
       It also appears as the “anchor” attribute on the ``<reference>``
       element in returned XML.
+
+   xml2rfc fetcher function
+   xml2rfc fetcher
+      A function registered and associated with a top-level xml2rfc subpath
+      via :func:`xml2rfc_compat.urls.register_fetcher`.
+
+      Fetcher function is passed the ``anchor`` argument as a string,
+      for which it must return
+      a :class:`bib_models.models.bibdata.BibliographicItem` instance,
+      and is expected to raise either :class:`sources.exceptions.RefNotFoundError`
+      or :class:`pydantic.ValidationError`.
+
+      .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`
