@@ -168,6 +168,9 @@ Security
 Integrations
 ------------
 
+Sentry
+~~~~~~
+
 ``SENTRY_DSN`` 
     accepted by Django and Compose, pass-through
 
@@ -179,11 +182,23 @@ Integrations
 Datatracker
 ~~~~~~~~~~~
 
+All of these are required for Datatracker OAuth2 login to work.
+
+.. seealso:: :mod:`datatracker.oauth`
+
 ``DATATRACKER_CLIENT_ID`` 
     accepted by Django and Compose, pass-through
 
 ``DATATRACKER_CLIENT_SECRET`` 
     accepted by Django and Compose, pass-through
+
+``DATATRACKER_REDIRECT_URI`` 
+    accepted by Django
+
+    Indicates the redirect URI configured for given client ID/secret
+    on Datatracker side.
+    The application will check if internal URL pattern configuration
+    yields the same URI, and consider Datatracker OAuth misconfigured if not.
 
 
 .. _matomo-integration-env:
@@ -202,9 +217,14 @@ Matomo
 
 .. seealso::
 
-   - :data:`bibxml.settings.MATOMO`
+   The :data:`~bibxml.settings.MATOMO` setting for more details.
+
+   Matomo’s own resources:
+
    - `Matomo tracker integration <https://developer.matomo.org/guides/tracking-javascript-guide>`_
    - `MTM integration <https://developer.matomo.org/guides/tagmanager/embedding>`_
+
+   :github:`static/js/matomo.js` and :github:`templates/base.html`.
 
 
 Environment variables passed through by Docker Compose
