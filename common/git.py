@@ -1,7 +1,7 @@
 """Utilities for dealing with Git."""
 
 from typing import Tuple
-from os import access, path, R_OK
+from os import access, path, R_OK, W_OK, X_OK
 from shutil import rmtree
 from git import Repo  # type: ignore[attr-defined]
 from celery.utils.log import get_task_logger
@@ -55,10 +55,11 @@ def ensure_latest(repo_url: str, branch: str, work_dir: str) \
     :rtype: (Repo, bool)
     """
 
-    if all([path.isdir(work_dir),
-            path.isdir(path.join(work_dir, '.git')),
-            access(work_dir, R_OK)]):
+    is_dir = path.isdir(work_dir)
+    is_git_dir = path.isdir(path.join(work_dir, '.git'))
+    is_accessible = access(work_dir, R_OK | W_OK | X_OK)
 
+    if all([is_dir, is_git_dir, is_accessible]):
         repo = Repo(work_dir)
 
         if all(['origin' in repo.remotes,
@@ -85,7 +86,9 @@ def ensure_latest(repo_url: str, branch: str, work_dir: str) \
             return reclone(repo_url, branch, work_dir), True
     else:
         logger.warning(
-            "Missing or inaccessible working directory for %s (%s), "
+            "Missing or inaccessible working directory for %s (%s: %s), "
             "must re-clone repo",
-            repo_url, work_dir)
+            repo_url,
+            work_dir,
+            f'dir: {is_dir}, git: {is_git_dir}, access: {is_accessible}')
         return reclone(repo_url, branch, work_dir), True
