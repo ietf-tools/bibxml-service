@@ -72,7 +72,8 @@ def get_indexed_object_meta(dataset_id: str, ref: str) -> IndexedObject:
 
 def locate_bibxml_source_repo(dataset_id: str):
     """
-    .. note:: Deprecated, as we now generate bibxml on the fly.
+    .. deprecated:: Service now generates bibxml on the fly,
+                    and bibxml source repos will be excluded.
 
     :param dataset_id: dataset ID as string
     :returns: 2-tuple of strings (repo_url, repo_branch)
