@@ -12,7 +12,7 @@ as long as :doc:`relevant precautions </howto/run-in-production>` are followed.
    the suite, in case of a local machine it’ll be localhost.
    The Compose configuration automatically binds services
    to host machine’s ports, so that you can explore services
-   by pointing to ``<host>:port``.
+   by pointing to ``<host>:<port>``.
 
 
 Primary services

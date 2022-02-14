@@ -7,7 +7,7 @@ Overview
 ========
 
 BibXML service consumes bibliographic data sources and
-provides web interfaces (API and GUI and xml2rfc tools style paths)
+provides web interfaces (API and GUI)
 to query bibliographic data and to manage data source indexing.
 It also provides bibliographic data accessible via xml2rfc tools style paths,
 and provides a GUI to manage xml2rfc path resolution.
