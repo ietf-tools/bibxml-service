@@ -354,7 +354,7 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
             # To exclude untyped:
             # f'@.id like_regex {docid} && exists (@.type)' % docid
             {'docid[*]':
-                f'@.type like_regex {id} && @.id like_regex {id_type}'
+                f'@.id like_regex {id} && @.type like_regex {id_type}'
                 if id_type else f'@.id like_regex {id}'}
             for (id, id_type) in ((
                 '"(?i)^%s$"' % re.escape(
