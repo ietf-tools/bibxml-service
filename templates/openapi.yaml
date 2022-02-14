@@ -27,10 +27,23 @@ paths:
       operationId: getBibItemByDocId
 
       parameters:
+      - name: docid
+        in: query
+        description: |
+          Document ID. For example, `RFC7991`.
+
+          More valid identifier examples:
+          {% for doctype in known_doctypes %}
+          - `{{ doctype.1 }}`
+          {% endfor %}
+        required: true
+        schema:
+          type: string
+
       - name: doctype
         in: query
         description: |
-          Document type.
+          Document identifier type (optional).
 
           Note that the schema lists _currently available types_
           (present across indexed bibliographic items at the time of viewing this page),
@@ -39,17 +52,6 @@ paths:
         required: false
         schema:
           $ref: '#/components/schemas/AvailableDoctypes'
-
-      - name: docid
-        in: query
-        description: |
-          Document ID. For example,
-          {% for doctype in known_doctypes %}
-          - `{{ doctype.1 }}` for document type {{ doctype.0 }}
-          {% endfor %}
-        required: true
-        schema:
-          type: string
 
       - name: format
         in: query
