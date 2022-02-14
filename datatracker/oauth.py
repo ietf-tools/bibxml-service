@@ -34,7 +34,10 @@ OAUTH_TOKEN_KEY = 'oauth_token'
 OAUTH_USER_INFO_KEY = 'oauth_user_info'
 
 CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None)
+"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
+
 CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None)
+"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_SECRET`."""
 
 
 def context_processor(request):
@@ -127,6 +130,14 @@ def _get_redirect_uri() -> str:
 
 
 def initiate(request):
+    """Redirects the user to Datatracker for login and approval.
+
+    If :data:`.CLIENT_ID` or :data:`.CLIENT_SECRET` are missing,
+    or if obtained redirect URI does not match configuration,
+    queues an error-level message and redirects the user back
+    to where they came from or landing page.
+    """
+
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
             "Datatracker OAuth2: client ID/secret not configured, "
@@ -159,6 +170,19 @@ def initiate(request):
 
 
 def handle_callback(request):
+    """
+    Handles OAuth2 redirect from Datatracker’s side.
+
+    Queues an error-level message if:
+
+    - :data:`.CLIENT_ID` or :data:`.CLIENT_SECRET` are missing, or
+    - obtained redirect URI does not match configuration, or
+    - there is no OAuth state in session, or
+    - there is any exception during token or user info retrieval,
+
+    In any case, it redirects the user to HTTP Referer or landing page.
+    """
+
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
             "Datatracker OAuth2 callback: client ID/secret not configured, "
@@ -246,6 +270,8 @@ def handle_callback(request):
 # =============
 
 class ProviderInfo(BaseModel, extra=Extra.ignore):
+    """Describes OAuth2 provider."""
+
     issuer: str
     authorization_endpoint: str
     token_endpoint: str
@@ -259,6 +285,10 @@ class ProviderInfo(BaseModel, extra=Extra.ignore):
 
 
 def get_provider():
+    """Tries to obtain up-to-date OAuth2 provider info
+    from Datatracker’s .well-known file,
+    falls back to :data:`.DEFAULT_PROVIDER` if failed."""
+
     try:
         data = request.get(
             'openid/.well-known/openid-configuration',
@@ -301,3 +331,5 @@ DEFAULT_PROVIDER = ProviderInfo(**{
       "client_secret_basic"
     ],
 })
+"""Datatracker OAuth2 provider info
+manually obtained from .well-known/openid-configuration."""
