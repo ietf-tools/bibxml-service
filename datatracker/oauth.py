@@ -187,6 +187,10 @@ def handle_callback(request):
     In any case, it redirects the user to HTTP Referer or landing page.
     """
 
+    redirect_to = request.headers.get('referer', '/')
+    # TODO: Find a way to capture original pre-auth URL using Datatracker
+    # and get it here. Referer will be empty, so the user will lose their place.
+
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
             "Datatracker OAuth2 callback: client ID/secret not configured, "
@@ -195,7 +199,7 @@ def handle_callback(request):
             request,
             "Couldn’t authenticate with Datatracker: "
             "integration is not configured")
-        return redirect(request.headers.get('referer', '/'))
+        return redirect(redirect_to)
 
     if OAUTH_STATE_KEY not in request.session:
         log.warning(
@@ -205,7 +209,7 @@ def handle_callback(request):
             request,
             "Couldn’t authenticate with Datatracker, "
             "please try again.")
-        return redirect(request.headers.get('referer', '/'))
+        return redirect(redirect_to)
 
     try:
         redirect_uri = _get_redirect_uri()
@@ -267,7 +271,7 @@ def handle_callback(request):
                     request,
                     "You have authenticated via Datatracker")
 
-    return redirect(request.headers.get('referer', '/'))
+    return redirect(redirect_to)
 
 
 # Provider info
