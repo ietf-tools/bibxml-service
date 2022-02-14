@@ -60,7 +60,7 @@ def context_processor(request):
 
 
 def get_client(request):
-    """Returns either a OAuth2Session, or None.
+    """Returns either an OAuth2Session, or None.
 
     Session is guaranteed to be authenticated,
     and can be used to perform authenticated operations.
@@ -98,6 +98,8 @@ def clear_session(request):
 
 
 def log_out(request):
+    """Clears OAuth session and redirects to referer or landing."""
+
     clear_session(request)
     return redirect(request.headers.get('referer', '/'))
 
@@ -106,9 +108,11 @@ def log_out(request):
 # ==========
 
 def _get_redirect_uri() -> str:
-    """Returns redirect URI without query string.
+    """Returns redirect URI without query string
+    by reversing an URL pattern 'datatracker_oauth_callback'.
 
-    :raises ImproperlyConfigured: mismatching redirect URI in integration.
+    :raises ImproperlyConfigured: obtained redirect URI
+        does not match indicated in integration.
     """
     # We do not use Django’s request.build_absolute_uri here,
     # since origin may be accessed over plain HTTP.
