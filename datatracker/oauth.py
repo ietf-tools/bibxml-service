@@ -299,7 +299,7 @@ def get_provider():
             format=None,
         ).json()
     except (JSONDecodeError, SSLError):
-        log.exception(
+        log.warn(
             "Invalid response from Datatracker’s OAuth provider spec, "
             "falling back to hard-coded data")
         return DEFAULT_PROVIDER
