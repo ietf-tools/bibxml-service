@@ -1,9 +1,8 @@
-"""Utilities for converting :class:`bib_models.models.bibdata.BibliographicItem`
-to BibXML/xml2rfc per RFC 7991.
+"""Serialization of :class:`bib_models.models.bibdata.BibliographicItem`
+into BibXML (xml2rfc) format roughly per RFC 7991,
+with bias towards existing xml2rfc documents where differs.
 
-Conversion is very lossy.
-
-Primary API are :func:`.to_xml()` and :func:`.to_xml_string()`.
+Primary API is :func:`.to_xml()` and :func:`.to_xml_string()`.
 """
 
 import datetime

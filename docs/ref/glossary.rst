@@ -74,8 +74,7 @@ Glossary
          with the same :term:`document identifier`.
        - One source can provide bibliographic items of more than one document type.
        
-       Bibliographic data can come from an :term:`indexable source`
-       or an :term:`external source`.
+       Can either be an :term:`indexable source` or an :term:`external source`.
 
    indexable source
        An external data source periodically compiled by external tools
@@ -122,7 +121,11 @@ Glossary
        A path that used to be handled by xml2rfc tools web server.
        (Normally points to an XML file.)
 
-       See :doc:`/topics/xml2rfc-compat` and :data:`xml2rfc_compat.models.dir_subpath_regex`.
+       .. seealso::
+
+          - :rfp:req:`5` for background
+          - :doc:`/topics/xml2rfc-compat` for overview
+          - :data:`xml2rfc_compat.models.dir_subpath_regex` for the regular expression
 
    xml2rfc anchor
       Part of the filename in an :term:`xml2rfc-style path`

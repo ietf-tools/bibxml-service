@@ -5,8 +5,16 @@ xml2rfc tools compatibility
 .. contents::
    :local:
 
-Pre-existing :term:`xml2rfc paths <xml2rfc-style path>`
-are maintained in the following way.
+xml2rfc tool compatibility tries to achieve the following goals:
+
+- Offer XML output in line with RFC 7991
+  (with bias towards preexisting xml2rfc tools web server output,
+  where it differs from the RFC) in API.
+
+- Handle pre-existing :term:`paths <xml2rfc-style path>`
+  provided by xml2rfc tools web server by providing
+  up-to-date bibliographic data in the abovementioned XML format
+  when possible.
 
 .. seealso::
 
@@ -16,6 +24,12 @@ are maintained in the following way.
      :doc:`/howto/adjust-xml2rfc-paths`.
 
    - :mod:`xml2rfc_compat` for Python module reference
+
+BibXML format support
+=====================
+
+Output format support is implemented
+via a custom ``BibliographicItem`` :mod:`~xml2rfc_compat.serializer`.
 
 .. _xml2rfc-path-resolution-algorithm:
 
@@ -83,7 +97,7 @@ is replaced with effective anchor at during request.
 .. seealso:: :func:`xml2rfc_compat.urls.obtain_fallback_xml()`
 
 Tracked metrics
-===============
+---------------
 
 :data:`prometheus.metrics.xml2rfc_api_bibitem_hits`
     incremented on each request (unless X-Requested-With header is xml2rfcResolver:

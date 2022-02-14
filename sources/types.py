@@ -25,11 +25,31 @@ class SourceMeta:
     """Where to file issues."""
 
 
+# Internal sources
+# ----------------
+
 @dataclass
 class IndexedSourceMeta(SourceMeta):
     """Describes an :term:`indexable source`."""
     pass
 
+
+@dataclass
+class IndexedObject:
+    """Represents an object retrieved from an :term:`indexed source`."""
+
+    name: str
+    """Sometimes called :term:`ref`. Filename, etc."""
+
+    external_url: Optional[str]
+    """URL, if the source makes objects accessible this way."""
+
+    indexed_at: Optional[datetime.date] = None
+    """When this object was indexed."""
+
+
+# External sources
+# ----------------
 
 @dataclass
 class ExternalSourceMeta(SourceMeta):
@@ -47,8 +67,8 @@ class ExternalSourceRequest(BaseModel):
     """Which URL was hit."""
 
 
-# Sourced items
-# =============
+# Sourced bibliographic data
+# ==========================
 
 class SourcedBibliographicItem(BaseModel):
     """Represents a base for sourced bibliographic item,
@@ -65,20 +85,6 @@ class SourcedBibliographicItem(BaseModel):
 
     details: Optional[str] = None
     """Extra details about this sourcing, human-readable."""
-
-
-@dataclass
-class IndexedObject:
-    """Represents an object retrieved from an :term:`indexed source`."""
-
-    name: str
-    """Sometimes called :term:`ref`. Filename, etc."""
-
-    external_url: Optional[str]
-    """URL, if the source makes objects accessible this way."""
-
-    indexed_at: Optional[datetime.date] = None
-    """When this object was indexed."""
 
 
 class IndexedBibliographicItem(SourcedBibliographicItem):
@@ -105,10 +111,10 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
 class CompositeSourcedBibliographicItem(BibliographicItem):
     """An item obtained by merging bibliographic items
     which were possibly obtained from different sources
-    but have one or more identifiers in common."""
+    but have one or more identifiers in common.
 
-    # sourced: List[SourcedBibliographicItem]
-    # """Source-specific metadata."""
+    .. seealso:: `bib_models.merger`
+    """
 
     sources: Mapping[str, SourcedBibliographicItem]
     """Sourced items.

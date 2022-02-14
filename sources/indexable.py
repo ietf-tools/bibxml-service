@@ -1,7 +1,9 @@
 """
-Facilities for registering and listing available indexable sources.
+Facilities for registering and listing
+:term:`indexable sources <indexable source>`.
 
-See :term:`indexable source`.
+Indexable sources are generic
+and don’t necessarily need to contain bibliographic data.
 """
 import functools
 import hashlib

@@ -389,13 +389,13 @@ def build_citation_for_docid(
         id: str,
         id_type: Optional[str] = None,
         strict: bool = True) -> CompositeSourcedBibliographicItem:
-    """Returns a ``BibliographicItem`` constructed from ``RefData`` instances
-    that matched given document identifier (``docid.id`` value).
+    """Returns a ``BibliographicItem``
+    for given document identifier (``docid.id`` value).
 
-    Returns complete citation representation contained in ``body``.
+    Uses indexed sources by querying :class:`.models.RefData`,
+    as well as priority external sources.
 
     If multiple refs were found, their citation data are merged.
-    (At most 10 found refs are considered, which is already atypically many.)
 
     :param bool strict: by default is True, and item that fails validation
                         will result in pydantic’s ``ValidationError`` raised.

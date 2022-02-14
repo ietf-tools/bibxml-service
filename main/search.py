@@ -27,6 +27,9 @@ QUERY_FORMAT_LABELS = {
     'json_path': "JSON path",
     'websearch': "web search",
 }
+"""Provides human-readable labels
+for available search query formats.
+"""
 
 
 jsonpath_re = [
@@ -64,8 +67,11 @@ is_websearch: Callable[[str], bool] = (
 
 class BaseCitationSearchView(BaseListView):
     """Generic view that handles citation search.
+    Intended to be usable as a base for both template-based GUI and API views.
 
-    Intended to be usable for both template-based GUI and API views."""
+    The class is structured in a way that lends itself
+    to refactoring by splitting into mixin classes in future.
+    """
 
     # model = RefData
     paginate_by = 10

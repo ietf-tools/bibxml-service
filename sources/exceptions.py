@@ -1,5 +1,5 @@
 class RefNotFoundError(RuntimeError):
-    """Bibliographic item could not be found.
+    """Bibliographic item could not be found in source.
 
     :param str query: Reference or query that did not yield a match."""
 

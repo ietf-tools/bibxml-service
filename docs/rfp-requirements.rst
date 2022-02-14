@@ -120,7 +120,10 @@ RFP requirement compliance
    Fallback to data indexed from xml2rfc mirror Git repository
    is used as last resort.
 
-   Refer to :doc:`/topics/xml2rfc-compat` for details.
+   .. seealso::
+
+      - :doc:`/topics/xml2rfc-compat` for xml2rfc compatibility overview
+      - :data:`xml2rfc_compat.models.dir_subpath_regex` for path regular expression
 
 .. rfp:req::
    :id: 6
@@ -265,4 +268,14 @@ RFP requirement compliance
        We anticipate adding additional output reference formats in the future, such as BibTex or CSL.
        The design of the service must facilitate the addition of these future formats.
 
-   See :doc:`/howto/add-new-output-format`.
+   This service supports pluggable output formats for bibliographic data
+   via a registry of ``BibliographicItem`` serializers.
+   Bibliographic item details GUI and API automatically support
+   serializers that were registered at service startup time.
+
+   .. seealso::
+
+      - :doc:`/howto/add-new-output-format`
+      - :mod:`bib_models.serializers` for serializer registry Python reference
+      - BibXML is registered as a pluggable serialization format
+        in :mod:`xml2rfc_compat.serializer`.
