@@ -328,6 +328,11 @@ def list_doctypes() -> List[Tuple[str, str]]:
 
 def search_refs_for_docids(*ids: Union[DocID, str]) \
         -> QuerySet[RefData]:
+    """Given a list of document identifiers
+    (``DocID`` instances or just strings,
+    which would be treated as ``docid.id``),
+    queries and retrieves matching :class:`.models.RefData` objects.
+    """
 
     # Exact & fast
     struct_queries: List[Any] = [
