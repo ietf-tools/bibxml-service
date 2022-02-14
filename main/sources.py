@@ -113,7 +113,6 @@ def locate_relaton_source_repo(dataset_id: str):
 # Source registration
 # ===================
 
-
 def register_relaton_source(source_id: str):
     indexable.register_git_source(
         source_id,
