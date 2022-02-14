@@ -33,10 +33,10 @@ OAUTH_STATE_KEY = 'oauth_state'
 OAUTH_TOKEN_KEY = 'oauth_token'
 OAUTH_USER_INFO_KEY = 'oauth_user_info'
 
-CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None)
+CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None) or None
 """Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
 
-CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None)
+CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None) or None
 """Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_SECRET`."""
 
 
