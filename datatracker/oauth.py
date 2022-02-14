@@ -89,12 +89,18 @@ def get_client(request):
 
 
 def clear_session(request):
-    """Removes Datatracker user info from session."""
-    try:
-        del request.session[OAUTH_TOKEN_KEY]
-        del request.session[OAUTH_USER_INFO_KEY]
-    except KeyError:
-        pass
+    """Removes Datatracker OAuth2 data from session."""
+
+    keys = [
+        OAUTH_TOKEN_KEY,
+        OAUTH_STATE_KEY,
+        OAUTH_USER_INFO_KEY,
+    ]
+    for key in keys:
+        try:
+            del request.session[key]
+        except KeyError:
+            pass
 
 
 def log_out(request):
