@@ -132,7 +132,7 @@ def _get_redirect_uri() -> str:
     if redirect_uri == settings.DATATRACKER_REDIRECT_URI:
         return redirect_uri
     else:
-        log.exception(
+        log.error(
             "Datatracker OAuth: "
             "Calculated redirect URI %s "
             "does not match required %s",
