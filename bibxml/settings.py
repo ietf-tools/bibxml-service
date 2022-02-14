@@ -294,6 +294,8 @@ activates Matomo integration.
   to the <CONTAINER> part of the “https://.../js/container_<CONTAINER>.js”
   string, which you will find within the tag manager snippet obtained
   from your Matomo dashboard.
+
+.. seealso:: :func:`bibxml.context_processors.matomo`
 """
 
 
