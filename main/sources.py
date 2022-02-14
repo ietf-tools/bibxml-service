@@ -12,15 +12,18 @@ under ``/data/`` directory under repository root
 
 .. seealso:: :rfp:req:`3`
 """
+from typing import Tuple, List, Dict, Any
 import glob
 from os import path
-from typing import Tuple
+import datetime
 
 import yaml
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db import transaction
 
+from bib_models.models import dates
+from common.util import as_list
 from sources import indexable
 from sources.types import IndexedSourceMeta, IndexedObject
 
@@ -199,11 +202,17 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                                 relaton_fhandler.read(),
                                 Loader=yaml.SafeLoader)
 
+                            latest_date = max(
+                                _to_dates(as_list(ref_data.get('date', [])))
+                                or [datetime.datetime.now().date()]
+                            )
+
                             RefData.objects.update_or_create(
                                 ref=ref,
                                 dataset=ds_id,
                                 defaults=dict(
                                     body=ref_data,
+                                    latest_date=latest_date,
                                     representations=dict(bibxml=bibxml_data)
                                 ),
                             )
@@ -234,6 +243,24 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                 delete())
 
     return total, len(indexed_refs)
+
+
+def _to_dates(items: List[Dict[str, Any]]) -> List[datetime.date]:
+    """Converts a list of dates in raw deserialized Relaton data
+    into a list of ``datetime.date`` objects."""
+
+    result: List[datetime.date] = []
+    for item in items:
+        raw_date = item.get('value', None)
+        if raw_date:
+            parsed = dates.parse_date_pydantic(raw_date)
+            if parsed:
+                result.append(parsed)
+            else:
+                relaxed = dates.parse_relaxed_date(raw_date)
+                if relaxed is not None:
+                    result.append(relaxed[0])
+    return result
 
 
 def reset_index_for_dataset(ds_id):

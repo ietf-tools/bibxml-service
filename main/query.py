@@ -80,7 +80,9 @@ def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
 
 
 def list_refs(dataset_id: str) -> QuerySet[RefData]:
-    return RefData.objects.filter(dataset__iexact=dataset_id)
+    return (
+        RefData.objects.filter(dataset__iexact=dataset_id).
+        order_by('-latest_date'))
 
 
 def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
@@ -95,7 +97,8 @@ def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
         RefData.objects.
         annotate(search=SearchVector(Cast('body', TextField()))).
         filter(search=SearchQuery(text, search_type='websearch')).
-        only('ref', 'dataset', 'body')[:limit])
+        only('ref', 'dataset', 'body').
+        order_by('-latest_date')[:limit])
 
 
 def search_refs_relaton_struct(
@@ -129,7 +132,8 @@ def search_refs_relaton_struct(
 
     return (
         RefData.objects.filter(id__in=query).
-        only('ref', 'dataset', 'body')[:limit])
+        only('ref', 'dataset', 'body').
+        order_by('-latest_date')[:limit])
 
 
 def search_refs_relaton_field(
@@ -275,7 +279,9 @@ def search_refs_relaton_field(
     #     annotate_headline or "no annotation",
     #     field_queries)
 
-    qs = RefData.objects.filter(id__in=final_query)
+    qs = (
+        RefData.objects.filter(id__in=final_query).
+        order_by('-latest_date'))
 
     if annotate_headline is not None:
         # This annotation does not seem to cause perceptible impact
@@ -306,9 +312,9 @@ def list_doctypes() -> List[Tuple[str, str]]:
             RefData.objects.
             # order_by('?').  # This may be inefficient as dataset grows
             raw('''
-                select distinct on (doctype) id, doctype, sample_id
+                select distinct on (doctype) id, doctype, sample_id, latest_date
                 from (
-                    select id, jsonb_array_elements_text(
+                    select id, latest_date, jsonb_array_elements_text(
                         jsonb_path_query_array(
                             body,
                             '$.docid[*].type'
@@ -320,7 +326,7 @@ def list_doctypes() -> List[Tuple[str, str]]:
                         )
                     ) as sample_id
                     from api_ref_data
-                ) as item
+                ) as item order by doctype, latest_date desc
                 ''')
         )
     ]

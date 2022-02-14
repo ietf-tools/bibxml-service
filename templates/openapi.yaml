@@ -123,6 +123,8 @@ paths:
       description: |
         Find bibliographic items across indexed (non-external) datasets that match given query.
 
+        Results are ordered by recorded date (publication, revision, etc.) from latest to oldest.
+
         NOTE: as of now, this API may not return the latest and complete results at all times,
         as various source indexes could be cleared and/or be mid-indexation.
       parameters:

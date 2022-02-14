@@ -45,6 +45,15 @@ class RefData(models.Model):
     a :class:`bib_models.models.bibdata.BibliographicItem` instance.
     """
 
+    latest_date = models.DateField()
+    """Latest publication or revision date found on the item.
+    Used e.g. when ordering results.
+    Do not use when displaying data, since this field does not preserve
+    specificity (use bibliographic item’s
+    :attr:`~bib_models.models.bibdata.BibliographicItem.date` attribute
+    instead).
+    """
+
     representations = models.JSONField(default=dict)
     """Contains alternative representations of the citation.
     A mapping of ``{ <format_id>: <freeform string> }``,
