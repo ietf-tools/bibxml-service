@@ -21,7 +21,8 @@ class RefData(models.Model):
 
     dataset = models.CharField(
         max_length=24,
-        help_text="Internal dataset ID.")
+        help_text="Internal dataset ID.",
+        db_index=True)
     """
     Which dataset given citation was indexed from.
     Matches indexable source ID in :any:`RELATON_DATASETS`.
@@ -29,6 +30,7 @@ class RefData(models.Model):
 
     ref = models.CharField(
         max_length=128,
+        db_index=True,
         help_text="Reference (or ID). "
                   "Corresponds to source dataset filename without extension.")
     """
@@ -41,7 +43,7 @@ class RefData(models.Model):
     of :term:`bibliographic item`
     (:class:`bib_models.models.bibdata.BibliographicItem`)."""
 
-    representations = models.JSONField(default=lambda: dict())
+    representations = models.JSONField(default=dict)
     """Contains alternative representations of the citation.
     A mapping of ``{ <format_id>: <freeform string> }``,
     where format is e.g. “bibxml”.
