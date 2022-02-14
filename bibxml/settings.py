@@ -330,7 +330,7 @@ DEFAULT_SEARCH_RESULT_LIMIT = 400
 If the user hits this limit, they are expected to provide
 a more precise query."""
 
-DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT')
+DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT', '/data/datasets')
 """Where to keep fetched source data and data generated during indexing.
 Should be a directory. No trailing slash."""
 
