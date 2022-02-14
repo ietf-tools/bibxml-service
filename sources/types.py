@@ -27,7 +27,7 @@ class SourceMeta:
 
 @dataclass
 class IndexedSourceMeta(SourceMeta):
-    """Describes a source that can be indexed in full."""
+    """Describes an :term:`indexable source`."""
     pass
 
 
@@ -38,7 +38,7 @@ class ExternalSourceMeta(SourceMeta):
 
 
 class ExternalSourceRequest(BaseModel):
-    """Represents a request to external source."""
+    """Represents a request to an external source."""
 
     time: Optional[int] = None
     """How long the request took."""
@@ -69,13 +69,13 @@ class SourcedBibliographicItem(BaseModel):
 
 @dataclass
 class IndexedObject:
-    """Represents an object from an indexed source."""
+    """Represents an object retrieved from an :term:`indexed source`."""
 
     name: str
-    """Sometimes called “ref”. Filename, etc."""
+    """Sometimes called :term:`ref`. Filename, etc."""
 
     external_url: Optional[str]
-    """URL, if indexable source makes objects accessible directly."""
+    """URL, if the source makes objects accessible this way."""
 
     indexed_at: Optional[datetime.date] = None
     """When this object was indexed."""
@@ -85,8 +85,10 @@ class IndexedBibliographicItem(SourcedBibliographicItem):
     """A bibliographic item obtained from an indexed source."""
 
     indexed_object: Optional[IndexedObject]
+    """Indexed object corresponding to this item."""
 
     source: IndexedSourceMeta
+    """Indexed source metadata."""
 
 
 class ExternalBibliographicItem(SourcedBibliographicItem):
@@ -97,6 +99,7 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
     when retrieving info from this source."""
 
     source: ExternalSourceMeta
+    """External source metadata."""
 
 
 class CompositeSourcedBibliographicItem(BibliographicItem):
