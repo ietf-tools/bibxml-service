@@ -80,6 +80,9 @@ paths:
         200:
           description: successful operation
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BibliographicItemResponse'
             application/xml:
               schema:
                 type: string
@@ -87,9 +90,6 @@ paths:
                   RFC 7991-formatted bibliographic item
                   with ``<reference>`` or ``<referencegroup>``
                   root element.
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BibliographicItemResponse'
 
         404:
           description: no bibliographic item found matching given document identifier type and id
