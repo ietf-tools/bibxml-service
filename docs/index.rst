@@ -25,7 +25,6 @@ to BibXML service maintainers, developers and operators.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    topics/index
    howto/index
