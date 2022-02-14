@@ -6,6 +6,8 @@ This project handles front-end build step using Django Compressor.
 Explicit build happens within Docker image build
 using ``python manage.py compress`` command.
 
+.. seealso:: :rfp:req:`1`
+
 When DEBUG is True, online mode is also enabled, so post-processing takes place
 at request time (if changes were detected).
 

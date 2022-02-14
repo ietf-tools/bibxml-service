@@ -30,8 +30,8 @@ to BibXML service maintainers, developers and operators.
    topics/index
    howto/index
    ref/index
-   rfp-requirements
    evolution
+   rfp-requirements
 
 Code layout
 ===========

@@ -34,6 +34,7 @@ release = f"v{os.environ.get('SNAPSHOT', 'N/A') or 'N/A'}"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+sys.path.append(os.path.abspath("./_ext"))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
@@ -41,6 +42,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     # 'sphinx.ext.linkcode',
     'sphinx.ext.todo',
+    'rfp',
 ]
 
 todo_include_todos = True

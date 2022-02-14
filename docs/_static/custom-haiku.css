@@ -34,6 +34,33 @@ body > div.content {
   line-height: 22px;
 }
 
+div.topic {
+  border: none;
+  padding: 0;
+}
+a.toc-backref {
+  font-weight: inherit;
+  color: inherit !important;
+}
+
+blockquote {
+  font-size: 90%;
+  line-height: 1.4;
+  margin-left: 2rem;
+  position: relative;
+}
+blockquote::before {
+  content: "“";
+  transform: translateX(-75%) translateY(75%);
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: 18px;
+  font-size: 500%;
+  opacity: 30%;
+  font-family: Georgia, serif;
+}
+
 ul, ol {
   margin: 0;
 }
@@ -76,6 +103,7 @@ pre {
   font-size: 80%;
   line-height: 1.4;
 }
+
 :not(.reference):not(.toc-backref):not(h1) > code:not(.py),
 dl > dt > code:not(.py) {
   padding: .15em .5em;

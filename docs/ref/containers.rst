@@ -33,6 +33,9 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
     - Navigate to ``<host>:8000``, where 8000 is the port number
       provided in your environment, to see service web GUI.
 
+    This container can be run in multiple instances
+    (see also :rfp:req:`7`).
+
 **celery**
     Workers that process long-running asynchronous tasks,
     like citation dataset indexing, using image built by web-precheck.
@@ -62,6 +65,8 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
     It stores indexed bibliographic items
     and Django session data (relied on by Datatracker OAuth flows).
 
+    .. seealso:: :rfp:req:`4`
+
     .. important:: No accommodations are currently made
                    for scaling PostgreSQL instance horizontally.
 
@@ -82,7 +87,10 @@ Monitoring services
 
 Defined in ``docker-compose.monitor.yml``.
 
-.. seealso:: :doc:`/howto/run-in-production`, :github:`docker-compose.monitor.yml`
+.. seealso::
+
+   - :doc:`/howto/run-in-production`
+   - :github:`docker-compose.monitor.yml`
 
 **celery-exporter** (third-party)
     Exports Celery-level metrics (number of active tasks, etc.)

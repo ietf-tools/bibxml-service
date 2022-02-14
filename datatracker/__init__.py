@@ -1,4 +1,7 @@
-"""Datatracker API integration."""
+"""Datatracker API integration.
+
+.. seealso:: :rfp:req:`15`
+"""
 
 
 from . import request

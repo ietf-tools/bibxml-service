@@ -8,8 +8,14 @@ xml2rfc tools compatibility
 Pre-existing :term:`xml2rfc paths <xml2rfc-style path>`
 are maintained in the following way.
 
-.. seealso:: If you have cases where paths are resolved incorrectly,
-             :doc:`/howto/adjust-xml2rfc-paths`.
+.. seealso::
+
+   - :rfp:req:`5`
+
+   - If you have cases where paths are resolved incorrectly,
+     :doc:`/howto/adjust-xml2rfc-paths`.
+
+   - :mod:`xml2rfc_compat` for Python module reference
 
 .. _xml2rfc-path-resolution-algorithm:
 

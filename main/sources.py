@@ -9,6 +9,8 @@ Each of the repositories is expected to follow certain structure
 with Relaton bibliographic item data serialized to YAML files
 under ``/data/`` directory under repository root
 (see :func:`.index_dataset()` for indexing logic).
+
+.. seealso:: :rfp:req:`3`
 """
 import glob
 from os import path

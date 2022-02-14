@@ -28,3 +28,5 @@ There is support for pluggable additional serialization methods.
    In the above example, we associate serializer with ID “foobar”,
    meaning API callers will be able to specify ``format=foobar`` in GET parameters,
    and content type ``application/json``, meaning that will be the MIME type of response they receive.
+
+.. seealso:: :rfp:req:`16`

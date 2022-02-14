@@ -2,7 +2,10 @@
 ``bibxml``: Django project root
 ===============================
 
-.. module:: bibxml
+.. automodule:: bibxml
+
+.. contents::
+   :local:
 
 URLs
 ====
@@ -34,19 +37,23 @@ Django settings
 Views
 =====
 
-``views``
----------
-
 .. automodule:: bibxml.views
    :members:
 
 
-``error_views``
----------------
+Error views
+-----------
 
 .. automodule:: bibxml.error_views
    :members:
 
+
+Context processors
+------------------
+
+.. automodule:: bibxml.context_processors
+   :members:
+   :undoc-members:
 
 
 Deployment helpers

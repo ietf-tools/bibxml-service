@@ -9,6 +9,7 @@ def service_meta(request):
 
 
 def matomo(request):
+    """Makes the :data:`.settings.MATOMO` available to templates."""
     return dict(
         matomo=getattr(settings, 'MATOMO', None),
     )

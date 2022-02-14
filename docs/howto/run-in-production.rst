@@ -7,6 +7,8 @@ While bundled Compose configuration
 to illustrate the way the service is intended to be operated,
 here are some external aspects and general notes.
 
+.. seealso:: :rfp:req:`6`
+
 Environment
 ===========
 
