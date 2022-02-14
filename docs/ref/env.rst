@@ -119,6 +119,18 @@ Main database
     User password for PostgreSQL server authentication.
 
 
+Indexing
+--------
+
+``DATASET_TMP_ROOT``
+    accepted by Django
+
+    Which directory to store fetched sources when indexing.
+    Must be an absolute path.
+
+    See :data:`bibxml.settings.DATASET_TMP_ROOT`.
+
+
 Redis
 -----
 
