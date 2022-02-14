@@ -58,6 +58,11 @@ class RefData(models.Model):
     """Contains alternative representations of the citation.
     A mapping of ``{ <format_id>: <freeform string> }``,
     where format is e.g. “bibxml”.
+
+    .. deprecated:: 2022.2
+
+       XML is obtained on the fly
+       using :mod:`xml2rfc_compat.serializer`.
     """
 
     ref_id = models.CharField(max_length=64)
