@@ -366,7 +366,7 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
                     id.id
                     if isinstance(id, DocID) else id
                 ),
-                '"(?i)^%s$"' % re.escape(id.type)
+                '"(?i)^%s$"' % re.escape(typeCast(DocID, id).type)
                 if getattr(id, 'type', None) else None,
             ) for id in ids)
         ]
