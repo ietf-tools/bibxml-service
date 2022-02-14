@@ -18,7 +18,7 @@ as long as :doc:`relevant precautions </howto/run-in-production>` are followed.
 Primary services
 ================
 
-Defined in ``docker-compose.yml``.
+Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
 
 **web-precheck**
     Builds a base image with Python requirements,
@@ -82,7 +82,7 @@ Monitoring services
 
 Defined in ``docker-compose.monitor.yml``.
 
-.. seealso:: :doc:`/howto/run-in-production`
+.. seealso:: :doc:`/howto/run-in-production`, :github:`docker-compose.monitor.yml`
 
 **celery-exporter** (third-party)
     Exports Celery-level metrics (number of active tasks, etc.)
