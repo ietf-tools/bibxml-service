@@ -309,7 +309,7 @@ DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '').strip()
 
 DATATRACKER_REDIRECT_URI = environ.get(
     "DATATRACKER_REDIRECT_URI",
-    'https://dev.bibxml.org/datatracker-auth/callback/')
+    f'https://{HOSTNAME}/datatracker-auth/callback/')
 """Redirect URI configured on Datatracker side."""
 
 
