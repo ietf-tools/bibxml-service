@@ -2,6 +2,7 @@
 
 from typing import Tuple
 from os import access, path, R_OK, W_OK, X_OK
+from pathlib import Path
 from shutil import rmtree
 from git import Repo  # type: ignore[attr-defined]
 from celery.utils.log import get_task_logger
@@ -30,6 +31,8 @@ def reclone(repo_url: str, branch: str, work_dir: str) \
         rmtree(work_dir)
     except FileNotFoundError:
         pass
+
+    Path(work_dir).mkdir(parents=True, exist_ok=True)
 
     repo = Repo.clone_from(repo_url, work_dir, branch=branch)
 
