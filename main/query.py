@@ -543,7 +543,6 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 
 def build_search_results(
     refs: QuerySet[RefData],
-    order_by: Optional[str] = None,
 ) -> List[CompositeSourcedBibliographicItem]:
     """Given a :class:`django.db.models.query.QuerySet`
     of :class:`.models.RefData` entries,
