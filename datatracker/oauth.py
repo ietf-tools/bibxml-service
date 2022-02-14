@@ -46,17 +46,21 @@ def context_processor(request):
     - ``datatracker_oauth_enabled`` (boolean)
     - ``datatracker_user``, currently authenticated user info
     """
+    try:
+        _get_redirect_uri()
+    except ImproperlyConfigured:
+        ok = False
+    else:
+        ok = True if (CLIENT_ID and CLIENT_SECRET) else False
+
     ctx = dict(
-        datatracker_oauth_enabled=CLIENT_ID and CLIENT_SECRET,
+        datatracker_oauth_enabled=ok,
     )
 
-    if OAUTH_USER_INFO_KEY in request.session:
-        return dict(
-            datatracker_user=request.session[OAUTH_USER_INFO_KEY],
-            **ctx,
-        )
-    else:
-        return ctx
+    if ok and OAUTH_USER_INFO_KEY in request.session:
+        ctx['datatracker_user'] = request.session[OAUTH_USER_INFO_KEY]
+
+    return ctx
 
 
 def get_client(request):
