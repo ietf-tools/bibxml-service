@@ -144,12 +144,6 @@ for source_id in settings.RELATON_DATASETS:
 # Indexing implementation
 # =======================
 
-yaml.SafeLoader.yaml_implicit_resolvers = {
-    k: [r for r in v if r[0] != "tag:yaml.org,2002:timestamp"]
-    for k, v in yaml.SafeLoader.yaml_implicit_resolvers.items()
-}
-
-
 def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
                   on_progress=None, on_error=None) -> Tuple[int, int]:
     """Indexes Relaton data into :class:`~.models.RefData` instances.
@@ -165,6 +159,10 @@ def index_dataset(ds_id, bibxml_path, relaton_path, refs=None,
 
     :raise EnvironmentError: passes through any IOError, FileNotFoundError etc.
     """
+    yaml.SafeLoader.yaml_implicit_resolvers = {
+        k: [r for r in v if r[0] != "tag:yaml.org,2002:timestamp"]
+        for k, v in yaml.SafeLoader.yaml_implicit_resolvers.items()
+    }
 
     report_progress = on_progress or (lambda total, current: print(
         "Indexing {}: {} of {}".format(ds_id, total, current))
