@@ -1,6 +1,10 @@
 {# Accepts query, query_format, expanded #}
 
-{% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" autofocus="1" detailed="1" %}
+{% if query %}
+  {% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" detailed="1" %}
+{% else %}
+  {% include "browse/search_form_quick.html" with htmlclass="mb-2" tabindex="0" detailed="1" autofocus="1" %}
+{% endif %}
 
 <div class="relative grow relative min-h-[10rem]">
   <details>
@@ -43,6 +47,7 @@
       name="query"
       type="text"
       placeholder="Advanced search query…"
+      {% if query %}autofocus{% endif %}
       class="
         grow
         w-full
