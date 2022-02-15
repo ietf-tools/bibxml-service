@@ -160,7 +160,7 @@ class CitationSearchResultListView(BaseCitationSearchView):
 
     def render_to_response(self, context):
         result_count = len(self.object_list)
-        meta = dict(total_records=result_count)
+        meta: Dict[str, Any] = dict(total_records=result_count)
 
         page_obj = context['page_obj']
         if page_obj:
