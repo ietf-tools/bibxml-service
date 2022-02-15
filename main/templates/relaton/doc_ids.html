@@ -1,6 +1,6 @@
-{% for docid in ids %}
+{% for docid in ids|dictsort:"id" %}
   <span class="bibitem-docid relative" id="docid-{{ docid.id|urlencode }}" {% if docid.primary %}title="{{ docid.id }} (citeable identifier)"{% endif %}>
-    {% if as_links and docid.id and docid.type and not docid.scope %}
+    {% if as_links %}
       {% if show_type and not docid.primary %}
         <span class="text-xs opacity-50">
           {{ docid.type }}:
@@ -8,7 +8,7 @@
       {% endif %}
       <a
         tabindex="{% if forloop.first and tabindex %}{{ tabindex }}{% else %}-1{% endif %}"
-        href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}{% if request.GET.query %}&query={{ request.GET.query|urlencode:"" }}{% if query_format %}&query_format={{ query_format }}{% endif %}{% if page_obj %}&page={{ page_obj.number }}{% endif %}{% endif %}{% if not forloop.first %}#docid-{{ docid.id|urlencode }}{% endif %}"
+        href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}{% if request.GET.query %}&query={{ request.GET.query|urlencode:"" }}{% if query_format %}&query_format={{ query_format }}{% endif %}{% if page_obj %}&page={{ page_obj.number }}{% endif %}{% endif %}"
         class="bibitem-docid-id {% if docid.primary or forloop.first %}font-semibold{% endif %}">
         {{ docid.id }}</a>
     {% else %}
