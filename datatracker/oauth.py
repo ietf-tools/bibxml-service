@@ -146,7 +146,8 @@ def _get_redirect_uri() -> str:
 def initiate(request):
     """Redirects the user to Datatracker for login and approval.
 
-    If :data:`.CLIENT_ID` or :data:`.CLIENT_SECRET` are missing,
+    If :data:`~datatracker.oauth.CLIENT_ID`
+    or :data:`~datatracker.oauth.CLIENT_SECRET` are missing,
     or if obtained redirect URI does not match configuration,
     queues an error-level message and redirects the user back
     to where they came from or landing page.
@@ -189,7 +190,8 @@ def handle_callback(request):
 
     Queues an error-level message if:
 
-    - :data:`.CLIENT_ID` or :data:`.CLIENT_SECRET` are missing, or
+    - :data:`~datatracker.oauth.CLIENT_ID`
+      or :data:`~datatracker.oauth.CLIENT_SECRET` are missing, or
     - obtained redirect URI does not match configuration, or
     - there is no OAuth state in session, or
     - there is any exception during token or user info retrieval,
