@@ -108,8 +108,8 @@ def get_by_docid(request):
         resp = JsonResponse({
             "error":
                 "Unable to find bibliographic item matching "
-                "document ID {} (type {})".
-                format(docid, doctype or "unspecified"),
+                "document ID {}{}".
+                format(docid, f' (type {doctype})' if doctype else ''),
         }, status=404)
 
     except ValidationError as err:
