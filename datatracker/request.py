@@ -1,14 +1,14 @@
 import requests
 
 
-API_BASE = 'https://datatracker.ietf.org/api'
+BASE_DOMAIN = 'https://datatracker.ietf.org'
 
 
 def post(endpoint: str, api_key: str) -> requests.Response:
     """Handles Datatracker authenticated POST request.
     """
     return requests.post(
-        f'{API_BASE}/{endpoint}',
+        f'{BASE_DOMAIN}/{endpoint}',
         files={'apikey': (None, api_key)},
     )
 
@@ -16,7 +16,7 @@ def post(endpoint: str, api_key: str) -> requests.Response:
 def get(endpoint: str, format='json') -> requests.Response:
     """Handles Datatracker GET request, specifies JSON format.
     """
-    return requests.post(
-        f'{API_BASE}/{endpoint}',
+    return requests.get(
+        f'{BASE_DOMAIN}/{endpoint}',
         params={'format': format} if format else None,
     )

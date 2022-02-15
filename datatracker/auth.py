@@ -56,7 +56,7 @@ def token_is_valid(api_key: str) -> bool:
     """Returns True if API key is considered valid
     for bibxml endpoint by Datatracker.
     """
-    resp = post('appauth/bibxml', api_key)
+    resp = post('api/appauth/bibxml', api_key)
 
     if resp.status_code == 200:
         try:
