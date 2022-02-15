@@ -345,6 +345,6 @@ def get_paragraphs_html(val: str) -> List[str]:
 def get_paragraphs_plain(val: str) -> List[str]:
     return [
         p.strip()
-        for p in val.split('\n')
+        for p in val.split('\n\n')
         if p.strip() != ''
     ]
