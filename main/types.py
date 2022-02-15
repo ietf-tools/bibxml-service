@@ -111,7 +111,7 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
 class CompositeSourcedBibliographicItem(BibliographicItem):
     """An item obtained by merging bibliographic items
     which were possibly obtained from different sources
-    but have one or more identifiers in common.
+    but have the same primary document identifier.
 
     .. seealso:: :mod:`bib_models.merger`
     """
@@ -122,4 +122,9 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     Keys should contain source ID and ref (e.g., ref@source-id),
     since there can be multiple refs per source
     and refs can be non-unique across different sources.
+    """
+
+    primary_docid: Optional[str] = None
+    """Primary identifier shared by all items.
+    If not present, it may indicate source data integrity issue.
     """

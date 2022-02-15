@@ -29,54 +29,24 @@ from .types import IndexedBibliographicItem
 from .types import CompositeSourcedBibliographicItem
 from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
+from .query_utils import query_suppressing_user_input_error, merge_refs
+from .query_utils import get_primary_docid, get_docid_struct_for_search
+
+
+__all__ = (
+    'list_refs',
+    'list_doctypes',
+    'build_citation_for_docid',
+    'search_refs_docids',
+    'search_refs_relaton_struct',
+    'search_refs_relaton_field',
+    'search_refs_json_repr_match',
+    'get_indexed_ref',
+    'get_indexed_ref_by_quury',
+)
 
 
 log = logging.getLogger(__name__)
-
-
-def query_suppressing_user_input_error(
-    query: Callable[[], QuerySet[RefData]],
-) -> Union[QuerySet[RefData], None]:
-    """Evaluates provided query and tries to suppress any error
-    that may result from bad user input.
-    """
-    try:
-        qs = query()
-        len(qs)  # Evaluate
-    except (ProgrammingError, DataError) as e:
-        if not is_benign_user_input_error(e):
-            raise
-        else:
-            return None
-    else:
-        return qs
-
-
-def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
-        -> bool:
-    """The service allows the user to make complex queries directly
-    using PostgreSQL’s various JSON path and/or regular expression
-    matching functions.
-
-    As it appears impossible to validate a query in advance,
-    we allow PostgreSQL to throw and check the thrown exception
-    for certain substrings that point to input syntax issues.
-    Those can then be suppressed and user would be able to edit the query.
-
-    We do not want to accidentally suppress actual error states,
-    which would bubble up under the same exception classes.
-
-    Note that user input must obviously still be properly escaped.
-    Escaping is delegated to Django’s ORM,
-    see e.g. :func:`.search_refs_relaton_field`.
-    """
-
-    err = repr(exc)
-    return any((
-        "invalid regular expression" in err,
-        "syntax error" in err and "jsonpath input" in err,
-        "unexpected end of quoted string" in err and "jsonpath input" in err,
-    ))
 
 
 def list_refs(dataset_id: str) -> QuerySet[RefData]:
@@ -336,8 +306,7 @@ def list_doctypes() -> List[Tuple[str, str]]:
     ]
 
 
-def search_refs_for_docids(*ids: Union[DocID, str]) \
-        -> QuerySet[RefData]:
+def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
     """Given a list of document identifiers
     (``DocID`` instances or just strings,
     which would be treated as ``docid.id``),
@@ -347,15 +316,13 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
     # Exact & fast
     struct_queries: List[Any] = [
         struct
-        for (id, id_type) in (
-            (id.id, id.type) if isinstance(id, DocID) else (id, None)
-            for id in ids
-        )
+        for id in ids
         for struct in (
-            {'docid': [{'id': id, 'type': id_type}]}
-            if id_type else {'docid': [{'id': id}]},
-            # {'docid': {'id': id, 'type': id_type}}
-            # if id_type else {'docid': {'id': id}},
+            {'docid': [get_docid_struct_for_search(id)]}
+            if isinstance(id, DocID) else {'docid': [{'id': id}]},
+            # Support cases where docid is not a list:
+            {'docid': get_docid_struct_for_search(id)}
+            if isinstance(id, DocID) else {'docid': {'id': id}},
         )
     ]
     refs = search_refs_relaton_struct(
@@ -366,18 +333,25 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
     if len(refs) < 1:
         # Less exact, case-insensitive, slower
         jsonpath_queries = [
-            # To exclude untyped:
-            # f'@.id like_regex {docid} && exists (@.type)' % docid
-            {'docid[*]':
-                f'@.id like_regex {id} && @.type like_regex {id_type}'
-                if id_type else f'@.id like_regex {id}'}
-            for (id, id_type) in ((
+            {
+                'docid[*]':
+                '@.id like_regex {id}{type_query}{primary_query}'.format(
+                    id=id,
+                    type_query=
+                        ' && @.type like_regex {id_type}' if id_type else '',
+                    primary_query=
+                        ' && @.primary == true' if id_primary else '',
+                ),
+                # To exclude untyped add ' && exists (@.type)'
+            }
+            for (id, id_type, id_primary) in ((
                 '"(?i)^%s$"' % re.escape(
                     id.id
                     if isinstance(id, DocID) else id
                 ),
                 '"(?i)^%s$"' % re.escape(typeCast(DocID, id).type)
                 if getattr(id, 'type', None) else None,
+                getattr(id, 'primary', False),
             ) for id in ids)
         ]
         refs = search_refs_relaton_field(
@@ -405,7 +379,9 @@ def build_citation_for_docid(
 
     Uses indexed sources by querying :class:`.models.RefData`.
 
-    If multiple refs were found, their citation data are merged.
+    Found bibliographic items (there can be more than one matching given ID)
+    are merged into a single composite item
+    under a primary document identifier (if any).
 
     :param str id: :term:`docid.id`
     :param str id_type: Optional :term:`document identifier type`
@@ -423,132 +399,29 @@ def build_citation_for_docid(
 
     # Retrieve pre-indexed refs
     refs = query_suppressing_user_input_error(
-        lambda: search_refs_for_docids(DocID(id, id_type) if id_type else id)
+        lambda: search_refs_docids(
+            DocID(id, id_type) if id_type else id)
     ) or []
 
     if len(refs) < 1:
         raise RefNotFoundError("Not found in indexed sources by docid", id)
 
-    docids = [
-        DocID(id=docid['id'], type=docid['type'])
+    # Retrieve bibliographic items with the same primary identifier.
+    # This is the preferred scenario.
+    primary_docid = get_primary_docid([
+        id
         for ref in refs
-        for docid in as_list(ref.body['docid'])
-        # Require id and type, but no scope:
-        if (docid.get('id', None)
-            and docid.get('type', None)
-            and not docid.get('scope', None)
-            # Exclude originally given ID:
-            and (docid['id'] != id or docid['type'] != id_type))
-    ]
+        for id in as_list(ref.body.get('docid', []))
+    ])
+    if primary_docid:
+        refs = query_suppressing_user_input_error(
+            lambda: search_refs_docids(typeCast(DocID, primary_docid))
+        ) or []
 
-    # Retrieve bibliographic items with intersecting identifiers
-    additional_refs = query_suppressing_user_input_error(
-        lambda: search_refs_for_docids(*docids)
-    ) or []
-
-    refs = [*refs, *additional_refs]
-
-    base: Dict[str, Any] = {}
-    # Merged bibitems
-
-    sources: Dict[str, IndexedBibliographicItem] = {}
-    # Their sources
-
-    if len(refs) == 1:
-        ref = refs[0]
-
-        source = get_source_meta(ref.dataset)
-        obj = get_indexed_object_meta(ref.dataset, ref.ref)
-        sourced_id = f'{ref.ref}@{source.id}'
-
-        base.update(ref.body)
-        try:
-            bibitem = BibliographicItem(**ref.body)
-            validation_errors = []
-        except ValidationError as e:
-            log.warn(
-                "Incorrect bibliographic item format: %s, %s",
-                ref.ref, e)
-            bibitem = BibliographicItem.construct(**ref.body)
-            validation_errors = [str(e)]
-        sources[sourced_id] = IndexedBibliographicItem(
-            indexed_object=obj,
-            source=source,
-            bibitem=bibitem,
-            validation_errors=validation_errors,
-        )
-
-    elif len(refs) > 1:
-        seen_types_by_id: Dict[str, str] = {}
-
-        for ref in refs:
-            source = get_source_meta(ref.dataset)
-            obj = get_indexed_object_meta(ref.dataset, ref.ref)
-            sourced_id = f'{ref.ref}@{source.id}'
-
-            for _docid in ref.body.get('docid', []):
-                # Identifier sanity check
-                _type = _docid.get('type', '').strip()
-                _id = _docid.get('id', None)
-                _scope = _docid.get('scope', None)
-                if not _id:
-                    raise RefNotFoundError(
-                        "Encountered item missing docid.id", id)
-                if not isinstance(_type, str) or len(_type) < 1:
-                    raise RefNotFoundError(
-                        "Encountered item missing docid.type", id)
-
-                # Sanity check that ID-IDs don’t clash across types,
-                # otherwise we are dealing with different bibliographic items
-                # that should not be merged
-                if _scope is None:
-                    seen_type = seen_types_by_id.get(_id, _type)
-                    if seen_type != _type:
-                        log.warning(
-                            "Mismatching docid.type/docid.id when merging: "
-                            "ID %s, got type %s, "
-                            "but already seen type %s for this ID",
-                            _id, _type, seen_type)
-                        raise RefNotFoundError(
-                            "Encountered items "
-                            "with incompatible document identifier types",
-                            id)
-                    seen_types_by_id[_id] = _type
-
-            bibitem_merger.merge(base, ref.body)
-            try:
-                bibitem = BibliographicItem(**ref.body)
-                validation_errors = []
-            except ValidationError as e:
-                log.warn(
-                    "Incorrect bibliographic item format: %s, %s",
-                    ref.ref, e)
-                bibitem = BibliographicItem.construct(**ref.body)
-                validation_errors = [str(e)]
-
-            sources[sourced_id] = IndexedBibliographicItem(
-                indexed_object=obj,
-                source=source,
-                bibitem=bibitem,
-                validation_errors=validation_errors,
-            )
-
-    composite: Dict[str, Any] = {
-        **base,
-        'sources': sources,
-    }
-    if strict is not False:
-        return CompositeSourcedBibliographicItem(**composite)
-    else:
-        try:
-            return CompositeSourcedBibliographicItem(**composite)
-        except ValidationError:
-            log.exception(
-                "Failed to validate composite sourced bibliographic item "
-                "%s %s "
-                "(suppressed with strict=False)",
-                id, id_type)
-            return CompositeSourcedBibliographicItem.construct(**composite)
+    return merge_refs(
+        refs,
+        primary_docid.id if primary_docid else None,
+        strict)
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
@@ -556,83 +429,41 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 
 def build_search_results(
     refs: QuerySet[RefData],
-) -> List[BibliographicItem]:
+) -> List[CompositeSourcedBibliographicItem]:
     """Given a :class:`django.db.models.query.QuerySet`
-    of :class:`.models.RefData` entries,
-    build a list of :class:`.types.SourcedBibliographicItem` objects
-    by merging ``RefData`` with intersecting document identifiers.
+    of :class:`~.models.RefData` entries,
+    build a list of :class:`~.types.CompositeSourcedBibliographicItem` objects
+    by merging ``RefData`` instances that share
+    their primary document identifier.
     """
 
-    # Tracks which document ID is represented by which source references
-    # (referenced by indices in the ``refs`` list)
-    refs_by_docid: Dict[FrozenSet[DocIDTuple], List[int]] = {}
+    # Groups refs by primary ID
+    # (in absence of such, a ref will go alone under its first ID)
+    refs_by_primary_id: Dict[str, List[int]] = {}
 
-    # Tracks which document IDs refer to the same bibliographic item
-    # For bibliographic items that have at least one document ID in common,
-    # all their document IDs are considered aliases to each other.
-    alias_docids: Dict[FrozenSet[DocIDTuple], Set[DocIDTuple]] = {}
-
-    results: List[BibliographicItem] = []
+    results: List[CompositeSourcedBibliographicItem] = []
 
     for idx, ref in enumerate(refs):
-        docid_tuples: FrozenSet[DocIDTuple] = frozenset(
-            typeCast(DocIDTuple, tuple(docid.items()))
-            for docid in as_list(ref.body['docid'])
-            # Exclude identifiers with scope or missing id/type
-            if all([
-                docid.get('type', None),
-                docid.get('id', None),
-                docid.get('primary', False),
-                not docid.get('scope', None)])
-        )
-        for id in docid_tuples:
-            id_tuple: FrozenSet[DocIDTuple] = frozenset([id])
-            refs_by_docid.setdefault(id_tuple, [])
-            alias_docids.setdefault(id_tuple, set())
-            refs_by_docid[id_tuple].append(idx)
-            alias_docids[id_tuple].update(docid_tuples)
+        suitable_ids: List[Dict[str, Any]] = as_list([
+            id
+            for id in ref.body.get('docid', [])
+            if 'id' in id and 'scope' not in id and 'type' in id
+        ])
+        if suitable_ids:
+            primary_id = get_primary_docid(suitable_ids)
+            if primary_id:
+                refs_by_primary_id.setdefault(primary_id.id, [])
+                refs_by_primary_id[primary_id.id].append(idx)
+            else:
+                refs_by_primary_id[suitable_ids[0]['id']]
 
     processed_docids = set[DocIDTuple]()
 
-    for _docid, ref_indexes in refs_by_docid.items():
-        docid, = _docid
-        if docid in processed_docids:
-            # This identifier was already processed as an alias
-            continue
-
-        # Don’t process this identifier as an alias next time
-        processed_docids.add(docid)
-
-        aliases: Set[DocIDTuple] = alias_docids.get(_docid, set())
-
-        # Refs that contain bibliographic data
-        # for this document identifier
-        ref_idxs = refs_by_docid.get(_docid, [])
-
-        # For any aliases that were not yet processed,
-        # add refs that contain their bibliographic data
-        # to refs for this document identifier
-        # and exclude from processing
-        for alias_docid in (aliases - processed_docids):
-            processed_docids.add(alias_docid)
-            ref_idxs.extend(
-                refs_by_docid.get(
-                    frozenset([alias_docid]),
-                    []))
-
-        refs_to_merge: Set[RefData] = set([refs[idx] for idx in ref_idxs])
+    for _docid, ref_indexes in refs_by_primary_id.items():
+        refs_to_merge: List[RefData] = [refs[idx] for idx in ref_indexes]
 
         if len(refs_to_merge) > 0:
-            base: Dict[str, Any] = {'sources': {}}
-            for ref in refs_to_merge:
-                if hasattr(ref, 'headline'):
-                    base['headline'] = ref.headline
-                bibitem_merger.merge(base, ref.body)
-            try:
-                bibitem = BibliographicItem(**base)
-            except ValidationError as e:
-                bibitem = BibliographicItem.construct(**base)
-            results.append(bibitem)
+            results.append(merge_refs(refs_to_merge, _docid, strict=False))
 
     return results
 

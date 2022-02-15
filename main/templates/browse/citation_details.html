@@ -63,7 +63,26 @@
     bg-dark-400/30 dark:bg-dark-800/50 backdrop-blur-lg z-10
     overflow-hidden
   ">
-    <div class="px-4 leading-tight">{{ data.type|as_list|join:", " }}</div>
+    <div class="
+      px-4 leading-tight
+      md:flex flex-row items-center md:space-x-4
+      text-sm
+      mb-1
+    ">
+      <span title="Document types(s)">
+        {{ data.type|as_list|join:", " }}
+      </span>
+      {% with item_count=data.sources.items|dictsort:0|length %}
+        {% if data.primary_docid and item_count > 1 %}
+          <span title="Primary identifier shared by documents">
+            {{ data.primary_docid }}
+          </span>
+        {% endif %}
+        {% if item_count > 1 %}
+          <span>{{ item_count }} document{{ item_count|pluralize:',s' }}</span>
+        {% endif %}
+      {% endwith %}
+    </div>
     <h2 class="
       px-4 mt-2
       font-serif font-thin dark:font-light tracking-tight dark:tracking-normal text-2xl

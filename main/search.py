@@ -17,7 +17,7 @@ from .models import RefData
 from .query import build_search_results
 from .query import search_refs_relaton_struct
 from .query import search_refs_relaton_field
-from .query import query_suppressing_user_input_error
+from .query_utils import query_suppressing_user_input_error
 
 
 QUERY_FORMAT_LABELS = {

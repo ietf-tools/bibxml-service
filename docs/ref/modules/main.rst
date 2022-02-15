@@ -52,6 +52,10 @@ Querying indexed sources
 .. automodule:: main.query
    :members:
 
+
+.. automodule:: main.query_utils
+   :members:
+
 External source registry
 ------------------------
 
