@@ -1,5 +1,6 @@
 """View functions for API endpoints."""
 
+from typing import Dict, Any
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
@@ -17,6 +18,7 @@ from .search import BaseCitationSearchView
 from .query import get_indexed_ref
 from .query import build_citation_for_docid
 from .exceptions import RefNotFoundError
+from . import external_sources
 
 
 # TODO: Make ``get_doi_ref`` logic part of ``get_by_docid``
@@ -35,7 +37,7 @@ def get_doi_ref(request, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
-        bibitem = list(_get_doi_ref(parsed_ref).sources.values())[0].bibitem
+        bibitem = _get_doi_ref(parsed_ref).bibitem
 
     except RefNotFoundError:
         return JsonResponse({
@@ -208,22 +210,61 @@ def json_schema(request, ref: str):
 
 
 def get_ref(request, dataset_name, ref):
-    """Internal: retrieve item from dataset by reference."""
+    """Retrieve a reference from dataset by reference.
+    Dataset can either be a :data:`.models.RefData.dataset`
+    or an external source ID.
+    """
 
     format = request.GET.get('format', 'relaton')
+
     try:
-        result = get_indexed_ref(dataset_name, ref, format)
+        bibitem: BibliographicItem
+        if dataset_name in external_sources.registry:
+            source = external_sources.registry[dataset_name]
+            bibitem = source.get_item(ref.strip()).bibitem
+        else:
+            data: Dict[str, Any] = get_indexed_ref(
+                dataset_name,
+                ref.strip(),
+                'relaton')
+            bibitem = BibliographicItem(**data)
+
+    except ValidationError:
+        return JsonResponse({
+            "error":
+                "Found ref {} in dataset {} did not validate".
+                format(ref, dataset_name),
+        }, status=404)
+
     except RefNotFoundError:
         return JsonResponse({
             "error":
                 "Unable to find ref {} in dataset {}".
                 format(ref, dataset_name),
         }, status=404)
+
     else:
-        if format == 'bibxml':
-            return HttpResponse(
-                result,
-                content_type="application/xml",
-                charset="utf-8")
+        if format == 'relaton':
+            return JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
+
         else:
-            return JsonResponse({"data": result})
+            kwargs = dict(anchor=request.GET.get('anchor', None))
+            serializer = serializers.get(format)
+
+            try:
+                bibitem_serialized = serializer.serialize(bibitem, **kwargs)
+
+            except ValueError as err:
+                return JsonResponse({
+                    "error":
+                        "Unable to serialize item {} "
+                        "into requested format: "
+                        "unsuitable source data (err: {})".
+                        format(ref, str(err)),
+                }, status=500)
+
+            else:
+                return HttpResponse(
+                    bibitem_serialized,
+                    content_type=serializer.content_type,
+                    charset='utf-8')

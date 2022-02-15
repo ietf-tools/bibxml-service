@@ -1,6 +1,6 @@
 """Responsible for Crossref interaction."""
 
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 
 from pydantic import ValidationError
 from crossref.restful import Works, Etiquette
@@ -15,6 +15,7 @@ from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import GenericStringValue, Link
 
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
+from main.exceptions import RefNotFoundError
 
 
 etiquette = Etiquette(
@@ -38,15 +39,16 @@ ALT_TITLES = [
 
 
 def get_bibitem(docid: DocID, strict: bool = True) \
-        -> Union[ExternalBibliographicItem, None]:
+        -> ExternalBibliographicItem:
     """Retrieves DOI information from Crossref and deserializes it
-    into a :class:`sources.types.ExternalBibliographicItem` instance.
+    into a :class:`main.types.ExternalBibliographicItem` instance.
 
     :returns None: if no match was returned from Crossref.
-    :rtype: None or sources.types.ExternalBibliographicItem
-    :raises ValueError: wrong docid.type (not DOI).
+    :rtype: None or main.types.ExternalBibliographicItem
+    :raises ValueError: wrong docid.type (not DOI)
+    :raises main.exceptions.RefNotFoundError: no matching item returned
     :raises pydantic.ValidationError:
-        strict is True and Relaton data failed to validate.
+        strict is True and Relaton data failed to validate
     """
 
     if docid.type != 'DOI':
@@ -57,7 +59,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
     resp = works.doi(docid.id)
 
     if not resp:
-        return None
+        raise RefNotFoundError
 
     docids: List[DocID] = [
         DocID(type='DOI', id=resp['DOI']),

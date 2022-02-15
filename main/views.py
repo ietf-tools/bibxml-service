@@ -27,6 +27,7 @@ from .query import get_indexed_ref, list_refs
 from .query import build_citation_for_docid
 from .search import BaseCitationSearchView
 from .search import QUERY_FORMAT_LABELS
+from . import external_sources
 
 
 log = logging.getLogger(__name__)
@@ -175,37 +176,38 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
 # ================
 
 def browse_external_reference(request, dataset_id):
+    """Allows to view a reference from
+    ``dataset_id`` (must be a registered :term:`external source`).
+    """
     ref = request.GET.get('ref')
 
     if ref:
-        if dataset_id not in settings.EXTERNAL_DATASETS:
-            return HttpResponseBadRequest("Unknown dataset requested")
+        if dataset_id not in external_sources.registry:
+            return HttpResponseBadRequest(
+                "Unknown external source %s" % dataset_id)
 
-        if dataset_id == 'doi':
-            try:
-                _data = get_doi_ref(ref.strip()).dict()
-                data = unpack_dataclasses(_data)
-            except RuntimeError as exc:
-                log.exception(
-                    "Failed to retrieve or unpack "
-                    "external bibliographic item %s from %s",
-                    ref,
-                    dataset_id)
-                messages.error(
-                    request,
-                    "Couldn’t retrieve citation: {}".format(
-                        str(exc)))
-            else:
-                return render(request, 'browse/citation_details.html', dict(
-                    dataset_id=dataset_id,
-                    ref=ref,
-                    data=data,
-                    **shared_context,
-                ))
-        else:
+        source = external_sources.registry[dataset_id]
+
+        try:
+            _data = source.get_item(ref.strip()).dict()
+            data = unpack_dataclasses(_data)
+        except RuntimeError as exc:
+            log.exception(
+                "Failed to retrieve or unpack "
+                "external bibliographic item %s from %s",
+                ref,
+                dataset_id)
             messages.error(
                 request,
-                "Unsupported external source {}".format(dataset_id))
+                "Couldn’t retrieve citation: {}".format(
+                    str(exc)))
+        else:
+            return render(request, 'browse/citation_details.html', dict(
+                dataset_id=dataset_id,
+                ref=ref,
+                data={**data['bibitem'], 'sources': {dataset_id: data}},
+                **shared_context,
+            ))
     else:
         messages.error(
             request,
@@ -222,13 +224,7 @@ def browse_indexed_reference(request, dataset_id, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
-        if dataset_id == 'doi':
-            try:
-                data = get_doi_ref(parsed_ref)
-            except Exception:
-                return error_views.server_error(request)
-        else:
-            data = get_indexed_ref(dataset_id, parsed_ref)
+        data = get_indexed_ref(dataset_id, parsed_ref)
 
     except RefNotFoundError:
         raise Http404(

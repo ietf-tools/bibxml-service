@@ -49,6 +49,12 @@ Querying indexed sources
 .. automodule:: main.query
    :members:
 
+External source registry
+========================
+
+.. automodule:: main.external_sources
+   :members:
+
 Models
 ======
 
