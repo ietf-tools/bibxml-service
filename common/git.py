@@ -34,7 +34,7 @@ def reclone(repo_url: str, branch: str, work_dir: str) \
 
     Path(work_dir).mkdir(parents=True, exist_ok=True)
 
-    repo = Repo.clone_from(repo_url, work_dir, branch=branch)
+    repo = Repo.clone_from(repo_url, work_dir, branch=branch, depth=1)
 
     # Set name and email; may be required when pulling
     repo.config_writer().set_value("user", "name", "ci").release()
