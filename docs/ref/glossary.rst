@@ -116,7 +116,8 @@ Glossary
        Example: Crossref is an external source that allows to look up
        bibliographic items via DOI (see :mod:`doi`).
 
-       Register external sources using :func:`main.external_sources.register()`.
+       Register external sources using
+       :func:`main.external_sources.register_for_types()`.
 
    xml2rfc-style path
    legacy path

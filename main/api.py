@@ -211,7 +211,7 @@ def json_schema(request, ref: str):
 
 def get_ref(request, dataset_name, ref):
     """Retrieve a reference from dataset by reference.
-    Dataset can either be a :data:`.models.RefData.dataset`
+    Dataset can either be a :attr:`.models.RefData.dataset`
     or an external source ID.
     """
 

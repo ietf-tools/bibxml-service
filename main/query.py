@@ -37,6 +37,7 @@ __all__ = (
     'list_refs',
     'list_doctypes',
     'build_citation_for_docid',
+    'build_search_results',
     'search_refs_docids',
     'search_refs_relaton_struct',
     'search_refs_relaton_field',
@@ -51,19 +52,63 @@ log = logging.getLogger(__name__)
 
 def list_refs(dataset_id: str) -> QuerySet[RefData]:
     """Returns all indexed refs in a dataset.
+
     :param str dataset_id: given Relaton source ID
-    :rtype: QuerySet[RefData]
+    :rtype: django.db.models.query.QuerySet[RefData]
     """
     return (
         RefData.objects.filter(dataset__iexact=dataset_id).
         order_by('-latest_date'))
 
 
+def list_doctypes() -> List[Tuple[str, str]]:
+    """Lists all distinct ``docid[*].doctype`` values
+    among indexed bibliographic items.
+
+    :returns: a list of 2-tuples of strings
+              (document type, example document ID)
+    """
+    return [
+        (i.doctype, i.sample_id)
+        for i in (
+            RefData.objects.
+            # order_by('?').  # This may be inefficient as dataset grows
+            raw('''
+                select distinct on (doctype) id, doctype, sample_id, latest_date
+                from (
+                    select id, latest_date, jsonb_array_elements_text(
+                        jsonb_path_query_array(
+                            body,
+                            '$.docid[*].type'
+                        )
+                    ) as doctype, jsonb_array_elements_text(
+                        jsonb_path_query_array(
+                            body,
+                            '$.docid[*].id'
+                        )
+                    ) as sample_id
+                    from api_ref_data
+                ) as item order by doctype, latest_date desc
+                ''')
+        )
+    ]
+
+
 def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
     """Uses given string to search across serialized JSON representations
     of Relaton citation data.
 
+    .. deprecated:: 2022.2
+
+       It is recommended to use :func:`~.search_refs_relaton_field()`,
+       which provides similar behavior.
+
     Supports PostgreSQL websearch operators like quotes, plus, minus, OR, AND.
+
+    :param str text: the query
+    :param int limit: how many results to return at the most
+                      (converts to SQL ``LIMIT``)
+    :rtype: django.db.models.query.QuerySet[RefData]
     """
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
@@ -81,13 +126,15 @@ def search_refs_relaton_struct(
     """Uses PostgreSQL’s JSON containment query
     to find bibliographic items containing any of given structures.
 
-    .. note:: This search is case-sensitive.
+    .. note:: Fast, but case-sensitive.
 
     .. seealso:: PostgreSQL docs on ``@>`` operator.
 
-    :returns: RefData where Relaton body contains
-              at least one of given ``obj`` structures.
-    :rtype: Queryset[RefData]
+    :param int limit: how many results to return at the most
+                      (converts to SQL ``LIMIT``)
+    :returns: ``RefData`` instances where Relaton body contains
+              at least one of given ``obj`` structures
+    :rtype: django.db.models.query.QuerySet[RefData]
     """
     if len(objs) < 1:
         return RefData.objects.none()
@@ -129,7 +176,7 @@ def search_refs_relaton_field(
     (if you pass more than one dict in ``field_queries``)
     are OR’ed.
 
-    :param int limit: Converts to DB ``LIMIT``.
+    :param int limit: Converts to SQL ``LIMIT``.
 
     :param bool exact: The ``exact`` flag applies to all ``field_queries``
         and determines whether to treat them as JSON path style queries
@@ -183,7 +230,7 @@ def search_refs_relaton_field(
 
               { '': '$.docid[*].id like_regex "(?i)rfc"' }
 
-    :rtype: django.db.models.query.Queryset[RefData]
+    :rtype: django.db.models.query.QuerySet[RefData]
     """
     if len(field_queries) < 1:
         return RefData.objects.none()
@@ -275,42 +322,13 @@ def search_refs_relaton_field(
     return qs.only('ref', 'dataset', 'body')[:limit]
 
 
-def list_doctypes() -> List[Tuple[str, str]]:
-    """Lists all distinct ``docid[*].doctype`` values among citation data.
-
-    Returns a list of 2-tuples (document type, example document ID).
-    """
-    return [
-        (i.doctype, i.sample_id)
-        for i in (
-            RefData.objects.
-            # order_by('?').  # This may be inefficient as dataset grows
-            raw('''
-                select distinct on (doctype) id, doctype, sample_id, latest_date
-                from (
-                    select id, latest_date, jsonb_array_elements_text(
-                        jsonb_path_query_array(
-                            body,
-                            '$.docid[*].type'
-                        )
-                    ) as doctype, jsonb_array_elements_text(
-                        jsonb_path_query_array(
-                            body,
-                            '$.docid[*].id'
-                        )
-                    ) as sample_id
-                    from api_ref_data
-                ) as item order by doctype, latest_date desc
-                ''')
-        )
-    ]
-
-
 def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
     """Given a list of document identifiers
-    (``DocID`` instances or just strings,
+    (``DocID`` instances, or just strings
     which would be treated as ``docid.id``),
     queries and retrieves matching :class:`.models.RefData` objects.
+
+    :rtype: django.db.models.query.QuerySet[RefData]
     """
 
     # Exact & fast
@@ -431,10 +449,13 @@ def build_search_results(
     refs: QuerySet[RefData],
 ) -> List[CompositeSourcedBibliographicItem]:
     """Given a :class:`django.db.models.query.QuerySet`
-    of :class:`~.models.RefData` entries,
-    build a list of :class:`~.types.CompositeSourcedBibliographicItem` objects
+    of :class:`~.models.RefData` entries, build a list
+    of :class:`~.types.CompositeSourcedBibliographicItem` objects
     by merging ``RefData`` instances that share
     their primary document identifier.
+
+    :param django.db.models.query.QuerySet[RefData] refs: found refs
+    :rtype: List[CompositeSourcedBibliographicItem]
     """
 
     # Groups refs by primary ID
