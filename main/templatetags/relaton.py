@@ -68,8 +68,8 @@ def substruct_search_link(value: Any, query: str):
 
 
 def _parse_params(params: List[str]) -> Tuple[Set[str], Set[str], bool]:
-    omitted_keys = set()
-    only_keys = set()
+    omitted_keys: Set[str] = set()
+    only_keys: Set[str] = set()
     as_list = False
     for param in params:
         param_name, param_value = param.split('=')
