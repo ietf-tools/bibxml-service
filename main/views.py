@@ -121,8 +121,10 @@ def browse_citation_by_docid(request):
         return HttpResponseBadRequest("Missing document ID")
 
     try:
+        if docid.endswith('.xml'):
+            docid = docid[:-len('.xml')]
         citation = build_citation_for_docid(
-            docid.strip().strip('.').strip('.xml'),
+            docid.strip(),
             doctype.strip() if doctype else None,
             strict=False)
 
