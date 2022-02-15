@@ -112,19 +112,28 @@ def create_reference(item: BibliographicItem) -> Element:
         *(create_author(contrib) for contrib in author_contributors),
     )
 
+    # Publication date… Or at least any date
     published_date: Optional[datetime.date] = None
+    published_date_raw: Optional[Union[str, datetime.date]] = None
+    all_dates = as_list(item.date or [])
     specificity: Optional[str] = None
-    for date in as_list(item.date or []):
+    for date in all_dates:
         if date.type == 'published':
-            if isinstance(date.value, str):
-                relaxed = parse_relaxed_date(date.value)
-                if relaxed:
-                    published_date = relaxed[0]
-                    specificity = relaxed[2]
-            else:
-                published_date = date.value
-                specificity = 'day'
+            published_date_raw = date.value
             break
+    if not published_date_raw and all_dates:
+        published_date_raw = all_dates[0].value
+
+    if published_date_raw:
+        if isinstance(published_date_raw, str):
+            relaxed = parse_relaxed_date(published_date_raw)
+            if relaxed:
+                published_date = relaxed[0]
+                specificity = relaxed[2]
+        else:
+            published_date = published_date_raw
+            specificity = 'day'
+
     if published_date and specificity:
         date_el = E.date(year=published_date.strftime('%Y'))
         if specificity in ['month', 'day']:
