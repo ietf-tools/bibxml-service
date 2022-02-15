@@ -73,7 +73,7 @@
     </h2>
   </header>
 
-  {% for ref, sourced_item in data.sources.items|dictsort:0 %}
+  {% for ref, sourced_item in data.sources.items|dictsort:0 reversed %}
     {% with data=sourced_item.bibitem %}
       <dl class="
         bibitem-dl
