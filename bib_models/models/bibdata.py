@@ -104,6 +104,12 @@ class Contributor:
     organization: Optional[Organization] = None
 
 
+@dataclass
+class Edition:
+    content: str
+    number: Optional[str] = None
+
+
 class BibliographicItem(BaseModel, extra=Extra.allow):
     """
     Relaton’s main model, bibliographic item.
@@ -136,7 +142,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     relation: 'Optional[List[Relation]]' = None
 
     title: Optional[Union[List[Title], Title]] = None
-    # edition: Optional[str] = None
+    edition: Optional[Edition] = None
     abstract: Optional[Union[List[GenericStringValue], GenericStringValue]] = \
         None
 
