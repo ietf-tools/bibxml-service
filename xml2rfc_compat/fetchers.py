@@ -5,10 +5,14 @@ Plug registered fetchers into root URL configuration
 via :func:`.urls.get_urls()`.
 """
 
+from typing import cast, Union
 import re
 
 from bib_models.models.bibdata import BibliographicItem, DocID
 from doi.crossref import get_bibitem as get_doi_bibitem
+from datatracker.internet_drafts import get_internet_draft, remove_version
+from datatracker.internet_drafts import version_re
+from common.util import as_list
 from main.models import RefData
 from main.query import search_refs_relaton_field
 from main.exceptions import RefNotFoundError
@@ -49,6 +53,9 @@ def misc(ref: str) -> BibliographicItem:
 
 @register_fetcher('bibxml3')
 def internet_drafts(ref: str) -> BibliographicItem:
+    """Returns either latest indexed version,
+    or latest version at Datatracker if it’s newer.
+    """
     type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
 
     ref_without_prefixes = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
@@ -77,8 +84,31 @@ def internet_drafts(ref: str) -> BibliographicItem:
         reverse=True,
     )
 
+    bibitem: Union[BibliographicItem, None]
     if len(results) > 0:
-        return BibliographicItem(**results[0].body)
+        bibitem = BibliographicItem(**results[0].body)
+        try:
+            version = [
+                version_re.match(d.id).group('version')
+                for d in as_list(bibitem.docid or [])
+                if d.type == 'Internet-Draft' and version_re.match(d.id)
+            ][0]
+        except:
+            version = None
+
+    else:
+        bibitem = None
+        version = None
+
+    latest_draft = get_internet_draft(
+        f'draft-{bare_ref}',
+        strict=bibitem is None,
+    ).bibitem
+
+    if not version or version != latest_draft.edition.content:
+        return latest_draft
+    elif bibitem:
+        return bibitem
     else:
         raise RefNotFoundError()
 
