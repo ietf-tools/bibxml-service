@@ -549,7 +549,7 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 
 def build_search_results(
     refs: QuerySet[RefData],
-) -> List[CompositeSourcedBibliographicItem]:
+) -> List[BibliographicItem]:
     """Given a :class:`django.db.models.query.QuerySet`
     of :class:`.models.RefData` entries,
     build a list of :class:`.types.SourcedBibliographicItem` objects
@@ -565,7 +565,7 @@ def build_search_results(
     # all their document IDs are considered aliases to each other.
     alias_docids: Dict[FrozenSet[DocIDTuple], Set[DocIDTuple]] = {}
 
-    results: List[CompositeSourcedBibliographicItem] = []
+    results: List[BibliographicItem] = []
 
     for idx, ref in enumerate(refs):
         docid_tuples: FrozenSet[DocIDTuple] = frozenset(
@@ -575,6 +575,7 @@ def build_search_results(
             if all([
                 docid.get('type', None),
                 docid.get('id', None),
+                docid.get('primary', False),
                 not docid.get('scope', None)])
         )
         for id in docid_tuples:
@@ -591,6 +592,7 @@ def build_search_results(
         if docid in processed_docids:
             # This identifier was already processed as an alias
             continue
+
         # Don’t process this identifier as an alias next time
         processed_docids.add(docid)
 
@@ -615,29 +617,15 @@ def build_search_results(
 
         if len(refs_to_merge) > 0:
             base: Dict[str, Any] = {'sources': {}}
-            sources: Dict[str, IndexedBibliographicItem] = {}
             for ref in refs_to_merge:
                 if hasattr(ref, 'headline'):
                     base['headline'] = ref.headline
-
                 bibitem_merger.merge(base, ref.body)
-
-                source = get_source_meta(ref.dataset)
-                obj = get_indexed_object_meta(ref.dataset, ref.ref)
-                sourced_id = f'{ref.ref}@{source.id}'
-                try:
-                    bibitem = BibliographicItem(**ref.body)
-                    validation_errors = []
-                except ValidationError as e:
-                    bibitem = BibliographicItem.construct(**ref.body)
-                    validation_errors = [str(e)]
-                sources[sourced_id] = IndexedBibliographicItem(
-                    indexed_object=obj,
-                    source=source,
-                    bibitem=bibitem,
-                    validation_errors=validation_errors,
-                )
-            results.append(CompositeSourcedBibliographicItem.construct(**base))
+            try:
+                bibitem = BibliographicItem(**base)
+            except ValidationError as e:
+                bibitem = BibliographicItem.construct(**base)
+            results.append(bibitem)
 
     return results
 
