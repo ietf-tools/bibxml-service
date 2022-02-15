@@ -174,13 +174,6 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
 # External sources
 # ================
 
-def external_dataset(request, dataset_id):
-    return render(request, 'browse/dataset.html', dict(
-        dataset_id=dataset_id,
-        **shared_context,
-    ))
-
-
 def browse_external_reference(request, dataset_id):
     ref = request.GET.get('ref')
 

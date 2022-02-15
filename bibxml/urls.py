@@ -200,9 +200,6 @@ urlpatterns = [
 
         path('external-sources/', include([
             path('<dataset_id>/', include([
-                path('', never_cache(require_safe(
-                    public_views.external_dataset
-                )), name='browse_external_dataset'),
                 path('<path:ref>/', require_safe(
                     public_views.browse_external_reference
                 ), name='browse_external_citation'),
