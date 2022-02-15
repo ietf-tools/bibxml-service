@@ -102,7 +102,7 @@ class ExploreDirectory(TemplateView):
     renders a JSON response (see :meth:`.get_json_response()`).
 
     Otherwise, renders a template
-    (see :meth:`.get_context_data()` for context).
+    (see :meth:`get_context_data()` for context).
     Template must be supplied by view user via ``template_name``.
     """
 
