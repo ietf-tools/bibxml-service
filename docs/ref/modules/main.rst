@@ -7,12 +7,6 @@
 .. contents::
    :local:
 
-Relaton source implementation
-=============================
-
-.. automodule:: main.sources
-   :members:
-
 Retrieval interfaces
 ====================
 
@@ -43,26 +37,35 @@ Template tags
 .. automodule:: main.templatetags.relaton
    :members:
 
+Sourcing data
+=============
+
+Relaton source implementation
+-----------------------------
+
+.. automodule:: main.sources
+   :members:
+
 Querying indexed sources
-========================
+------------------------
 
 .. automodule:: main.query
    :members:
 
 External source registry
-========================
+------------------------
 
 .. automodule:: main.external_sources
    :members:
 
-Models
-======
+Data models
+===========
 
 .. autoclass:: main.models.RefData
    :members:
 
 Types
-=====
+-----
 
 .. automodule:: main.types
    :members:
@@ -70,7 +73,7 @@ Types
    :exclude-members: __init__
 
 Exceptions
-==========
+----------
 
 .. automodule:: main.exceptions
    :members:

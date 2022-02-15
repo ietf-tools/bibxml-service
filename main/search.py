@@ -241,7 +241,7 @@ class BaseCitationSearchView(BaseListView):
         """In addition to parent implementation,
         provides search-related variables.
 
-        As a side-effect, queries a message regarding query format.
+        As a side-effect, queues a message regarding query format.
         """
 
         ctx = dict(

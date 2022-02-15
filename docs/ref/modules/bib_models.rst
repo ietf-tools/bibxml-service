@@ -91,8 +91,8 @@ Strings
    :members:
 
 
-``merger``: Merging related bibliographic items
-===============================================
+``merger``: Merging bibliographic items representing the same document
+======================================================================
 
 .. automodule:: bib_models.merger
    :members:

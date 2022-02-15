@@ -1,5 +1,5 @@
 """Pluggable serializer registry
-for :class:`.models.bibdata.BibliographicItem` instances.
+for :class:`~.models.bibdata.BibliographicItem` instances.
 
 Currently, only serialization
 into various utf-8 strings is supported.
@@ -28,7 +28,7 @@ def register(id: str, content_type: str):
 @dataclass
 class Serializer:
     """A registered serializer.
-    Instantiated automatically by the :func:`bib_models.serializers.register`
+    Instantiated automatically by the :func:`~bib_models.serializers.register`
     function.
     """
     serialize: Callable[..., str]
@@ -50,7 +50,7 @@ def get(id: str) -> Serializer:
 
 
 class SerializerNotFound(RuntimeError):
-    """No serializer with given ID."""
+    """No registered serializer with given ID."""
     pass
 
 

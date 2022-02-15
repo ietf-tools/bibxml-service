@@ -80,6 +80,10 @@ def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
 
 
 def list_refs(dataset_id: str) -> QuerySet[RefData]:
+    """Returns all indexed refs in a dataset.
+    :param str dataset_id: given Relaton source ID
+    :rtype: QuerySet[RefData]
+    """
     return (
         RefData.objects.filter(dataset__iexact=dataset_id).
         order_by('-latest_date'))
@@ -392,23 +396,26 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
 
 
 def build_citation_for_docid(
-        id: str,
-        id_type: Optional[str] = None,
-        strict: bool = True) -> CompositeSourcedBibliographicItem:
-    """Returns a ``BibliographicItem``
+    id: str,
+    id_type: Optional[str] = None,
+    strict: bool = True,
+) -> CompositeSourcedBibliographicItem:
+    """Retrieves and constructs a ``BibliographicItem``
     for given document identifier (``docid.id`` value).
 
-    Uses indexed sources by querying :class:`.models.RefData`,
-    as well as priority external sources.
+    Uses indexed sources by querying :class:`.models.RefData`.
 
     If multiple refs were found, their citation data are merged.
 
+    :param str id: :term:`docid.id`
+    :param str id_type: Optional :term:`document identifier type`
     :param bool strict: by default is True, and item that fails validation
                         will result in pydantic’s ``ValidationError`` raised.
                         If set to False, item will be constructed anyway,
-                        but may contain unexpected data structure.
-                        This is OK for some cases
-                        (e.g., forgiving template rendering).
+                        but may contain unexpected data structure—this
+                        is intended for cases like forgiving template rendering,
+                        and not recommended if returned item is programmatically
+                        consumed.
 
     :rtype: main.types.CompositeSourcedBibliographicItem
     :raises main.exceptions.RefNotFoundError: if no matching refs were found.

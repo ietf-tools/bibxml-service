@@ -74,8 +74,13 @@ def home(request):
 
 def smart_query(request):
     """Tries to find a bibliographic item
-    from search query given in ``query`` GET parameter,
-    with optional ``query_format``."""
+    from search query given in ``query``
+    and optional ``query_format`` GET parameters.
+
+    - If ``query_format`` is not given, redirects to
+      :func:`.browse_citation_by_docid()`.
+    - If ``query_format`` is given, redirects to search.
+    """
 
     query = request.GET.get('query', None)
     query_format = request.GET.get('query_format', None)

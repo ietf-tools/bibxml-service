@@ -51,6 +51,6 @@ bibitem_merger = Merger(
     [deduplicate_and_coerce_to_list],
 )
 """A ``deepmerge`` merger
-for :class:`bib_models.models.bibdata.BibliographicItem`
+for :class:`~bib_models.models.bibdata.BibliographicItem`
 dictionary representations.
 """

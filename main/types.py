@@ -117,7 +117,7 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     """
 
     sources: Mapping[str, SourcedBibliographicItem]
-    """Sourced items.
+    """Retrieved items by source.
 
     Keys should contain source ID and ref (e.g., ref@source-id),
     since there can be multiple refs per source
