@@ -16,8 +16,9 @@ logger = get_task_logger(__name__)
 def reclone(repo_url: str, branch: str, work_dir: str) \
         -> Repo:
     """
-    Wipes proposed ``work_dir``,
+    Wipes proposed ``work_dir``
     and clones given repository into that location.
+    Sets depth of 1 to avoid fetching history.
     """
 
     if path.commonpath([
@@ -47,7 +48,8 @@ def ensure_latest(repo_url: str, branch: str, work_dir: str) \
         -> Tuple[Repo, bool]:
     """
     If specified working directory contains a Git repo
-    matching provided configuration (URL and branch), performs a pull.
+    matching provided configuration (URL and branch), performs a pull
+    (fetch with depth of 1 and reset).
 
     Otherwise, removes working directory if it exists
     and clones the repository afresh.
