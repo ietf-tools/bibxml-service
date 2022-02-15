@@ -54,3 +54,18 @@ Models
 
 .. autoclass:: main.models.RefData
    :members:
+
+Types
+=====
+
+.. automodule:: main.types
+   :members:
+   :show-inheritance:
+   :exclude-members: __init__
+
+Exceptions
+==========
+
+.. automodule:: main.exceptions
+   :members:
+   :show-inheritance:

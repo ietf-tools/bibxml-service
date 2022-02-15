@@ -9,7 +9,6 @@ from pydantic import ValidationError
 from common.pydantic import unpack_dataclasses
 from bib_models.models.bibdata import BibliographicItem
 from bib_models import serializers
-from sources.exceptions import RefNotFoundError
 from prometheus import metrics
 
 from doi import get_doi_ref as _get_doi_ref
@@ -17,6 +16,7 @@ from doi import get_doi_ref as _get_doi_ref
 from .search import BaseCitationSearchView
 from .query import get_indexed_ref
 from .query import build_citation_for_docid
+from .exceptions import RefNotFoundError
 
 
 # TODO: Make ``get_doi_ref`` logic part of ``get_by_docid``

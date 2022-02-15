@@ -19,7 +19,7 @@ from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
 from bib_models import serializers
-from sources.exceptions import RefNotFoundError
+from .exceptions import RefNotFoundError
 from doi import get_doi_ref
 
 from .models import RefData

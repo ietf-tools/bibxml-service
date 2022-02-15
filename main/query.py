@@ -23,10 +23,10 @@ from django.conf import settings
 from common.util import as_list
 from bib_models.models.bibdata import BibliographicItem, DocID
 from bib_models.merger import bibitem_merger
-from sources.exceptions import RefNotFoundError
-from sources.types import IndexedBibliographicItem
-from sources.types import CompositeSourcedBibliographicItem
 
+from .exceptions import RefNotFoundError
+from .types import IndexedBibliographicItem
+from .types import CompositeSourcedBibliographicItem
 from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
 
@@ -376,6 +376,7 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
                 if getattr(id, 'type', None) else None,
             ) for id in ids)
         ]
+        print ("Extra querie", jsonpath_queries)
         refs = search_refs_relaton_field(
             *jsonpath_queries,
             exact=True,
@@ -410,8 +411,8 @@ def build_citation_for_docid(
                         This is OK for some cases
                         (e.g., forgiving template rendering).
 
-    :rtype: sources.types.CompositeSourcedBibliographicItem
-    :raises sources.exceptions.RefNotFoundError: if no matching refs were found.
+    :rtype: main.types.CompositeSourcedBibliographicItem
+    :raises main.exceptions.RefNotFoundError: if no matching refs were found.
     """
 
     # Retrieve pre-indexed refs
@@ -433,6 +434,8 @@ def build_citation_for_docid(
             # Exclude originally given ID:
             and (docid['id'] != id or docid['type'] != id_type))
     ]
+
+    print("GOT EXTRA DOCIDS", docids)
 
     # Retrieve bibliographic items with intersecting identifiers
     additional_refs = query_suppressing_user_input_error(

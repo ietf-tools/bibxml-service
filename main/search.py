@@ -12,8 +12,7 @@ from django.core.cache import cache
 from django.http import Http404
 from django.contrib import messages
 
-from sources.types import CompositeSourcedBibliographicItem
-
+from .types import CompositeSourcedBibliographicItem
 from .models import RefData
 from .query import build_search_results
 from .query import search_refs_relaton_struct

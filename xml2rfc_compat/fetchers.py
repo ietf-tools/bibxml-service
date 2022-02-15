@@ -8,10 +8,10 @@ via :func:`.urls.get_urls()`.
 import re
 
 from bib_models.models.bibdata import BibliographicItem, DocID
-from sources.exceptions import RefNotFoundError
 from doi.crossref import get_bibitem as get_doi_bibitem
 from main.models import RefData
 from main.query import search_refs_relaton_field
+from main.exceptions import RefNotFoundError
 
 from .urls import register_fetcher
 

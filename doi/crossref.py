@@ -14,7 +14,7 @@ from bib_models import Title, Contributor, Organization
 from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import GenericStringValue, Link
 
-from sources.types import ExternalBibliographicItem, ExternalSourceMeta
+from main.types import ExternalBibliographicItem, ExternalSourceMeta
 
 
 etiquette = Etiquette(

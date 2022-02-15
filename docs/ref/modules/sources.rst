@@ -1,12 +1,11 @@
-================================================
-``sources``: Managing bibliographic data sources
-================================================
+============================================
+``sources``: Managing indexable data sources
+============================================
+
+.. automodule:: sources
 
 .. contents::
    :local:
-
-.. automodule:: sources
-   :members:
 
 ``indexable``: Indexable sources
 ================================
@@ -18,21 +17,6 @@
 
 .. autodata:: sources.indexable.registry
    :no-value:
-
-``types``: Bibliographic data sourcing types
-============================================
-
-.. automodule:: sources.types
-   :members:
-   :show-inheritance:
-   :exclude-members: __init__
-
-Exceptions
-==========
-
-.. automodule:: sources.exceptions
-   :members:
-   :show-inheritance:
 
 Managing indexing tasks
 =======================

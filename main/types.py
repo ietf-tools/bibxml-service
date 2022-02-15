@@ -113,7 +113,7 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     which were possibly obtained from different sources
     but have one or more identifiers in common.
 
-    .. seealso:: `bib_models.merger`
+    .. seealso:: :mod:`bib_models.merger`
     """
 
     sources: Mapping[str, SourcedBibliographicItem]

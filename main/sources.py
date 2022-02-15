@@ -25,8 +25,8 @@ from django.db import transaction
 from bib_models.models import dates
 from common.util import as_list
 from sources import indexable
-from sources.types import IndexedSourceMeta, IndexedObject
 
+from .types import IndexedSourceMeta, IndexedObject
 from .models import RefData
 
 

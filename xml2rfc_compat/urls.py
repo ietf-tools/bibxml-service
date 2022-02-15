@@ -16,7 +16,7 @@ from pydantic import ValidationError
 
 from prometheus import metrics
 from bib_models.models.bibdata import BibliographicItem
-from sources.exceptions import RefNotFoundError
+from main.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
 from .aliases import unalias, get_aliases

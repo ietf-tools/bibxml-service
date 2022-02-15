@@ -142,7 +142,7 @@ Glossary
       Fetcher function is passed the ``anchor`` argument as a string,
       for which it must return
       a :class:`~bib_models.models.bibdata.BibliographicItem` instance,
-      and is expected to raise either :class:`sources.exceptions.RefNotFoundError`
+      and is expected to raise either :class:`main.exceptions.RefNotFoundError`
       or :class:`pydantic.ValidationError`.
 
       .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`

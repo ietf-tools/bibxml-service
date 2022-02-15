@@ -9,9 +9,9 @@ from simplejson import JSONDecodeError
 from pydantic import ValidationError
 
 from bib_models import DocID
-from sources.exceptions import RefNotFoundError
-from sources.types import ExternalBibliographicItem
 from sources.types import CompositeSourcedBibliographicItem
+from main.exceptions import RefNotFoundError
+from main.types import ExternalBibliographicItem
 
 from .crossref import get_bibitem
 
