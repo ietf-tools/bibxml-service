@@ -142,6 +142,7 @@ def create_reference(item: BibliographicItem) -> Element:
             date_el.set('day', str(published_date.day))
         front.append(date_el)
 
+    # Abstract
     abstracts = as_list(item.abstract or [])
     if len(abstracts) > 0:
         front.append(E.abstract(*(
@@ -151,10 +152,12 @@ def create_reference(item: BibliographicItem) -> Element:
 
     ref = E.reference(front)
 
+    # Links
     links = as_list(item.link or [])
     if len(links) > 0:
         ref.set('target', links[0].content)
 
+    # Series
     docids: List[DocID] = as_list(item.docid or [])
     series: Set[Union[None, Tuple[str, str]]] = set()
     for docid in docids:
