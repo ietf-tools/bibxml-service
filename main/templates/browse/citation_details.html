@@ -123,7 +123,9 @@
           {% include "deflist/entry_list.html" with key="creators" tmpl="relaton/contributor.html" items=data.contributor|as_list wide=True inline=True %}
         {% endif %}
 
-        {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
+        {% if data.place %}
+          {% include "deflist/entry_list.html" with key="place(s)" items=data.place|default:"—"|as_list %}
+        {% endif %}
 
         {% if data.relation %}
           {% include "deflist/entry_list.html" with key="relations" items=data.relation|as_list tmpl="relaton/relation.html" %}
