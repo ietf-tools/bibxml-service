@@ -49,25 +49,29 @@ def misc(ref: str) -> BibliographicItem:
 
 @register_fetcher('bibxml3')
 def internet_drafts(ref: str) -> BibliographicItem:
-    # E.g., draft-abarth-cookie-07
-    option1 = (
-        '@.type == "Internet-Draft" && @.id == "%s"'
-        % ref.replace('I-D.', ''))
-    # E.g., draft-abarth-cookie
-    option2 = (
-        r'@.type == "Internet-Draft" && @.id like_regex "%s\-\d{2}"'
-        % ref.replace('I-D.', ''))
-    # E.g., I-D.abarth-cookie
-    option3 = (
-        '@.type == "IETF" && @.id == "%s"'
-        % ref)
+    ref_without_id_prefix = ref.replace('I-D.', '')
+
+    type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
+
+    # Variants with/without draft- and I-D. prefixes
+    id_prefix_variants = [
+        ref,
+        ref_without_id_prefix,
+        f'draft-{ref_without_id_prefix}',
+        f'I-D.draft-{ref_without_id_prefix}',
+    ]
+    id_query = ' || '.join([
+        # Variants with/without version
+        '@.id == "%s" || @.id like_regex "%s"' % (
+            re.escape(pattern),
+            re.escape(r'%s-\d{2}' % pattern),
+        )
+        for pattern in id_prefix_variants
+    ])
 
     results = sorted(
         search_refs_relaton_field({
-            'docid[*]': ' || '.join([
-                f'({opt})'
-                for opt in [option1, option2, option3]
-            ]),
+            'docid[*]': f'({type_query}) && ({id_query})',
         }, limit=10, exact=True),
         key=_sort_by_id_draft_number,
         reverse=True,
