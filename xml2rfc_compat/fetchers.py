@@ -63,7 +63,7 @@ def internet_drafts(ref: str) -> BibliographicItem:
     id_query = ' || '.join([
         # Variants with/without version
         '@.id == "%s" || @.id like_regex "%s"' % (
-            re.escape(pattern),
+            pattern,
             re.escape(r'%s-\d{2}' % pattern),
         )
         for pattern in id_prefix_variants
