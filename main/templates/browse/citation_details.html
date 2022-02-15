@@ -110,7 +110,9 @@
           {% include "deflist/entry_list.html" with key="abstract(s)" items=data.abstract|default:"—"|as_list tmpl="relaton/formatted_string.html" wide="1" htmlclass="md:row-span-2" multiline=1 %}
         {% endif %}
 
-        {% include "deflist/entry.html" with key="edition" val=data.edition|default:"—" %}
+        {% if data.edition.content %}
+          {% include "deflist/entry.html" with key="edition" val=data.edition.content|default:"—" %}
+        {% endif %}
 
         {% if data.date %}
           {% include "deflist/entry_list.html" with key="dates" tmpl="relaton/date.html" items=data.date|as_list %}
