@@ -49,24 +49,24 @@ def misc(ref: str) -> BibliographicItem:
 
 @register_fetcher('bibxml3')
 def internet_drafts(ref: str) -> BibliographicItem:
-    ref_without_id_prefix = ref.replace('I-D.', '')
-
     type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
 
+    ref_without_prefixes = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
+    bare_ref = remove_version(ref_without_prefixes)
+
     # Variants with/without draft- and I-D. prefixes
-    id_prefix_variants = [
-        ref,
-        ref_without_id_prefix,
-        f'draft-{ref_without_id_prefix}',
-        f'I-D.draft-{ref_without_id_prefix}',
+    versionless_prefix_variants = [
+        bare_ref,
+        f'draft-{bare_ref}',
+        f'I-D.draft-{bare_ref}',
     ]
     id_query = ' || '.join([
         # Variants with/without version
         '@.id == "%s" || @.id like_regex "%s"' % (
-            pattern,
-            re.escape(r'%s-\d{2}' % pattern),
+            versionless,
+            re.escape(r'%s-\d{2}' % versionless),
         )
-        for pattern in id_prefix_variants
+        for versionless in versionless_prefix_variants
     ])
 
     results = sorted(
