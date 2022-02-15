@@ -376,7 +376,6 @@ def search_refs_for_docids(*ids: Union[DocID, str]) \
                 if getattr(id, 'type', None) else None,
             ) for id in ids)
         ]
-        print ("Extra querie", jsonpath_queries)
         refs = search_refs_relaton_field(
             *jsonpath_queries,
             exact=True,
@@ -434,8 +433,6 @@ def build_citation_for_docid(
             # Exclude originally given ID:
             and (docid['id'] != id or docid['type'] != id_type))
     ]
-
-    print("GOT EXTRA DOCIDS", docids)
 
     # Retrieve bibliographic items with intersecting identifiers
     additional_refs = query_suppressing_user_input_error(
