@@ -101,11 +101,14 @@ def get_by_docid(request):
     outcome: str
 
     try:
-        bibitem = build_citation_for_docid(
+        composite_bibitem = build_citation_for_docid(
             docid.strip(),
             doctype.strip() if doctype else None)
 
-    except RefNotFoundError:
+        # This will be the latest sourced item.
+        bibitem = list(composite_bibitem.sources.values())[0].bibitem
+
+    except (RefNotFoundError, AttributeError, IndexError):
         outcome = 'not_found'
         resp = JsonResponse({
             "error":
