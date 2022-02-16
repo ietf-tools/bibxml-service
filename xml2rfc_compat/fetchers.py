@@ -5,6 +5,7 @@ Plug registered fetchers into root URL configuration
 via :func:`.urls.get_urls()`.
 """
 
+import logging
 from typing import cast, Union
 import re
 
@@ -18,6 +19,9 @@ from main.query import search_refs_relaton_field
 from main.exceptions import RefNotFoundError
 
 from .urls import register_fetcher
+
+
+log = logging.getLogger(__name__)
 
 
 @register_fetcher('bibxml')
@@ -100,14 +104,20 @@ def internet_drafts(ref: str) -> BibliographicItem:
         bibitem = None
         version = None
 
-    latest_draft = get_internet_draft(
-        f'draft-{bare_ref}',
-        strict=bibitem is None,
-    ).bibitem
+    try:
+        latest_draft = get_internet_draft(
+            f'draft-{bare_ref}',
+            strict=bibitem is None,
+        ).bibitem
+    except:
+        log.exception(
+            "Failed to fetch latest draft from Datatracker "
+            "when resolving xml2rfc bibxml3 path")
+    else:
+        if not version or version != latest_draft.edition.content:
+            return latest_draft
 
-    if not version or version != latest_draft.edition.content:
-        return latest_draft
-    elif bibitem:
+    if bibitem:
         return bibitem
     else:
         raise RefNotFoundError()
