@@ -32,6 +32,14 @@ to BibXML service maintainers, developers and operators.
    evolution
    rfp-requirements
 
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 Code layout
 ===========
 
@@ -163,11 +171,3 @@ Code layout
        ├── query_profiler.py
        ├── git.py
        └── util.py
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
