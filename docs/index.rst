@@ -39,12 +39,16 @@ Code layout
 
    ├── README.rst
    │
+   │
+   │   Client-side code:
+   │
    ├── static/
-   │   │   Client-side CSS and JS.
    │   ├── css
    │   └── js
    │
+   │
    │   Post-processing client-side code:
+   │
    ├── package.json
    ├── package-lock.json
    ├── babel.config.json
@@ -52,6 +56,9 @@ Code layout
    ├── tailwind.config.js
    ├── build/
    │       Directory where build artifacts end up.
+   │
+   │
+   │   Documentation:
    │
    ├── docs/
    │   ├── conf.py
@@ -66,13 +73,14 @@ Code layout
    │   ├── _static
    │   └── ...
    │
-   ├── mypy.ini
-   │       mypy linting/type-checking configuration.
    │
    │   Operations-related:
+   │
    ├── docker-compose.yml
    ├── docker-compose.dev.yml
+   ├── docker-compose.monitor.yml
    ├── Dockerfile
+   ├── test.Dockerfile
    ├── wait-for-migrations.sh
    ├── ops/
    │   │
@@ -88,8 +96,14 @@ Code layout
    │   │       Prometheus configuration template.
    │   └── prometheus.Dockerfile
    │
+   │
+   │   Python project:
+   │
    ├── requirements.txt
    │       Python requirements.
+   │
+   ├── mypy.ini
+   │       mypy linting/type-checking configuration.
    │
    ├── manage.py
    │       Django project entry point.
@@ -112,13 +126,14 @@ Code layout
    │       Bibliographic item dataclasses/Pydantic models.
    │
    ├── sources/
-   │       Bibliographic data sources
+   │       Indexable sources. Async tasks, registry, etc.
    │
    ├── main/
    │   │   Retrieval GUI and API views and associated utilities.
    │   │
    │   ├── templates/
    │   │       Templates for browsing GUI.
+   │   │
    │   └── models.py
    │           Django model definitions for indexed bibliographic data.
    │
@@ -130,18 +145,18 @@ Code layout
    │  ...
    │
    ├── datatracker/
-   │       Datatracker integration: token validation, OAuth2.
+   │       Datatracker integration.
+   │
+   ├── doi/
+   │   │   DOI retrieval, Crossref integration.
+   │   │
+   │   └── crossref.py
    │
    ├── prometheus/
    │       Prometheus metrics & export view.
    │
-   ├── doi/
-   │   │   DOI retrieval implementation.
-   │   │
-   │   └── crossref.py
-   │
    └── xml2rfc_compat/
-   │       xml2rfc tools style API support.
+   │       xml2rfc tools API and format support.
    │
    └── common/
        ├── pydantic.py
