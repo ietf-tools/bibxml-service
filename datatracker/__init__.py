@@ -1,6 +1,4 @@
 """Datatracker API integration.
-
-.. seealso:: :rfp:req:`15`
 """
 
 

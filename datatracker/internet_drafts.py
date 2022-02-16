@@ -1,5 +1,8 @@
-"""Responsible for retrieving Internet Drafts
-from Datatracker.
+"""Retrieving Internet Drafts from Datatracker.
+
+Registers :func:`.get_internet_draft()`
+as an :term:`external source` of bibliographic data
+for “Internet-Draft” document identifier type.
 """
 
 import ast
@@ -20,9 +23,9 @@ from .request import get, BASE_DOMAIN
 
 
 __all__ = (
-    'version_re',
-    'remove_version',
     'get_internet_draft',
+    'remove_version',
+    'version_re',
 )
 
 
@@ -45,7 +48,15 @@ def remove_version(id: str) -> str:
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
 def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographicItem:
-    """Retrieves an Internet Draft from Datatracker."""
+    """Retrieves an Internet Draft from Datatracker in Relaton format.
+
+    Makes necessary requests to Datatracker API
+    and converts .
+
+    :param str docid:
+    :param bool strict: see :ref:`strict-validation`
+    :rtype: main.types.ExternalBibliographicItem
+    """
 
     versionless = remove_version(docid)
 

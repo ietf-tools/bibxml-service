@@ -24,6 +24,10 @@ __all__ = (
     'initiate',
     'handle_callback',
     'log_out',
+    'clear_session',
+    'get_provider',
+    'ProviderInfo',
+    'DEFAULT_PROVIDER',
 )
 
 
@@ -144,7 +148,8 @@ def _get_redirect_uri() -> str:
 
 
 def initiate(request):
-    """Redirects the user to Datatracker for login and approval.
+    """A Django view that redirects the user to Datatracker
+    for login and approval.
 
     If :data:`~datatracker.oauth.CLIENT_ID`
     or :data:`~datatracker.oauth.CLIENT_SECRET` are missing,
@@ -186,7 +191,7 @@ def initiate(request):
 
 def handle_callback(request):
     """
-    Handles OAuth2 redirect from Datatracker’s side.
+    A Django view that handles OAuth2 redirect from Datatracker’s side.
 
     Queues an error-level message if:
 
@@ -304,10 +309,11 @@ class ProviderInfo(BaseModel, extra=Extra.ignore):
     token_endpoint_auth_methods_supported: List[str]
 
 
-def get_provider():
+def get_provider() -> ProviderInfo:
     """Tries to obtain up-to-date OAuth2 provider info
     from Datatracker’s .well-known file,
-    falls back to :data:`.DEFAULT_PROVIDER` if failed."""
+    falls back to :data:`.DEFAULT_PROVIDER` if failed.
+    """
 
     try:
         data = request.get(
