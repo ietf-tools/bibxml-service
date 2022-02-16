@@ -19,7 +19,6 @@ from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
 from bib_models import serializers
-from .exceptions import RefNotFoundError
 from doi import get_doi_ref
 
 from .models import RefData
@@ -27,6 +26,7 @@ from .query import get_indexed_ref, list_refs
 from .query import build_citation_for_docid
 from .search import BaseCitationSearchView
 from .search import QUERY_FORMAT_LABELS
+from .exceptions import RefNotFoundError
 from . import external_sources
 
 
