@@ -5,8 +5,9 @@ as an :term:`external source` of bibliographic data
 for “Internet-Draft” document identifier type.
 """
 
-import ast
+import logging
 from typing import Dict, Any, List
+import ast
 import datetime
 import re
 import json
@@ -27,6 +28,9 @@ __all__ = (
     'remove_version',
     'version_re',
 )
+
+
+log = logging.getLogger(__name__)
 
 
 version_re = re.compile(r'^(?P<versionless>[-\w]+?)(\-(?P<version>\d{2}))?$')
@@ -103,45 +107,51 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
 
     # Some data (e.g., authors and dates) is only available
     # via separate submission endpoint
-    latest_submission_url = data['submissions'][-1]
     try:
-        latest_submission_data = get(latest_submission_url).json()
-    except requests.exceptions.ConnectionError:
-        pass
+        latest_submission_url = data['submissions'][-1]
+    except IndexError:
+        log.warning(
+            "Unable to retrieve complete Internet Draft metadata: "
+            "no submissions available")
     else:
-        if 'document_date' in latest_submission_data:
-            bibitem_data['date'] = [{
-                'type': 'created',
-                'value': latest_submission_data['document_date'],
-            }, {
-                'type': 'submitted',
-                'value': latest_submission_data['submission_date'],
-            }]
+        try:
+            latest_submission_data = get(latest_submission_url).json()
+        except requests.exceptions.ConnectionError:
+            pass
+        else:
+            if 'document_date' in latest_submission_data:
+                bibitem_data['date'] = [{
+                    'type': 'created',
+                    'value': latest_submission_data['document_date'],
+                }, {
+                    'type': 'submitted',
+                    'value': latest_submission_data['submission_date'],
+                }]
 
-        if 'authors' in latest_submission_data:
-            authors: List[Any]
-            if isinstance(latest_submission_data['authors'], list):
-                authors = latest_submission_data['authors']
-            elif isinstance(latest_submission_data['authors'], str):
-                try:
-                    authors = json.loads(latest_submission_data['authors'])
-                except json.JSONDecodeError:
+            if 'authors' in latest_submission_data:
+                authors: List[Any]
+                if isinstance(latest_submission_data['authors'], list):
+                    authors = latest_submission_data['authors']
+                elif isinstance(latest_submission_data['authors'], str):
                     try:
-                        authors = ast.literal_eval(latest_submission_data['authors'])
-                    except:
-                        authors = []
-            else:
-                authors = []
-            if authors:
-                bibitem_data['contributor'] += [
-                    {
-                        'role': ['author'],
-                        'person': {'name': {'completename':
-                            {'content': a['name']}
-                        }},
-                    }
-                    for a in authors
-                ]
+                        authors = json.loads(latest_submission_data['authors'])
+                    except json.JSONDecodeError:
+                        try:
+                            authors = ast.literal_eval(latest_submission_data['authors'])
+                        except:
+                            authors = []
+                else:
+                    authors = []
+                if authors:
+                    bibitem_data['contributor'] += [
+                        {
+                            'role': ['author'],
+                            'person': {'name': {'completename':
+                                {'content': a['name']}
+                            }},
+                        }
+                        for a in authors
+                    ]
 
     errors: List[str] = []
     if strict:
