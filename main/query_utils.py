@@ -36,7 +36,14 @@ def merge_refs(
     strict: bool = True,
 ) -> CompositeSourcedBibliographicItem:
     """
-    Merges retrieved refs into a composite item.
+    Construct a composite bibliographic item from retrieved refs.
+
+    :param django.db.models.query.QuerySet[RefData] refs:
+       References to use.
+
+       .. note::
+
+          Should be ordered by date, latest document first.
 
     :param primary_id:
         :attr:`main.types.CompositeSourcedBibliographicItem.primary_docid`

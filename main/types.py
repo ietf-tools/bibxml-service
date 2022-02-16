@@ -117,11 +117,14 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     """
 
     sources: Mapping[str, SourcedBibliographicItem]
-    """Retrieved items by source.
+    """Retrieved documents, keyed by source.
 
     Keys should contain source ID and ref (e.g., ref@source-id),
     since there can be multiple refs per source
     and refs can be non-unique across different sources.
+
+    Additionally, documents are supposed to be added in order
+    “the latest document to the oldest”.
     """
 
     primary_docid: Optional[str] = None
