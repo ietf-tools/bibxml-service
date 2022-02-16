@@ -112,9 +112,13 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
 class CompositeSourcedBibliographicItem(BibliographicItem):
     """An item obtained by merging bibliographic items
     which were possibly obtained from different sources
-    but have the same primary document identifier.
+    but describe the same document
+    (ideally, this is inferred by shared primary identifier).
 
-    .. seealso:: :mod:`bib_models.merger`
+    .. seealso::
+
+       - :mod:`bib_models.merger`
+       - :func:`main.query_utils.merge_refs`
     """
 
     sources: Mapping[str, SourcedBibliographicItem]
