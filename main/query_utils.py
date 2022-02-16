@@ -48,12 +48,7 @@ def merge_refs(
     :param primary_id:
         :attr:`main.types.CompositeSourcedBibliographicItem.primary_docid`
 
-    :param bool strict:
-        Throw if an item failed Pydantic validation.
-        Is True by default. Can be set to False
-        if it’s acceptable for data structure to be fuzzy
-        (e.g., when it’s to be displayed and not
-        to be manipulated programmatically).
+    :param bool strict: see :ref:`strict-validation`
 
     :rtype: main.types.CompositeSourcedBibliographicItem
     """

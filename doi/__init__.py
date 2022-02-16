@@ -30,8 +30,7 @@ def get_doi_ref(
     """
     Obtains an item by DOI.
 
-    :param bool strict: same meaning
-                        as in :func:`main.query.build_citation_for_docid()`.
+    :param bool strict: see :ref:`strict-validation`.
     :rtype: main.types.ExternalBibliographicItem
     :raises main.exceptions.RefNotFoundError: reference not found
     """

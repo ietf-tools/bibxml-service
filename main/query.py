@@ -403,13 +403,7 @@ def build_citation_for_docid(
 
     :param str id: :term:`docid.id`
     :param str id_type: Optional :term:`document identifier type`
-    :param bool strict: by default is True, and item that fails validation
-                        will result in pydantic’s ``ValidationError`` raised.
-                        If set to False, item will be constructed anyway,
-                        but may contain unexpected data structure—this
-                        is intended for cases like forgiving template rendering,
-                        and not recommended if returned item is programmatically
-                        consumed.
+    :param bool strict: see :ref:`strict-validation`
 
     :rtype: main.types.CompositeSourcedBibliographicItem
     :raises main.exceptions.RefNotFoundError: if no matching refs were found.

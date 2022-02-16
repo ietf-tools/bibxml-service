@@ -7,5 +7,6 @@ Topic guides
 
    auth
    relaton-format
+   validation
    sourcing
    xml2rfc-compat
