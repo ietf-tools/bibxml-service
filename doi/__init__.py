@@ -28,7 +28,7 @@ def get_doi_ref(
     strict: bool = True,
 ) -> ExternalBibliographicItem:
     """
-    Obtains an item by DOI.
+    Obtains an item by DOI using Crossref.
 
     :param bool strict: see :ref:`strict-validation`.
     :rtype: main.types.ExternalBibliographicItem

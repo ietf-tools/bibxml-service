@@ -24,18 +24,9 @@ etiquette = Etiquette(
     settings.HOSTNAME,
     settings.ADMINS[0][1],
 )
+"""Etiquette info to be used when making Crossref API requests."""
+
 works = Works(etiquette=etiquette)
-
-
-ISBN_TMPL = '{0}{1}{2}-{3}-{4}{5}{6}{7}-{8}{9}{10}{11}-{12}'
-ALT_TITLES = [
-    'subtitle',
-    'original-title',
-    'short-title',
-    'container-title',
-    'short-container-title',
-    'group-title',
-]
 
 
 def get_bibitem(docid: DocID, strict: bool = True) \
@@ -43,7 +34,9 @@ def get_bibitem(docid: DocID, strict: bool = True) \
     """Retrieves DOI information from Crossref and deserializes it
     into a :class:`main.types.ExternalBibliographicItem` instance.
 
-    :returns None: if no match was returned from Crossref.
+    :param str docid: DOI identifier
+    :param bool strict: see :ref:`strict-validation`
+    :returns None: if no match was returned by Crossref
     :rtype: None or main.types.ExternalBibliographicItem
     :raises ValueError: wrong docid.type (not DOI)
     :raises main.exceptions.RefNotFoundError: no matching item returned
@@ -155,6 +148,13 @@ def get_bibitem(docid: DocID, strict: bool = True) \
 
 def to_contributor(role: str, crossref_author: Dict[str, Any]) \
         -> Contributor:
+    """Constructs a contributor from the author object
+    returned by Crossref.
+
+    :param str role: contributor’s role
+    :param dict crossref_author: structure from Crossref response
+    :rtype: bib_models.models.bibdata.Contributor
+    """
     return Contributor(
         role=[role],
         person=Person(
@@ -180,3 +180,17 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
             ),
         ),
     )
+
+
+ISBN_TMPL = '{0}{1}{2}-{3}-{4}{5}{6}{7}-{8}{9}{10}{11}-{12}'
+"""Crossref returns ISBNs without dashes.
+This format string conforms it to Relaton, which uses dashes."""
+
+ALT_TITLES = [
+    'subtitle',
+    'original-title',
+    'short-title',
+    'container-title',
+    'short-container-title',
+    'group-title',
+]
