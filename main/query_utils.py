@@ -19,7 +19,7 @@ from .types import IndexedBibliographicItem
 
 
 __all__ = (
-    'merge_refs_by_primary_id',
+    'merge_refs',
     'get_primary_docid',
     'get_docid_struct_for_search',
     'query_suppressing_user_input_error',
