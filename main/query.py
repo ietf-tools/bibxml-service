@@ -476,7 +476,7 @@ def build_search_results(
                 refs_by_primary_id.setdefault(primary_id.id, [])
                 refs_by_primary_id[primary_id.id].append(idx)
             else:
-                refs_by_primary_id[suitable_ids[0]['id']]
+                refs_by_primary_id[suitable_ids[0]['id']] = [idx]
 
     processed_docids = set[DocIDTuple]()
 
