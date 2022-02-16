@@ -258,17 +258,17 @@ class IndexedDatasetCitationListView(ListView):
     template_name = 'browse/dataset.html'
 
     def get_queryset(self) -> QuerySet[RefData]:
-        items = list_refs(self.kwargs['dataset_id'])
-        for item in items:
-            try:
-                item.bibitem = BibliographicItem(**item.body)
-            except ValidationError:
-                pass
-        return items
+        return list_refs(self.kwargs['dataset_id'])
 
     def get_context_data(self, **kwargs):
-        return dict(
+        ctx = dict(
             **super().get_context_data(**kwargs),
             dataset_id=self.kwargs['dataset_id'],
             **shared_context,
         )
+        for item in ctx['object_list']:
+            try:
+                item.bibitem = BibliographicItem(**item.body)
+            except ValidationError:
+                pass
+        return ctx
