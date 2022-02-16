@@ -38,7 +38,8 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
 
 **celery**
     Workers that process long-running asynchronous tasks,
-    like citation dataset indexing, using image built by web-precheck.
+    like :term:`indexable source` indexing, using image
+    built by web-precheck.
 
     Celery also spins up a thread
     with Prometheus server exporting metrics on port 9080.

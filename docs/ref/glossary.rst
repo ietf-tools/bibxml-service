@@ -13,7 +13,7 @@ Glossary
 
    citation
        In BibXML service codebase and documentation,
-       sometimes mistakenly used as a synonym for :term:`bibliographic item`.
+       sometimes not quite correctly used as a synonym for :term:`bibliographic item`.
 
    docid
    document identifier
