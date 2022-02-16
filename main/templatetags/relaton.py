@@ -39,24 +39,32 @@ def bibitem_link(value: Any):
     id: Optional[str]
     type: Optional[str]
 
-    if hasattr(value, 'docid'):
-        try:
-            docid = as_list(value.docid or [])[0]
-            id, type = docid.id, docid.type
-        except (ValueError, IndexError):
-            id, type = None, None
-    elif isinstance(value, dict):
-        try:
-            docid = as_list(value.get('docid', []))[0]
-            id, type = docid['id'], docid['type']
-        except (IndexError, KeyError):
-            id, type = None, None
+    try:
+        docid = as_list(getattr(
+            value,
+            'docid',
+            None,
+        ) or value.get('docid', []))[0]
+    except IndexError:
+        id, type = None, None
+    else:
+        if hasattr(docid, 'id'):
+            id, type = docid.id, (docid.type or None)
+        elif isinstance(docid, dict):
+            try:
+                id, type = docid['id'], docid['type']
+            except KeyError:
+                id, type = None, None
 
-    if id and type:
-        return (
+    if id:
+        id_query = (
             f'{get_by_docid_base}'
-            f'?docid={quote_plus(id)}'
-            f'&doctype={quote_plus(type)}')
+            f'?docid={quote_plus(id)}')
+        if type:
+            return (
+                f'{id_query}&doctype={quote_plus(type)}')
+        else:
+            return id_query
 
     elif isinstance(value, dict):
         return (
