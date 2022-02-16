@@ -1,0 +1,3 @@
+{% load relaton %}
+{# Accepts bibitem, query, query_format, page (Paginator page object) #}
+{{ bibitem|bibitem_link }}{% if query %}&query={{ query|urlencode:"" }}{% if query_format %}&query_format={{ query_format }}{% endif %}{% if page %}&page={{ page.number }}{% endif %}{% endif %}

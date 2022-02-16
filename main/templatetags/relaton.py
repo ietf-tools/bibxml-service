@@ -1,4 +1,4 @@
-from typing import Any, Set, Tuple, Callable, List
+from typing import Any, Set, Tuple, Callable, List, Optional
 from urllib.parse import quote_plus
 import json
 
@@ -9,6 +9,7 @@ from common.util import as_list as base_as_list
 
 
 citation_search_base = reverse('search_citations')
+get_by_docid_base = reverse('get_citation_by_docid')
 
 
 register = template.Library()
@@ -22,6 +23,53 @@ def as_list(value):
     result: Any = base_as_list(value)
 
     return [val for val in result if val is not None and val != '']
+
+
+@register.filter
+def bibitem_link(value: Any):
+    """The value can either be a BibliographicItem
+    or its dictionary representation.
+    This is necessary because source data may not pass
+    Pydantic validation.
+
+    If neither is the case, the filter will fall back to search URL
+    using given item as query to avoid breaking GUI due to template error.
+    """
+
+    id: Optional[str]
+    type: Optional[str]
+
+    if hasattr(value, 'docid'):
+        try:
+            docid = as_list(value.docid or [])[0]
+            id, type = docid.id, docid.type
+        except (ValueError, IndexError):
+            id, type = None, None
+    elif isinstance(value, dict):
+        try:
+            docid = as_list(value.get('docid', []))[0]
+            id, type = docid['id'], docid['type']
+        except (IndexError, KeyError):
+            id, type = None, None
+
+    if id and type:
+        return (
+            f'{get_by_docid_base}'
+            f'?docid={quote_plus(id)}'
+            f'&doctype={quote_plus(type)}')
+
+    elif isinstance(value, dict):
+        return (
+            f'{citation_search_base}'
+            f'?query={quote_plus(json.dumps(value))}'
+            f'&query_format=json_struct')
+
+    else:
+        return (
+            f'{citation_search_base}'
+            f'?query={quote_plus(str(value))}'
+            f'&query_format=websearch')
+
 
 
 @register.filter

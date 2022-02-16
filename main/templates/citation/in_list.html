@@ -5,7 +5,9 @@
 <article class="{% include "_list_item_classes.html" %} bibitem-in-list">
   <div class="{% include "_list_item_inner_classes.html" %}">
     <p class="px-4 mb-1 bibitem-title font-serif tracking-tight leading-tight">
-      {% include "relaton/smart_title.html" with bibitem=data %}
+      <a class="link no-underline" href="{% include "citation/srp_link_href.html" with bibitem=data query=request.GET.query query_format=query_format page=page_obj %}">
+        {% include "relaton/smart_title.html" with bibitem=data %}
+      </a>
     </p>
 
     <div class="
@@ -16,7 +18,7 @@
       {% endif %}
       leading-tight text-sm
     ">
-      {% include "relaton/doc_ids.html" with ids=data.docid|as_list ref=ref query=query tabindex="0" as_links=1 %}
+      {% include "relaton/doc_ids.html" with ids=data.docid|as_list query=query tabindex="0" %}
     </div>
 
     {% if data.headline %}

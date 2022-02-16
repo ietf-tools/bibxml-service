@@ -51,8 +51,8 @@
       </div>
     </form>
   {% else %}
-    {% for citation in object_list %}
-      {% include "citation/in_list.html" with data=citation.body dataset_id=dataset_id ref=citation.ref %}
+    {% for ref in object_list %}
+      {% include "citation/in_list.html" with data=ref.bibitem|default:ref.body dataset_id=dataset_id %}
     {% endfor %}
   {% endif %}
 {% endblock %}

@@ -15,10 +15,12 @@ from django.views.generic.list import ListView
 from django.views.generic.list import MultipleObjectTemplateResponseMixin
 from django.contrib import messages
 
+from pydantic import ValidationError
+
 from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
-from bib_models import serializers
+from bib_models import serializers, BibliographicItem
 from doi import get_doi_ref
 
 from .models import RefData
@@ -256,7 +258,13 @@ class IndexedDatasetCitationListView(ListView):
     template_name = 'browse/dataset.html'
 
     def get_queryset(self) -> QuerySet[RefData]:
-        return list_refs(self.kwargs['dataset_id'])
+        items = list_refs(self.kwargs['dataset_id'])
+        for item in items:
+            try:
+                item.bibitem = BibliographicItem(**item.body)
+            except ValidationError:
+                pass
+        return items
 
     def get_context_data(self, **kwargs):
         return dict(
