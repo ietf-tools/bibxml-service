@@ -2,6 +2,7 @@ from typing import List, Dict, Callable
 from pathlib import Path
 import re
 from os import environ, path
+import socket
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,18 +38,30 @@ HOSTNAME = environ.get("PRIMARY_HOSTNAME")
 """Primary hostname the service is publicly deployed under."""
 
 
+# Networking/infrastructure
+# =========================
 
+detected_hostname, _, detected_ipv4_ips = socket.gethostbyname_ex(
+    socket.gethostname())
 
 if DEBUG:
-    import socket
-    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-    INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
+    # Set internal IPs in Docker environment, per Django debug toolbar docs:
+    INTERNAL_IPS = [
+        ip[:-1] + '1'
+        for ip in detected_ipv4_ips
+    ] + ['127.0.0.1', '10.0.2.2']
 
 INTERNAL_HOSTNAMES = [
     h.strip()
     for h in environ.get("INTERNAL_HOSTNAMES", "").split(',')
     if h.strip() != ''
 ]
+
+if environ.get("RESPOND_TO_DETECTED_INTERNAL_HOSTNAME", 0) == 1:
+    INTERNAL_HOSTNAMES.append(detected_hostname)
+
+if environ.get("RESPOND_TO_DETECTED_INTERNAL_IPS", 0) == 1:
+    INTERNAL_HOSTNAMES.extend(detected_ipv4_ips)
 
 ALLOWED_HOSTS = [
     HOSTNAME,

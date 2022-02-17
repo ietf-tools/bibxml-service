@@ -89,6 +89,20 @@ Web server
     Docker Compose will make Web GUI available
     on the host OS under this port number.
 
+``RESPOND_TO_DETECTED_INTERNAL_HOSTNAME``
+    accepted by Django
+
+    If set to 1, Django will machine’s hostname detected at runtime
+    to the list of ``INTERNAL_HOSTNAMES``.
+
+``RESPOND_TO_DETECTED_INTERNAL_IPS``
+    accepted by Django
+
+    If set to 1, Django will machine’s IPs detected at runtime
+    to the list of ``INTERNAL_HOSTNAMES``.
+
+    .. note:: This only supports IPv4 at this time.
+
 
 Main database
 -------------
