@@ -37,16 +37,7 @@ HOSTNAME = environ.get("PRIMARY_HOSTNAME")
 """Primary hostname the service is publicly deployed under."""
 
 
-# Basic Django settings
-# =====================
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = environ.get("DJANGO_SECRET")
-
-ADMINS = [(
-    "%s operations" % environ.get("SERVICE_NAME"),
-    environ.get("CONTACT_EMAIL"),
-)]
 
 if DEBUG:
     import socket
@@ -63,6 +54,18 @@ ALLOWED_HOSTS = [
     HOSTNAME,
     *INTERNAL_HOSTNAMES,
 ]
+
+
+# Basic Django settings
+# =====================
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = environ.get("DJANGO_SECRET")
+
+ADMINS = [(
+    "%s operations" % environ.get("SERVICE_NAME"),
+    environ.get("CONTACT_EMAIL"),
+)]
 
 
 if environ.get("SENTRY_DSN", None):
