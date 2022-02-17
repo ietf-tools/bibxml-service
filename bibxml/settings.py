@@ -2,7 +2,6 @@ from typing import List, Dict, Callable
 from pathlib import Path
 import re
 from os import environ, path
-from socket import gethostname, gethostbyname, gethostbyname_ex
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,12 +59,8 @@ INTERNAL_HOSTNAMES = [
     if h.strip() != ''
 ]
 
-# Detect IP during health check of ALB
-detected_hosts = [ gethostname(), ] + gethostbyname_ex(gethostname())[-1]
-
 ALLOWED_HOSTS = [
     HOSTNAME,
-    detected_hosts,
     *INTERNAL_HOSTNAMES,
 ]
 
