@@ -184,6 +184,10 @@ Security
     If set to 1, Django’s built-in ``runserver`` is used
     to serve the GUI, and error pages are verbose.
 
+    It will also try to auto-detect IPs and hostnames and add them
+    to ``INTERNAL_IP`` for Django debug toolbar to work
+    in Docker environment.
+
     .. important:: Don’t set in production.
 
 
