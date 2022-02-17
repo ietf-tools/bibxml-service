@@ -131,14 +131,24 @@ Indexing
     See :data:`bibxml.settings.DATASET_TMP_ROOT`.
 
 
-Redis
------
+Celery & Redis
+--------------
 
 ``REDIS_HOST``
     **required by Django**, provided by Compose
 
 ``REDIS_PORT``
     **required by Django**, provided by Compose
+
+``CELERY_BROKER_URL``
+    **required by Django**, provided by Compose
+
+    Point this to Redis host & port.
+
+``CELERY_RESULT_BACKEND``
+    **required by Django**, provided by Compose
+
+    Point this to Redis host & port.
 
 
 Security
