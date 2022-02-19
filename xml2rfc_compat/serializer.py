@@ -23,7 +23,7 @@ from common.util import as_list
 E = objectify.E
 
 
-AUTHOR_ROLES = set(('author', 'editor'))
+AUTHOR_ROLES = set(('author', 'editor', 'publisher'))
 
 
 __all__ = (
