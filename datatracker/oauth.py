@@ -33,9 +33,29 @@ __all__ = (
 
 log = logging.getLogger(__name__)
 
+# Session keys.
+
 OAUTH_STATE_KEY = 'oauth_state'
+"""
+Session key under which
+the opaque state string used by OAuth implementation
+is stored.
+"""
+
 OAUTH_TOKEN_KEY = 'oauth_token'
+"""
+Session key under which
+the OAuth access token that can be used to make authenticated requests
+is stored.
+"""
+
 OAUTH_USER_INFO_KEY = 'oauth_user_info'
+"""
+Session key under which
+a dictionary with user data (username, etc.) obtained from OAuth2 provider
+is stored.
+"""
+
 
 CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None) or None
 """Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
