@@ -56,6 +56,31 @@ a dictionary with user data (username, etc.) obtained from OAuth2 provider
 is stored.
 """
 
+OAUTH_INITIATED_FROM_URL_KEY = 'oauth_initiated_from_url'
+"""
+Session key under which
+the information on where the user was before they initiated OAuth flow
+(to avoid the user losing their place after the redirect)
+is stored.
+
+.. note::
+
+   Currently, contains a domain-relative path.
+   This can theoretically cause a 404 if at the time of redirect
+   URL configuration is no longer configured to handle
+   the path stored in the session for some reason.
+"""
+
+get_default_post_oauth_redirect_url = lambda: reverse('browse')
+"""
+Where to redirect the user after:
+
+- successful OAuth attempt,
+  if nothing is available via :data:`~.OAUTH_INITIATED_FROM_URL_KEY`
+  in session, or
+- failed OAuth initiation,
+  if “referer” is not available in request meta.
+"""
 
 CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None) or None
 """Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
@@ -123,6 +148,7 @@ def clear_session(request):
         OAUTH_TOKEN_KEY,
         OAUTH_STATE_KEY,
         OAUTH_USER_INFO_KEY,
+        OAUTH_INITIATED_FROM_URL_KEY,
     ]
     for key in keys:
         try:
@@ -132,10 +158,14 @@ def clear_session(request):
 
 
 def log_out(request):
-    """Clears OAuth session and redirects to referer or landing."""
+    """Clears OAuth session and redirects to referer
+    or :func:`~.get_default_post_oauth_redirect_url()`.
+    """
 
     clear_session(request)
-    return redirect(request.headers.get('referer', '/'))
+    return redirect(
+        request.headers.get('referer', get_default_post_oauth_redirect_url())
+    )
 
 
 # Flow views
@@ -175,8 +205,15 @@ def initiate(request):
     or :data:`~datatracker.oauth.CLIENT_SECRET` are missing,
     or if obtained redirect URI does not match configuration,
     queues an error-level message and redirects the user back
-    to where they came from or landing page.
+    to where they came from or default post-OAuth redirect URL.
     """
+
+    redirect_to = request.headers.get(
+        'referer',
+        get_default_post_oauth_redirect_url())
+    # In case of error, user will be redirected here immediately.
+    # Otherwise, will be stored in session to internally redirect the user
+    # after OAuth callback.
 
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
@@ -186,7 +223,7 @@ def initiate(request):
             request,
             "Couldn’t authenticate with Datatracker: "
             "integration is not configured")
-        return redirect(request.headers.get('referer', '/'))
+        return redirect(redirect_to)
 
     provider = get_provider()
     try:
@@ -197,8 +234,9 @@ def initiate(request):
             "Couldn’t authenticate with Datatracker: "
             "misconfigured redirect URI "
             f"({err})")
-        return redirect(request.headers.get('referer', '/'))
+        return redirect(redirect_to)
     else:
+        request.session[OAUTH_INITIATED_FROM_URL_KEY] = redirect_to
         session = OAuth2Session(
             CLIENT_ID,
             scope=['openid'],
@@ -224,9 +262,9 @@ def handle_callback(request):
     In any case, it redirects the user to HTTP Referer or landing page.
     """
 
-    redirect_to = request.headers.get('referer', '/')
-    # TODO: Find a way to capture original pre-auth URL using Datatracker
-    # and get it here. Referer will be empty, so the user will lose their place.
+    redirect_to = request.session.pop(
+        OAUTH_INITIATED_FROM_URL_KEY,
+        get_default_post_oauth_redirect_url())
 
     if not CLIENT_ID or not CLIENT_SECRET:
         log.warning(
@@ -256,7 +294,7 @@ def handle_callback(request):
             "Couldn’t authenticate with Datatracker: "
             "misconfigured redirect URI "
             f"({err})")
-        return redirect('/')
+        return redirect(redirect_to)
 
     provider = get_provider()
 
