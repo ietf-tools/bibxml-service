@@ -14,6 +14,11 @@
         href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
       >relaton</a>
   {% else %}
-    —
+    Please
+    <a
+      class="link"
+      href="{% url "datatracker_oauth_initiate" %}"
+      title="Logging in will allow exporting bibliographic data in {% for format in available_serialization_formats %}{{ format }}, {% endfor %}relaton."
+    >log in via Datatracker</a>
   {% endif %}
 {% endwith %}
