@@ -1,4 +1,4 @@
-{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only #}
+{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only, tooltip #}
 
 <div class="
   deflist-entry
@@ -9,7 +9,7 @@
   <dt class="{% if key_sr_only %}sr-only{% endif %}">
     {{ key }}{% if idx %}&nbsp;({{ idx }}){% endif %}:
   </dt>
-  <dd class="" title="{% if key_sr_only %}{{ key }}{% endif %} {% if not tmpl %}{{ val }}{% endif %}">
+  <dd class="" title="{% if tooltip %}{{ tooltip }}{% else %}{% if key_sr_only %}{{ key }} {% endif %}{% if not tmpl %}{{ val }} {% endif %}{% endif %}">
     <span class="val">
       {% if tmpl %}
         {% include tmpl with val=val %}
