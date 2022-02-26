@@ -1,5 +1,9 @@
 {% for docid in ids %}
-  <span class="bibitem-docid relative" id="docid-{{ docid.id|urlencode }}" {% if docid.primary %}title="{{ docid.id }} (citeable identifier)"{% endif %}>
+  <span
+    class="bibitem-docid relative"
+    id="docid-{{ docid.id|urlencode }}"
+    {% if docid.primary %}title="{{ docid.id }} (citeable identifier)"{% endif %}
+  >
     {% if as_links %}
       {% if show_type and not docid.primary %}
         <span class="text-xs opacity-50">
