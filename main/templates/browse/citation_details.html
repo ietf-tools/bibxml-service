@@ -118,7 +118,7 @@
         md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
         md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
       " data-source-entry='{# #}'>
-        {% include "deflist/entry.html" with key="document identifiers" ids=data.docid|as_list tmpl="relaton/doc_ids.html" show_type=1 htmlclass="bg-sky-600/25 sm:!border-transparent md:row-span-2 bibitem-docids" key_sr_only=1 %}
+        {% include "deflist/entry.html" with key="document identifiers" ids=data.docid|as_list tmpl="relaton/doc_ids.html" show_type=0 htmlclass="bg-sky-600/25 sm:!border-transparent md:row-span-2 bibitem-docids" key_sr_only=1 %}
         {% include "deflist/entry.html" with key="export" val=data.docid|as_list|first tmpl="citation/export.html" htmlclass="" %}
         {% include "deflist/entry.html" with key="source" val=sourced_item tmpl="citation/sourced.html" htmlclass="" %}
 
