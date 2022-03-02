@@ -304,7 +304,7 @@ def export_manual_map(request):
         {'mappings': mappings},
         headers={
             'Content-Disposition':
-                'inline; filename=bibxml-service-xml2rfc-path-map.json',
+                'attachment; filename=bibxml-service-xml2rfc-path-map.json',
         },
         json_dumps_params=dict(indent=4))
 
