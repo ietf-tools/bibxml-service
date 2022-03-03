@@ -2,6 +2,7 @@
 """
 
 from typing import List
+import json
 import logging
 
 from pydantic import BaseModel, Extra
@@ -342,6 +343,7 @@ def handle_callback(request):
                     f"Failed to fetch user info ({err})")
             else:
                 request.session[OAUTH_USER_INFO_KEY] = user_info
+                log.info("datatracker.oauth: Got user info: %s", json.dumps(user_info))
                 messages.success(
                     request,
                     "You have authenticated via Datatracker")
