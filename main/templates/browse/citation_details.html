@@ -134,6 +134,10 @@
           {% include "deflist/entry.html" with key="edition" val=data.edition.content|default:"—" %}
         {% endif %}
 
+        {% if data.language %}
+          {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
+        {% endif %}
+
         {% if data.date %}
           {% include "deflist/entry_list.html" with key="dates" tmpl="relaton/date.html" items=data.date|as_list %}
         {% endif %}
@@ -151,10 +155,6 @@
 
         {% if data.relation %}
           {% include "deflist/entry_list.html" with key="relations" items=data.relation|as_list tmpl="relaton/relation.html" %}
-        {% endif %}
-
-        {% if data.language %}
-          {% include "deflist/entry.html" with key="language" val=data.language|default:"—"|as_list|join:', ' %}
         {% endif %}
 
         {% for link in data.link|as_list %}
