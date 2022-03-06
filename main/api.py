@@ -119,12 +119,16 @@ def get_by_docid(request):
 
     except ValidationError as err:
         outcome = 'validation_error'
-        resp = JsonResponse({
-            "error":
-                "Found item {} ({}), but source data didn’t validate "
-                "(err: {})".
-                format(docid, doctype or "unspecified", str(err)),
-        }, status=500)
+        if format == 'relaton':
+            # Eat the error, although it’s suboptimal.
+            resp = JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
+        else:
+            resp = JsonResponse({
+                "error":
+                    "Found item {} ({}), but source data didn’t validate "
+                    "(err: {})".
+                    format(docid, doctype or "unspecified", str(err)),
+            }, status=500)
 
     else:
         if format == 'relaton':
