@@ -36,6 +36,8 @@ log = logging.getLogger(__name__)
 
 # Session keys.
 
+OAUTH_SCOPES = ['openid', 'profile']
+
 OAUTH_STATE_KEY = 'oauth_state'
 """
 Session key under which
@@ -126,7 +128,7 @@ def get_client(request):
     if OAUTH_TOKEN_KEY in request.session:
         session = OAuth2Session(
             CLIENT_ID,
-            scope=['openid'],
+            scope=OAUTH_SCOPES,
             redirect_uri=_get_redirect_uri(),
             token=request.session[OAUTH_TOKEN_KEY])
         provider = get_provider()
@@ -240,7 +242,7 @@ def initiate(request):
         request.session[OAUTH_INITIATED_FROM_URL_KEY] = redirect_to
         session = OAuth2Session(
             CLIENT_ID,
-            scope=['openid'],
+            scope=OAUTH_SCOPES,
             redirect_uri=redirect_uri)
         auth_url, state = session.authorization_url(
             provider.authorization_endpoint)
@@ -302,7 +304,7 @@ def handle_callback(request):
     try:
         session = OAuth2Session(
             CLIENT_ID,
-            scope=['openid'],
+            scope=OAUTH_SCOPES,
             redirect_uri=redirect_uri,
             state=request.session[OAUTH_STATE_KEY])
     except Exception as err:
@@ -330,7 +332,7 @@ def handle_callback(request):
             try:
                 session_with_token = OAuth2Session(
                     CLIENT_ID,
-                    scope=['openid'],
+                    scope=OAUTH_SCOPES,
                     state=request.session[OAUTH_STATE_KEY],
                     token=token)
                 user_info = session_with_token.get(
