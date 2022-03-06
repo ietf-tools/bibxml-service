@@ -139,6 +139,18 @@ input, button, select, textarea {
       > dt.sr-only + dd {
         @apply sm:!col-span-6 sm:pl-4;
       }
+      /*
+        // Expand on hover:
+        &:hover {
+          @apply overflow-visible;
+          > dd {
+            @apply overflow-y-visible;
+          }
+          > dd {
+            @apply dark:bg-dark-600 bg-white dark:border-dark-600 border-white z-10;
+          }
+        }
+      */
     }
     div.deflist-entry-wide {
       @apply md:col-span-2;
