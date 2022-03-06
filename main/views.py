@@ -3,6 +3,7 @@
 import logging
 from math import log as log_, floor
 from urllib.parse import unquote_plus
+import json
 
 from django.db.models.query import QuerySet
 from django.urls import reverse
@@ -178,20 +179,28 @@ def export_citation(request):
     resp = auth.api(get_by_docid)(request)
 
     if resp.status_code == 200:
-        resp.headers['Content-Disposition'] = \
-            'attachment; filename=bibxml-service-xml2rfc-path-map.json'
+        ext = 'xml' if request.GET.get('format') == 'bibxml' else 'json'
+        docid = request.GET.get('docid')
+        filename = f'{docid}.{ext}'
+        resp.headers['Content-Disposition'] = f'attachment; filename={filename}'
         return resp
 
     else:
-        content = ''.join(resp.content.decode('utf-8'))
-
-        err = ""
+        message = ""
         if resp.status_code == 403:
-            err += "Please re-authenticate and try again. "
-        err += "Could not export this item, the error was: "
-        err += f"{content}"
-        messages.error(request, err)
+            message += "Please re-authenticate and try again. "
+        message += "Could not export this item, the error was: "
+        content = ''.join(resp.content.decode('utf-8'))
+        if resp['Content-Type'].startswith('application/json'):
+            try:
+                err = json.loads(content)['error']
+            except (json.JSONDecodeError, KeyError):
+                err = content
+        else:
+            err = content
+        message += f"{err}"
 
+        messages.error(request, err)
         return redirect(request.META.get(
             'referer',
             f"{reverse('get_citation_by_docid')}?{request.GET.urlencode()}"))
