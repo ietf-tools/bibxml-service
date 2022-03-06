@@ -34,9 +34,33 @@ __all__ = (
 
 log = logging.getLogger(__name__)
 
-# Session keys.
 
 OAUTH_SCOPES = ['openid', 'profile']
+
+
+# Redirection
+
+get_default_post_oauth_redirect_url = lambda: reverse('browse')
+"""
+Where to redirect the user after:
+
+- successful OAuth attempt,
+  if nothing is available via :data:`~.OAUTH_INITIATED_FROM_URL_KEY`
+  in session, or
+- failed OAuth initiation,
+  if “referer” is not available in request meta.
+"""
+
+# Credentials
+
+CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None) or None
+"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
+
+CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None) or None
+"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_SECRET`."""
+
+
+# Session keys
 
 OAUTH_STATE_KEY = 'oauth_state'
 """
@@ -73,23 +97,6 @@ is stored.
    URL configuration is no longer configured to handle
    the path stored in the session for some reason.
 """
-
-get_default_post_oauth_redirect_url = lambda: reverse('browse')
-"""
-Where to redirect the user after:
-
-- successful OAuth attempt,
-  if nothing is available via :data:`~.OAUTH_INITIATED_FROM_URL_KEY`
-  in session, or
-- failed OAuth initiation,
-  if “referer” is not available in request meta.
-"""
-
-CLIENT_ID = getattr(settings, 'DATATRACKER_CLIENT_ID', None) or None
-"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`."""
-
-CLIENT_SECRET = getattr(settings, 'DATATRACKER_CLIENT_SECRET', None) or None
-"""Populated from :data:`~bibxml.settings.DATATRACKER_CLIENT_SECRET`."""
 
 
 def context_processor(request):
