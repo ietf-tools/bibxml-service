@@ -194,15 +194,19 @@ def iana(ref: str) -> BibliographicItem:
 
 @register_fetcher('bibxml9')
 def rfcsubseries(ref: str) -> BibliographicItem:
-    series, num = ref.split('.')
-    results = search_refs_relaton_field({
-        'docid[*]': '@.type == "IETF" && @.id == "%s"'
-        % f'{series}{num}',
-    }, limit=10, exact=True)
-    if len(results) > 0:
-        return BibliographicItem(**results[0].body)
-    else:
-        raise RefNotFoundError()
+    parts = ref.split('.')
+
+    if len(parts) >= 2:
+        series, num, *_ = ref.split('.')
+        results = search_refs_relaton_field({
+            'docid[*]': '@.type == "IETF" && (@.id == "%s" || @.id == "%s")'
+            % (f'{series}{num}', f'{series} {num}'),
+        }, limit=10, exact=True)
+
+        if len(results) > 0:
+            return BibliographicItem(**results[0].body)
+
+    raise RefNotFoundError()
 
 
 @register_fetcher('bibxml-nist')
