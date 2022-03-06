@@ -136,7 +136,7 @@ def get_primary_docid(raw_ids: List[Dict[str, Any]]) -> Optional[DocID]:
         log.warn(
             "build_citation_by_docid: unexpected number of primary docids "
             "found for %s: %s",
-            id,
+            raw_ids,
             len(primary_docids))
 
     try:
