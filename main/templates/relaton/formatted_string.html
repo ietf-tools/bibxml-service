@@ -1,1 +1,5 @@
-{{ val.content|default:"—" }}
+{% if val.format == "text/html" %}
+  {{ val.content|default:"—"|safe }}
+{% else %}
+  {{ val.content|default:"—" }}
+{% endif %}
