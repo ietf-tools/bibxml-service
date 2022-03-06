@@ -63,6 +63,10 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
     is_referencegroup = len(titles) < 1 and len(constituents) > 0
     is_reference = len(titles) > 0
 
+    docids = as_list(item.docid or [])
+    if anchor is None and len(docids) > 0:
+        anchor = ([d for d in docids if d.primary] or docids)[0].id
+
     if is_reference:
         root = create_reference(item)
 
@@ -177,6 +181,11 @@ def create_reference(item: BibliographicItem) -> Element:
                 name=series_info[0],
                 value=series_info[1],
             ))
+
+    # Anchor, may be overwritten by callers
+    if len(docids) > 0:
+        primary_docid: DocID = ([d for d in docids if d.primary] or docids)[0]
+        ref.set('anchor', docid.id)
 
     return ref
 
