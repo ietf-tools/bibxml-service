@@ -7,7 +7,7 @@
       dark:bg-indigo-900 dark:text-indigo-200
     ">
       Logged&nbsp;in
-      as&nbsp;<strong class="whitespace-nowrap">{{ datatracker_user.username|default:"N/A" }}</strong>
+      as&nbsp;<strong class="whitespace-nowrap">{{ datatracker_user.name|default:"N/A" }}</strong>
       <br />
       <a class="text-xs" href="{% url "datatracker_oauth_logout" %}">Log&nbsp;out</a>
     </aside>
