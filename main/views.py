@@ -200,7 +200,7 @@ def export_citation(request):
             err = content
         message += f"{err}"
 
-        messages.error(request, err)
+        messages.error(request, message)
         return redirect(request.META.get(
             'referer',
             f"{reverse('get_citation_by_docid')}?{request.GET.urlencode()}"))
