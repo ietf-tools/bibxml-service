@@ -1,4 +1,4 @@
-{# Expects key, val, tmpl, idx, multiline (?), wide, break_row, htmlclass, key_sr_only #}
+{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only #}
 
 <div class="
   deflist-entry
@@ -9,7 +9,7 @@
   <dt class="{% if key_sr_only %}sr-only{% endif %}">
     {{ key|default:"N/A" }}{% if idx %}&nbsp;({{ idx }}){% endif %}:
   </dt>
-  <dd class="{% if not multiline %}truncate{% endif %}" title="{% if key_sr_only %}{{ key }}{% endif %} {{ items|length }} item(s)">
+  <dd class="" title="{% if key_sr_only %}{{ key }}{% endif %} {{ items|length }} item(s)">
     <ul class="val {% if inline %}flex flex-row flex-wrap items-center gap-x-2{% endif %}">
       {% for val in items %}
         <li title="Item #{{ forloop.counter }}{% if not tmpl %}: {{ val }}{% endif %}">
