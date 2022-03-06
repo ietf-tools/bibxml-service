@@ -4,12 +4,12 @@
     {% for format in available_serialization_formats %}
       <a
           class="link"
-          href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
+          href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
         >{{ format }}</a>,
     {% endfor %}
     <a
         class="link opacity-50"
-        href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
+        href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
       >relaton</a>
   {% else %}
     Please

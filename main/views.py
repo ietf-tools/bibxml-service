@@ -29,6 +29,8 @@ from .query import build_citation_for_docid
 from .search import BaseCitationSearchView
 from .search import QUERY_FORMAT_LABELS
 from .exceptions import RefNotFoundError
+from .api import get_by_docid
+from datatracker import auth
 from . import external_sources
 
 
@@ -165,6 +167,36 @@ def browse_citation_by_docid(request):
             available_serialization_formats=serializers.registry.keys(),
             **shared_context,
         ))
+
+def export_citation(request):
+    """Calls :func:`main.api.get_by_docid`
+    (wrapping it in :func:`datatracker.auth.api`),
+    providing appropriate Content-Disposition header and handling errors
+    (including authentication errors) by queueing an error-level message
+    for the user and redirecting to referer.
+    """
+    resp = auth.api(get_by_docid)(request)
+
+    if resp.status_code == 200:
+        resp.headers['Content-Disposition'] = \
+            'attachment; filename=bibxml-service-xml2rfc-path-map.json'
+        return resp
+
+    else:
+        content = ''.join(resp.content.decode('utf-8'))
+
+        err = ""
+        if resp.status_code == 403:
+            err += "Please re-authenticate and try again. "
+        err += "Could not export this item, the error was: "
+        err += f"{content}"
+        messages.error(request, err)
+
+        return redirect(request.META.get(
+            'referer',
+            f"{reverse('get_citation_by_docid')}?{request.GET.urlencode()}"))
+
+    return resp
 
 
 class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,

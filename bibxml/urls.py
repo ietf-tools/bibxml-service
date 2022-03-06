@@ -181,6 +181,10 @@ urlpatterns = [
                 public_views.browse_citation_by_docid
             ), name='get_citation_by_docid'),
 
+            path('export/', require_safe(
+                public_views.export_citation
+            ), name='export_citation'),
+
             # We let external source retrieval logic to cache this one:
             path('external/<dataset_id>/', never_cache(require_safe(
                 public_views.browse_external_reference
