@@ -4,13 +4,11 @@
     {% for format in available_serialization_formats %}
       <a
           class="link"
-          download="{{ docid.id }}.xml"
           href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
         >{{ format }}</a>,
     {% endfor %}
     <a
         class="link opacity-50"
-        download="{{ docid.id }}.json"
         href="{% url "api_get_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
       >relaton</a>
   {% else %}
