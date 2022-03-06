@@ -103,7 +103,8 @@ def get_by_docid(request):
     try:
         composite_bibitem = build_citation_for_docid(
             docid.strip(),
-            doctype.strip() if doctype else None)
+            doctype.strip() if doctype else None,
+            strict=format != 'relaton')
 
         # This will be the latest sourced item.
         bibitem = list(composite_bibitem.sources.values())[0].bibitem
@@ -119,16 +120,12 @@ def get_by_docid(request):
 
     except ValidationError as err:
         outcome = 'validation_error'
-        if format == 'relaton':
-            # Eat the error, although it’s suboptimal.
-            resp = JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
-        else:
-            resp = JsonResponse({
-                "error":
-                    "Found item {} ({}), but source data didn’t validate "
-                    "(err: {})".
-                    format(docid, doctype or "unspecified", str(err)),
-            }, status=500)
+        resp = JsonResponse({
+            "error":
+                "Found item {} ({}), but source data didn’t validate "
+                "(err: {})".
+                format(docid, doctype or "unspecified", str(err)),
+        }, status=500)
 
     else:
         if format == 'relaton':
