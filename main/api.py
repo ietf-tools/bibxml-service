@@ -122,7 +122,7 @@ def get_by_docid(request):
         outcome = 'validation_error'
         resp = JsonResponse({
             "error":
-                "Found item {} ({}), but source data didn’t validate "
+                "Source data for item {} ({}) didn’t validate "
                 "(err: {})".
                 format(docid, doctype or "unspecified", str(err)),
         }, status=500)
