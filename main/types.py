@@ -136,3 +136,18 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     """Primary identifier shared by all items.
     If not present, it may indicate source data integrity issue.
     """
+
+
+class FoundItem(CompositeSourcedBibliographicItem):
+    """An item obtained by user searching."""
+
+    headline: str = ''
+    """For some types of search, headline highlights search terms
+    encountered in context. Expected to be an HTML-formatted string.
+    Empty string indicates headline is not available.
+
+    .. seealso::
+
+       :func:`main.query.search_refs_relaton_field`,
+       :func:`main.query.build_search_results`.
+    """

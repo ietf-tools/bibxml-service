@@ -26,7 +26,7 @@ from bib_models.merger import bibitem_merger
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
-from .types import CompositeSourcedBibliographicItem
+from .types import CompositeSourcedBibliographicItem, FoundItem
 from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
 from .query_utils import query_suppressing_user_input_error, merge_refs
@@ -441,22 +441,24 @@ DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
 
 def build_search_results(
     refs: QuerySet[RefData],
-) -> List[CompositeSourcedBibliographicItem]:
+) -> List[FoundItem]:
     """Given a :class:`django.db.models.query.QuerySet`
-    of :class:`~.models.RefData` entries, build a list
-    of :class:`~.types.CompositeSourcedBibliographicItem` objects
+    of :class:`~.models.RefData` entries, builds a list
+    of :class:`~.types.FoundItem` objects
     by merging ``RefData`` instances that share
     their primary document identifier.
 
+    Takes care of merging search headlines, if any.
+
     :param django.db.models.query.QuerySet[RefData] refs: found refs
-    :rtype: List[CompositeSourcedBibliographicItem]
+    :rtype: List[FoundItem]
     """
 
     # Groups refs by primary ID
     # (in absence of such, a ref will go alone under its first ID)
     refs_by_primary_id: Dict[str, List[int]] = {}
 
-    results: List[CompositeSourcedBibliographicItem] = []
+    results: List[FoundItem] = []
 
     for idx, ref in enumerate(refs):
         suitable_ids: List[Dict[str, Any]] = as_list([
@@ -478,7 +480,15 @@ def build_search_results(
         refs_to_merge: List[RefData] = [refs[idx] for idx in ref_indexes]
 
         if len(refs_to_merge) > 0:
-            results.append(merge_refs(refs_to_merge, _docid, strict=False))
+            headlines = set([
+                getattr(r, 'headline', '')
+                for r in refs_to_merge
+            ])
+            found_item = typeCast(
+                FoundItem,
+                merge_refs(refs_to_merge, _docid, strict=False))
+            found_item.headline = ' … '.join(headlines)
+            results.append(found_item)
 
     return results
 
