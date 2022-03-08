@@ -26,7 +26,7 @@ some functions responsible for constructing bibliographic item instances
 support a ``strict`` boolean keyword argument.
 
 By default it is ``True``, and item that fails validation
-will make the function raising :class:`pydantic.ValidationError`.
+will make the function raise a :class:`pydantic.ValidationError`.
 
 If explicitly set to ``False``, the item will be constructed anyway,
 but it may contain unexpected data structures. For example, it may
