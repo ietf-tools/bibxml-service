@@ -375,8 +375,10 @@ DATASET_SOURCE_OVERRIDES = {
         },
     },
 }
-"""Overrides dataset bibxml and/or relaton source.
+"""Overrides dataset relaton source.
 Supports partial override.
+
+.. seealso:: :mod:`main.sources`.
 """
 
 EXTERNAL_DATASETS = [
