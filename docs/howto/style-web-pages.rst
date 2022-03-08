@@ -41,8 +41,8 @@ but it’s not recommended to make changes there because it’s more difficult
 to know where they may have unexpected effect. Be sure to grep around
 and understand how it works first.
 
-It is also not recommended to spread styling across new CSS files
-and maintain a single convention within this project.
+It is also not recommended to spread styling across new CSS files.
+Try to maintain the convention within this project instead.
 
 .. important::
 
