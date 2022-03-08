@@ -148,6 +148,11 @@ class FoundItem(CompositeSourcedBibliographicItem):
 
     .. seealso::
 
-       :func:`main.query.search_refs_relaton_field`,
-       :func:`main.query.build_search_results`.
+       - :func:`main.query.search_refs_relaton_field`
+         annotates ``RefData`` queryset with ``headline``
+         if websearch mode is used.
+
+       - :func:`main.query.build_search_results`
+         makes sure ``headline`` annotation makes its way to
+         this attribute.
     """
