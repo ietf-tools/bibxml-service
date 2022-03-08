@@ -17,6 +17,10 @@ within ``{% compress %}`` tag
 (see existing templates for examples).
 
 
+.. contents::
+   :local:
+
+
 Editing JS
 ==========
 
@@ -44,18 +48,29 @@ and understand how it works first.
 It is also not recommended to spread styling across new CSS files.
 Try to maintain the convention within this project instead.
 
+Troubleshooting
+---------------
+
+CSS doesn’t include the style rule for newly used utility class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Make sure each class you use appears as a full string.
+Tailwind needs to “see” the entire class, such as ``bg-rose-600``,
+appear in your code.
+
 .. important::
 
-   Never construct Tailwind class strings dynamically.
-
-   Tailwind needs to “see” the entire class, such as ``bg-rose-600``,
-   appear in your code.
+   Never construct Tailwind class strings dynamically
+   by substituting variables.
    If you write ``bg-{{ classes.warning }}-600`` in a template
    or ``text-${classes.warning}-100`` in JS,
    the build won’t include relevant style rules.
 
-Not seeing your changes
------------------------
+Also, note that Tailwind in this project is only configured
+to scan HTML and Python files for utility classes.
+
+CSS rebuild is not triggered in development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 At build step, Tailwind’s plugin needs to read all files
 that reference any of its class names, in order to deliver a small
@@ -64,12 +79,14 @@ if you change styling by adding a new Tailwind class
 (e.g., changing padding from ``p-2`` to ``p-3``),
 Tailwind needs to build CSS again.
 
-This works fine if you made changes to ``main.css`` directly.
+This works fine if you made changes to ``main.css`` directly,
+but normally you wouldn’t do that—instead,
+you’ll change utility classes in HTML templates,
+or in some cases Python code.
 
-But, unfortunately, our build is not able to deduce that
-it also needs to regenerate CSS
-whenever you edited e.g. a template file to add a new CSS class to an element
-(so that Tailwind adds corresponding new style rules).
+And, unfortunately, our build is not able to deduce that
+it also needs to regenerate CSS whenever you edited
+e.g. a template file to add a new CSS class to an element.
 
 To force it to do so, after you edit classes in a template (or JS, etc.),
 you can ``touch static/css/main.css`` to update its mtime, and subsequent
