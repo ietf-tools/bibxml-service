@@ -43,7 +43,7 @@ __all__ = (
     'search_refs_relaton_field',
     'search_refs_json_repr_match',
     'get_indexed_ref',
-    'get_indexed_ref_by_quury',
+    'get_indexed_ref_by_query',
 )
 
 
