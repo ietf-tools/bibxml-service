@@ -7,8 +7,8 @@ info:
   contact:
     email: ietf-ribose@ribose.com
   license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+    name: BSD 3-Clause
+    url: https://github.com/ietf-ribose/bibxml-service/blob/main/LICENSE
   version: {{ snapshot }}
 
 servers:
