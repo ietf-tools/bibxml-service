@@ -63,6 +63,10 @@ class RefData(models.Model):
 
        XML is obtained on the fly
        using :mod:`xml2rfc_compat.serializer`.
+
+       The property is no longer filled in, but is left in place
+       in case a choice is made to pre-serialize representations
+       at indexing stage.
     """
 
     ref_id = models.CharField(max_length=64)
