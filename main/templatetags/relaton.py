@@ -1,5 +1,6 @@
 from typing import Any, Set, Tuple, Callable, List, Optional
 from urllib.parse import quote_plus
+import dataclasses
 import json
 
 from django.urls import reverse
@@ -83,7 +84,7 @@ def bibitem_link(value: Any):
 @register.filter
 def substruct_search_link(value: Any, query: str):
     """
-    Given structure as value, formats it
+    Given structure (dict or dataclass) as value, formats it
     as json_struct bibliographic item search link.
 
     Query should be in the form 'subfield;param=value;param2=value2'.
@@ -115,7 +116,12 @@ def substruct_search_link(value: Any, query: str):
             else True
         )
 
-    substruct_json = json.dumps(select_keys(value, key_checker))
+    if dataclasses.is_dataclass(value):
+        serializable = dataclasses.asdict(value)
+    else:
+        serializable = value
+
+    substruct_json = json.dumps(select_keys(serializable, key_checker))
     query_json = subfield % substruct_json
     return (
         f'{citation_search_base}'
