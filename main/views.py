@@ -169,6 +169,7 @@ def browse_citation_by_docid(request):
             **shared_context,
         ))
 
+
 def export_citation(request):
     """Calls :func:`main.api.get_by_docid`
     (wrapping it in :func:`datatracker.auth.api`),
