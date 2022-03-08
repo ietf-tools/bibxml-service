@@ -198,7 +198,7 @@ urlpatterns = [
                 )), name='browse_dataset'),
                 path('<ref>/', never_cache(require_safe(
                     public_views.browse_indexed_reference
-                )), name='browse_citation'),
+                )), name='browse_indexed_ref'),
             ])),
         ])),
 
