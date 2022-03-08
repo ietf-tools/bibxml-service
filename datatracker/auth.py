@@ -42,12 +42,13 @@ def api(viewfunc):
                 if authenticated:
                     return viewfunc(request, *args, **kwargs)
                 else:
-                    return HttpResponseForbidden("Invalid Datatracker token")
+                    return HttpResponseForbidden("Invalid Datatracker API key")
 
         elif get_client(request) is not None:
             return viewfunc(request, *args, **kwargs)
 
-        return HttpResponseForbidden("Missing Datatracker token")
+        return HttpResponseForbidden(
+            "Missing Datatracker API key, or outdated OAuth2 access token")
 
     return wrapper
 
