@@ -15,7 +15,7 @@ from prometheus import metrics
 from doi import get_doi_ref as _get_doi_ref
 
 from .search import BaseCitationSearchView
-from .query import get_indexed_ref
+from .query import get_indexed_item
 from .query import build_citation_for_docid
 from .exceptions import RefNotFoundError
 from . import external_sources
@@ -227,11 +227,11 @@ def get_ref(request, dataset_name: str, ref: str):
             source = external_sources.registry[dataset_name]
             bibitem = source.get_item(ref.strip()).bibitem
         else:
-            data: Dict[str, Any] = get_indexed_ref(
+            indexed_item = get_indexed_item(
                 dataset_name,
                 ref.strip(),
-                'relaton')
-            bibitem = BibliographicItem(**data)
+                strict=False)
+            bibitem = indexed_item.bibitem
 
     except ValidationError:
         return JsonResponse({

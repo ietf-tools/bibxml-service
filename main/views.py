@@ -25,7 +25,7 @@ from bib_models import serializers, BibliographicItem
 from doi import get_doi_ref
 
 from .models import RefData
-from .query import get_indexed_ref, list_refs
+from .query import get_indexed_item, list_refs
 from .query import build_citation_for_docid
 from .search import BaseCitationSearchView
 from .search import QUERY_FORMAT_LABELS
@@ -275,7 +275,7 @@ def browse_indexed_reference(request, dataset_id, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
-        data = get_indexed_ref(dataset_id, parsed_ref)
+        data = unpack_dataclasses(get_indexed_item(dataset_id, parsed_ref).dict())
 
     except RefNotFoundError:
         raise Http404(

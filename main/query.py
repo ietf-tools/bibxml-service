@@ -42,7 +42,7 @@ __all__ = (
     'search_refs_relaton_struct',
     'search_refs_relaton_field',
     'search_refs_json_repr_match',
-    'get_indexed_ref',
+    'get_indexed_item',
     'get_indexed_ref_by_query',
 )
 
@@ -396,10 +396,15 @@ def build_citation_for_docid(
     for given document identifier (``docid.id`` value).
 
     Uses indexed sources by querying :class:`.models.RefData`.
-
     Found bibliographic items (there can be more than one matching given ID)
     are merged into a single composite item
     under a primary document identifier (if any).
+
+    It is different from :func:`~.get_indexed_item` in that *this* function
+    uses ``docid.id``, instead of dataset-specific reference (such as filename).
+    This also means that there can be multiple bibliographic items
+    matching given document ID among different datasets,
+    which is why a composite bibliographic item is returned.
 
     :param str id: :term:`docid.id`
     :param str id_type: Optional :term:`document identifier type`
@@ -493,33 +498,57 @@ def build_search_results(
     return results
 
 
-def get_indexed_ref(dataset_id, ref, format='relaton'):
-    """Retrieves a reference from an indexed internal dataset.
+def get_indexed_item(
+    dataset_id: str,
+    ref: str,
+    strict = True,
+) -> IndexedBibliographicItem:
+    """Retrieves a bibliographic item by :term:`reference`
+    from an indexed internal dataset.
 
-    :param str format: "bibxml" or "relaton"
-    :returns dict: if format is "relaton", a :class:`dict`.
-    :returns str: if format is "bibxml", an XML string.
+    Different from :func:`~.build_citation_for_docid` in that this function
+    uses a dataset-specific reference (such as filename).
+    As such, this function is not suitable for handling user queries
+    (users are not expected to know dataset-specific references).
+
+    :param bool strict: see :ref:`strict-validation`
+    :rtype: IndexedBibliographicItem
     :raises RefNotFoundError: either reference or requested format not found
     """
 
-    return get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref), format)
+    ref = get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref))
+
+    params = {
+        'bibitem': ref.body,
+        'source': get_source_meta(dataset_id),
+        'indexed_object': get_indexed_object_meta(dataset_id, ref.ref),
+    }
+
+    if strict:
+        return IndexedBibliographicItem(**params)
+    else:
+        try:
+            return IndexedBibliographicItem(**params)
+        except ValidationError as e:
+            params['validation_errors'] = [str(e)]
+            return IndexedBibliographicItem.construct(**params)
 
 
-def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
-    """Uses query to retrieve a reference from an indexed internal dataset.
+def get_indexed_ref_by_query(
+    dataset_id: str,
+    query: Q,
+) -> RefData:
+    """Uses query to retrieve a :class:`~main.models.RefData`
+    by :term:`reference`
+    from an indexed internal dataset.
 
-    :param str format: "bibxml" or "relaton"
     :param django.db.models.Q query: query
-    :returns: reference in specified format, if available
-    :rtype: dict or str, depending on format
+    :rtype: main.models.RefData
     :raises RefNotFoundError: either reference or requested format not found
     """
-
-    if format not in ['relaton', 'bibxml']:
-        raise ValueError("Unknown citation format requested")
 
     try:
-        result = RefData.objects.get(
+        return RefData.objects.get(
             query &
             Q(dataset__iexact=dataset_id))
     except RefData.DoesNotExist:
@@ -530,15 +559,3 @@ def get_indexed_ref_by_query(dataset_id, query: Q, format='relaton'):
         raise RefNotFoundError(
             "Multiple references match query in given dataset",
             repr(Q))
-
-    if format == 'relaton':
-        return result.body
-
-    else:
-        bibxml_repr = result.representations.get('bibxml', None)
-        if bibxml_repr:
-            return bibxml_repr
-        else:
-            raise RefNotFoundError(
-                "BibXML representation not found for requested reference",
-                repr(Q))

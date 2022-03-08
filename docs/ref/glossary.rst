@@ -29,6 +29,12 @@ Glossary
        under :data:`BibliographicItem.docid <bib_models.models.bibdata.BibliographicItem.docid>`,
        and each identifier is a :class:`bib_models.models.bibdata.DocID` instance in Python.
 
+       .. seealso::
+
+          :func:`main.query.build_citation_for_docid` constructs a bibliographic item
+          by locating references matching given ``docid`` (ID and optionally type)
+          across indexed sources.
+
    primary document identifier
        Main characteristics of a primary identifier:
 
@@ -103,6 +109,16 @@ Glossary
 
        In case of Relaton sources, references
        correspond to :class:`main.models.RefData` instances.
+
+       .. note:: Being a dataset-specific reference (such as a filename),
+                 it is not expected to be known by the user. Hence, user searches
+                 should not use :term:`ref`, but instead use
+                 a :term:`document identifier`.
+
+       .. seealso::
+
+          :func:`main.query.get_indexed_item` retrieves a bibliographic item
+          matching given source and source-specific reference, if it is indexed.
 
    external source
    external dataset

@@ -52,7 +52,7 @@
     </form>
   {% else %}
     {% for ref in object_list %}
-      {% include "citation/in_list.html" with data=ref.bibitem|default:ref.body dataset_id=dataset_id %}
+      {% include "citation/in_list.html" with data=ref.bibitem|default:ref.body dataset_id=dataset_id ref=ref.ref dataset_id=ref.dataset %}
     {% endfor %}
   {% endif %}
 {% endblock %}

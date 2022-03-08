@@ -1,11 +1,22 @@
-{# Expects context: bibliographic item as data, forloop #}
+{# Expects context: bibliographic item as data, forloop, optional ref, dataset_id #}
 
 {% load relaton %}
 
 <article class="{% include "_list_item_classes.html" %} bibitem-in-list">
   <div class="{% include "_list_item_inner_classes.html" %}">
     <p class="px-4 mb-1 bibitem-title font-serif tracking-tight leading-tight">
-      <a class="link no-underline" href="{% include "citation/srp_link_href.html" with bibitem=data query=request.GET.query query_format=query_format page=page_obj %}">
+      <a
+        class="link no-underline"
+        href="
+          {% if ref %}
+            {# We are browsing an indexed dataset (non-primary use case) #}
+            {% url "browse_indexed_ref" dataset_id ref %}
+          {% else %}
+            {# We are browsing search results (primary use case) #}
+            {% include "citation/srp_link_href.html" with bibitem=data query=request.GET.query query_format=query_format page=page_obj %}
+          {% endif %}
+        "
+      >
         {% include "relaton/smart_title.html" with bibitem=data %}
       </a>
     </p>
