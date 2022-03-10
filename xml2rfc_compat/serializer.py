@@ -184,8 +184,11 @@ def create_reference(item: BibliographicItem) -> Element:
 
     # Anchor, may be overwritten by callers
     if len(docids) > 0:
-        primary_docid: DocID = ([d for d in docids if d.primary] or docids)[0]
-        ref.set('anchor', docid.id)
+        anchor_docid: DocID = (
+            [d for d in docids if d.scope == 'anchor']
+            or [d for d in docids if d.primary]
+            or docids)[0]
+        ref.set('anchor', anchor_docid.id)
 
     return ref
 
