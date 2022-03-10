@@ -275,7 +275,11 @@ def browse_indexed_reference(request, dataset_id, ref):
     parsed_ref = unquote_plus(ref)
 
     try:
-        data = unpack_dataclasses(get_indexed_item(dataset_id, parsed_ref).dict())
+        data = unpack_dataclasses(get_indexed_item(
+            dataset_id,
+            parsed_ref,
+            strict=False,
+        ).dict())
 
     except RefNotFoundError:
         raise Http404(
