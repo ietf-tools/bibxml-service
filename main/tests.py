@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict, Any
 from urllib.parse import quote_plus
 import json
@@ -39,6 +40,7 @@ class RefDataModelTests(TestCase):
             dataset=self.dataset_name,
             body=self.ref_body,
             representations={},
+            latest_date=datetime.datetime.now().date()
         )
         import datatracker.auth
         datatracker.auth.token_is_valid = lambda key: True
@@ -79,9 +81,11 @@ class RefDataModelTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         found_obj = response.json().get("data")[0]
+        # strip None values
+        found_obj_doc_id = [{k: v for k, v in found_obj['docid'][0].items() if v is not None}]
 
         self.assertEqual(found_obj['id'], self.ref_body['id'])
-        self.assertEqual(found_obj['docid'], self.ref_body['docid'])
+        self.assertEqual(found_obj_doc_id, self.ref_body['docid'])
 
     def test_fail_search_ref(self):
         struct_query = json.dumps(
@@ -104,3 +108,15 @@ class RefDataModelTests(TestCase):
         results_count = len(response.json().get("data"))
 
         self.assertEqual(results_count, 0)
+
+    def test_get_by_doc_id(self):
+        url = f'{reverse("api_get_by_docid")}?docid={self.ref_body.get("id")}'
+        response = self.client.get(url, **self.api_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['data']['id'], self.ref_body['id'])
+
+    def test_not_found_by_doc_id(self):
+        url = f'{reverse("api_get_by_docid")}?docid=UNEXISTENT_DOC_ID'
+        response = self.client.get(url, **self.api_headers)
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(len(response.json()["error"]) > 0)
