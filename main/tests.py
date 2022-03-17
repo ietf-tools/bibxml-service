@@ -109,14 +109,16 @@ class RefDataModelTests(TestCase):
 
         self.assertEqual(results_count, 0)
 
-    def test_get_by_doc_id(self):
-        url = f'{reverse("api_get_by_docid")}?docid={self.ref_body.get("id")}'
-        response = self.client.get(url, **self.api_headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)['data']['id'], self.ref_body['id'])
+    def test_get_doi_ref(self):
+        pass
+        # TODO: Shall we have here a static external reference/DOI to use for testing?
+        # url = f'{reverse("api_get_doi_ref", kwargs={"ref": self.ref_id})}'
+        # response = self.client.get(url, **self.api_headers)
+        # self.assertEqual(response.status_code, 200)
+        # self.assertEqual(json.loads(response.content)['data']['id'], self.ref_body['id'])
 
-    def test_not_found_by_doc_id(self):
-        url = f'{reverse("api_get_by_docid")}?docid=UNEXISTENT_DOC_ID'
+    def test_not_found_by_doi_ref(self):
+        url = f'{reverse("api_get_doi_ref", kwargs={"ref": "NONEXISTENTREF404"})}'
         response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 404)
         self.assertTrue(len(response.json()["error"]) > 0)
