@@ -34,7 +34,7 @@ logger = get_task_logger(__name__)
 
 
 # Repository discovery
-# ===================
+# ====================
 
 GITHUB_REPO_URL = "https://github.com/{user}/{repo}"
 
