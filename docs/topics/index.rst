@@ -10,3 +10,4 @@ Topic guides
    validation
    sourcing
    xml2rfc-compat
+   production-setup
