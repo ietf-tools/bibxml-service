@@ -3,10 +3,11 @@ How to run in production
 ========================
 
 There are many ways the service could be deployed.
-No assumptions were made about how infrastructure is operated.
 
-Below is a **very simple** example of how it is possible to run the service
-in production using the bundled Compose configuration.
+Except for reliance on Docker, no assumptions are made about how infrastructure is operated.
+
+That said, below is a **very simple** example of how it is possible to run the service
+on AWS infrastructure using the bundled Compose configuration.
 
 .. seealso:: :doc:`/topics/production-setup`
 
