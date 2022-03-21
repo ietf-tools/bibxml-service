@@ -14,14 +14,6 @@ services:
     ports:
       - "5555:5555"
 
-  celery-exporter:
-    image: danihodovic/celery-exporter
-    command: "--broker-url=redis://redis:6379"
-    depends_on:
-      - redis
-    ports:
-      - "9081:9808"
-
   prometheus:
     image: prom/prometheus
     hostname: prometheus

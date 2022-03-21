@@ -144,3 +144,11 @@ services:
       - redis
     ports:
       - "9080:9080"
+
+  celery-exporter:
+    image: danihodovic/celery-exporter
+    command: "--broker-url=redis://redis:6379"
+    depends_on:
+      - redis
+    ports:
+      - "9081:9808"
