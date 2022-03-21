@@ -2,111 +2,69 @@
 How to run in production
 ========================
 
-While bundled Compose configuration
-:doc:`configures containers </ref/containers>`
-to illustrate the way the service is intended to be operated,
-here are some external aspects and general notes.
+There are many ways the service could be deployed.
+No assumptions were made about how infrastructure is operated.
 
-.. seealso:: :rfp:req:`6`
+Below is a **very simple** example of how it is possible to run the service
+in production using the bundled Compose configuration.
 
-Environment
-===========
+.. seealso:: :doc:`topics/production-setup`
 
-The service requires
-certain :doc:`environment variables </ref/env>`
-to be available at runtime.
+1. Using AWS Lightsail, provision an Ubuntu x86-64 server with port 80 open.
 
-If you run via Compose, environment can be provided via ``.env`` file
-as a sibling of ``docker-compose.yml``.
+2. Assign a static IP to the instance. Take note of it.
 
-.. important:: No matter how you provide environment variables,
-               make sure ``DEBUG`` is not set in production.
+3. Using AWS Route 53, point "origin.your.chosen.domain.name.com"
+   to that static IP by creating an A record.
 
-HTTPS setup
-===========
+4. SSH into the server, install Docker and Docker Compose () and enter a Tmux session.
 
-The service relies on being accessed via HTTPS URLs.
+5. Clone this repository under ``ubuntu`` user home directory.
 
-It is expected to be run from behind a load balancer (reverse proxy, CDN)
-that terminates SSL and talks to BibXML in plain HTTP.
+6. Place a ``.env`` file at the root of the repository with following contents::
 
-Typical choices include an Nginx frontend,
-AWS CloudFront/ELB, CloudFlare.
+       PORT=12345
+       DB_NAME=bibxml
+       DB_SECRET="random string without double quote characters"
+       DJANGO_SECRET="a very long and very random string without double quote characters"
+       SENTRY_DSN="your Sentry DSN string"
+       HOST=your.chosen.domain.name.com
+       API_SECRET="API secret to be used in management GUI and API authentication"
+       DEBUG=0
+       SERVICE_NAME="IETF BibXML service"
+       CONTACT_EMAIL="operating team contact email"
 
-.. important::
+7. Run the command::
 
-   - Make sure the connection between TLS-terminating layer
-     and BibXML is secure.
+       sudo docker-compose build && sudo docker-compose -f docker-compose.yml up
 
-     For example, in case of AWS-based infrastructure,
-     there is a difference between terminating SSL at CloudFront or ELB
-     where the latter is more secure (but more resource-intensive).
+   If you want to run the bundled monitoring services[0]_, this would be::
 
-   - Make sure HTTP ``Host`` header and ``X-Forwarded-For`` headers
-     are forwarded accurately to BibXML service.
+       sudo docker-compose build && sudo docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up
 
-   - Be minfdul of additional caching at LB/front-end proxy level
-     that can result in stale bibliographic data being displayed.
+8. Set up a CloudFront distribution that uses plain HTTP to talk to "origin.your.chosen.domain.name.com" via port 12345,
+   responds to "your.chosen.domain.name.com" as an alternate domain name (CNAME)
+   and redirects HTTP to HTTPS for visitors from the outside
+   (you may need to provision an SSL certificate first).
 
+9. Using Route 53, point "your.chosen.domain.name.com" to your CloudFront distribution
+   by creating an alias record.
 
-Monitoring errors
-=================
+After CloudFront distribution is initialized,
+the site should be available via https://your.chosen.domain.name.com.
 
-The service can report to a Sentry instance.
-It is recommended to provide ``SENTRY_DSN`` environment variable.
+.. [0] Typically, if you operate numerous services, you would already have a Prometheus instance set up.
+       In that case, just update your Prometheus instance to scrape two additional targets:
+       "origin.your.chosen.domain.name.com:9808" (Celery async task worker)
+       and "origin.your.chosen.domain.name.com:12345" (web instance with Hypercorn web server).
 
+       (If you increase the number of web instances,
+       make sure each target’s URL is added to your Prometheus instance for scraping.)
 
-Tracking metrics
-================
+       The bundled ``docker-compose.monitor.yml`` is there primarily for illustration purposes.
 
-Web service exports metrics in Prometheus format under ``/metrics/`` path.
-The path requires HTTP Basic authentication (see :doc:`/topics/auth`).
+Updating
+========
 
-Celery worker process also exports metrics under port 9080.
-
-
-.. note::
-
-   ``docker-compose.monitor.yml`` provides a configuration that runs
-   Prometheus, Grafana, Flower and Celery exporter utility image::
-   
-       docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
-   
-   .. seealso:: :doc:`/ref/containers`
-
-
-Scaling
-=======
-
-The web service
----------------
-
-It is possible to run multiple instances of the web service
-(the container that runs Hypercorn server)
-by spinning up multiple containers.
-
-.. note::
-
-   If you run multiple instances of the web container,
-   make sure the Prometheus instance is able to discover all scaled containers
-   and scrapes bibliographic data access and other metrics
-   from all of them.
-  
-   This is currently not handled by the bundled Compose configuration.
-
-.. important:: Do **not** increase the number of Hypercorn workers
-               per instance. Prometheus Python client metric export,
-               as implemented, will not work in multiprocessing scenarios.
-               Scale the number of containers instead.
-
-Other services
---------------
-
-Other services are not intended to be run in parallel.
-I.e., there should be at most 1 instance of each container
-(DB, Celery async task processor, and so on).
-
-.. important:: Do **not** scale the number of async task workers
-               within the Celery container, either.
-               Indexing tasks, as currently implemented,
-               are not intended to be run in parallel.
+Simply SSH back in, ``tmux attach``, stop Docker Compose,
+run ``git pull --rebase`` and re-run the Compose command from step 7.
