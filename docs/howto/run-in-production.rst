@@ -8,7 +8,7 @@ No assumptions were made about how infrastructure is operated.
 Below is a **very simple** example of how it is possible to run the service
 in production using the bundled Compose configuration.
 
-.. seealso:: :doc:`topics/production-setup`
+.. seealso:: :doc:`/topics/production-setup`
 
 1. Using AWS Lightsail, provision an Ubuntu x86-64 server with port 80 open.
 
@@ -17,7 +17,7 @@ in production using the bundled Compose configuration.
 3. Using AWS Route 53, point "origin.your.chosen.domain.name.com"
    to that static IP by creating an A record.
 
-4. SSH into the server, install Docker and Docker Compose () and enter a Tmux session.
+4. SSH into the server, install Docker and Docker Compose [1]_ [2]_ and enter a Tmux session.
 
 5. Clone this repository under ``ubuntu`` user home directory.
 
@@ -38,7 +38,7 @@ in production using the bundled Compose configuration.
 
        sudo docker-compose build && sudo docker-compose -f docker-compose.yml up
 
-   If you want to run the bundled monitoring services[0]_, this would be::
+   If you want to run the bundled monitoring services [3]_, this would be::
 
        sudo docker-compose build && sudo docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up
 
@@ -53,7 +53,11 @@ in production using the bundled Compose configuration.
 After CloudFront distribution is initialized,
 the site should be available via https://your.chosen.domain.name.com.
 
-.. [0] Typically, if you operate numerous services, you would already have a Prometheus instance set up.
+.. [1] https://docs.docker.com/engine/install/ubuntu/
+
+.. [2] https://docs.docker.com/compose/install/
+
+.. [3] Typically, if you operate numerous services, you would already have a Prometheus instance set up.
        In that case, just update your Prometheus instance to scrape two additional targets:
        "origin.your.chosen.domain.name.com:9808" (Celery async task worker)
        and "origin.your.chosen.domain.name.com:12345" (web instance with Hypercorn web server).
