@@ -26,7 +26,7 @@ class PersonName:
         List[GenericStringValue],
         GenericStringValue,
     ]] = None
-    """Also known as givne name or first name."""
+    """Also known as given name or first name."""
 
 
 @dataclass
