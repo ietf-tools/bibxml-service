@@ -1,5 +1,5 @@
 from copy import copy
-from typing import Dict, Any
+from io import StringIO
 
 from django.test import TestCase
 from lxml import etree
@@ -26,7 +26,7 @@ class XML2RFCTestCase(TestCase):
             },
             "role": "author",
         }
-        self.bibitem_data: Dict[str, Any] = {
+        self.bibitem_data = {
             "id": "ref_01",
             "title": [
                 {
@@ -43,6 +43,8 @@ class XML2RFCTestCase(TestCase):
                 "script": "Latn",
                 "format": "text/plain",
             },
+            "contributor": [self.contributor_organization_data],
+            "date": [{"type": "published", "value": "1996-02"}],
             "relation": [
                 {
                     "type": "includes",
@@ -67,10 +69,6 @@ class XML2RFCTestCase(TestCase):
                         "docid": [{"id": "RFC1917", "type": "RFC"}],
                         "docnumber": "RFC1917",
                         "date": [{"type": "published", "value": "1996-02"}],
-                        "contributor": [
-                            self.contributor_organization_data,
-                            self.contributor_person_data,
-                        ],
                     },
                 }
             ],
@@ -83,8 +81,45 @@ class XML2RFCTestCase(TestCase):
         self.contributor_person = Contributor(**self.contributor_person_data)
 
     def test_bibliographicitem_to_xml(self):
-        # TODO validate XML schema
-        to_xml(self.bibitem)
+        xml = to_xml(self.bibitem)
+
+        bibitem_xsd = StringIO(
+            """
+                    <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                      <xs:element name="reference" type="referenceType"/>
+                      <xs:complexType name="authorType">
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="organization"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:complexType name="dateType">
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="month"/>
+                            <xs:attribute type="xs:short" name="year"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                      <xs:complexType name="frontType">
+                        <xs:sequence>
+                          <xs:element type="xs:string" name="title"/>
+                          <xs:element type="authorType" name="author"/>
+                          <xs:element type="dateType" name="date"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                      <xs:complexType name="referenceType">
+                        <xs:sequence>
+                          <xs:element type="frontType" name="front"/>
+                        </xs:sequence>
+                        <xs:attribute type="xs:string" name="anchor"/>
+                      </xs:complexType>
+                    </xs:schema>
+                """
+        )
+        xmlschema_doc = etree.parse(bibitem_xsd)
+        xmlschema = etree.XMLSchema(xmlschema_doc)
+        xmlschema.assertValid(xml)  # Validate XML Schema
 
     def test_fail_bibliographicitem_to_xml_if_wrong_combination_of_titles_and_relations(
         self,
@@ -97,7 +132,6 @@ class XML2RFCTestCase(TestCase):
             to_xml(new_bibitem_with_missing_data)
 
     def test_create_reference(self):
-        # TODO validate XML schema
         ref = create_reference(self.bibitem)
         self.assertEqual(ref.tag, "reference")
 
@@ -109,10 +143,26 @@ class XML2RFCTestCase(TestCase):
             create_reference(new_bibitem_with_missing_data)
 
     def test_create_author(self):
-        # TODO validate XML schema
+        author_xsd = StringIO(
+            """
+        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+          <xs:element name="author" type="authorType"/>
+          <xs:complexType name="authorType">
+            <xs:sequence>
+              <xs:element type="xs:string" name="organization"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:schema>
+        """
+        )
+        xmlschema_doc = etree.parse(author_xsd)
+        author_xmlschema = etree.XMLSchema(xmlschema_doc)
+
         author = create_author(self.contributor_organization)
         create_author(self.contributor_person)
         self.assertEqual(author.tag, "author")
+
+        author_xmlschema.validate(author)
 
     def test_fail_create_author_if_incompatible_roles(self):
         contributor_organization = copy(self.contributor_organization)
