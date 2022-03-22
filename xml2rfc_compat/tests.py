@@ -145,15 +145,16 @@ class XML2RFCTestCase(TestCase):
     def test_create_author(self):
         author_xsd = StringIO(
             """
-        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-          <xs:element name="author" type="authorType"/>
-          <xs:complexType name="authorType">
-            <xs:sequence>
-              <xs:element type="xs:string" name="organization"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:schema>
-        """
+            <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+                <xs:element name="author" type="authorType"/> 
+                <xs:complexType name="authorType"> 
+                    <xs:sequence> 
+                        <xs:element type="xs:string" name="organization"/> 
+                    </xs:sequence> 
+                </xs:complexType> 
+            </xs:schema> 
+            """
         )
         xmlschema_doc = etree.parse(author_xsd)
         author_xmlschema = etree.XMLSchema(xmlschema_doc)
