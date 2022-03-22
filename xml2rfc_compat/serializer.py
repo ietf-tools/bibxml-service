@@ -77,7 +77,7 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
 
     else:
         raise ValueError(
-            "Unable to construct neither <reference> nor <referencegroup>: "
+            "Able to construct neither <reference> nor <referencegroup>: "
             "impossible combination of titles and relations")
 
     if anchor:
