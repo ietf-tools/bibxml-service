@@ -11,7 +11,7 @@ RFP requirement compliance
        and Javascript/HTML/CSS for the interactive web page,
        built on modern infrastructure components and designed for maintainability.
 
-   - Server-side is written in Python 3.9 with type annotations.
+   - Server side is written in Python 3.9 with type annotations.
 
    - Client-side, JavaScript is purposefully maintained entirely
      optional for core functionality.
