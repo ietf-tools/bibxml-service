@@ -11,7 +11,11 @@ on AWS infrastructure using the bundled Compose configuration.
 
 .. seealso:: :doc:`/topics/production-setup`
 
-1. Using AWS Lightsail, provision an Ubuntu x86-64 server with port 80 open.
+.. note::
+
+   Below, 12345 is a sample port used for communicating with the origin. You can use any port, like 80.
+
+1. Using AWS Lightsail, provision an Ubuntu x86-64 server with port 12345 open.
 
 2. Assign a static IP to the instance. Take note of it.
 
@@ -24,16 +28,20 @@ on AWS infrastructure using the bundled Compose configuration.
 
 6. Place a ``.env`` file at the root of the repository with following contents::
 
+       DEBUG=0
+       HOST=your.chosen.domain.name.com
        PORT=12345
        DB_NAME=bibxml
        DB_SECRET="random string without double quote characters"
        DJANGO_SECRET="a very long and very random string without double quote characters"
-       SENTRY_DSN="your Sentry DSN string"
-       HOST=your.chosen.domain.name.com
        API_SECRET="API secret to be used in management GUI and API authentication"
-       DEBUG=0
        SERVICE_NAME="IETF BibXML service"
        CONTACT_EMAIL="operating team contact email"
+       DATATRACKER_CLIENT_ID="Datatracker OAuth2 client ID"
+       DATATRACKER_CLIENT_SECRET="Datatracker OAuth2 client secret"
+       SENTRY_DSN="your Sentry DSN string"
+       MATOMO_URL="Matomo URL"
+       MATOMO_SITE_ID="Matomo site ID"
 
 7. Run the command::
 
@@ -43,8 +51,9 @@ on AWS infrastructure using the bundled Compose configuration.
 
        sudo docker-compose build && sudo docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up
 
-8. Set up a CloudFront distribution that uses plain HTTP to talk to "origin.your.chosen.domain.name.com" via port 12345,
-   responds to "your.chosen.domain.name.com" as an alternate domain name (CNAME)
+8. Set up a CloudFront distribution that
+   uses plain HTTP to talk to "origin.your.chosen.domain.name.com" via port 12345,
+   responds to "your.chosen.domain.name.com" as an alternate domain name (CNAME),
    and redirects HTTP to HTTPS for visitors from the outside
    (you may need to provision an SSL certificate first).
 
@@ -58,15 +67,15 @@ the site should be available via https://your.chosen.domain.name.com.
 
 .. [2] https://docs.docker.com/compose/install/
 
-.. [3] Typically, if you operate numerous services, you would already have a Prometheus instance set up.
-       In that case, just update your Prometheus instance to scrape two additional targets:
+.. [3] The bundled ``docker-compose.monitor.yml`` is there primarily for illustrative purposes,
+       as typically you would already have a Prometheus instance set up.
+
+       If you have a Prometheus instance, update it to scrape two additional targets:
        "origin.your.chosen.domain.name.com:9808" (Celery async task worker)
        and "origin.your.chosen.domain.name.com:12345" (web instance with Hypercorn web server).
 
-       (If you increase the number of web instances,
-       make sure each target’s URL is added to your Prometheus instance for scraping.)
-
-       The bundled ``docker-compose.monitor.yml`` is there primarily for illustration purposes.
+       If you increase the number of web instances,
+       make sure each target’s URL is added to your Prometheus instance for scraping.
 
 Updating
 ========
