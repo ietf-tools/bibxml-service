@@ -234,7 +234,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
             )
 
         if item:
-            xml_repr = to_xml_string(item, anchor=anchor)
+            xml_repr = to_xml_string(item)
         else:
             xml_repr = obtain_fallback_xml(
                 xml2rfc_subpath,
