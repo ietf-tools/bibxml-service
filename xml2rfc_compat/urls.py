@@ -5,7 +5,7 @@ fit for inclusion in site’s root URL configuration."""
 import logging
 import functools
 import re
-from typing import Callable, List, Union, Dict, Tuple, TypedDict, cast
+from typing import Callable, List, Union, Dict, Tuple, TypedDict, cast, Optional
 
 from django.urls import re_path
 from django.views.decorators.cache import never_cache
@@ -237,8 +237,7 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
             xml_repr = to_xml_string(item)
         else:
             xml_repr = obtain_fallback_xml(
-                xml2rfc_subpath,
-                anchor)
+                xml2rfc_subpath)
             method_results['fallback'] = dict(
                 config='',
                 error='' if xml_repr else "not indexed",
@@ -303,7 +302,10 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
     return handle_xml2rfc_path
 
 
-def obtain_fallback_xml(subpath: str, anchor: str) -> Union[str, None]:
+def obtain_fallback_xml(
+    subpath: str,
+    anchor: Optional[str] = None,
+) -> Union[str, None]:
     """Obtains XML fallback for given subpath, if possible."""
 
     requested_dirname = subpath.split('/')[-2]
@@ -321,7 +323,10 @@ def obtain_fallback_xml(subpath: str, anchor: str) -> Union[str, None]:
         except Xml2rfcItem.DoesNotExist:
             return None
         else:
-            return _replace_anchor(xml_repr, anchor)
+            if anchor:
+                return _replace_anchor(xml_repr, anchor)
+            else:
+                return xml_repr
 
 
 def _replace_anchor(xml_repr: str, anchor: str) -> str:
