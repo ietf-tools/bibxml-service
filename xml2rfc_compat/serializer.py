@@ -64,8 +64,11 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
     is_reference = len(titles) > 0
 
     docids = as_list(item.docid or [])
-    if anchor is None and len(docids) > 0:
-        anchor = ([d for d in docids if d.primary] or docids)[0].id
+    if anchor is None:
+        try:
+            anchor = get_suitable_anchor(docids)
+        except ValueError:
+            pass
 
     if is_reference:
         root = create_reference(item)
@@ -182,15 +185,40 @@ def create_reference(item: BibliographicItem) -> Element:
                 value=series_info[1],
             ))
 
-    # Anchor, may be overwritten by callers
-    if len(docids) > 0:
+    try:
+        # Anchor, may be overwritten by callers
+        ref.set('anchor', get_suitable_anchor(docids))
+    except ValueError:
+        # Anchor could not be detected.
+        pass
+
+    return ref
+
+
+# Anchors
+# =======
+
+def get_suitable_anchor(docids: List[DocID]):
+    """From a list of ``DocID`` instances, get best anchor value
+    and return it as a string.
+
+    Ideally it’s a ``DocID`` with ``scope`` equal to “anchor”,
+    otherwise primary identifier, otherwise any idnetifier.
+
+    :param docids: a list of :class:`bib_models.bibdata.DocID` instances
+    :returns str: a string to be used as anchor
+    :rtype: str
+    :raises ValueError: no suitable document identifier (possibly empty list)
+    """
+    try:
         anchor_docid: DocID = (
             [d for d in docids if d.scope == 'anchor']
             or [d for d in docids if d.primary]
             or docids)[0]
-        ref.set('anchor', anchor_docid.id)
-
-    return ref
+    except IndexError:
+        raise ValueError("No anchor could be found")
+    else:
+        return anchor_docid.id
 
 
 # Authors and contributors
