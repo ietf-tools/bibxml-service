@@ -1,3 +1,4 @@
+import os
 from copy import copy
 from io import StringIO
 
@@ -83,43 +84,15 @@ class XML2RFCTestCase(TestCase):
     def test_bibliographicitem_to_xml(self):
         xml = to_xml(self.bibitem)
 
-        bibitem_xsd = StringIO(
-            """
-                    <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
-                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                      <xs:element name="reference" type="referenceType"/>
-                      <xs:complexType name="authorType">
-                        <xs:sequence>
-                          <xs:element type="xs:string" name="organization"/>
-                        </xs:sequence>
-                      </xs:complexType>
-                      <xs:complexType name="dateType">
-                        <xs:simpleContent>
-                          <xs:extension base="xs:string">
-                            <xs:attribute type="xs:string" name="month"/>
-                            <xs:attribute type="xs:short" name="year"/>
-                          </xs:extension>
-                        </xs:simpleContent>
-                      </xs:complexType>
-                      <xs:complexType name="frontType">
-                        <xs:sequence>
-                          <xs:element type="xs:string" name="title"/>
-                          <xs:element type="authorType" name="author"/>
-                          <xs:element type="dateType" name="date"/>
-                        </xs:sequence>
-                      </xs:complexType>
-                      <xs:complexType name="referenceType">
-                        <xs:sequence>
-                          <xs:element type="frontType" name="front"/>
-                        </xs:sequence>
-                        <xs:attribute type="xs:string" name="anchor"/>
-                      </xs:complexType>
-                    </xs:schema>
-                """
-        )
-        xmlschema_doc = etree.parse(bibitem_xsd)
-        xmlschema = etree.XMLSchema(xmlschema_doc)
-        xmlschema.assertValid(xml)  # Validate XML Schema
+        # print(etree.tostring(xml, pretty_print=True))
+
+        # xmlschema_doc = etree.parse()
+        module_dir = os.path.dirname(__file__)
+        file_path = os.path.join(module_dir, 'static/schemas/v3.xsd')
+        xmlschema = etree.XMLSchema(file=file_path)
+
+        doc = etree.parse(xml)
+        xmlschema.assertValid(doc)
 
     def test_fail_bibliographicitem_to_xml_if_wrong_combination_of_titles_and_relations(
         self,
@@ -145,15 +118,15 @@ class XML2RFCTestCase(TestCase):
     def test_create_author(self):
         author_xsd = StringIO(
             """
-            <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
-                <xs:element name="author" type="authorType"/> 
-                <xs:complexType name="authorType"> 
-                    <xs:sequence> 
-                        <xs:element type="xs:string" name="organization"/> 
-                    </xs:sequence> 
-                </xs:complexType> 
-            </xs:schema> 
+            <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"> 
+                <xsd:element name="author" type="authorType"/> 
+                <xsd:complexType name="authorType"> 
+                    <xsd:sequence> 
+                        <xsd:element type="xsd:string" name="organization"/> 
+                    </xsd:sequence> 
+                </xsd:complexType> 
+            </xsd:schema> 
             """
         )
         xmlschema_doc = etree.parse(author_xsd)

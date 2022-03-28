@@ -1,0 +1,1580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns:ns1="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg">
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="SVG-1.2-RFC.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <!-- xml2rfc Version 3 grammar -->
+  <xs:element name="rfc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="link"/>
+        <xs:element ref="front"/>
+        <xs:element ref="middle"/>
+        <xs:element minOccurs="0" ref="back"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="number"/>
+      <xs:attribute name="obsoletes" default=""/>
+      <xs:attribute name="updates" default=""/>
+      <xs:attribute name="category">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="std"/>
+            <xs:enumeration value="bcp"/>
+            <xs:enumeration value="exp"/>
+            <xs:enumeration value="info"/>
+            <xs:enumeration value="historic"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="mode"/>
+      <xs:attribute name="consensus" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="no"/>
+            <xs:enumeration value="yes"/>
+            <xs:enumeration value="false"/>
+            <xs:enumeration value="true"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="seriesNo"/>
+      <xs:attribute name="ipr"/>
+      <xs:attribute name="iprExtract" type="xs:IDREF"/>
+      <xs:attribute name="submissionType" default="IETF">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IETF"/>
+            <xs:enumeration value="IAB"/>
+            <xs:enumeration value="IRTF"/>
+            <xs:enumeration value="independent"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="docName"/>
+      <xs:attribute name="sortRefs" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="symRefs" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="tocInclude" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="tocDepth" default="3"/>
+      <xs:attribute name="prepTime"/>
+      <xs:attribute name="indexInclude" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="version"/>
+      <xs:attribute name="scripts" default="Common,Latin"/>
+      <xs:attribute name="expiresDate"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="link">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="href" use="required"/>
+      <xs:attribute name="rel"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="front">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="title"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="seriesInfo"/>
+        <xs:element maxOccurs="unbounded" ref="author"/>
+        <xs:element minOccurs="0" ref="date"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="area"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="workgroup"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="keyword"/>
+        <xs:element minOccurs="0" ref="abstract"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="note"/>
+        <xs:element minOccurs="0" ref="boilerplate"/>
+        <xs:element minOccurs="0" ref="toc"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="br"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="abbrev"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="author">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="organization"/>
+        <xs:element minOccurs="0" ref="address"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="initials"/>
+      <xs:attribute name="asciiInitials"/>
+      <xs:attribute name="surname"/>
+      <xs:attribute name="asciiSurname"/>
+      <xs:attribute name="fullname"/>
+      <xs:attribute name="role">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="editor"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="asciiFullname"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="contact">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="organization"/>
+        <xs:element minOccurs="0" ref="address"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="initials"/>
+      <xs:attribute name="asciiInitials"/>
+      <xs:attribute name="surname"/>
+      <xs:attribute name="asciiSurname"/>
+      <xs:attribute name="fullname"/>
+      <xs:attribute name="asciiFullname"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="organization">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="abbrev"/>
+      <xs:attribute name="ascii"/>
+      <xs:attribute name="asciiAbbrev"/>
+      <xs:attribute name="showOnFrontPage" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="address">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="postal"/>
+        <xs:element minOccurs="0" ref="phone"/>
+        <xs:element minOccurs="0" ref="facsimile"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="email"/>
+        <xs:element minOccurs="0" ref="uri"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="postal">
+    <xs:complexType>
+      <xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="city"/>
+          <xs:element ref="cityarea"/>
+          <xs:element ref="code"/>
+          <xs:element ref="country"/>
+          <xs:element ref="extaddr"/>
+          <xs:element ref="pobox"/>
+          <xs:element ref="region"/>
+          <xs:element ref="sortingcode"/>
+          <xs:element ref="street"/>
+        </xs:choice>
+        <xs:element maxOccurs="unbounded" ref="postalLine"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="extaddr">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pobox">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="street">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="cityarea">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="city">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="region">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="code">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sortingcode">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="country">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="postalLine">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="phone">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="facsimile">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="email">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="ascii"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="uri">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="date">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="day"/>
+      <xs:attribute name="month"/>
+      <xs:attribute name="year"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="area">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="workgroup">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="keyword">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="abstract">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="dl"/>
+        <xs:element ref="ol"/>
+        <xs:element ref="t"/>
+        <xs:element ref="ul"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="note">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="dl"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="t"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="title"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="removeInRFC" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="boilerplate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="toc">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="middle">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="aside"/>
+          <xs:element ref="author"/>
+          <xs:element ref="blockquote"/>
+          <xs:element ref="contact"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="table"/>
+          <xs:element ref="texttable"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="title"/>
+      <xs:attribute name="numbered" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="toc" default="default">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="include"/>
+            <xs:enumeration value="exclude"/>
+            <xs:enumeration value="default"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="removeInRFC" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="name">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="slugifiedName" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="br">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="t">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="contact"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="list"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="spanx"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="u"/>
+        <xs:element ref="vspace"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="hangText"/>
+      <xs:attribute name="indent" default="0"/>
+      <xs:attribute name="keepWithNext" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="keepWithPrevious" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="aside">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="artset"/>
+        <xs:element ref="artwork"/>
+        <xs:element ref="blockquote"/>
+        <xs:element ref="dl"/>
+        <xs:element ref="figure"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="ol"/>
+        <xs:element ref="t"/>
+        <xs:element ref="table"/>
+        <xs:element ref="ul"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="blockquote">
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="bcp14"/>
+          <xs:element ref="br"/>
+          <xs:element ref="cref"/>
+          <xs:element ref="em"/>
+          <xs:element ref="eref"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="relref"/>
+          <xs:element ref="strong"/>
+          <xs:element ref="sub"/>
+          <xs:element ref="sup"/>
+          <xs:element ref="tt"/>
+          <xs:element ref="u"/>
+          <xs:element ref="xref"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="cite"/>
+      <xs:attribute name="quotedFrom"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="t"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="style" default="empty"/>
+      <xs:attribute name="hangIndent"/>
+      <xs:attribute name="counter"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ol">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="li"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="type" default="1"/>
+      <xs:attribute name="start" default="1"/>
+      <xs:attribute name="group"/>
+      <xs:attribute name="spacing" default="normal">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="compact"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="indent" default="adaptive"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ul">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="li"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="spacing" default="normal">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="compact"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="empty" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="bare" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="indent" default="3"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="li">
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="blockquote"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="table"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="bcp14"/>
+          <xs:element ref="br"/>
+          <xs:element ref="cref"/>
+          <xs:element ref="em"/>
+          <xs:element ref="eref"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="relref"/>
+          <xs:element ref="strong"/>
+          <xs:element ref="sub"/>
+          <xs:element ref="sup"/>
+          <xs:element ref="tt"/>
+          <xs:element ref="u"/>
+          <xs:element ref="xref"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="derivedCounter"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dl">
+    <xs:complexType>
+      <xs:sequence maxOccurs="unbounded">
+        <xs:element ref="dt"/>
+        <xs:element ref="dd"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="spacing" default="normal">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="normal"/>
+            <xs:enumeration value="compact"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="newline" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="indent" default="3"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dt">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="dd">
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="aside"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="table"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="bcp14"/>
+          <xs:element ref="br"/>
+          <xs:element ref="cref"/>
+          <xs:element ref="em"/>
+          <xs:element ref="eref"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="relref"/>
+          <xs:element ref="strong"/>
+          <xs:element ref="sub"/>
+          <xs:element ref="sup"/>
+          <xs:element ref="tt"/>
+          <xs:element ref="u"/>
+          <xs:element ref="xref"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="xref">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="em"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="target" use="required" type="xs:IDREF"/>
+      <xs:attribute name="pageno" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="format" default="default">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="default"/>
+            <xs:enumeration value="title"/>
+            <xs:enumeration value="counter"/>
+            <xs:enumeration value="none"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="derivedContent"/>
+      <xs:attribute name="sectionFormat" default="of">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="of"/>
+            <xs:enumeration value="comma"/>
+            <xs:enumeration value="parens"/>
+            <xs:enumeration value="bare"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="section"/>
+      <xs:attribute name="relative"/>
+      <xs:attribute name="derivedLink"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="relref">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="target" use="required" type="xs:IDREF"/>
+      <xs:attribute name="displayFormat" default="of">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="of"/>
+            <xs:enumeration value="comma"/>
+            <xs:enumeration value="parens"/>
+            <xs:enumeration value="bare"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="derivedContent"/>
+      <xs:attribute name="section" use="required"/>
+      <xs:attribute name="relative"/>
+      <xs:attribute name="derivedLink"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="eref">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="brackets" default="none">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="angle"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="target" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="iref">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="item" use="required"/>
+      <xs:attribute name="subitem" default=""/>
+      <xs:attribute name="primary" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="cref">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="br"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="source"/>
+      <xs:attribute name="display" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tt">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="strong">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="em">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="br"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sub">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sup">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="spanx">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attributeGroup ref="xml:space"/>
+      <xs:attribute name="style" default="emph"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="vspace">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="blankLines" default="0"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="figure">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="iref"/>
+        <xs:element minOccurs="0" ref="preamble"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="sourcecode"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="postamble"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="title" default=""/>
+      <xs:attribute name="suppress-title" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="src"/>
+      <xs:attribute name="originalSrc"/>
+      <xs:attribute name="align" default="left">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="alt" default=""/>
+      <xs:attribute name="width" default=""/>
+      <xs:attribute name="height" default=""/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="table">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="iref"/>
+        <xs:element minOccurs="0" ref="thead"/>
+        <xs:element maxOccurs="unbounded" ref="tbody"/>
+        <xs:element minOccurs="0" ref="tfoot"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="align" default="center">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="preamble">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="spanx"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="u"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="artset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="artwork"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="artwork">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="svg:svg"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attributeGroup ref="xml:space1"/>
+      <xs:attribute name="name" default=""/>
+      <xs:attribute name="type" default=""/>
+      <xs:attribute name="src"/>
+      <xs:attribute name="align" default="left">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="alt" default=""/>
+      <xs:attribute name="width" default=""/>
+      <xs:attribute name="height" default=""/>
+      <xs:attribute name="originalSrc"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sourcecode">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="name" default=""/>
+      <xs:attribute name="type" default=""/>
+      <xs:attribute name="markers" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="src"/>
+      <xs:attribute name="originalSrc"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="thead">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="tr"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tbody">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="tr"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tfoot">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="tr"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tr">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="td"/>
+        <xs:element ref="th"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="td">
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="bcp14"/>
+          <xs:element ref="br"/>
+          <xs:element ref="cref"/>
+          <xs:element ref="em"/>
+          <xs:element ref="eref"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="relref"/>
+          <xs:element ref="strong"/>
+          <xs:element ref="sub"/>
+          <xs:element ref="sup"/>
+          <xs:element ref="tt"/>
+          <xs:element ref="u"/>
+          <xs:element ref="xref"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="colspan" default="1"/>
+      <xs:attribute name="rowspan" default="1"/>
+      <xs:attribute name="align" default="left">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="th">
+    <xs:complexType mixed="true">
+      <xs:choice>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="artset"/>
+          <xs:element ref="artwork"/>
+          <xs:element ref="dl"/>
+          <xs:element ref="figure"/>
+          <xs:element ref="ol"/>
+          <xs:element ref="sourcecode"/>
+          <xs:element ref="t"/>
+          <xs:element ref="ul"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="bcp14"/>
+          <xs:element ref="br"/>
+          <xs:element ref="cref"/>
+          <xs:element ref="em"/>
+          <xs:element ref="eref"/>
+          <xs:element ref="iref"/>
+          <xs:element ref="relref"/>
+          <xs:element ref="strong"/>
+          <xs:element ref="sub"/>
+          <xs:element ref="sup"/>
+          <xs:element ref="tt"/>
+          <xs:element ref="u"/>
+          <xs:element ref="xref"/>
+        </xs:choice>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="colspan" default="1"/>
+      <xs:attribute name="rowspan" default="1"/>
+      <xs:attribute name="align" default="left">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="postamble">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cref"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="spanx"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="texttable">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:element minOccurs="0" ref="preamble"/>
+        <xs:element maxOccurs="unbounded" ref="ttcol"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="c"/>
+        <xs:element minOccurs="0" ref="postamble"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="title" default=""/>
+      <xs:attribute name="suppress-title" default="false">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="align" default="center">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="style" default="full">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="all"/>
+            <xs:enumeration value="none"/>
+            <xs:enumeration value="headers"/>
+            <xs:enumeration value="full"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ttcol">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cref"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="width"/>
+      <xs:attribute name="align" default="left">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="left"/>
+            <xs:enumeration value="center"/>
+            <xs:enumeration value="right"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="c">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="cref"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="spanx"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bcp14">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="back">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="displayreference"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="references"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="displayreference">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="target" use="required" type="xs:IDREF"/>
+      <xs:attribute name="to" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="references">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="name"/>
+        <xs:choice>
+          <xs:element maxOccurs="unbounded" ref="references"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="reference"/>
+            <xs:element ref="referencegroup"/>
+          </xs:choice>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="title"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="reference">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="stream"/>
+        <xs:element ref="front"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="annotation"/>
+          <xs:element ref="format"/>
+          <xs:element ref="refcontent"/>
+          <xs:element ref="seriesInfo"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" use="required" type="xs:ID"/>
+      <xs:attribute name="derivedAnchor"/>
+      <xs:attribute name="target"/>
+      <xs:attribute name="quoteTitle" default="true">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="quote-title">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="false"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="stream">
+    <xs:simpleType>
+      <xs:union>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IETF"/>
+            <xs:enumeration value="IAB"/>
+            <xs:enumeration value="IRTF"/>
+            <xs:enumeration value="independent"/>
+          </xs:restriction>
+        </xs:simpleType>
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:length value="0"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="referencegroup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="reference"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="anchor" use="required" type="xs:ID"/>
+      <xs:attribute name="derivedAnchor"/>
+      <xs:attribute name="target"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="seriesInfo">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="value" use="required"/>
+      <xs:attribute name="asciiName"/>
+      <xs:attribute name="asciiValue"/>
+      <xs:attribute name="status"/>
+      <xs:attribute name="stream">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IETF"/>
+            <xs:enumeration value="IAB"/>
+            <xs:enumeration value="IRTF"/>
+            <xs:enumeration value="independent"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="format">
+    <xs:complexType>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+      <xs:attribute name="target"/>
+      <xs:attribute name="type" use="required"/>
+      <xs:attribute name="octets"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="annotation">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="cref"/>
+        <xs:element ref="em"/>
+        <xs:element ref="eref"/>
+        <xs:element ref="iref"/>
+        <xs:element ref="relref"/>
+        <xs:element ref="spanx"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+        <xs:element ref="u"/>
+        <xs:element ref="xref"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="refcontent">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="bcp14"/>
+        <xs:element ref="em"/>
+        <xs:element ref="strong"/>
+        <xs:element ref="sub"/>
+        <xs:element ref="sup"/>
+        <xs:element ref="tt"/>
+      </xs:choice>
+      <xs:attributeGroup ref="xml:base"/>
+      <xs:attributeGroup ref="xml:lang"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="u">
+    <xs:complexType mixed="true">
+      <xs:attribute name="anchor" type="xs:ID"/>
+      <xs:attribute name="ascii"/>
+      <xs:attribute name="format" default="lit-name-num"/>
+      <xs:attribute name="pn" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
