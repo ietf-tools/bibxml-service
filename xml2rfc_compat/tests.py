@@ -1,11 +1,9 @@
 import os
 from copy import copy
 from io import StringIO
-from urllib.request import urlopen
 
-import requests
 from django.test import TestCase
-from lxml import etree, html
+from lxml import etree
 
 from bib_models import BibliographicItem, Contributor
 from xml2rfc_compat.serializer import to_xml, create_reference, create_author
@@ -29,7 +27,7 @@ class XML2RFCTestCase(TestCase):
             },
             "role": "author",
         }
-        self.bibitem_data = {
+        self.bibitem_reference_data = {
             "id": "ref_01",
             "title": [
                 {
@@ -40,14 +38,13 @@ class XML2RFCTestCase(TestCase):
                 }
             ],
             "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
-            "formattedref": {
-                "content": "BCP4",
-                "language": "en",
-                "script": "Latn",
-                "format": "text/plain",
-            },
-            "contributor": [self.contributor_organization_data],
+            "contributor": [self.contributor_person_data],
             "date": [{"type": "published", "value": "1996-02"}],
+        }
+
+        self.bibitem_referencegroup_data = {
+            "id": "ref_02",
+            "docid": [{"id": "ref_02", "type": "test_dataset_02"}],
             "relation": [
                 {
                     "type": "includes",
@@ -61,52 +58,62 @@ class XML2RFCTestCase(TestCase):
                                 "format": "text / plain",
                             }
                         ],
+                        "contributor": [
+                            self.contributor_organization_data,
+                            self.contributor_person_data,
+                        ],
                         "link": [
                             {
                                 "content": "https://raw.githubusercontent.com/relaton/relaton-data-ietf/master/data/reference.RFC"
-                                ".1917.xml",
+                                ".1918.xml",
                                 "type": "xml",
                             }
                         ],
                         "type": "standard",
-                        "docid": [{"id": "RFC1917", "type": "RFC"}],
-                        "docnumber": "RFC1917",
-                        "date": [{"type": "published", "value": "1996-02"}],
+                        "docid": [{"id": "RFC1918", "type": "RFC"}],
+                        "docnumber": "RFC1918",
+                        "date": [{"type": "published", "value": "1998-02"}],
                     },
                 }
             ],
         }
 
-        self.bibitem = BibliographicItem(**self.bibitem_data)
+        self.bibitem_reference = BibliographicItem(**self.bibitem_reference_data)
+        self.bibitem_referencegroup = BibliographicItem(
+            **self.bibitem_referencegroup_data
+        )
         self.contributor_organization = Contributor(
             **self.contributor_organization_data
         )
         self.contributor_person = Contributor(**self.contributor_person_data)
 
     def test_bibliographicitem_to_xml(self):
-        xml = to_xml(self.bibitem)
+
+        xml_reference = to_xml(self.bibitem_reference)
+        xml_referencegroup = to_xml(self.bibitem_referencegroup)
 
         module_dir = os.path.dirname(__file__)
-        file_path = os.path.join(module_dir, 'static/schemas/v3.xsd')
+        file_path = os.path.join(module_dir, "static/schemas/v3.xsd")
         xmlschema = etree.XMLSchema(file=file_path)
-        xmlschema.assertValid(xml)
+        xmlschema.assertValid(xml_reference)
+        xmlschema.assertValid(xml_referencegroup)
 
     def test_fail_bibliographicitem_to_xml_if_wrong_combination_of_titles_and_relations(
         self,
     ):
-        data = copy(self.bibitem_data)
+        data = copy(self.bibitem_reference_data)
         del data["title"]
-        del data["relation"]
+        # del data["relation"]
         new_bibitem_with_missing_data = BibliographicItem(**data)
         with self.assertRaises(ValueError):
             to_xml(new_bibitem_with_missing_data)
 
     def test_create_reference(self):
-        ref = create_reference(self.bibitem)
+        ref = create_reference(self.bibitem_reference)
         self.assertEqual(ref.tag, "reference")
 
     def test_fail_create_reference_if_missing_titles(self):
-        data = copy(self.bibitem_data)
+        data = copy(self.bibitem_reference_data)
         del data["title"]
         new_bibitem_with_missing_data = BibliographicItem(**data)
         with self.assertRaises(ValueError):
