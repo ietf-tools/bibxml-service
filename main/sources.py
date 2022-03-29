@@ -73,7 +73,7 @@ def get_indexed_object_meta(dataset_id: str, ref: str) -> IndexedObject:
     )
 
 
-def locate_relaton_source_repo(dataset_id: str):
+def locate_relaton_source_repo(dataset_id: str) -> Tuple[str, str]:
     """
     :param dataset_id: dataset ID as string
     :returns: tuple (repo_url, repo_branch)
