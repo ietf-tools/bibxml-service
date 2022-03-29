@@ -12,8 +12,6 @@
         <xs:element ref="middle"/>
         <xs:element minOccurs="0" ref="back"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
       <xs:attribute name="number"/>
       <xs:attribute name="obsoletes" default=""/>
       <xs:attribute name="updates" default=""/>
@@ -94,8 +92,6 @@
   </xs:element>
   <xs:element name="link">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
       <xs:attribute name="href" use="required"/>
       <xs:attribute name="rel"/>
     </xs:complexType>
@@ -115,8 +111,7 @@
         <xs:element minOccurs="0" ref="boilerplate"/>
         <xs:element minOccurs="0" ref="toc"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="title">
@@ -124,8 +119,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="br"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="abbrev"/>
       <xs:attribute name="ascii"/>
     </xs:complexType>
@@ -136,8 +130,7 @@
         <xs:element minOccurs="0" ref="organization"/>
         <xs:element minOccurs="0" ref="address"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="anchor" type="xs:ID"/>
       <xs:attribute name="initials"/>
       <xs:attribute name="asciiInitials"/>
@@ -160,9 +153,8 @@
         <xs:element minOccurs="0" ref="organization"/>
         <xs:element minOccurs="0" ref="address"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="initials"/>
       <xs:attribute name="asciiInitials"/>
       <xs:attribute name="surname"/>
@@ -173,8 +165,7 @@
   </xs:element>
   <xs:element name="organization">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="abbrev"/>
       <xs:attribute name="ascii"/>
       <xs:attribute name="asciiAbbrev"/>
@@ -197,8 +188,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="email"/>
         <xs:element minOccurs="0" ref="uri"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="postal">
@@ -217,109 +207,93 @@
         </xs:choice>
         <xs:element maxOccurs="unbounded" ref="postalLine"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="extaddr">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="pobox">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="street">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="cityarea">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="city">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="region">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="code">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="sortingcode">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="country">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="postalLine">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="phone">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="facsimile">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="email">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="ascii"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="uri">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="date">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="day"/>
       <xs:attribute name="month"/>
       <xs:attribute name="year"/>
@@ -327,20 +301,17 @@
   </xs:element>
   <xs:element name="area">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="workgroup">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="keyword">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="abstract">
@@ -351,9 +322,8 @@
         <xs:element ref="t"/>
         <xs:element ref="ul"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -368,8 +338,7 @@
           <xs:element ref="ul"/>
         </xs:choice>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="title"/>
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="removeInRFC" default="false">
@@ -387,8 +356,7 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="section"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="toc">
@@ -396,8 +364,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="middle">
@@ -405,8 +372,7 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="section"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="section">
@@ -432,9 +398,8 @@
         </xs:choice>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="title"/>
       <xs:attribute name="numbered" default="true">
@@ -480,15 +445,13 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="slugifiedName" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="br">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="t">
@@ -512,9 +475,8 @@
         <xs:element ref="vspace"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="hangText"/>
       <xs:attribute name="indent" default="0"/>
@@ -550,9 +512,8 @@
         <xs:element ref="table"/>
         <xs:element ref="ul"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -585,9 +546,8 @@
           <xs:element ref="xref"/>
         </xs:choice>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="cite"/>
       <xs:attribute name="quotedFrom"/>
@@ -598,8 +558,7 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="t"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="style" default="empty"/>
       <xs:attribute name="hangIndent"/>
       <xs:attribute name="counter"/>
@@ -611,9 +570,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="li"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="type" default="1"/>
       <xs:attribute name="start" default="1"/>
       <xs:attribute name="group"/>
@@ -634,9 +592,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="li"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="spacing" default="normal">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -696,9 +653,8 @@
           <xs:element ref="xref"/>
         </xs:choice>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="derivedCounter"/>
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
@@ -709,9 +665,8 @@
         <xs:element ref="dt"/>
         <xs:element ref="dd"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="spacing" default="normal">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -748,9 +703,8 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -785,9 +739,8 @@
           <xs:element ref="xref"/>
         </xs:choice>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -800,8 +753,7 @@
         <xs:element ref="sup"/>
         <xs:element ref="tt"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="target" use="required" type="xs:IDREF"/>
       <xs:attribute name="pageno" default="false">
         <xs:simpleType>
@@ -839,8 +791,7 @@
   </xs:element>
   <xs:element name="relref">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="target" use="required" type="xs:IDREF"/>
       <xs:attribute name="displayFormat" default="of">
         <xs:simpleType>
@@ -860,8 +811,7 @@
   </xs:element>
   <xs:element name="eref">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="brackets" default="none">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -875,8 +825,7 @@
   </xs:element>
   <xs:element name="iref">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="item" use="required"/>
       <xs:attribute name="subitem" default=""/>
       <xs:attribute name="primary" default="false">
@@ -903,9 +852,8 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="source"/>
       <xs:attribute name="display" default="true">
         <xs:simpleType>
@@ -932,8 +880,7 @@
         <xs:element ref="sup"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="strong">
@@ -951,8 +898,7 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="em">
@@ -970,8 +916,7 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="sub">
@@ -989,8 +934,7 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="sup">
@@ -1008,22 +952,19 @@
         <xs:element ref="tt"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="spanx">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attributeGroup ref="xml:space"/>
       <xs:attribute name="style" default="emph"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="vspace">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="blankLines" default="0"/>
     </xs:complexType>
   </xs:element>
@@ -1040,9 +981,8 @@
         </xs:choice>
         <xs:element minOccurs="0" ref="postamble"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="title" default=""/>
       <xs:attribute name="suppress-title" default="false">
@@ -1078,8 +1018,7 @@
         <xs:element maxOccurs="unbounded" ref="tbody"/>
         <xs:element minOccurs="0" ref="tfoot"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="align" default="center">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -1089,7 +1028,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="anchor" type="xs:ID"/>
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -1110,8 +1049,7 @@
         <xs:element ref="u"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="artset">
@@ -1119,9 +1057,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="artwork"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
@@ -1130,9 +1067,8 @@
       <xs:sequence>
         <xs:element minOccurs="0" ref="svg:svg"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attributeGroup ref="xml:space1"/>
       <xs:attribute name="name" default=""/>
@@ -1155,9 +1091,8 @@
   </xs:element>
   <xs:element name="sourcecode">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="pn" type="xs:ID"/>
       <xs:attribute name="name" default=""/>
       <xs:attribute name="type" default=""/>
@@ -1178,9 +1113,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="tr"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
     </xs:complexType>
   </xs:element>
   <xs:element name="tbody">
@@ -1188,9 +1122,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="tr"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
     </xs:complexType>
   </xs:element>
   <xs:element name="tfoot">
@@ -1198,9 +1131,8 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="tr"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
     </xs:complexType>
   </xs:element>
   <xs:element name="tr">
@@ -1209,9 +1141,8 @@
         <xs:element ref="td"/>
         <xs:element ref="th"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
     </xs:complexType>
   </xs:element>
   <xs:element name="td">
@@ -1243,9 +1174,8 @@
           <xs:element ref="xref"/>
         </xs:choice>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="colspan" default="1"/>
       <xs:attribute name="rowspan" default="1"/>
       <xs:attribute name="align" default="left">
@@ -1288,9 +1218,8 @@
           <xs:element ref="xref"/>
         </xs:choice>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="colspan" default="1"/>
       <xs:attribute name="rowspan" default="1"/>
       <xs:attribute name="align" default="left">
@@ -1313,8 +1242,7 @@
         <xs:element ref="spanx"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="texttable">
@@ -1326,9 +1254,8 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="c"/>
         <xs:element minOccurs="0" ref="postamble"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+      
+
       <xs:attribute name="title" default=""/>
       <xs:attribute name="suppress-title" default="false">
         <xs:simpleType>
@@ -1367,8 +1294,7 @@
         <xs:element ref="iref"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="width"/>
       <xs:attribute name="align" default="left">
         <xs:simpleType>
@@ -1390,14 +1316,12 @@
         <xs:element ref="spanx"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="bcp14">
     <xs:complexType mixed="true">
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="back">
@@ -1407,14 +1331,12 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="references"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="displayreference">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="target" use="required" type="xs:IDREF"/>
       <xs:attribute name="to" use="required"/>
     </xs:complexType>
@@ -1431,10 +1353,9 @@
           </xs:choice>
         </xs:choice>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="pn" type="xs:ID"/>
-      <xs:attribute name="anchor" type="xs:ID"/>
+
       <xs:attribute name="title"/>
     </xs:complexType>
   </xs:element>
@@ -1450,8 +1371,7 @@
           <xs:element ref="seriesInfo"/>
         </xs:choice>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="anchor" use="required" type="xs:ID"/>
       <xs:attribute name="derivedAnchor"/>
       <xs:attribute name="target"/>
@@ -1497,8 +1417,7 @@
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="reference"/>
       </xs:sequence>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="anchor" use="required" type="xs:ID"/>
       <xs:attribute name="derivedAnchor"/>
       <xs:attribute name="target"/>
@@ -1506,8 +1425,7 @@
   </xs:element>
   <xs:element name="seriesInfo">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="name" use="required"/>
       <xs:attribute name="value" use="required"/>
       <xs:attribute name="asciiName"/>
@@ -1527,8 +1445,7 @@
   </xs:element>
   <xs:element name="format">
     <xs:complexType>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
       <xs:attribute name="target"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="octets"/>
@@ -1551,8 +1468,7 @@
         <xs:element ref="u"/>
         <xs:element ref="xref"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="refcontent">
@@ -1565,13 +1481,12 @@
         <xs:element ref="sup"/>
         <xs:element ref="tt"/>
       </xs:choice>
-      <xs:attributeGroup ref="xml:base"/>
-      <xs:attributeGroup ref="xml:lang"/>
+      
     </xs:complexType>
   </xs:element>
   <xs:element name="u">
     <xs:complexType mixed="true">
-      <xs:attribute name="anchor" type="xs:ID"/>
+
       <xs:attribute name="ascii"/>
       <xs:attribute name="format" default="lit-name-num"/>
       <xs:attribute name="pn" type="xs:ID"/>

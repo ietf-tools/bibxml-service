@@ -1,9 +1,11 @@
 import os
 from copy import copy
 from io import StringIO
+from urllib.request import urlopen
 
+import requests
 from django.test import TestCase
-from lxml import etree
+from lxml import etree, html
 
 from bib_models import BibliographicItem, Contributor
 from xml2rfc_compat.serializer import to_xml, create_reference, create_author
@@ -84,15 +86,10 @@ class XML2RFCTestCase(TestCase):
     def test_bibliographicitem_to_xml(self):
         xml = to_xml(self.bibitem)
 
-        # print(etree.tostring(xml, pretty_print=True))
-
-        # xmlschema_doc = etree.parse()
         module_dir = os.path.dirname(__file__)
         file_path = os.path.join(module_dir, 'static/schemas/v3.xsd')
         xmlschema = etree.XMLSchema(file=file_path)
-
-        doc = etree.parse(xml)
-        xmlschema.assertValid(doc)
+        xmlschema.assertValid(xml)
 
     def test_fail_bibliographicitem_to_xml_if_wrong_combination_of_titles_and_relations(
         self,
@@ -132,11 +129,13 @@ class XML2RFCTestCase(TestCase):
         xmlschema_doc = etree.parse(author_xsd)
         author_xmlschema = etree.XMLSchema(xmlschema_doc)
 
-        author = create_author(self.contributor_organization)
-        create_author(self.contributor_person)
-        self.assertEqual(author.tag, "author")
+        author_organization = create_author(self.contributor_organization)
+        author_person = create_author(self.contributor_person)
+        self.assertEqual(author_organization.tag, "author")
+        self.assertEqual(author_person.tag, "author")
 
-        author_xmlschema.validate(author)
+        author_xmlschema.validate(author_organization)
+        author_xmlschema.validate(author_person)
 
     def test_fail_create_author_if_incompatible_roles(self):
         contributor_organization = copy(self.contributor_organization)
