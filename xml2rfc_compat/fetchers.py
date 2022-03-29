@@ -62,22 +62,19 @@ def internet_drafts(ref: str) -> BibliographicItem:
     """
     type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
 
-    ref_without_prefixes = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
-    bare_ref = remove_version(ref_without_prefixes)
+    bare_ref = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
+    if bare_ref != remove_version(bare_ref):
+        raise RefNotFoundError("Versioned I-D references are not supported")
 
     # Variants with/without draft- and I-D. prefixes
-    versionless_prefix_variants = [
+    prefix_variants = [
         bare_ref,
         f'draft-{bare_ref}',
         f'I-D.draft-{bare_ref}',
     ]
     id_query = ' || '.join([
-        # Variants with/without version
-        '@.id == "%s" || @.id like_regex "%s"' % (
-            versionless,
-            re.escape(r'%s-\d{2}' % versionless),
-        )
-        for versionless in versionless_prefix_variants
+        '@.id == "%s"' % variant
+        for variant in prefix_variants
     ])
 
     results = sorted(
