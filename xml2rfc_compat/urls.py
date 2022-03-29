@@ -148,11 +148,11 @@ def resolve_automatically(
     error: Union[str, None]
     try:
         item = fetcher_func(anchor)
-    except RefNotFoundError:
+    except RefNotFoundError as e:
         log.exception(
             "Unable to resolve xml2rfc path automatically: %s",
             subpath)
-        error = "not found"
+        error = f"not found ({str(e)})"
         item = None
     except ValidationError:
         log.exception(
