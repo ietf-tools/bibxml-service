@@ -37,7 +37,7 @@ retrieval API and GUI.
 .. note:: If your source does **not** provide bibliographic data in Relaton format,
           you should make conversion to Relaton part of your indexing logic.
 
-          Not doing so is recommended only in data migration fallback scenarios:
+          Not doing so is only suitable for certain special scenarios such as data migration fallback:
           for an example of that, see :mod:`xml2rfc_compat`,
-          which registers its own Git-based source
-          and uses it for xml2rfc-style path fallback.
+          which registers custom indexing logic (:func:`xml2rfc_compat.source.index_xml2rfc_source`)
+          that caches data for xml2rfc-style path fallback.
