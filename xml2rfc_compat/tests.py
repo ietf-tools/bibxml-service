@@ -95,6 +95,7 @@ class XML2RFCTestCase(TestCase):
         module_dir = os.path.dirname(__file__)
         file_path = os.path.join(module_dir, "static/schemas/v3.xsd")
         xmlschema = etree.XMLSchema(file=file_path)
+
         xmlschema.assertValid(xml_reference)
         xmlschema.assertValid(xml_referencegroup)
 
@@ -103,7 +104,6 @@ class XML2RFCTestCase(TestCase):
     ):
         data = copy(self.bibitem_reference_data)
         del data["title"]
-        # del data["relation"]
         new_bibitem_with_missing_data = BibliographicItem(**data)
         with self.assertRaises(ValueError):
             to_xml(new_bibitem_with_missing_data)
