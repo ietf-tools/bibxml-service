@@ -37,9 +37,21 @@ External sources
 ================
 
 External sources don’t make bibliographic data available
-in bulk in Relaton format.
+in bulk in Relaton format, but they still make bibliographic data available for querying.
+
+Examples of such sources are Datatracker and DOI.
+
+External sources are registered using external source registry in :mod:`main.external_sources`.
+Registration of an external source associates it with a unique source ID, :term:`document identifier type`,
+and a function that, given a :term:`docid.id` and a ``strict`` parameter, makes the necessary requests
+to external services and returns an :class:`main.types.ExternalBibliographicItem` instance
+constructed from response data.
+
+Subsequently, registered external sources can be queried via :func:`main.views.browse_external_reference`,
+and in future used in other ways.
 
 .. seealso::
 
    - :func:`doi.get_doi_ref`
    - :func:`datatracker.internet_drafts.get_internet_draft`
+   - :mod:`main.external_sources`
