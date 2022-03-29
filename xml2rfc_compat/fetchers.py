@@ -61,13 +61,42 @@ def internet_drafts(ref: str) -> BibliographicItem:
     or latest version at Datatracker if it’s newer.
 
     .. note:: Datatracker structures may contain less data than indexed sources.
+
+    Paths should work as follows:
+
+    - Unversioned I-D has path pattern: reference.I-D.xxx.xml
+    - Versioned I-D has path pattern: reference.I-D.draft-xxx-nn.xml
+
+    In the following cases, the path should return 404:
+
+    - Unversioned I-D has path pattern: reference.I-D.draft-xxx.xml
+    - Versioned I-D has path pattern: reference.I-D.xxx-nn.xml
+
+    (Note that ``ref`` passed to this function, like any other fetcher,
+    already excludes the ``reference.`` prefix.)
+
+    .. seealso:: :issue:`157`
     """
     type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
 
     bare_ref = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
+    unversioned_ref = remove_version(bare_ref)
 
-    if bare_ref != remove_version(bare_ref):
-        raise RefNotFoundError("Versioned I-D references are not supported")
+    ref_is_valid = all([
+        # all references must have the I-D. prefix:
+        ref.startswith('I-D.'),
+        any([
+            # and must be either versioned with the additional draft- prefix:
+            ref.startswith('I-D.draft-') and unversioned_ref != bare_ref,
+            # or unversioned without the additional draft- prefix:
+            not ref.startswith('I-D.draft-') and unversioned_ref == bare_ref,
+        ]),
+    ])
+    if not ref_is_valid:
+        raise RefNotFoundError(
+            "unsupported xml2rfc-style I-D reference: "
+            "possibly missing I-D prefix "
+            "or unexpected draft- prefix and trailing version combination")
 
     # Look up by ID using variants with/without draft- and I-D. prefixes
     docid_variants = [
