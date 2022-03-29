@@ -69,17 +69,15 @@ def internet_drafts(ref: str) -> BibliographicItem:
     if bare_ref != remove_version(bare_ref):
         raise RefNotFoundError("Versioned I-D references are not supported")
 
-    draft_prefixed = f'draft-{bare_ref}'
-
     # Look up by ID using variants with/without draft- and I-D. prefixes
-    prefix_variants = [
+    docid_variants = [
         bare_ref,
-        draft_prefixed,
+        f'draft-{bare_ref}',
         f'I-D.{bare_ref}',
     ]
     id_query = ' || '.join([
         '@.id == "%s"' % variant
-        for variant in prefix_variants
+        for variant in docid_variants
     ])
 
     results = sorted(
