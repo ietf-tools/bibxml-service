@@ -59,6 +59,8 @@ def misc(ref: str) -> BibliographicItem:
 def internet_drafts(ref: str) -> BibliographicItem:
     """Returns either latest indexed version,
     or latest version at Datatracker if it’s newer.
+
+    .. note:: Datatracker structures may contain less data than indexed sources.
     """
     type_query = '@.type == "Internet-Draft" || @.type == "IETF"'
 
@@ -85,6 +87,8 @@ def internet_drafts(ref: str) -> BibliographicItem:
         reverse=True,
     )
 
+    # Obtain the newest draft version available in indexed sources
+    # (both bibitem data and version number)
     bibitem: Union[BibliographicItem, None]
     if len(results) > 0:
         bibitem = BibliographicItem(**results[0].body)
@@ -101,18 +105,29 @@ def internet_drafts(ref: str) -> BibliographicItem:
         bibitem = None
         version = None
 
+    # Check Datatracker’s latest version (slow)
     try:
-        latest_draft = get_internet_draft(
+        dt_bibitem = get_internet_draft(
             f'draft-{bare_ref}',
             strict=bibitem is None,
         ).bibitem
+        dt_version = dt_bibitem.edition.content
     except:
         log.exception(
-            "Failed to fetch latest draft from Datatracker "
+            "Failed to fetch or validate latest draft from Datatracker "
             "when resolving xml2rfc bibxml3 path")
     else:
-        if not version or version != latest_draft.edition.content:
-            return latest_draft
+        if not version or version != dt_version:
+            # Datatracker’s version is newer or we don’t have this draft indexed.
+            # Note this (should be transient until sources are reindexed, if not
+            # then there’s a problem) and return Datatracker’s version
+            log.warn(
+                "Datatracker has newer I-D version %s "
+                "(indexed sources have %s), "
+                "returning Datatracker’s version",
+                dt_version,
+                version)
+            return dt_bibitem
 
     if bibitem:
         return bibitem
