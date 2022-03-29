@@ -20,6 +20,15 @@ it queues an asynchronous task
 that pulls or clones the relevant repositories and runs specified indexer function
 that reads the data and populates the database.)
 
+The full list of internal sources is provided in :data:`bibxml.settings.RELATON_DATASETS`.
+For every item in that list, a repository URL can be obtained
+using the apptoach in :func:`main.sources.locate_relaton_source_repo()`: the common case
+is ``https://github.com/ietf-ribose/relaton-data-{dataset ID}`` with branch name ``main``
+(where “dataset ID” is the string from ``RELATON_DATASETS``),
+unless an override is specified in :data:`bibxml.settings.DATASET_SOURCE_OVERRIDES`
+for that dataset ID (in which case that setting will have ``relaton_data.repo_url``
+specifying URL and/or branch name explicitly).
+
 .. seealso::
 
    - :mod:`main.sources`
