@@ -110,10 +110,12 @@ class ExternalBibliographicItem(SourcedBibliographicItem):
 
 
 class CompositeSourcedBibliographicItem(BibliographicItem):
-    """An item obtained by merging bibliographic items
-    which were possibly obtained from different sources
-    but describe the same document
-    (ideally, this is inferred by shared primary identifier).
+    """An item obtained by merging multiple “physical” bibliographic items
+    that were possibly obtained from different sources
+    but correspond to the same item conceptually.
+
+    Correspondence of multiple “physical” bibliographic items
+    is achieved by shared primary document identifier.
 
     .. seealso::
 
