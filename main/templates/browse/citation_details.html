@@ -71,7 +71,10 @@
         mb-1
       ">
         <span title="Document types(s)">
-          {{ data.type|as_list|join:", " }}
+          {# ``doctype`` will override the bare ``type`` #}
+          {% with actual_type=data.type|default:"document" %}
+            {{ data.doctype|as_list|join:", "|default:actual_type }}
+          {% endwith %}
         </span>
         {% with item_count=data.sources.items|dictsort:0|length %}
           {% if data.primary_docid and item_count > 1 %}
