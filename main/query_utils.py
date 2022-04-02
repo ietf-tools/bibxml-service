@@ -36,7 +36,12 @@ def merge_refs(
     strict: bool = True,
 ) -> CompositeSourcedBibliographicItem:
     """
-    Construct a composite bibliographic item from retrieved refs.
+    Converts multiple physical ``RefData`` instances
+    into a single logical bibliographic item.
+
+    This function assumes that you have ensured to collect ``RefData``
+    instances that represent the same bibliographic item
+    using ``primary_id`` as shared docid.
 
     :param django.db.models.query.QuerySet[RefData] refs:
        References to use.
