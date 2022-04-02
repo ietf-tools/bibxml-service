@@ -180,9 +180,11 @@ def export_citation(request):
     resp = auth.api(get_by_docid)(request)
 
     if resp.status_code == 200:
+        anchor = (
+            resp.headers.get('X-Xml2rfc-Anchor', None)
+            or request.GET.get('docid'))
         ext = 'xml' if request.GET.get('format') == 'bibxml' else 'json'
-        docid = request.GET.get('docid')
-        filename = f'{docid}.{ext}'
+        filename = f'reference.{anchor}.{ext}'
         resp.headers['Content-Disposition'] = f'attachment; filename={filename}'
         return resp
 

@@ -13,6 +13,8 @@ from bib_models import serializers
 from prometheus import metrics
 
 from doi import get_doi_ref as _get_doi_ref
+from common.util import as_list
+from xml2rfc_compat.serializer import get_suitable_anchor
 
 from .search import BaseCitationSearchView
 from .query import get_indexed_item
@@ -82,6 +84,11 @@ def get_by_docid(request):
     (“accepts” header is ignored at this time.)
 
     ``anchor``, if provided in GET query, is passed to serializer.
+
+    Response has extra header ``X-Xml2rfc-Anchor``
+    containing xml2rfc-compatible effective anchor string
+    (either given in GET query
+    or obtained via :func:`xml2rfc_compat.serializer.get_suitable_anchor()`).
     """
 
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
@@ -96,6 +103,8 @@ def get_by_docid(request):
         return JsonResponse({
             "error": "Missing document ID",
         }, status=400)
+
+    requested_anchor = request.GET.get('anchor', None)
 
     resp: HttpResponse
     outcome: str
@@ -132,10 +141,11 @@ def get_by_docid(request):
             outcome = 'success'
             resp = JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
         else:
-            kwargs = dict(anchor=request.GET.get('anchor', None))
             serializer = serializers.get(format)
             try:
-                bibitem_serialized = serializer.serialize(bibitem, **kwargs)
+                bibitem_serialized = serializer.serialize(
+                    bibitem,
+                    anchor=requested_anchor)
             except ValueError as err:
                 outcome = 'serialization_error'
                 resp = JsonResponse({
@@ -151,6 +161,10 @@ def get_by_docid(request):
                     bibitem_serialized,
                     content_type=serializer.content_type,
                     charset='utf-8')
+                anchor = (
+                    requested_anchor
+                    or get_suitable_anchor(as_list(bibitem.docid or [])))
+                resp.headers['X-Xml2rfc-Anchor'] = anchor
 
     metrics.api_bibitem_hits.labels(docid, outcome, format).inc()
 
