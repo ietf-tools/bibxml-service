@@ -108,6 +108,7 @@ input, button, select, textarea {
   .bibitem-full .bibitem-dl {
     @apply overflow-hidden;
     @apply text-sm;
+    @apply sm:p-1;
 
     div.deflist-entry, div.deflist-entry-inline {
       > dt, > dd {
