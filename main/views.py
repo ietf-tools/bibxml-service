@@ -294,7 +294,7 @@ def browse_indexed_reference(request, dataset_id, ref):
         return render(request, 'browse/citation_details.html', dict(
             dataset_id=dataset_id,
             ref=ref,
-            data=data,
+            data={**data['bibitem'], 'sources': {dataset_id: data}},
             available_serialization_formats=serializers.registry.keys(),
             **shared_context,
         ))

@@ -101,9 +101,6 @@
   {% for ref, sourced_item in data.sources.items|dictsort:0 reversed %}
     {# The case with an indexed item #}
     {% include "citation/citation_as_dl.html" with data=sourced_item.bibitem sourced_item=sourced_item %}
-  {% empty %}
-    {# The case with an indexed item #}
-    {% include "citation/citation_as_dl.html" with data=data.bibitem sourced_item=data %}
   {% endfor %}
 {% endblock %}
 
