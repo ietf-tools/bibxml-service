@@ -8,7 +8,7 @@ from bib_models import BibliographicItem, Contributor
 from xml2rfc_compat.serializer import to_xml, create_reference, create_author
 
 
-class XML2RFCTestCase(TestCase):
+class XML2RFCSerializersTestCase(TestCase):
     def setUp(self):
         self.contributor_organization_data = {
             "organization": {
