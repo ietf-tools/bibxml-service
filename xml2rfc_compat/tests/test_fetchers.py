@@ -60,6 +60,13 @@ class XML2RFCFetchersTestCase(TestCase):
             fetchers.internet_drafts(ref=self.internet_drafts_ref.replace("I-D.", ""))
 
     def test_w3c(self):
+        """
+        This test fails with some old data representation. Relatons data should conform
+        to the official schema https://github.com/relaton/relaton-models/blob/main/grammars/biblio.rnc
+        pydantic.error_wrappers.ValidationError: 1 validation error for BibliographicItem
+        relation -> 0 -> bibitem -> formattedref
+        instance of GenericStringValue, tuple or dict expected (type=type_error.dataclass; class_name=GenericStringValue)
+        """
         bibitem = fetchers.w3c(ref=self.w3c_ref)
         self._assert_is_instance_of_bibliographicitem(bibitem)
         self._assert_refs_equal(bibitem, self.w3c_ref)

@@ -121,7 +121,7 @@ class BibliographicItem(BaseModel, extra=Extra.allow):
     # if Relaton spec makes it clear which properties
     # are mandatory in absence of formattedref.
 
-    formattedref: Optional[Union[GenericStringValue, str]] = None
+    formattedref: Optional[GenericStringValue] = None
     """References a bibliographic item via a primary ID.
     Exclusive with other properties.
 
