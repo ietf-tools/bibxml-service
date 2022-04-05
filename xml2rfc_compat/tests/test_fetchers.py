@@ -20,6 +20,14 @@ class XML2RFCFetchersTestCase(TestCase):
         self.nist_ref = "NBS.CRPL-F-A.90"
         self.doi_ref = "10.1093/benz/9780199773787.article.b00004912"
 
+    def _assert_refs_equal(self, bibitem, ref):
+        for id in bibitem.docid:
+            if id.scope == 'anchor':
+                self.assertEqual(id.id, ref)
+
+    def _assert_is_instance_of_bibliographicitem(self, obj):
+        self.assertIsInstance(obj, BibliographicItem)
+
     def test_rfcs(self):
         bibitem = fetchers.rfcs(ref=self.rfcs_ref)
         self._assert_is_instance_of_bibliographicitem(bibitem)
@@ -28,14 +36,6 @@ class XML2RFCFetchersTestCase(TestCase):
     def test_rfcs_not_found(self):
         with self.assertRaises(RefNotFoundError):
             fetchers.rfcs(ref="UNEXISTING_REF")
-
-    def _assert_refs_equal(self, bibitem, ref):
-        for id in bibitem.docid:
-            if id.scope == 'anchor':
-                self.assertEqual(id.id, ref)
-
-    def _assert_is_instance_of_bibliographicitem(self, obj):
-        self.assertIsInstance(obj, BibliographicItem)
 
     def test_misc(self):
         bibitem = fetchers.misc(ref=self.misc_ref)
@@ -60,14 +60,14 @@ class XML2RFCFetchersTestCase(TestCase):
             fetchers.internet_drafts(ref=self.internet_drafts_ref.replace("I-D.", ""))
 
     def test_w3c(self):
-        pass  # TODO: fix formattedRef initialization/validation
+        # TODO: fix formattedRef initialization/validation
         """
         pydantic.error_wrappers.ValidationError: 1 validation error for BibliographicItem
         relation -> 0 -> bibitem -> formattedref
         instance of GenericStringValue, tuple or dict expected (type=type_error.dataclass; class_name=GenericStringValue)
         """
-        # bibitem = fetchers.w3c(ref=self.w3c_ref)
-        # self._assert_is_instance_of_bibliographicitem(bibitem)
+        bibitem = fetchers.w3c(ref=self.w3c_ref)
+        self._assert_is_instance_of_bibliographicitem(bibitem)
         # self._assert_refs_equal(bibitem, self.w3c_ref)
 
     def test_w3c_not_found(self):
@@ -75,15 +75,8 @@ class XML2RFCFetchersTestCase(TestCase):
             fetchers.w3c(ref="UNEXISTING_REF")
 
     def test_threegpp(self):
-        pass  # TODO: fix Contact initialization/validation
-        """
-        pydantic.error_wrappers.ValidationError: 1 validation error for CompositeSourcedBibliographicItem
-        contributor -> 0 -> organization -> contact -> 0
-        Contact.__init__() got an unexpected keyword argument 'street' (type=type_error)
-        """
-        # bibitem = fetchers.threegpp(ref=self.threegpp_ref)
-        # # self.assertEqual(bibitem.id, self.threegpp_ref)
-        # self._assert_refs_equal(bibitem, self.threegpp_ref)
+        bibitem = fetchers.threegpp(ref=self.threegpp_ref)
+        self._assert_refs_equal(bibitem, self.threegpp_ref)
 
     def test_threegpp_not_found(self):
         with self.assertRaises(RefNotFoundError):
