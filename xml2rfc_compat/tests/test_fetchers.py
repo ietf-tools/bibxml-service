@@ -10,7 +10,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def setUp(self):
         self.rfcs_ref = "RFC4037"
-        self.misc_ref = "IEEE.802-3.1988"  # or 99983?
+        self.misc_ref = "IEEE.802-3.1988"
         self.internet_drafts_ref = "I-D.ietf-hip-rfc5201-bis"
         self.w3c_ref = "W3C.REC-owl2-syntax-20121211"
         self.threegpp_ref = "3GPP.TS 25.321:Rel-8/8.3.0"
