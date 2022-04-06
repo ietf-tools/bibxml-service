@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns:ns1="urn:isbn:1-931666-22-9" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <xs:import namespace="urn:isbn:1-931666-22-9" schemaLocation="test.xsd"/>
+  <xs:attributeGroup name="type">
+    <xs:attribute name="type" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="simple"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attribute name="href" type="xs:anyURI"/>
+  <xs:attribute name="role" type="xs:anyURI"/>
+  <xs:attribute name="arcrole" type="xs:anyURI"/>
+  <xs:attribute name="title"/>
+  <xs:attribute name="show">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="new"/>
+        <xs:enumeration value="replace"/>
+        <xs:enumeration value="embed"/>
+        <xs:enumeration value="other"/>
+        <xs:enumeration value="none"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="actuate">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="onLoad"/>
+        <xs:enumeration value="onRequest"/>
+        <xs:enumeration value="other"/>
+        <xs:enumeration value="none"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="label" type="xs:NMTOKEN"/>
+  <xs:attribute name="from" type="xs:NMTOKEN"/>
+  <xs:attribute name="to" type="xs:NMTOKEN"/>
+  <xs:attributeGroup name="type1">
+    <xs:attribute name="type" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="extended"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="type2">
+    <xs:attribute name="type" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="locator"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="type3">
+    <xs:attribute name="type" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="arc"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="type4">
+    <xs:attribute name="type" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="resource"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

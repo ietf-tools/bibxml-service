@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns:ns1="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg">
+  <xs:import schemaLocation="v3.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="SVG-1.2-RFC.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:attributeGroup name="show">
+    <xs:attribute name="show" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="embed"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="actuate">
+    <xs:attribute name="actuate" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onLoad"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attribute name="type">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="simple"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="role">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:anyURI xs:string"/>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="arcrole">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:anyURI xs:string"/>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="title"/>
+  <xs:attribute name="href">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:anyURI xs:string"/>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attributeGroup name="show1">
+    <xs:attribute name="show" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="new"/>
+          <xs:enumeration value="replace"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="actuate1">
+    <xs:attribute name="actuate" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="onRequest"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>

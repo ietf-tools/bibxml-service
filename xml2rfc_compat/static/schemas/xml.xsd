@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.w3.org/XML/1998/namespace" xmlns:ns1="http://www.w3.org/1999/xlink" xmlns:svg="http://www.w3.org/2000/svg">
+  <xs:import schemaLocation="v3.xsd"/>
+  <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="ns1.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/svg" schemaLocation="SVG-1.2-RFC.xsd"/>
+  <xs:attributeGroup name="base">
+    <xs:attribute name="base" use="required" form="qualified"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lang">
+    <xs:attribute name="lang" use="required" form="qualified"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="space">
+    <xs:attribute name="space" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="default"/>
+          <xs:enumeration value="preserve"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="space1">
+    <xs:attribute name="space" use="required" form="qualified"/>
+  </xs:attributeGroup>
+  <xs:attribute name="id" type="xs:NCName"/>
+  <xs:attributeGroup name="base1">
+    <xs:attribute name="base" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lang1">
+    <xs:attribute name="lang" use="required" form="qualified">
+      <xs:simpleType>
+        <xs:union memberTypes="xs:language">
+          <xs:simpleType>
+            <xs:restriction base="xs:token">
+              <xs:length value="0"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:union>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>
