@@ -22,7 +22,7 @@ class RefDataModelTests(TestCase):
             "id": "ref_01",
             "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
             "date": {"type": "published", "value": "2000-01-01"},
-            "doctype": "standart",
+            "type": "standard",
             "language": ["en"],
             "script": "Latn",
             "title": [
@@ -65,7 +65,7 @@ class RefDataModelTests(TestCase):
     def test_success_search_ref(self):
         struct_query = json.dumps(
             {
-                "doctype": "standart", "id": "ref_01",
+                "type": "standard", "id": "ref_01",
             }
         )
         url = '%s?query_format=json_struct' % reverse(
@@ -90,7 +90,7 @@ class RefDataModelTests(TestCase):
     def test_fail_search_ref(self):
         struct_query = json.dumps(
             {
-                "doctype": "standart", "id": "NONEXISTENTID404",
+                "type": "standard", "id": "NONEXISTENTID404",
             }
         )
         url = '%s?query_format=json_struct' % reverse(
