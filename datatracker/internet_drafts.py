@@ -64,7 +64,7 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
 
     versionless = remove_version(docid)
 
-    resp = get(f'api/v1/doc/document/{versionless}/')
+    resp = get(f'/api/v1/doc/document/{versionless}/')
 
     if resp.status_code == 404:
         raise RefNotFoundError()

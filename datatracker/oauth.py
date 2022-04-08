@@ -386,7 +386,7 @@ def get_provider() -> ProviderInfo:
 
     try:
         data = request.get(
-            'api/openid/.well-known/openid-configuration',
+            '/api/openid/.well-known/openid-configuration',
             format=None,
         ).json()
     except (JSONDecodeError, SSLError):
