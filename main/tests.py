@@ -21,7 +21,7 @@ class RefDataModelTests(TestCase):
         self.ref_body: Dict[str, Any] = {
             "id": "ref_01",
             "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
-            "date": {"type": "published", "value": "2000-01-01"},
+            "date": [{"type": "published", "value": "2000-01-01"}],
             "type": "standard",
             "language": ["en"],
             "script": "Latn",
