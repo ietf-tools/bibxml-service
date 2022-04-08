@@ -75,12 +75,14 @@ def make_xml2rfc_path_pattern(
     ``<dirname>/[_]reference.<xml2rfc anchor>.xml``,
     and constructed view handles bibliographic item resolution
     according to :ref:`xml2rfc-path-resolution-algorithm`.
+
+    See :func:`.make_xml2rfc_path_handler` for how URL is handled.
     """
     return [
         re_path(
             dir_subpath_regex % dirname,
             never_cache(require_safe(
-                _make_xml2rfc_path_handler(fetcher_func),
+                make_xml2rfc_path_handler(fetcher_func),
             )),
             name='xml2rfc_%s' % dirname)
         for dirname in dirnames
@@ -171,10 +173,10 @@ class ResolutionOutcome(TypedDict, total=True):
     error: str
 
 
-def _make_xml2rfc_path_handler(fetcher_func: Callable[
+def make_xml2rfc_path_handler(fetcher_func: Callable[
     [str], BibliographicItem
 ]):
-    """Creates a view function, given a :term:`xml2rfc fetcher`.
+    """Creates a view function, given an :term:`xml2rfc fetcher`.
 
     Fetcher function will only be called if manual map was not found
     or did not resolve successfully.
@@ -182,17 +184,23 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
     The automatically created view function handles filename
     cleanup, constructing a :class:`bib_models.models.bibdata.BibliographicItem`
     and serializing it into an XML string with proper anchor tag supplied.
-    """
 
-    @functools.wraps(fetcher_func)
-    def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
-        """The view function to handle given xml2rfc-style path.
+    The view function behaves as following
+    (see also :ref:`xml2rfc-path-resolution-algorithm`):
 
-        Inspects ``X-Requested-With`` header, and does not increment
-        access metric if it’s the internal ``xml2rfcResolver`` tool.
+    - Inspects ``X-Requested-With`` request header, and does not increment
+      access metric if it’s the internal ``xml2rfcResolver`` tool.
 
-        In case of success, returns an ``application/xml`` response
-        with custom headers:
+    - The ``anchor`` component of URL pattern
+      (see :data:`xml2rfc_compat.models.dir_subpath_regex`)
+      is always used when attempting to auto-resolve to Relaton document,
+      but never used to obtain the value of ``anchor`` attributes
+      in resulting XML.
+
+    :returns:
+
+      - In case of success, ``application/xml`` response
+        with custom headers aiming to simplify troubleshooting path resolution:
 
         ``X-Resolution-Methods``
             semicolon-separated string of resolution methods tried.
@@ -204,9 +212,23 @@ def _make_xml2rfc_path_handler(fetcher_func: Callable[
 
             Substrings can be empty, e.g. if method was not tried,
             there was no error, not configuration, etc.
+  
+        .. note::
 
-        In case of failure (and no fallback available),
-        returns an ``application/json`` response with error description.
+           - The ``anchor`` *XML attribute value* is generated according to logic
+             in :mod:`xml2rfc_compat.serializer` and may not match anchor given
+             in URL pattern string.
+      
+           - The optional ``anchor`` passed *as GET parameter*
+             will override ``anchor`` attribute in XML.
+
+      - In case of failure (and no fallback available),
+        ``application/json`` response with error description.
+    """
+
+    @functools.wraps(fetcher_func)
+    def handle_xml2rfc_path(request, xml2rfc_subpath: str, anchor: str):
+        """The view function to handle given xml2rfc-style path.
         """
 
         resp: HttpResponse
