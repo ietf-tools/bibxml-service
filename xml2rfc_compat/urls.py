@@ -235,6 +235,8 @@ def make_xml2rfc_path_handler(fetcher_func: Callable[
         item: Union[BibliographicItem, None]
         xml_repr: Union[str, None]
 
+        requested_anchor = request.GET.get('anchor', None)
+
         methods = ["manual", "auto", "fallback"]
         method_results: Dict[str, ResolutionOutcome] = {}
 
@@ -256,10 +258,11 @@ def make_xml2rfc_path_handler(fetcher_func: Callable[
             )
 
         if item:
-            xml_repr = to_xml_string(item)
+            xml_repr = to_xml_string(item, anchor=requested_anchor)
         else:
             xml_repr = obtain_fallback_xml(
-                xml2rfc_subpath)
+                xml2rfc_subpath,
+                anchor=requested_anchor)
             method_results['fallback'] = dict(
                 config='',
                 error='' if xml_repr else "not indexed",
