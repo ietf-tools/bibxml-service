@@ -14,7 +14,7 @@ from lxml import etree, objectify
 from bib_models import BibliographicItem, Relation, Series
 from bib_models.models.dates import parse_relaxed_date
 from bib_models import Contributor, PersonAffiliation, Organization
-from bib_models import GenericStringValue, Contact, DocID
+from bib_models import GenericStringValue, Contact, DocID, Link
 from bib_models import serializers
 
 from common.util import as_list
@@ -63,13 +63,6 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
     is_referencegroup = len(titles) < 1 and len(constituents) > 0
     is_reference = len(titles) > 0
 
-    docids = as_list(item.docid or [])
-    if anchor is None:
-        try:
-            anchor = get_suitable_anchor(docids)
-        except ValueError:
-            pass
-
     if is_reference:
         root = create_reference(item)
 
@@ -83,8 +76,22 @@ def to_xml(item: BibliographicItem, anchor=None) -> Element:
             "Able to construct neither <reference> nor <referencegroup>: "
             "impossible combination of titles and relations")
 
+    # Fill in default root element anchor, unless specified
+    if anchor is None:
+        try:
+            anchor = get_suitable_anchor(as_list(item.docid or []))
+        except ValueError:
+            pass
     if anchor:
         root.set('anchor', anchor)
+
+    # Fill in appropriate target
+    try:
+        target = get_suitable_target(as_list(item.link or []))
+    except ValueError:
+        pass
+    else:
+        root.set('target', target)
 
     objectify.deannotate(root)
     etree.cleanup_namespaces(root)
@@ -159,11 +166,6 @@ def create_reference(item: BibliographicItem) -> Element:
 
     ref = E.reference(front)
 
-    # Links
-    links = as_list(item.link or [])
-    if len(links) > 0:
-        ref.set('target', links[0].content)
-
     # Series
     docids: List[DocID] = as_list(item.docid or [])
     series: Set[Union[None, Tuple[str, str]]] = set()
@@ -185,12 +187,21 @@ def create_reference(item: BibliographicItem) -> Element:
                 value=series_info[1],
             ))
 
+    # Target, may be overwritten by callers
     try:
-        # Anchor, may be overwritten by callers
-        ref.set('anchor', get_suitable_anchor(docids))
+        target = get_suitable_target(as_list(item.link or []))
     except ValueError:
-        # Anchor could not be detected.
         pass
+    else:
+        ref.set('target', target)
+
+    # Anchor, may be overwritten by callers
+    try:
+        anchor = get_suitable_anchor(docids)
+    except ValueError:
+        pass
+    else:
+        ref.set('anchor', anchor)
 
     return ref
 
@@ -219,6 +230,24 @@ def get_suitable_anchor(docids: List[DocID]):
         raise ValueError("No anchor could be found")
     else:
         return anchor_docid.id
+
+
+# Targets
+# =======
+
+def get_suitable_target(links: List[Link]):
+    """From a list of :class:`bib_models.models.links.Link` instances,
+    return a string suitable to be used as value of ``target`` attribute
+    on root XML element.
+    """
+    try:
+        target: Link = (
+            [l for l in links if l.type == 'src']
+            or links)[0]
+    except IndexError:
+        raise ValueError("Unable to find a suitable target (no links given)")
+    else:
+        return target.content
 
 
 # Authors and contributors
