@@ -172,7 +172,7 @@ def index_dataset(ds_id, relaton_path, refs=None,
                         Loader=yaml.SafeLoader)
 
                     latest_date = max(
-                        _to_dates(as_list(ref_data.get('date', [])))
+                        to_dates(as_list(ref_data.get('date', [])))
                         or [datetime.datetime.now().date()]
                     )
 
@@ -209,7 +209,7 @@ def index_dataset(ds_id, relaton_path, refs=None,
     return total, len(indexed_refs)
 
 
-def _to_dates(items: List[Dict[str, Any]]) -> List[datetime.date]:
+def to_dates(items: List[Dict[str, Any]]) -> List[datetime.date]:
     """Converts a list of dates in raw deserialized Relaton data
     into a list of ``datetime.date`` objects."""
 
