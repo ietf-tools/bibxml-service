@@ -239,6 +239,9 @@ def get_suitable_target(links: List[Link]):
     """From a list of :class:`bib_models.models.links.Link` instances,
     return a string suitable to be used as value of ``target`` attribute
     on root XML element.
+
+    It prefers a link with ``type`` set to “src”,
+    if not present then first available link.
     """
     try:
         target: Link = (
