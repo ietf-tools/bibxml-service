@@ -22,7 +22,6 @@ class RefDataModelTests(TestCase):
             "id": "ref_01",
             "docid": [{"id": "ref_01", "type": "standard"}],
             "date": [{"type": "published", "value": "2000-01-01"}],
-            "type": "standard",
             "language": ["en"],
             "script": "Latn",
             "title": [
