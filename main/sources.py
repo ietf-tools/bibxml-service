@@ -117,8 +117,8 @@ def locate_relaton_source_repo(dataset_id: str) -> Tuple[str, str]:
     """
     Given a Relaton dataset ID, returns Git repository information
     (URL and branch) using :data:`bibxml.settings.DATASET_SOURCE_OVERRIDES`
-    with fallbacks to :data:`DEFAULT_DATASET_REPO_URL_TEMPLATE`
-    and :data:`DEFAULT_DATASET_REPO_BRANCH`.
+    with fallbacks to :data:`bibxml.settings.DEFAULT_DATASET_REPO_URL_TEMPLATE`
+    and :data:`bibxml.settings.DEFAULT_DATASET_REPO_BRANCH`.
 
     .. important:: Does not verify that repository and branch do in fact exist;
                    ensuring that settings reference correct repositories
