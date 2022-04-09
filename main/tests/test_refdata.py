@@ -6,7 +6,7 @@ import json
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import RefData
+from main.models import RefData
 
 
 class RefDataModelTests(TestCase):
