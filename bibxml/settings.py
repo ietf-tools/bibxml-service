@@ -375,8 +375,8 @@ DATASET_SOURCE_OVERRIDES = {
         },
     },
 }
-"""Overrides dataset relaton source.
-Supports partial override.
+"""Overrides Relaton source location (Git repository URL and branch).
+Supports partial overrides.
 
 .. seealso:: :mod:`main.sources`.
 """
