@@ -11,12 +11,14 @@
         class="link opacity-50"
         href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format=relaton"
       >relaton</a>
-  {% else %}
+  {% elif datatracker_oauth_enabled %}
     Please
     <a
       class="link"
       href="{% url "datatracker_oauth_initiate" %}"
       title="Logging in will allow exporting bibliographic data in {% for format in available_serialization_formats %}{{ format }}, {% endfor %}relaton."
     >log in via Datatracker</a>
+  {% else %}
+    —
   {% endif %}
 {% endwith %}
