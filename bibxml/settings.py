@@ -343,6 +343,7 @@ SEARCH_CACHE_SECONDS = 3600
 
 
 # BibXML-specific
+# ===============
 
 DEFAULT_SEARCH_RESULT_LIMIT = 400
 """Default hard limit for found item count.
@@ -353,6 +354,31 @@ a more precise query."""
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT', '/data/datasets')
 """Where to keep fetched source data and data generated during indexing.
 Should be a directory. No trailing slash."""
+
+
+# API access
+# ----------
+
+API_USER = 'ietf'
+"""Username for HTTP Basic auth to access management GUI."""
+
+API_SECRETS = [
+    environ.get('API_SECRET'),
+    *[
+        s.strip()
+        for s in environ.get('EXTRA_API_SECRETS', '').split(',')
+        if s.strip() != ''
+    ],
+]
+"""Secrets used to authenticate API requests and access to management GUI.
+Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
+
+.. seealso:: :doc:`/topics/auth`
+"""
+
+
+# Relaton dataset sources
+# -----------------------
 
 RELATON_DATASETS = [
     'rfcs',
@@ -365,7 +391,12 @@ RELATON_DATASETS = [
     'iana',
     'nist',
 ]
-"""Relaton sources. Must refer to existing GitHub repositories.
+"""A list of Relaton source IDs.
+Must refer to existing Git repositories
+(see :func:`main.sources.locate_relaton_source_repo` for a remark on that).
+
+Settings following below define how the service obtains Git repository
+URL and branch corresponding to those datasets at indexing stage.
 """
 
 DATASET_SOURCE_OVERRIDES = {
@@ -388,31 +419,9 @@ EXTERNAL_DATASETS = [
 but support retrieval from.
 """
 
-AUTHORITATIVE_DATASETS = [
-    'rfcs',
-    'ids',
-    'rfcsubseries',
-]
-"""A list of authoritative datasets.
-"""
 
-API_USER = 'ietf'
-"""Username for HTTP Basic auth to access management GUI."""
-
-API_SECRETS = [
-    environ.get('API_SECRET'),
-    *[
-        s.strip()
-        for s in environ.get('EXTRA_API_SECRETS', '').split(',')
-        if s.strip() != ''
-    ],
-]
-"""Secrets used to authenticate API requests and access to management GUI.
-Obtained from environment variables ``API_SECRET`` and ``EXTRA_API_SECRETS``.
-
-.. seealso:: :doc:`/topics/auth`
-"""
-
+# xml2rfc compatibility
+# ---------------------
 
 XML2RFC_COMPAT_DIR_ALIASES = {
     'bibxml': ['bibxml-rfcs'],
@@ -434,4 +443,16 @@ XML2RFC_PATH_PREFIX = 'public/rfc/'
 This prefix is subtracted from further resolution.
 
 Must have trailing slash, but no leading slash.
+"""
+
+
+# Other
+# -----
+
+AUTHORITATIVE_DATASETS = [
+    'rfcs',
+    'ids',
+    'rfcsubseries',
+]
+"""A list of authoritative datasets.
 """
