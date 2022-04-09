@@ -169,10 +169,10 @@ paths:
     parameters:
     - name: dataset
       in: path
-      description: Dataset ID
+      description: Indexable source ID
       required: true
       schema:
-        $ref: '#/components/schemas/IndexableDatasets'
+        $ref: '#/components/schemas/IndexableSources'
     get:
       summary: Get dataset status
       description: |
@@ -190,10 +190,10 @@ paths:
     parameters:
     - name: dataset
       in: path
-      description: Dataset ID
+      description: Indexable source ID
       required: true
       schema:
-        $ref: '#/components/schemas/IndexableDatasets'
+        $ref: '#/components/schemas/IndexableSources'
     post:
       summary: (Re)index dataset
       description: |
@@ -212,7 +212,10 @@ paths:
               type: object
               properties:
                 refs:
-                  description: Comma-separated list of refs to index (if not provided, the entire dataset is reindexed)
+                  description: |
+                    Comma-separated list of refs to index.
+                    Whether this option has effect depends on indexable source implementation.
+                    If not provided, the entire dataset is reindexed.
                   type: array
                   items:
                     type: string
@@ -240,10 +243,10 @@ paths:
     parameters:
     - name: dataset
       in: path
-      description: Dataset ID
+      description: Indexable source ID
       required: true
       schema:
-        $ref: '#/components/schemas/IndexableDatasets'
+        $ref: '#/components/schemas/IndexableSources'
     post:
       summary: Clear dataset index
       description: Clears indexed data for given dataset; notably, does not abort any indexing tasks queued or progressing.
@@ -268,10 +271,10 @@ paths:
     parameters:
     - name: task_id
       in: path
-      description: Task ID. Can be obtained from dataset status endpoint.
+      description: Task ID. The ID of an indexing task can be obtained from dataset status endpoint.
       required: true
       schema:
-        $ref: '#/components/schemas/IndexableDatasets'
+        $ref: '#/components/schemas/IndexableSources'
     post:
       summary: Stop task
       description: Revokes given task, and attempts to terminate if running.
@@ -295,7 +298,7 @@ paths:
   /management/tasks/stop-all/:
     post:
       summary: Revoke all tasks
-      description: Revokes any pending tasks. Tries to terminate already running ones, but no guarantees.
+      description: Revokes any pending tasks. Tries to terminate those already running, but no guarantees.
       operationId: stopAllTasks
       security:
       - APIKeyAuth: []
@@ -318,13 +321,13 @@ paths:
     - name: dataset
       in: path
       description: |
-        Dataset ID.
+        Relaton dataset ID.
 
         Note that the schema lists all registered datasets,
         even those from which no bibliographic items are indexed at the moment of viewing this page.
       required: true
       schema:
-        $ref: '#/components/schemas/AvailableDatasets'
+        $ref: '#/components/schemas/RelatonDatasets'
     - name: ref_id
       in: path
       description: |
@@ -399,7 +402,7 @@ components:
       - {{ doctype.0 }}
       {% endfor %}
 
-    AvailableDatasets:
+    RelatonDatasets:
       type: string
       enum:
       {% for ds_id in relaton_datasets %}
@@ -448,7 +451,7 @@ components:
           items:
             $ref: '#/components/schemas/BibliographicItem'
 
-    IndexableDatasets:
+    IndexableSources:
       type: string
       enum:
       {% for source_id in indexable_sources %}
