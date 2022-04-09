@@ -65,8 +65,7 @@ class RefDataModelTests(TestCase):
     def test_success_search_ref(self):
         struct_query = json.dumps(
             {
-                "type": "standard",
-                "id": self.ref_body.get("docid")[0].get("id"),
+                "docid": [{"id": self.ref_body.get("docid")[0].get("id"), "type": "standard"}],
             }
         )
         url = '%s?query_format=json_struct' % reverse(
@@ -91,8 +90,7 @@ class RefDataModelTests(TestCase):
     def test_fail_search_ref(self):
         struct_query = json.dumps(
             {
-                "type": "standard",
-                "id": "NONEXISTENTID404",
+                "docid": [{"id": "NONEXISTENTID404", "type": "standard"}],
             }
         )
         url = '%s?query_format=json_struct' % reverse(
