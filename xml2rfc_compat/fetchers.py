@@ -239,7 +239,13 @@ def rfcsubseries(ref: str) -> BibliographicItem:
     parts = ref.split('.')
 
     if len(parts) >= 2:
-        series, num, *_ = ref.split('.')
+        series, num_raw, *_ = ref.split('.')
+
+        try:
+            num = int(num_raw)
+        except ValueError:
+            raise RefNotFoundError("Invalid rfcsubseries number component")
+
         results = search_refs_relaton_field({
             'docid[*]': '@.type == "IETF" && (@.id == "%s" || @.id == "%s")'
             % (f'{series}{num}', f'{series} {num}'),
