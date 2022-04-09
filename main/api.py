@@ -137,9 +137,17 @@ def get_by_docid(request):
         }, status=500)
 
     else:
+        headers = {
+            'X-Xml2rfc-Anchor':
+                requested_anchor
+                or get_suitable_anchor(as_list(bibitem.docid or [])),
+        }
+
         if format == 'relaton':
             outcome = 'success'
-            resp = JsonResponse({"data": unpack_dataclasses(bibitem.dict())})
+            resp = JsonResponse({
+                "data": unpack_dataclasses(bibitem.dict()),
+            }, headers=headers)
         else:
             serializer = serializers.get(format)
             try:
@@ -160,11 +168,8 @@ def get_by_docid(request):
                 resp = HttpResponse(
                     bibitem_serialized,
                     content_type=serializer.content_type,
-                    charset='utf-8')
-                anchor = (
-                    requested_anchor
-                    or get_suitable_anchor(as_list(bibitem.docid or [])))
-                resp.headers['X-Xml2rfc-Anchor'] = anchor
+                    charset='utf-8',
+                    headers=headers)
 
     metrics.api_bibitem_hits.labels(docid, outcome, format).inc()
 
