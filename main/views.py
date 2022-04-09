@@ -307,6 +307,13 @@ class IndexedDatasetCitationListView(ListView):
     paginate_by = 10
     template_name = 'browse/dataset.html'
 
+    def get(self, request, *args, **kwargs):
+        dataset_id = kwargs.get('dataset_id', None)
+        if dataset_id not in settings.RELATON_DATASETS:
+            raise Http404("No Relaton dataset with such ID")
+
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self) -> QuerySet[RefData]:
         return list_refs(self.kwargs['dataset_id'])
 

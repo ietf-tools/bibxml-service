@@ -26,8 +26,6 @@ def openapi_spec(request):
 
     return render(request, 'openapi.yaml', dict(
         known_doctypes=list_doctypes(),
-        known_dataset_ids=list(
-            getattr(settings, 'RELATON_DATASETS', [])),
         pre_indented_bibliographic_item_definitions=bibitem_objects,
         supported_search_query_formats=search_formats,
     ), content_type='text/x-yaml')

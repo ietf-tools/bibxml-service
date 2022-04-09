@@ -32,27 +32,7 @@
 {% block content %}
   {{ block.super }}
 
-  {% if dataset_id in external_datasets %}
-    <form class="black-80" method="GET" action="{% url "get_external_citation" dataset_id %}">
-      <div class="">
-        <input
-          id="ref"
-          name="ref"
-          type="text"
-          placeholder="Enter reference…"
-          class="input-reset dib ba b--black-20 pa2 db"
-          aria-describedby="ref-desc" />
-        <input type="submit"
-            class="dim pa2 ph3 dib ba bg-dark-blue white"
-            value="Request" />
-        <div id="ref-desc" class="f6 black-60 db mb2 measure lh-copy">
-          <p>This is an external dataset, so we don’t maintain index and only support retrieval by exact reference.
-        </div>
-      </div>
-    </form>
-  {% else %}
-    {% for ref in object_list %}
-      {% include "citation/in_list.html" with data=ref.bibitem|default:ref.body dataset_id=dataset_id ref=ref.ref dataset_id=ref.dataset %}
-    {% endfor %}
-  {% endif %}
+  {% for ref in object_list %}
+    {% include "citation/in_list.html" with data=ref.bibitem|default:ref.body dataset_id=dataset_id ref=ref.ref dataset_id=ref.dataset %}
+  {% endfor %}
 {% endblock %}

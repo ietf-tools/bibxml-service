@@ -412,12 +412,6 @@ Supports partial overrides.
 .. seealso:: :mod:`main.sources`.
 """
 
-EXTERNAL_DATASETS = [
-    'doi',
-]
-"""A list of external datasets that we don’t index or search,
-but support retrieval from.
-"""
 
 
 # xml2rfc compatibility

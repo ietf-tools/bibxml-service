@@ -402,7 +402,7 @@ components:
     AvailableDatasets:
       type: string
       enum:
-      {% for ds_id in known_dataset_ids %}
+      {% for ds_id in relaton_datasets %}
       - {{ ds_id }}
       {% endfor %}
 
@@ -451,14 +451,9 @@ components:
     IndexableDatasets:
       type: string
       enum:
-      {% for ds_id in known_datasets %}
-      {% if ds_id not in external_datasets %}
-      - {{ ds_id }}
-      {% endif %}
+      {% for source_id in indexable_sources %}
+      - {{ source_id }}
       {% endfor %}
-      description: |
-        For up-to-date list of available datasets,
-        see relaton-data-* repositories under ietf-ribose GitHub organization.
 
     IndexerStatus:
       type: object

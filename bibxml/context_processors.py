@@ -1,4 +1,5 @@
 from django.conf import settings
+from sources.indexable import registry as indexable_sources
 
 
 def service_meta(request):
@@ -17,11 +18,7 @@ def matomo(request):
 
 def sources(request):
     return dict(
-        known_datasets=[
-            *settings.RELATON_DATASETS,
-            *settings.EXTERNAL_DATASETS,
-        ],
+        indexable_sources=indexable_sources.keys(),
         relaton_datasets=settings.RELATON_DATASETS,
-        external_datasets=settings.EXTERNAL_DATASETS,
         authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     )
