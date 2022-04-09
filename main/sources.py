@@ -19,6 +19,7 @@ import datetime
 
 import yaml
 from celery.utils.log import get_task_logger
+from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import transaction
 
@@ -33,11 +34,50 @@ from .models import RefData
 logger = get_task_logger(__name__)
 
 
+# Below guards against possible AttributeError during setting access
+# and performs runtime sanity check that requisite settings are given.
+
+DATASETS = getattr(
+    settings,
+    'RELATON_DATASETS',
+    [])
+
+if len(DATASETS) < 1:
+    raise ImproperlyConfigured("No Relaton datasets configured")
+
+DATASET_SOURCE_OVERRIDES = getattr(
+    settings,
+    'DATASET_SOURCE_OVERRIDES',
+    {})
+
+DEFAULT_DATASET_REPO_URL_TEMPLATE = getattr(
+    settings,
+    'DEFAULT_DATASET_REPO_URL_TEMPLATE',
+    None)
+
+DEFAULT_DATASET_REPO_BRANCH = getattr(
+    settings,
+    'DEFAULT_DATASET_REPO_BRANCH',
+    None)
+
+have_explicit_sources_for_all_datasets = all([
+    dataset_id in DATASET_SOURCE_OVERRIDES
+    for dataset_id in DATASETS
+])
+
+have_fallback_defaults = all([
+    DEFAULT_DATASET_REPO_BRANCH,
+    DEFAULT_DATASET_REPO_URL_TEMPLATE,
+])
+
+if not have_explicit_sources_for_all_datasets and not have_fallback_defaults:
+    raise ImproperlyConfigured(
+        "Missing Relaton source Git repository defaults, "
+        "and not all sources have their locations explicitly specified")
+
+
 # Repository discovery
 # ====================
-
-GITHUB_REPO_URL = "https://github.com/{user}/{repo}"
-
 
 get_github_web_data_root = (
     lambda repo_home, branch:
@@ -75,20 +115,29 @@ def get_indexed_object_meta(dataset_id: str, ref: str) -> IndexedObject:
 
 def locate_relaton_source_repo(dataset_id: str) -> Tuple[str, str]:
     """
+    Given a Relaton dataset ID, returns Git repository information
+    (URL and branch) using :data:`bibxml.settings.DATASET_SOURCE_OVERRIDES`
+    with fallbacks to :data:`DEFAULT_DATASET_REPO_URL_TEMPLATE`
+    and :data:`DEFAULT_DATASET_REPO_BRANCH`.
+
+    .. important:: Does not verify that repository and branch do in fact exist;
+                   ensuring that settings reference correct repositories
+                   is considered a responsibility of operations engineers.
+
     :param dataset_id: dataset ID as string
     :returns: tuple (repo_url, repo_branch)
     """
-    overrides = (getattr(settings, 'DATASET_SOURCE_OVERRIDES', {}).
+    overrides = (DATASET_SOURCE_OVERRIDES.
                  get(dataset_id, {}).
                  get('relaton_data', {}))
 
     return (
         overrides.get(
             'repo_url',
-            GITHUB_REPO_URL.format(
-                user='ietf-ribose',
-                repo='relaton-data-%s' % dataset_id)),
-        overrides.get('repo_branch', 'main'),
+            DEFAULT_DATASET_REPO_URL_TEMPLATE.format(dataset_id=dataset_id)),
+        overrides.get(
+            'repo_branch',
+            DEFAULT_DATASET_REPO_BRANCH),
     )
 
 

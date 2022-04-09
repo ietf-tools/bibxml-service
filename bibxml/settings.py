@@ -399,6 +399,23 @@ Settings following below define how the service obtains Git repository
 URL and branch corresponding to those datasets at indexing stage.
 """
 
+DEFAULT_DATASET_REPO_URL_TEMPLATE = "https://github.com/ietf-ribose/relaton-data-{dataset_id}"
+"""Used to obtain default Git repository URL for a Relaton source,
+if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
+
+Intended to be used with ``.format()``
+and must accept placeholder ``dataset_id``.
+
+.. seealso:: :mod:`main.sources`
+"""
+
+DEFAULT_DATASET_REPO_BRANCH = 'main'
+"""Default Git repository branch name for Relaton source repository,
+if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
+
+.. seealso:: :mod:`main.sources`
+"""
+
 DATASET_SOURCE_OVERRIDES = {
     'ieee': {
         'relaton_data': {
@@ -409,9 +426,12 @@ DATASET_SOURCE_OVERRIDES = {
 """Overrides Relaton source location (Git repository URL and branch).
 Supports partial overrides.
 
-.. seealso:: :mod:`main.sources`.
-"""
+For any dataset ID from :data:`.RELATON_DATASETS` that is *not* listed here,
+:data:`.DEFAULT_DATASET_REPO_URL_TEMPLATE`
+and :data:`.DEFAULT_DATASET_REPO_BRANCH` are used as fallbacks.
 
+.. seealso:: :mod:`main.sources`
+"""
 
 
 # xml2rfc compatibility
