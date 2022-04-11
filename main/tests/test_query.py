@@ -75,4 +75,51 @@ class QueryTestCase(TestCase):
         with self.assertRaises(RefNotFoundError):
             build_citation_for_docid(id, doctype)
 
-    
+    def test_build_search_results(self):
+        docids = self._get_list_of_docids_from_fixture("misc")
+        docid = next(docid["id"] for docid in docids if docid.get("scope") == "anchor")
+
+        limit = 10
+        refs = search_refs_relaton_field({
+            'docid[*]': '@.id == "%s"'
+                        % re.escape(docid),
+        }, limit=limit, exact=True)
+
+        found_items = build_search_results(refs)
+        self.assertIsInstance(found_items, list)
+        self.assertGreater(len(found_items), 0)
+
+    def test_build_search_empty_results(self):
+        limit = 10
+        refs = search_refs_relaton_field({
+            'docid[*]': '@.id == "%s"'
+                        % re.escape("NONEXISTENTID"),
+        }, limit=limit, exact=True)
+
+        found_items = build_search_results(refs)
+        self.assertIsInstance(found_items, list)
+        self.assertEqual(len(found_items), 0)
+
+    def test_get_indexed_item(self):
+        dataset_object = [item["fields"] for item
+                          in self.json_fixtures if item["fields"]["dataset"] == "rfcs"][0]
+        dataset, ref = dataset_object["dataset"], dataset_object["ref"]
+        indexed_item = get_indexed_item(dataset, ref)
+        self.assertIsInstance(indexed_item, IndexedBibliographicItem)
+
+    # def test_get_indexed_item_nonexistent(self):
+    #     dataset, ref = "NONEXISTENTDATASET", "NONEXISTENTREF"
+    #     with self.assertRaises(RefNotFoundError):
+    #         get_indexed_item(dataset, ref)
+
+    def test_get_indexed_ref_by_query(self):
+        dataset_object = [item["fields"] for item
+                          in self.json_fixtures if item["fields"]["dataset"] == "rfcs"][0]
+        dataset, ref = dataset_object["dataset"], dataset_object["ref"]
+        data = get_indexed_ref_by_query(dataset, Q(ref__iexact=ref))
+        self.assertIsInstance(data, RefData)
+
+    def test_get_indexed_ref_by_query_unexistent_ref(self):
+        dataset, ref = "NONEXISTING_DATASET", "NONEXISTING_REF"
+        with self.assertRaises(RefNotFoundError):
+            get_indexed_ref_by_query(dataset, Q(ref__iexact=ref))
