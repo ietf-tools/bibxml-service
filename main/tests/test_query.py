@@ -27,7 +27,7 @@ class QueryTestCase(TestCase):
         with open("xml2rfc_compat/fixtures/test_refdata.json", "r") as f:
             self.json_fixtures = json.load(f)
 
-    def _get_list_of_docids_from_fixture(self, dataset="rfcs"):
+    def _get_list_of_docids_for_dataset_from_fixture(self, dataset="rfcs"):
         return [
             item["fields"]["body"]["docid"]
             for item in self.json_fixtures
@@ -49,7 +49,7 @@ class QueryTestCase(TestCase):
         self.assertIsInstance(doctypes[0], tuple)
 
     def test_search_refs_relaton_field(self):
-        docids = self._get_list_of_docids_from_fixture("misc")
+        docids = self._get_list_of_docids_for_dataset_from_fixture("misc")
         docid = next(docid["id"] for docid in docids if docid.get("scope") == "anchor")
 
         limit = 10
@@ -70,14 +70,14 @@ class QueryTestCase(TestCase):
         self.assertEqual(refs.count(), 0)
 
     def test_search_refs_docids(self):
-        docids = self._get_list_of_docids_from_fixture()
+        docids = self._get_list_of_docids_for_dataset_from_fixture()
         docids = [item["id"] for item in docids]
         refs = search_refs_docids(*docids)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertGreater(refs.count(), 0)
 
     def test_build_citation_for_docid(self):
-        docids = self._get_list_of_docids_from_fixture()
+        docids = self._get_list_of_docids_for_dataset_from_fixture()
         for docid in docids:
             id, doctype = docid["id"], docid["type"]
             citation = build_citation_for_docid(id, doctype)
@@ -89,7 +89,7 @@ class QueryTestCase(TestCase):
             build_citation_for_docid(id, doctype)
 
     def test_build_search_results(self):
-        docids = self._get_list_of_docids_from_fixture("misc")
+        docids = self._get_list_of_docids_for_dataset_from_fixture("misc")
         docid = next(docid["id"] for docid in docids if docid.get("scope") == "anchor")
 
         limit = 10
