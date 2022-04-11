@@ -129,11 +129,6 @@ class QueryTestCase(TestCase):
         indexed_item = get_indexed_item(dataset, ref)
         self.assertIsInstance(indexed_item, IndexedBibliographicItem)
 
-    # def test_get_indexed_item_nonexistent(self):
-    #     dataset, ref = "NONEXISTENTDATASET", "NONEXISTENTREF"
-    #     with self.assertRaises(RefNotFoundError):
-    #         get_indexed_item(dataset, ref)
-
     def test_get_indexed_ref_by_query(self):
         dataset_object = [
             item["fields"]
