@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import TestCase, Client
 from django.db.utils import IntegrityError
 from django.conf import settings
@@ -15,6 +17,7 @@ class RefDataModelTests(TestCase):
     def test_fail_duplicate_ref(self):
         self.ref1 = RefData.objects.create(
             ref="ref_01", dataset=self.dataset1_name, body=self.ref_body, representations={},
+            latest_date=datetime.datetime.now().date()
         )
 
         self.assertRaises(
@@ -24,14 +27,17 @@ class RefDataModelTests(TestCase):
             dataset=self.dataset1_name,
             body=self.ref_body,
             representations={},
+            latest_date=datetime.datetime.now().date()
         )
 
     def test_same_ref_diff_datasets(self):
         self.ref1 = RefData.objects.create(
             ref="ref_01", dataset=self.dataset1_name, body=self.ref_body, representations={},
+            latest_date=datetime.datetime.now().date()
         )
         self.ref2 = RefData.objects.create(
             ref="ref_01", dataset=self.dataset2_name, body=self.ref_body, representations={},
+            latest_date=datetime.datetime.now().date()
         )
 
 

@@ -36,7 +36,6 @@ class MyViewTests(StaticLiveServerTestCase):
 
         page.close()
 
-
     def test_doi_ref_search(self):
         page = self.browser.new_page()
         page.goto(self.live_server_url)
@@ -47,7 +46,7 @@ class MyViewTests(StaticLiveServerTestCase):
 
         self.assertEquals(page.url, '%s%s' % (
             self.live_server_url,
-            'get-one/external/doi/?ref=+https%3A%2F%2Fdoi.org%2F10.1093%2Fbenz%2F9780199773787.article.b00004912',
+            '/get-one/external/doi/?ref=10.1093%252Fbenz%252F9780199773787.article.b00004912',
         ))
 
         page.close()

@@ -20,9 +20,8 @@ class RefDataModelTests(TestCase):
         self.dataset_name = 'nist'
         self.ref_body: Dict[str, Any] = {
             "id": "ref_01",
-            "docid": [{"id": "ref_01", "type": "test_dataset_01"}],
-            "date": {"type": "published", "value": "2000-01-01"},
-            "doctype": "standart",
+            "docid": [{"id": "ref_01", "type": "standard"}],
+            "date": [{"type": "published", "value": "2000-01-01"}],
             "language": ["en"],
             "script": "Latn",
             "title": [
@@ -65,7 +64,7 @@ class RefDataModelTests(TestCase):
     def test_success_search_ref(self):
         struct_query = json.dumps(
             {
-                "doctype": "standart", "id": "ref_01",
+                "docid": [{"id": self.ref_body.get("docid")[0].get("id"), "type": "standard"}],
             }
         )
         url = '%s?query_format=json_struct' % reverse(
@@ -90,7 +89,7 @@ class RefDataModelTests(TestCase):
     def test_fail_search_ref(self):
         struct_query = json.dumps(
             {
-                "doctype": "standart", "id": "NONEXISTENTID404",
+                "docid": [{"id": "NONEXISTENTID404", "type": "standard"}],
             }
         )
         url = '%s?query_format=json_struct' % reverse(
