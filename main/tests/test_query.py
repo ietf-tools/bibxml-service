@@ -1,5 +1,6 @@
 import json
 import re
+from typing import List
 from unittest import TestCase
 
 from django.core.management import call_command
@@ -21,13 +22,19 @@ from main.types import CompositeSourcedBibliographicItem, IndexedBibliographicIt
 
 
 class QueryTestCase(TestCase):
+
     def setUp(self) -> None:
+        # load fixtures (fixtures file is in a different app, thus it needs to be loaded manually)
         call_command("loaddata", "xml2rfc_compat/fixtures/test_refdata.json")
 
         with open("xml2rfc_compat/fixtures/test_refdata.json", "r") as f:
             self.json_fixtures = json.load(f)
 
-    def _get_list_of_docids_for_dataset_from_fixture(self, dataset="rfcs"):
+    def _get_list_of_docids_for_dataset_from_fixture(self, dataset="rfcs") -> List[dict]:
+        """
+        Retrieves a list of docids for a given dataset given as parameter
+        from the fixtures used to test this component.
+        """
         return [
             item["fields"]["body"]["docid"]
             for item in self.json_fixtures
@@ -143,3 +150,8 @@ class QueryTestCase(TestCase):
         dataset, ref = "NONEXISTING_DATASET", "NONEXISTING_REF"
         with self.assertRaises(RefNotFoundError):
             get_indexed_ref_by_query(dataset, Q(ref__iexact=ref))
+
+    def test_get_indexed_ref_by_query_multiple_ref_found(self):
+        dataset = "rfcs"
+        with self.assertRaises(RefNotFoundError):
+            get_indexed_ref_by_query(dataset, Q())

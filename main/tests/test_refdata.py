@@ -17,7 +17,7 @@ class RefDataModelTests(TestCase):
 
     def setUp(self):
         self.ref_id = "ref_01"
-        self.dataset_name = 'nist'
+        self.dataset_name = "nist"
         self.ref_body: Dict[str, Any] = {
             "id": "ref_01",
             "docid": [{"id": "ref_01", "type": "standard"}],
@@ -39,24 +39,27 @@ class RefDataModelTests(TestCase):
             dataset=self.dataset_name,
             body=self.ref_body,
             representations={},
-            latest_date=datetime.datetime.now().date()
+            latest_date=datetime.datetime.now().date(),
         )
         import datatracker.auth
+
         datatracker.auth.token_is_valid = lambda key: True
 
         self.api_headers = {
-            'HTTP_X_DATATRACKER_TOKEN': 'test',
+            "HTTP_X_DATATRACKER_TOKEN": "test",
         }
 
     def test_get_ref(self):
-        docid = self.ref_body['docid'][0]['id']
-        url = f'%s?docid={docid}' % reverse("api_get_by_docid")
+        docid = self.ref_body["docid"][0]["id"]
+        url = f"%s?docid={docid}" % reverse("api_get_by_docid")
         response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content)['data']['id'], self.ref_body['id'])
+        self.assertEqual(
+            json.loads(response.content)["data"]["id"], self.ref_body["id"]
+        )
 
     def test_not_found_ref(self):
-        url = '%s?docid=NONEXISTENTKEY404' % reverse("api_get_by_docid")
+        url = "%s?docid=NONEXISTENTKEY404" % reverse("api_get_by_docid")
         response = self.client.get(url, **self.api_headers)
         self.assertEqual(response.status_code, 404)
         self.assertTrue(len(response.json()["error"]) > 0)
@@ -64,10 +67,12 @@ class RefDataModelTests(TestCase):
     def test_success_search_ref(self):
         struct_query = json.dumps(
             {
-                "docid": [{"id": self.ref_body.get("docid")[0].get("id"), "type": "standard"}],
+                "docid": [
+                    {"id": self.ref_body.get("docid")[0].get("id"), "type": "standard"}
+                ],
             }
         )
-        url = '%s?query_format=json_struct' % reverse(
+        url = "%s?query_format=json_struct" % reverse(
             "api_search",
             args=[quote_plus(struct_query)],
         )
@@ -81,10 +86,12 @@ class RefDataModelTests(TestCase):
 
         found_obj = response.json().get("data")[0]
         # strip None values
-        found_obj_doc_id = [{k: v for k, v in found_obj['docid'][0].items() if v is not None}]
+        found_obj_doc_id = [
+            {k: v for k, v in found_obj["docid"][0].items() if v is not None}
+        ]
 
-        self.assertEqual(found_obj['id'], self.ref_body['id'])
-        self.assertEqual(found_obj_doc_id, self.ref_body['docid'])
+        self.assertEqual(found_obj["id"], self.ref_body["id"])
+        self.assertEqual(found_obj_doc_id, self.ref_body["docid"])
 
     def test_fail_search_ref(self):
         struct_query = json.dumps(
@@ -92,7 +99,7 @@ class RefDataModelTests(TestCase):
                 "docid": [{"id": "NONEXISTENTID404", "type": "standard"}],
             }
         )
-        url = '%s?query_format=json_struct' % reverse(
+        url = "%s?query_format=json_struct" % reverse(
             "api_search",
             args=[quote_plus(struct_query)],
         )

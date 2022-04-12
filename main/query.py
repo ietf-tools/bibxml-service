@@ -555,7 +555,7 @@ def get_indexed_ref_by_query(
         raise RefNotFoundError(
             "Cannot find matching reference in given dataset",
             repr(Q))
-    except RefData.MultipleObjectsReturned():
+    except RefData.MultipleObjectsReturned:
         raise RefNotFoundError(
             "Multiple references match query in given dataset",
             repr(Q))
