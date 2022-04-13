@@ -22,7 +22,6 @@ from main.types import CompositeSourcedBibliographicItem, IndexedBibliographicIt
 
 
 class QueryTestCase(TestCase):
-
     def setUp(self) -> None:
         # load fixtures (fixtures file is in a different app, thus it needs to be loaded manually)
         call_command("loaddata", "xml2rfc_compat/fixtures/test_refdata.json")
@@ -30,7 +29,9 @@ class QueryTestCase(TestCase):
         with open("xml2rfc_compat/fixtures/test_refdata.json", "r") as f:
             self.json_fixtures = json.load(f)
 
-    def _get_list_of_docids_for_dataset_from_fixture(self, dataset="rfcs") -> List[dict]:
+    def _get_list_of_docids_for_dataset_from_fixture(
+        self, dataset="rfcs"
+    ) -> List[dict]:
         """
         Retrieves a list of docids for a given dataset given as parameter
         from the fixtures used to test this component.
@@ -154,7 +155,8 @@ class QueryTestCase(TestCase):
         dataset_object = [
             item["fields"]
             for item in self.json_fixtures
-            if item["fields"]["dataset"] == "rfcs" and item["fields"]["ref"] == dataset_ref
+            if item["fields"]["dataset"] == "rfcs"
+            and item["fields"]["ref"] == dataset_ref
         ][0]
         dataset, ref = dataset_object["dataset"], dataset_object["ref"]
         indexed_item = get_indexed_item(dataset, ref, strict=False)
