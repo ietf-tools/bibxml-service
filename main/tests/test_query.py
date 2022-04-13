@@ -95,6 +95,13 @@ class QueryTestCase(TestCase):
         with self.assertRaises(RefNotFoundError):
             build_citation_for_docid(id, doctype)
 
+    def test_build_citation_for_docid_strict_is_false(self):
+        docids = self._get_list_of_docids_for_dataset_from_fixture()
+        for docid in docids:
+            id, doctype = docid["id"], docid["type"]
+            citation = build_citation_for_docid(id, doctype, strict=False)
+            self.assertIsInstance(citation, CompositeSourcedBibliographicItem)
+
     def test_build_search_results(self):
         docids = self._get_list_of_docids_for_dataset_from_fixture("misc")
         docid = next(docid["id"] for docid in docids if docid.get("scope") == "anchor")
@@ -137,10 +144,17 @@ class QueryTestCase(TestCase):
         self.assertIsInstance(indexed_item, IndexedBibliographicItem)
 
     def test_get_indexed_item_strict_is_false(self):
+        """
+        The dataset_object of reference for this test contains
+        some formatting errors. Using strict=False, validation
+        errors should not be triggered, however a
+        representation should be returned anyway.
+        """
+        dataset_ref = "RFC4035"
         dataset_object = [
             item["fields"]
             for item in self.json_fixtures
-            if item["fields"]["dataset"] == "rfcs"
+            if item["fields"]["dataset"] == "rfcs" and item["fields"]["ref"] == dataset_ref
         ][0]
         dataset, ref = dataset_object["dataset"], dataset_object["ref"]
         indexed_item = get_indexed_item(dataset, ref, strict=False)
