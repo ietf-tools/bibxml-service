@@ -9,7 +9,7 @@
   const globalPrefix = document.documentElement.dataset['xml2rfc-global-prefix'];
   const selectedPath = document.documentElement.dataset['xml2rfc-selected-path'];
 
-  const allPathEls = document.querySelectorAll('[data-xml2rfc-path]');
+  const allPathEls = document.querySelectorAll('[data-item-i-d]');
   const scrollView = document.getElementById('xml2rfcPathScrollView');
 
   if (dirname && pageCacheKey && scrollView && globalPrefix && allPathEls.length > 0) {
@@ -21,13 +21,43 @@
 
     const needJSBrowserForItems = scrollView.dataset['load-js-browser-this-is-too-many-items'];
     if (needJSBrowserForItems) {
-      window.createWindowedXml2rfcPathListing(
+      let cleanUpWatcher = null;
+      function handleWindowChange(itemElements) {
+        if (cleanUpWatcher !== null) {
+          cleanUpWatcher();
+        }
+        cleanUpWatcher = window.xml2rfcResolver.watchElements(
+          cache,
+          itemElements,
+          scrollView,
+          globalPrefix,
+        );
+      }
+      function makeItemLabel(path, labelTemplate) {
+        const labelEl = labelTemplate;
+        labelEl.setAttribute('title', path);
+
+        const linkEl = labelEl.querySelector('a');
+        const originalHrefParts = linkEl.getAttribute('href').split('/'); 
+        const fnameEl = linkEl.querySelector('span');
+
+        const newHref = `${originalHrefParts.slice(0, originalHrefParts.length - 3).join('/')}/${path}`;
+        linkEl.setAttribute('href', newHref);
+
+        const filename = path.split('/').slice(1, 2)[0];
+        fnameEl.textContent = filename;
+
+        return labelEl;
+      }
+      window.createWindowedListing(
         JSON.parse(needJSBrowserForItems),
         scrollView,
-        cache,
-        globalPrefix,
         selectedPath,
         markAsSelected,
+        makeItemLabel,
+        null,
+        null,
+        handleWindowChange,
       );
     } else {
       window.xml2rfcResolver.watchElements(cache, allPathEls, scrollView, globalPrefix);
@@ -38,7 +68,7 @@
           if (el) {
             // Scroll to selected path if any
             el.parentNode.scrollTop = el.offsetTop - el.parentNode.offsetTop
-            markAsSelected(el);
+            markAsSelected(null, el);
           }
         }
       }
@@ -167,7 +197,7 @@
   }
 
   /** Make item look selected. */
-  function markAsSelected(el) {
+  function markAsSelected(itemID, el) {
     el.classList.add('bg-sky-800');
     el.classList.add('text-white');
   }

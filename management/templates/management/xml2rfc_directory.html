@@ -137,21 +137,23 @@
         {% cache 3600 xml2rfc_directory_listing1 cache_key %}
           {% for item in items|slice:":6000" %}
             <article
-              class="flex flex-row flex-nowrap hover:bg-sky-500/40"
+              class="hover:bg-sky-500/40"
               title="{{ item.subpath }}"
-              data-xml2rfc-path="{{ item.subpath }}"
+              data-item-i-d="{{ item.subpath }}"
             >
-              <a
-                class="grow truncate {{ row_htmlclass }}"
-                href="{% url "manage_xml2rfc_directory" item.subpath %}"
-              >
-                <span class="grow">{{ item.format_filename }}</span>
-              </a>
-              <span
-                class="resolution opacity-80 {{ row_htmlclass }}"
-                title="Effective method used to resolve this path. In green if it matches the preferred method (“auto” by default, “manual” if manual map is specified)."
-              >
-                {# Filled by JS. #}
+              <span data-item-label="true" class="flex flex-row flex-nowrap">
+                <a
+                  class="grow truncate {{ row_htmlclass }}"
+                  href="{% url "manage_xml2rfc_directory" item.subpath %}"
+                >
+                  <span class="grow">{{ item.format_filename }}</span>
+                </a>
+                <span
+                  class="resolution opacity-80 {{ row_htmlclass }}"
+                  title="Effective method used to resolve this path. In green if it matches the preferred method (“auto” by default, “manual” if manual map is specified)."
+                >
+                  {# Filled by JS. #}
+                </span>
               </span>
             </article>
           {% endfor %}

@@ -3,7 +3,7 @@
   /**
    * Creates an intersection observer and watches given elements.
    *
-   * Each element is expected to have an `xml2rfc-path` data attribute,
+   * Each element is expected to have an `item-i-d` data attribute,
    * and a `.resolution` child in which abbreviated resolution result
    * will be formatted as HTML.
    *
@@ -28,9 +28,9 @@
       for (const entry of entries) {
         if (entry.intersectionRatio > 0) {
           const resolution = entry.target.querySelector('.resolution');
-          if (resolution) {
+          if (resolution && (entry.target.dataset ?? {}).itemID) {
             resolutionQueue.push(
-              entry.target.dataset['xml2rfc-path']
+              entry.target.dataset.itemID
             );
           }
         }
@@ -38,7 +38,7 @@
     }, { root: scrollView, threshold: 0.5 });
 
     for (const el of elements) {
-      if (el.dataset['xml2rfc-path'] && el.querySelector('.resolution')) {
+      if ((el.dataset ?? {}).itemID && el.querySelector('.resolution')) {
         observer.observe(el);
       } else {
         console.warn("Won’t watch element (no path data or resolution placeholder)", el);
@@ -46,7 +46,7 @@
     }
 
     async function processResolutionTask(subpath) {
-      const el = document.querySelector(`[data-xml2rfc-path="${subpath}"]`);
+      const el = document.querySelector(`[data-item-i-d="${subpath}"]`);
       if (!el) {
         console.warn("Won’t resolve path: element not in DOM", subpath, el);
         return;
