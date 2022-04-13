@@ -56,10 +56,10 @@ class QueryTestCase(TestCase):
         self.assertIsInstance(doctypes[0], tuple)
 
     def test_search_refs_relaton_field(self):
-        docids = self._get_list_of_docids_for_dataset_from_fixture("misc")
+        docids = self._get_list_of_docids_for_dataset_from_fixture("rfcs")
         docid = next(docid["id"] for docid in docids if docid.get("scope") == "anchor")
 
-        limit = 10
+        limit = 2
         refs = search_refs_relaton_field(
             {
                 "docid[*]": '@.id == "%s"' % re.escape(docid),
@@ -69,7 +69,7 @@ class QueryTestCase(TestCase):
         )
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertGreater(refs.count(), 0)
-        self.assertLess(refs.count(), limit)
+        self.assertLessEqual(refs.count(), limit)
 
     def test_search_refs_relaton_field_without_field_queries(self):
         refs = search_refs_relaton_field()
@@ -134,6 +134,16 @@ class QueryTestCase(TestCase):
         ][0]
         dataset, ref = dataset_object["dataset"], dataset_object["ref"]
         indexed_item = get_indexed_item(dataset, ref)
+        self.assertIsInstance(indexed_item, IndexedBibliographicItem)
+
+    def test_get_indexed_item_strict_is_false(self):
+        dataset_object = [
+            item["fields"]
+            for item in self.json_fixtures
+            if item["fields"]["dataset"] == "rfcs"
+        ][0]
+        dataset, ref = dataset_object["dataset"], dataset_object["ref"]
+        indexed_item = get_indexed_item(dataset, ref, strict=False)
         self.assertIsInstance(indexed_item, IndexedBibliographicItem)
 
     def test_get_indexed_ref_by_query(self):
