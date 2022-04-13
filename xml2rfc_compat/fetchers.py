@@ -261,7 +261,7 @@ def rfcsubseries(ref: str) -> BibliographicItem:
 def nist(ref: str) -> BibliographicItem:
     results = search_refs_relaton_field({
         'docid[*]': '@.id == "%s" && @.type == "NIST"'
-        % re.escape(ref),
+        % re.escape(ref.replace('.', ' ')),
     }, limit=10, exact=True)
 
     if len(results) > 0:
