@@ -113,7 +113,7 @@ def get_by_docid(request):
         composite_bibitem = build_citation_for_docid(
             docid.strip(),
             doctype.strip() if doctype else None,
-            strict=format != 'relaton')
+            strict=True)
 
         # This will be the latest sourced item.
         bibitem = list(composite_bibitem.sources.values())[0].bibitem
