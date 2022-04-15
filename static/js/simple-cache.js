@@ -18,7 +18,7 @@
     const data = loadCache() ?? initial;
 
     let dirty = false;
-    const cacheStoreInterval = window.setInterval(function cachePathResolution() {
+    const cacheStoreInterval = window.setInterval(function cacheTick() {
       if (dirty) {
         storeCache(data);
         dirty = false;
