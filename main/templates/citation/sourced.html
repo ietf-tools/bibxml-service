@@ -1,5 +1,8 @@
 {% with indexed_at=val.indexed_object.indexed_at %}
   <span title="{% if indexed_at %}Last indexed at {{ indexed_at }}{% endif %}">
+    {% if val.validation_errors|length > 0 %}
+      {% include "_error_icon.html" with title="Source did not validate" htmlclass="h-5 w-5 inline text-rose-600" %}
+    {% endif %}
     {% if val.indexed_object %}
       {% if val.indexed_object.external_url %}
         <a class="link" title="Link to source file" href="{{ val.indexed_object.external_url }}"
