@@ -10,6 +10,7 @@ from typing import Dict, List, Union, Tuple, Any, Optional
 from dataclasses import dataclass
 from pydantic import BaseModel, ValidationError
 from pydantic.json import pydantic_encoder
+import time
 import logging
 import json
 import simplejson
@@ -198,16 +199,20 @@ class ExploreDirectory(TemplateView):
         A cache key that is guaranteed to change if any mapped path changes,
         or if the number of indexed xml2rfc paths is different.
         """
-        indexed_count = indexable.registry['xml2rfc'].count_indexed()
-        mapped_paths = frozenset([
-            f'{m.xml2rfc_subpath}:{m.docid}'
-            for m in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
-        ])
-        return json.dumps({
-            'total_indexed': indexed_count,
-            'map_hash': hash(mapped_paths),
-            'dirname': dirname,
-        })
+        no_cache = self.request.GET.get('bypass_cache', None)
+        if no_cache:
+            return str(time.time())
+        else:
+            indexed_count = indexable.registry['xml2rfc'].count_indexed()
+            mapped_paths = frozenset([
+                f'{m.xml2rfc_subpath}:{m.docid}'
+                for m in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
+            ])
+            return json.dumps({
+                'total_indexed': indexed_count,
+                'map_hash': hash(mapped_paths),
+                'dirname': dirname,
+            })
 
     def get_selection(self, **kwargs) -> Tuple[str, Union[Xml2rfcItem, None]]:
         """
