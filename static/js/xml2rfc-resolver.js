@@ -81,7 +81,6 @@
 
     return function unwatch() {
       observer.disconnect();
-      storage.destroy?.();
     }
   }
 
