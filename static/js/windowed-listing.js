@@ -136,8 +136,10 @@
       }
 
       // Expand parents of shown items, if needed
-      for (const [idx, iid] of itemIDs.entries()) {
-        _expandParents(iid, idx);
+      if (isExpandable) {
+        for (const [idx, iid] of itemIDs.entries()) {
+          _expandParents(iid, idx);
+        }
       }
 
       itemCount = itemIDs.length;
