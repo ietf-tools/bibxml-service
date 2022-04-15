@@ -1,5 +1,6 @@
 {% with indexed_at=val.indexed_object.indexed_at %}
-  <span title="{% if indexed_at %}Last indexed at {{ indexed_at }}{% endif %}">
+  <div title="{% if indexed_at %}Last indexed at: {{ indexed_at }}. {% endif %}{% if val.validation_errors|length > 0 %}Warning: source data did not validate!
+  {{ val.validation_errors|first }}{% endif %}">
     {% if val.validation_errors|length > 0 %}
       {% include "_error_icon.html" with title="Source did not validate" htmlclass="h-5 w-5 inline text-rose-600" %}
     {% endif %}
@@ -25,5 +26,5 @@
           >(issues)</a>
       {% endif %}
     </span>
-  </span>
+  </div>
 {% endwith %}
