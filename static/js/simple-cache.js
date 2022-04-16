@@ -10,7 +10,7 @@
    */
   function getCache(cacheKey, initial, options = { ttlMs: undefined, debounceStoreMs: undefined }) {
     const DEFAULT_CACHE_TTL_MS = 3600000; // 1 hour
-    const DEFAULT_DEBOUNCE_MS = 10000; // 10 seconds
+    const DEFAULT_DEBOUNCE_MS = 2000; // 2 seconds
 
     const ttl = options?.ttlMs ?? DEFAULT_CACHE_TTL_MS;
     const debounceMs = options?.debounceStoreMs ?? DEFAULT_DEBOUNCE_MS;
