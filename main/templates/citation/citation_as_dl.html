@@ -68,7 +68,7 @@
   {% endif %}
 
   {% for link in data.link|as_list %}
-    {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content break_row=forloop.first wide=1 %}
+    {% include "deflist/entry.html" with key=link.type|default:"link" val=link.content break_row=forloop.first wide=1 tmpl="relaton/link.html" %}
   {% endfor %}
 
   {% if data.series %}
