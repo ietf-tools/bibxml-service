@@ -64,7 +64,7 @@
       if (selectedPath) {
         const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
         if (vw > TAILWIND_SM_BREAKPOINT_PX) {
-          const el = document.querySelector(`[data-xml2rfc-path="${selectedPath}"]`);
+          const el = document.querySelector(`[data-item-i-d="${selectedPath}"]`);
           if (el) {
             // Scroll to selected path if any
             el.parentNode.scrollTop = el.offsetTop - el.parentNode.offsetTop
