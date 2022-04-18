@@ -501,7 +501,7 @@ def build_search_results(
 def get_indexed_item(
     dataset_id: str,
     ref: str,
-    strict = True,
+    strict=True,
 ) -> IndexedBibliographicItem:
     """Retrieves a bibliographic item by :term:`reference`
     from an indexed internal dataset.
