@@ -22,6 +22,10 @@ from main.types import CompositeSourcedBibliographicItem, IndexedBibliographicIt
 
 
 class QueryTestCase(TestCase):
+    """
+    Test cases for query.py
+    """
+
     def setUp(self) -> None:
         # load fixtures (fixtures file is in a different app, thus it needs to be loaded manually)
         call_command("loaddata", "xml2rfc_compat/fixtures/test_refdata.json")
@@ -73,6 +77,10 @@ class QueryTestCase(TestCase):
         self.assertLessEqual(refs.count(), limit)
 
     def test_search_refs_relaton_field_without_field_queries(self):
+        """
+        The function search_refs_relaton_field should return an empty
+        QuerySet if no query is passed as parameter.
+        """
         refs = search_refs_relaton_field()
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertEqual(refs.count(), 0)
@@ -92,11 +100,20 @@ class QueryTestCase(TestCase):
             self.assertIsInstance(citation, CompositeSourcedBibliographicItem)
 
     def test_build_citation_for_nonexistent_docid(self):
+        """
+        The function build_citation_for_docid should :raise RefNotFoundError:
+        if a combination of non-existing id and reference is passed as parameter.
+        """
         id, doctype = "NONEXISTENTID", "NONEXISTENTTYPE"
         with self.assertRaises(RefNotFoundError):
             build_citation_for_docid(id, doctype)
 
     def test_build_citation_for_docid_strict_is_false(self):
+        """
+        Test build_citation_for_docid using strict=False. Validation
+        errors should not be triggered, however a representation should
+        be returned anyway.
+        """
         docids = self._get_list_of_docids_for_dataset_from_fixture()
         for docid in docids:
             id, doctype = docid["id"], docid["type"]
@@ -121,12 +138,14 @@ class QueryTestCase(TestCase):
         self.assertGreater(len(found_items), 0)
 
     def test_build_search_empty_results(self):
-        limit = 10
+        """
+        Test that build_search_results returns an empty list of
+        results if ID does not match any entry.
+        """
         refs = search_refs_relaton_field(
             {
                 "docid[*]": '@.id == "%s"' % re.escape("NONEXISTENTID"),
             },
-            limit=limit,
             exact=True,
         )
 
@@ -172,12 +191,20 @@ class QueryTestCase(TestCase):
         data = get_indexed_ref_by_query(dataset, Q(ref__iexact=ref))
         self.assertIsInstance(data, RefData)
 
-    def test_get_indexed_ref_by_query_unexistent_ref(self):
+    def test_get_indexed_ref_by_query_nonexistent_ref(self):
+        """
+        The function get_indexed_ref_by_query should :raise RefNotFoundError:
+        if a combination of non-existing dataset and reference is passed as parameter.
+        """
         dataset, ref = "NONEXISTING_DATASET", "NONEXISTING_REF"
         with self.assertRaises(RefNotFoundError):
             get_indexed_ref_by_query(dataset, Q(ref__iexact=ref))
 
     def test_get_indexed_ref_by_query_multiple_ref_found(self):
+        """
+        The function get_indexed_ref_by_query should :raise RefNotFoundError:
+        if multiple instances are found given the query passed as parameter.
+        """
         dataset = "rfcs"
         with self.assertRaises(RefNotFoundError):
             get_indexed_ref_by_query(dataset, Q())
