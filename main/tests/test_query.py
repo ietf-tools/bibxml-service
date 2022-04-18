@@ -140,7 +140,7 @@ class QueryTestCase(TestCase):
     def test_build_search_empty_results(self):
         """
         Test that build_search_results returns an empty list of
-        results if ID does not match any entry.
+        results with a query that does not match any item.
         """
         refs = search_refs_relaton_field(
             {
