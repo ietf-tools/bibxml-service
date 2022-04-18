@@ -64,33 +64,9 @@ class QueryTestCase(TestCase):
     def test_search_refs_relaton_struct(self):
         limit = 2
         objs = [
-            {
-                "docid": [
-                    {
-                        "id": self._get_list_of_docids_for_dataset_from_fixture()[
-                            0
-                        ].get("id")
-                    }
-                ]
-            },
-            {
-                "docid": [
-                    {
-                        "id": self._get_list_of_docids_for_dataset_from_fixture("misc")[
-                            0
-                        ].get("id")
-                    }
-                ]
-            },
-            {
-                "docid": [
-                    {
-                        "id": self._get_list_of_docids_for_dataset_from_fixture("ieee")[
-                            0
-                        ].get("id")
-                    }
-                ]
-            },
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture()[0].get("id")}]},
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture("misc")[0].get("id")}]},
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture("ieee")[0].get("id")}]},
         ]
         refs = search_refs_relaton_struct(*objs, limit=limit)
         self.assertIsInstance(refs, QuerySet[RefData])
