@@ -105,12 +105,11 @@ class XML2RFCSerializersTestCase(TestCase):
 
     def test_bibliographicitem_to_xml(self):
         """
-        Test that a BibliographicItem is properly converted to XML.
-        Validate the XML formatting against an XSD schema.
-        The XSD schema was generated using trang using the official
-        Relax NG schema.
-        See issue https://github.com/ietf-ribose/bibxml-service/issues/155
-        for more details.
+        Test that a BibliographicItem is properly converted to XML,
+        validating its formatting against an XSD schema.
+        The XSD schema (xml2rfc_compat/tests/static/v3.xsd) was generated
+        using trang using the official Relax NG schema.
+        See: https://github.com/ietf-ribose/bibxml-service/issues/155
         """
 
         xml_reference = to_xml(self.bibitem_reference)
@@ -311,12 +310,12 @@ class XML2RFCSerializersTestCase(TestCase):
         self.assertIsNone(extract_id_series(docid))
 
     def test_extract_w3c_series(self):
-        id_value = "W3C REC-owl2-syntax-20121211"
+        id_value = "W3C.REC-owl2-syntax-20121211"
         type_value = "W3C"
         docid = DocID(id=id_value, type=type_value)
         serie, id = extract_w3c_series(docid)
         self.assertEqual(serie, type_value)
-        self.assertEqual(id, id_value.split("W3C ")[-1])
+        self.assertEqual(id, id_value.replace('.', ' ').split("W3C ")[-1])
 
     def test_fail_extract_w3c_series(self):
         """
@@ -358,8 +357,20 @@ class XML2RFCSerializersTestCase(TestCase):
         self.assertEqual(serie, type_value)
         self.assertTrue(
             id == "%s-%s" % (id_value_alternative.replace("-", "."), year)
-            or id == id_value
+            # or id == id_value
         )
+
+    def test_extract_ieee_series_with_malformed_id(self):
+        """
+        extract_ieee_series should return DocID.id if id_value is not
+        formatted properly (e.g. "IEEE P2740/D-6.5.2020-08").
+        """
+        id_value = "IEEE P2740/D-6.5 2020-08"
+        type_value = "IEEE"
+        docid = DocID(id=id_value, type=type_value)
+        serie, id = extract_ieee_series(docid)
+        self.assertEqual(serie, type_value)
+        self.assertEqual(id, id_value)
 
     def test_fail_extract_ieee_series(self):
         """
