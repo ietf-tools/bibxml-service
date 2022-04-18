@@ -16,7 +16,8 @@ from main.query import (
     build_citation_for_docid,
     build_search_results,
     get_indexed_item,
-    get_indexed_ref_by_query, search_refs_relaton_struct,
+    get_indexed_ref_by_query,
+    search_refs_relaton_struct,
 )
 from main.types import CompositeSourcedBibliographicItem, IndexedBibliographicItem
 
@@ -61,8 +62,36 @@ class QueryTestCase(TestCase):
         self.assertIsInstance(doctypes[0], tuple)
 
     def test_search_refs_relaton_struct(self):
-        limit = 1
-        objs = [{'docid': [{'id': self._get_list_of_docids_for_dataset_from_fixture()[0].get("id")}]}]
+        limit = 2
+        objs = [
+            {
+                "docid": [
+                    {
+                        "id": self._get_list_of_docids_for_dataset_from_fixture()[
+                            0
+                        ].get("id")
+                    }
+                ]
+            },
+            {
+                "docid": [
+                    {
+                        "id": self._get_list_of_docids_for_dataset_from_fixture("misc")[
+                            0
+                        ].get("id")
+                    }
+                ]
+            },
+            {
+                "docid": [
+                    {
+                        "id": self._get_list_of_docids_for_dataset_from_fixture("ieee")[
+                            0
+                        ].get("id")
+                    }
+                ]
+            },
+        ]
         refs = search_refs_relaton_struct(*objs, limit=limit)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertGreater(refs.count(), 0)
