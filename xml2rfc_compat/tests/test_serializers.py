@@ -6,9 +6,19 @@ from django.test import TestCase
 from lxml import etree
 
 from bib_models import BibliographicItem, Contributor, DocID, Link
-from xml2rfc_compat.serializer import to_xml, create_reference, create_author, get_suitable_anchor, get_suitable_target, \
-    extract_doi_series, extract_rfc_series, extract_id_series, extract_w3c_series, extract_3gpp_tr_series, \
-    extract_ieee_series
+from xml2rfc_compat.serializer import (
+    to_xml,
+    create_reference,
+    create_author,
+    get_suitable_anchor,
+    get_suitable_target,
+    extract_doi_series,
+    extract_rfc_series,
+    extract_id_series,
+    extract_w3c_series,
+    extract_3gpp_tr_series,
+    extract_ieee_series,
+)
 
 
 class XML2RFCSerializersTestCase(TestCase):
@@ -220,9 +230,15 @@ class XML2RFCSerializersTestCase(TestCase):
             get_suitable_anchor(docids)
 
     def test_get_suitable_target(self):
+        """
+        get_suitable_target should return the content of the
+        Link whose type == "src"
+        """
         link_content = "link_content"
-        links = [Link(content=link_content, type="src"),
-                 Link(content="not_src_link", type="not_src")]
+        links = [
+            Link(content=link_content, type="src"),
+            Link(content="not_src_link", type="not_src"),
+        ]
         target_content = get_suitable_target(links)
         self.assertIsInstance(target_content, str)
         self.assertEqual(target_content, link_content)
@@ -255,7 +271,7 @@ class XML2RFCSerializersTestCase(TestCase):
     def test_fail_extract_doi_series(self):
         """
         extract_doi_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "10.17487/RFC4036"
         docid = DocID(id=id_value, type="TYPE")
@@ -271,7 +287,7 @@ class XML2RFCSerializersTestCase(TestCase):
     def test_fail_extract_rfc_series(self):
         """
         extract_rfc_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "RFC 4036"
         docid = DocID(id=id_value, type="TYPE")
@@ -288,7 +304,7 @@ class XML2RFCSerializersTestCase(TestCase):
     def test_fail_extract_id_series(self):
         """
         extract_id_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "draft-ietf-hip-rfc5201-bis-13"
         docid = DocID(id=id_value, type="TYPE")
@@ -300,12 +316,12 @@ class XML2RFCSerializersTestCase(TestCase):
         docid = DocID(id=id_value, type=type_value)
         serie, id = extract_w3c_series(docid)
         self.assertEqual(serie, type_value)
-        self.assertEqual(id, id_value.split('W3C ')[-1])
+        self.assertEqual(id, id_value.split("W3C ")[-1])
 
     def test_fail_extract_w3c_series(self):
         """
         extract_w3c_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "W3C REC-owl2-syntax-20121211"
         docid = DocID(id=id_value, type="TYPE")
@@ -317,12 +333,15 @@ class XML2RFCSerializersTestCase(TestCase):
         docid = DocID(id=id_value, type=type_value)
         serie, id = extract_3gpp_tr_series(docid)
         self.assertEqual(serie, f"{type_value} TR")
-        self.assertEqual(id, f"{id_value.split('3GPP TR ')[1].split(':')[0]} {id_value.split('/')[-1]}")
+        self.assertEqual(
+            id,
+            f"{id_value.split('3GPP TR ')[1].split(':')[0]} {id_value.split('/')[-1]}",
+        )
 
     def test_fail_extract_3gpp_tr_series(self):
         """
         extract_3gpp_tr_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "3GPP TR 25.321:Rel-8/8.3.0"
         docid = DocID(id=id_value, type="TYPE")
@@ -333,14 +352,19 @@ class XML2RFCSerializersTestCase(TestCase):
         type_value = "IEEE"
         docid = DocID(id=id_value, type=type_value)
         serie, id = extract_ieee_series(docid)
-        id_value_alternative, year, *_ = docid.id.split(' ')[-1].lower().strip().split('.')
+        id_value_alternative, year, *_ = (
+            docid.id.split(" ")[-1].lower().strip().split(".")
+        )
         self.assertEqual(serie, type_value)
-        self.assertTrue(id == '%s-%s' % (id_value_alternative.replace('-', '.'), year) or id == id_value)
+        self.assertTrue(
+            id == "%s-%s" % (id_value_alternative.replace("-", "."), year)
+            or id == id_value
+        )
 
     def test_fail_extract_ieee_series(self):
         """
         extract_ieee_series should fail with the wrong combination
-        of id and type.
+        of DocID.id and DocID.type.
         """
         id_value = "IEEE P2740/D-6.5.2020-08"
         docid = DocID(id=id_value, type="TYPE")
