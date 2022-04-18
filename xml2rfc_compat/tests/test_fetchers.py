@@ -35,7 +35,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_rfcs_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.rfcs(ref="UNEXISTING_REF")
+            fetchers.rfcs(ref="NONEXISTENT_REF")
 
     def test_misc(self):
         bibitem = fetchers.misc(ref=self.misc_ref)
@@ -44,7 +44,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_misc_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.misc(ref="UNEXISTING_REF")
+            fetchers.misc(ref="NONEXISTENT_REF")
 
     def test_internet_drafts(self):
         bibitem = fetchers.internet_drafts(ref=self.internet_drafts_ref)
@@ -53,7 +53,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_internet_drafts_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.internet_drafts(ref="UNEXISTING_REF")
+            fetchers.internet_drafts(ref="NONEXISTENT_REF")
 
     def test_internet_drafts_invalid_ref(self):
         with self.assertRaises(RefNotFoundError):
@@ -73,7 +73,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_w3c_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.w3c(ref="UNEXISTING_REF")
+            fetchers.w3c(ref="NONEXISTENT_REF")
 
     def test_threegpp(self):
         bibitem = fetchers.threegpp(ref=self.threegpp_ref)
@@ -81,7 +81,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_threegpp_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.threegpp(ref="UNEXISTING_REF")
+            fetchers.threegpp(ref="NONEXISTENT_REF")
 
     def test_ieee(self):
         bibitem = fetchers.ieee(ref=self.ieee_ref)
@@ -90,21 +90,21 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_ieee_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.ieee(ref="UNEXISTING_REF")
+            fetchers.ieee(ref="NONEXISTENT_REF")
 
     def test_doi(self):
         self._assert_is_instance_of_bibliographicitem(fetchers.doi(ref=self.doi_ref))
 
     def test_doi_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.doi(ref="UNEXISTING_REF")
+            fetchers.doi(ref="NONEXISTENT_REF")
 
     def test_iana(self):
         self._assert_is_instance_of_bibliographicitem(fetchers.iana(ref=self.iana_ref))
 
     def test_iana_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.iana(ref="UNEXISTING_REF")
+            fetchers.iana(ref="NONEXISTENT_REF")
 
     def test_rfcsubseries(self):
         bibitem = fetchers.rfcsubseries(ref=self.rfcsubseries_ref)
@@ -112,7 +112,7 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_rfcsubseries_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.rfcsubseries(ref="UNEXISTING_REF")
+            fetchers.rfcsubseries(ref="NONEXISTENT_REF")
 
     def test_nist(self):
         bibitem = fetchers.nist(ref=self.nist_ref)
@@ -120,5 +120,5 @@ class XML2RFCFetchersTestCase(TestCase):
 
     def test_nist_not_found(self):
         with self.assertRaises(RefNotFoundError):
-            fetchers.nist(ref="UNEXISTING_REF")
+            fetchers.nist(ref="NONEXISTENT_REF")
 
