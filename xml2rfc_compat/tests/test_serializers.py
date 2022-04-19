@@ -357,7 +357,6 @@ class XML2RFCSerializersTestCase(TestCase):
         self.assertEqual(serie, type_value)
         self.assertTrue(
             id == "%s-%s" % (id_value_alternative.replace("-", "."), year)
-            # or id == id_value
         )
 
     def test_extract_ieee_series_with_malformed_id(self):
