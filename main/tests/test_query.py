@@ -17,6 +17,7 @@ from main.query import (
     build_search_results,
     get_indexed_item,
     get_indexed_ref_by_query,
+    search_refs_relaton_struct,
 )
 from main.types import CompositeSourcedBibliographicItem, IndexedBibliographicItem
 
@@ -59,6 +60,28 @@ class QueryTestCase(TestCase):
         self.assertIsInstance(doctypes, list)
         self.assertGreater(len(doctypes), 0)
         self.assertIsInstance(doctypes[0], tuple)
+
+    def test_search_refs_relaton_struct(self):
+        limit = 2
+        objs = [
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture()[0].get("id")}]},
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture("misc")[0].get("id")}]},
+            {"docid": [{"id": self._get_list_of_docids_for_dataset_from_fixture("ieee")[0].get("id")}]},
+        ]
+        refs = search_refs_relaton_struct(*objs, limit=limit)
+        self.assertIsInstance(refs, QuerySet[RefData])
+        self.assertGreater(refs.count(), 0)
+        self.assertLessEqual(refs.count(), limit)
+
+    def test_search_refs_relaton_struct_empty_results(self):
+        """
+        Test that search_refs_relaton_struct returns an empty list of
+        results when called with an empty list of objs.
+        """
+        objs = []
+        refs = search_refs_relaton_struct(*objs)
+        self.assertIsInstance(refs, QuerySet[RefData])
+        self.assertEqual(refs.count(), 0)
 
     def test_search_refs_relaton_field(self):
         docids = self._get_list_of_docids_for_dataset_from_fixture("rfcs")
