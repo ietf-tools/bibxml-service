@@ -24,6 +24,9 @@ RUN apt-get install -y python3.10 python3.10-distutils python3.10-dev
 RUN ln -sf python3.10 /bin/python
 RUN ln -sf pip3 /bin/pip
 
+# Install Wait-For-It (https://github.com/vishnubob/wait-for-it)
+RUN apt-get install wait-for-it
+
 RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 
 # TODO: Get rid of this
@@ -60,6 +63,9 @@ ENV API_SECRET=test
 
 COPY . /code
 
+COPY ops/wait-for-test-db.sh /code/ops/wait-for-test-db.sh
+RUN chmod +x /code/ops/wait-for-test-db.sh
+
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
-RUN ["python", "manage.py", "compress"]
-CMD python manage.py test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log
+RUN ["python", "manage.py", "compress", "--force"]
+CMD ["./ops/wait-for-test-db.sh"]
