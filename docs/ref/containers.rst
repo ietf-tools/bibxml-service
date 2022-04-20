@@ -4,7 +4,7 @@ Bundled container reference
 
 The bundled Docker Compose configurations run following containers.
 It’s intended as a reference, but could be used in production
-as long as :doc:`relevant precautions </howto/run-in-production>` are followed.
+as long as :doc:`relevant precautions </topics/production-setup>` are followed.
 
 .. note::
 
