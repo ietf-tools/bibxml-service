@@ -67,5 +67,5 @@ COPY ops/wait-for-test-db.sh /code/ops/wait-for-test-db.sh
 RUN chmod +x /code/ops/wait-for-test-db.sh
 
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
-RUN ["python", "manage.py", "compress", "--force"]
+RUN ["python", "manage.py", "compress"]
 CMD ["./ops/wait-for-test-db.sh"]
