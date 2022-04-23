@@ -136,21 +136,25 @@ are unavoidable but a new warning may indicate a broken cross-reference.
 Linting
 -------
 
-.. important:: Always lint your code. Ideally, make your IDE do it by default.
-
-Linting does not require using Docker. If on macOS or Linux, instead you can:
-
-1. Create and active a Python 3.9 virtual environment using ``virtualenv``.
-2. Install requirements with ``pip install -r requirements.txt``.
-3. Make sure your IDE resolves to Python within the virtualenv.
-   In case of VS Code, use the “Select Python interpreter…” command.
-
-The project includes a mypy configuration, and it’s required that you run
-mypy on your code to ensure valid typings.
+The project includes a mypy configuration, and it’s crucial that every contributor
+runs mypy to ensure valid typings.
 
 Most IDEs can lint code on any change and highlight
 problems in the editor.
-Some IDEs may require you to install mypy separately.
+
+.. important:: Always lint your code. Ideally, make your IDE do it by default.
+
+Linting types properly requires mypy to be able to access imported modules.
+However, this does not require running Docker at all times.
+If on macOS or Linux, instead you can:
+
+1. Create and active a Python 3.9 virtual environment using ``virtualenv``.
+2. Install requirements with ``pip install -r requirements.txt``.
+   (Don’t forget to repeat this step if requirements change later.)
+3. Make sure your IDE resolves to Python within the virtualenv.
+   In case of VS Code, use the “Select Python interpreter…” command.
+
+.. note:: Some IDEs may require you to install mypy separately.
 
 .. note::
 
@@ -159,7 +163,7 @@ Some IDEs may require you to install mypy separately.
    no third-party typing stubs are silently installed.
 
 It’s also a good idea to run flake8. Where project conventions
-differ from flake8 style use project conventions.
+differ from flake8 style, use project conventions.
 
 Automated testing
 -----------------
