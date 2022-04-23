@@ -5,7 +5,7 @@ Glossary
 .. glossary::
 
    bibliographic item
-       Document metadata describing a document. Used when e.g. citing.
+       Document metadata for purposes of referencing or citing.
        Corresponds to :class:`bib_models.models.bibdata.BibliographicItem` instance.
 
        In BibXML service, data for a single bibliographic item can be provided
