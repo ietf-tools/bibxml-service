@@ -1,9 +1,12 @@
-===========================================
-How to set up local development environment
-===========================================
+======================
+How to develop locally
+======================
 
 .. contents::
    :local:
+
+Setting up
+==========
 
 You will need Docker and Docker Compose.
 Configuration entry point lives in ``docker-compose.yml``
@@ -33,7 +36,7 @@ at the root of the repository.
 
 
 Building base image
-===================
+-------------------
 
 .. note::
 
@@ -60,7 +63,7 @@ Building base image
 
 
 Building documentation
-======================
+----------------------
 
 In production (without DEBUG and dev Compose config),
 the documentation is made available under `/static/docs/index.html`.
