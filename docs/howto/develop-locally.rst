@@ -116,3 +116,54 @@ Invoking Django management commands
 ::
 
     docker compose exec web bash
+
+
+Working on codebase
+===================
+
+Make sure to build and run the image as described in adjacent section.
+Docker Compose will automatically reload the code for you.
+
+In addition, make sure to build documentation,
+make sure any new units are documented and all cross-references
+(including the previously existing ones) resolve. Pay attention
+to any new warnings during documentation generation, some warnings
+are unavoidable but a new warning may indicate a broken cross-reference.
+
+Linting
+-------
+
+.. important:: Always lint your code. Ideally, make your IDE do it by default.
+
+Linting does not require using Docker. If on macOS or Linux, instead you can:
+
+1. Create and active a Python 3.9 virtual environment using ``virtualenv``.
+2. Install requirements with ``pip install -r requirements.txt``.
+3. Make sure your IDE resolves to Python within the virtualenv.
+   In case of VS Code, use the “Select Python interpreter…” command.
+
+The project includes a mypy configuration, and it’s required that you run
+mypy on your code to ensure valid typings.
+
+Most IDEs can lint code on any change and highlight
+problems in the editor.
+Some IDEs may require you to install mypy separately.
+
+.. note::
+
+   In VS Code, it’s recommended to disable mypy linting in Python extension
+   and delegate linting to a separate Mypy extension. This ensures
+   no third-party typing stubs are silently installed.
+
+It’s also a good idea to run flake8. Where project conventions
+differ from flake8 style use project conventions.
+
+Automated testing
+-----------------
+
+See :doc:`/howto/run-tests`.
+
+Marking new release
+-------------------
+
+See :doc:`/howto/mark-releases`.
