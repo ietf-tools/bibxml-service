@@ -1,6 +1,7 @@
 import os
 from copy import copy
 from io import StringIO
+from typing import Dict, Any
 
 from django.test import TestCase
 from lxml import etree
@@ -11,13 +12,13 @@ from xml2rfc_compat.serializer import to_xml, create_reference, create_author
 
 class XML2RFCSerializersTestCase(TestCase):
     def setUp(self):
-        self.contributor_organization_data = {
+        self.contributor_organization_data: Dict[str, Any] = {
             "organization": {
                 "name": "Internet Engineering Task Force",
             },
             "role": "publisher",
         }
-        self.contributor_person_data = {
+        self.contributor_person_data: Dict[str, Any] = {
             "person": {
                 "name": {
                     "initial": [{"content": "Mr", "language": "en"}],
@@ -27,7 +28,7 @@ class XML2RFCSerializersTestCase(TestCase):
             },
             "role": "author",
         }
-        self.bibitem_reference_data = {
+        self.bibitem_reference_data: Dict[str, Any] = {
             "id": "ref_01",
             "title": [
                 {
@@ -42,7 +43,7 @@ class XML2RFCSerializersTestCase(TestCase):
             "date": [{"type": "published", "value": "1996-02"}],
         }
 
-        self.bibitem_referencegroup_data = {
+        self.bibitem_referencegroup_data: Dict[str, Any] = {
             "id": "ref_02",
             "docid": [{"id": "ref_02", "type": "test_dataset_02"}],
             "relation": [
@@ -147,8 +148,8 @@ class XML2RFCSerializersTestCase(TestCase):
     def test_fail_create_author_if_incompatible_roles(self):
         contributor_organization = copy(self.contributor_organization)
         contributor_person = copy(self.contributor_person)
-        contributor_organization.role = None
-        contributor_person.role = None
+        contributor_organization.role = "random"
+        contributor_person.role = "random"
         with self.assertRaises(ValueError):
             create_author(contributor_organization)
             create_author(contributor_person)
