@@ -3,13 +3,15 @@ from typing import Dict, Any
 from urllib.parse import quote_plus
 import json
 
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+import datatracker.auth
 from main.models import RefData
 
 
-class RefDataModelTests(TestCase):
+class RefDataApiTests(TestCase):
     """
     If we make "service" instances read only, this test will fail,
     and at least setUp() should be rewritten.
