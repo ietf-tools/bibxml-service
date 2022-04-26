@@ -27,12 +27,16 @@ class XML2RFCSerializersTestCase(TestCase):
     """
 
     def setUp(self):
+
+        # Data for a Contributor of type Organization
         self.contributor_organization_data = {
             "organization": {
                 "name": "Internet Engineering Task Force",
             },
             "role": "publisher",
         }
+
+        # Data for a Contributor of type Person
         self.contributor_person_data = {
             "person": {
                 "name": {
@@ -43,6 +47,9 @@ class XML2RFCSerializersTestCase(TestCase):
             },
             "role": "author",
         }
+
+        # Data for a BibliographicItem which will be
+        # converted to a reference root tag in the XML schema
         self.bibitem_reference_data = {
             "id": "ref_01",
             "title": [
@@ -58,6 +65,8 @@ class XML2RFCSerializersTestCase(TestCase):
             "date": [{"type": "published", "value": "1996-02"}],
         }
 
+        # Data for a BibliographicItem which will be
+        # converted to a referencegroup root tag in the XML schema
         self.bibitem_referencegroup_data = {
             "id": "ref_02",
             "docid": [{"id": "ref_02", "type": "test_dataset_02"}],
@@ -106,10 +115,10 @@ class XML2RFCSerializersTestCase(TestCase):
     def test_bibliographicitem_to_xml(self):
         """
         Test that a BibliographicItem is properly converted to XML,
-        validating its formatting against an XSD schema.
-        The XSD schema (xml2rfc_compat/tests/static/v3.xsd) was generated
-        using trang using the official Relax NG schema.
-        See: https://github.com/ietf-ribose/bibxml-service/issues/155
+        and that its format validates against a converted authoritative
+        schema (xml2rfc_compat/tests/static/v3.xsd).
+        More info about the schema here
+        https://github.com/ietf-ribose/bibxml-service/issues/155
         """
 
         xml_reference = to_xml(self.bibitem_reference)
@@ -126,7 +135,7 @@ class XML2RFCSerializersTestCase(TestCase):
         self,
     ):
         """
-        to_xml should fail if no titles or relations are present.
+        to_xml should fail if no titles or relations are provided
         """
         data = copy(self.bibitem_reference_data)
         del data["title"]
@@ -140,7 +149,7 @@ class XML2RFCSerializersTestCase(TestCase):
 
     def test_fail_create_reference_if_missing_titles(self):
         """
-        create_reference should fail if no title is present.
+        create_reference should fail if no title is provider
         """
         data = copy(self.bibitem_reference_data)
         del data["title"]
@@ -149,6 +158,9 @@ class XML2RFCSerializersTestCase(TestCase):
             create_reference(new_bibitem_with_missing_data)
 
     def test_create_author(self):
+        """
+        test create_author should return a valid XML
+        """
         author_xsd = StringIO(
             """
             <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" 
@@ -187,7 +199,7 @@ class XML2RFCSerializersTestCase(TestCase):
 
     def test_fail_create_author_if_missing_person_or_organization(self):
         """
-        create_author should fail if no person or organization is present.
+        create_author should fail if no person or organization is provided
         """
         contributor_organization = copy(self.contributor_organization)
         contributor_person = copy(self.contributor_person)
@@ -198,6 +210,9 @@ class XML2RFCSerializersTestCase(TestCase):
             create_author(contributor_person)
 
     def test_get_suitable_anchor(self):
+        """
+        test get_suitable_anchor returns the correct anchor value
+        """
         id = "RFC1918"
         docids = [DocID(id=id, type="RFC", scope="anchor")]
         anchor = get_suitable_anchor(docids)
@@ -222,7 +237,8 @@ class XML2RFCSerializersTestCase(TestCase):
 
     def test_fail_get_suitable_anchor(self):
         """
-        get_suitable_anchor should fail if a list of empty ids is provided
+        get_suitable_anchor should fail if called with
+        a list of empty ids
         """
         docids = []
         with self.assertRaises(ValueError):
@@ -254,7 +270,8 @@ class XML2RFCSerializersTestCase(TestCase):
 
     def test_fail_get_suitable_target(self):
         """
-        get_suitable_target should fail if a list of empty links is provided
+        get_suitable_target should fail if called with
+        a list of empty links
         """
         links = []
         with self.assertRaises(ValueError):
@@ -315,7 +332,7 @@ class XML2RFCSerializersTestCase(TestCase):
         docid = DocID(id=id_value, type=type_value)
         serie, id = extract_w3c_series(docid)
         self.assertEqual(serie, type_value)
-        self.assertEqual(id, id_value.replace('.', ' ').split("W3C ")[-1])
+        self.assertEqual(id, id_value.replace(".", " ").split("W3C ")[-1])
 
     def test_fail_extract_w3c_series(self):
         """
@@ -355,9 +372,7 @@ class XML2RFCSerializersTestCase(TestCase):
             docid.id.split(" ")[-1].lower().strip().split(".")
         )
         self.assertEqual(serie, type_value)
-        self.assertTrue(
-            id == "%s-%s" % (id_value_alternative.replace("-", "."), year)
-        )
+        self.assertTrue(id == "%s-%s" % (id_value_alternative.replace("-", "."), year))
 
     def test_extract_ieee_series_with_malformed_id(self):
         """
