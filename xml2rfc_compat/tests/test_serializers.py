@@ -26,7 +26,7 @@ class XML2RFCSerializersTestCase(TestCase):
     Test cases for serializers.py file
     """
 
-    def setUp(self):
+    def setUpTestData(self):
 
         # Data for a Contributor of type Organization
         self.contributor_organization_data = {
