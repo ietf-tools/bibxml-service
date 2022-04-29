@@ -3,14 +3,14 @@
 from . import merger
 from . import serializers
 
-from .models.bibdata import *
-from .models.copyrights import *
-from .models.people import *
-from .models.orgs import *
-from .models.contacts import *
-from .models.links import *
-from .models.dates import *
-from .models.strings import *
+from relaton.models.bibdata import *
+from relaton.models.copyrights import *
+from relaton.models.people import *
+from relaton.models.orgs import *
+from relaton.models.contacts import *
+from relaton.models.links import *
+from relaton.models.dates import *
+from relaton.models.strings import *
 
 
 __all__ = (

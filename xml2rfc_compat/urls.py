@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from pydantic import ValidationError
 
 from prometheus import metrics
-from bib_models.models.bibdata import BibliographicItem
+from bib_models import BibliographicItem
 from main.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 

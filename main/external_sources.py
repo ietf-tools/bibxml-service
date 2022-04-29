@@ -7,7 +7,7 @@ from functools import wraps
 from pydantic.dataclasses import dataclass
 from pydantic import ValidationError
 
-from bib_models.models.bibdata import DocID
+from bib_models import DocID
 
 from .types import ExternalBibliographicItem
 from .exceptions import RefNotFoundError

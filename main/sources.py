@@ -19,11 +19,11 @@ import datetime
 
 import yaml
 from celery.utils.log import get_task_logger
+from relaton.models import dates
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import transaction
 
-from bib_models.models import dates
 from common.util import as_list
 from sources import indexable
 

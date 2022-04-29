@@ -8,7 +8,7 @@ from django.db.utils import ProgrammingError, DataError
 
 from pydantic import ValidationError
 
-from bib_models.models.bibdata import BibliographicItem, DocID
+from bib_models import BibliographicItem, DocID
 from bib_models.merger import bibitem_merger
 
 from .models import RefData
