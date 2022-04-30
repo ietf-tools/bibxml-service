@@ -17,7 +17,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.conf import settings
 
-from .request import get as datatracker_get, BASE_AUTH_DOMAIN
+from .request import BASE_AUTH_DOMAIN
 
 
 __all__ = (
@@ -386,7 +386,7 @@ def get_provider() -> ProviderInfo:
     """
 
     try:
-        data = datatracker_get(
+        data = requests.get(
             f'{BASE_AUTH_DOMAIN}api/openid/.well-known/openid-configuration',
         ).json()
     except (JSONDecodeError, SSLError):
