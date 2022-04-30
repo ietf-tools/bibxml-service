@@ -8,6 +8,7 @@ import logging
 from pydantic import BaseModel, Extra
 from requests_oauthlib import OAuth2Session
 from simplejson import JSONDecodeError
+import requests
 from requests.exceptions import SSLError
 
 from django.urls import reverse
@@ -16,7 +17,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.conf import settings
 
-from . import request
+from .request import get as datatracker_get, BASE_AUTH_DOMAIN
 
 
 __all__ = (
@@ -380,14 +381,13 @@ class ProviderInfo(BaseModel, extra=Extra.ignore):
 
 def get_provider() -> ProviderInfo:
     """Tries to obtain up-to-date OAuth2 provider info
-    from Datatracker’s .well-known file,
+    from IETF auth’s .well-known file,
     falls back to :data:`.DEFAULT_PROVIDER` if failed.
     """
 
     try:
-        data = request.get(
-            '/api/openid/.well-known/openid-configuration',
-            format=None,
+        data = datatracker_get(
+            f'{BASE_AUTH_DOMAIN}api/openid/.well-known/openid-configuration',
         ).json()
     except (JSONDecodeError, SSLError):
         log.warn(
