@@ -399,12 +399,12 @@ def get_provider() -> ProviderInfo:
 
 
 DEFAULT_PROVIDER = ProviderInfo(**{
-    "issuer": "https://datatracker.ietf.org/api/openid",
-    "authorization_endpoint": "https://datatracker.ietf.org/api/openid/authorize",
-    "token_endpoint": "https://datatracker.ietf.org/api/openid/token",
-    "userinfo_endpoint": "https://datatracker.ietf.org/api/openid/userinfo",
-    "end_session_endpoint": "https://datatracker.ietf.org/api/openid/end-session",
-    "introspection_endpoint": "https://datatracker.ietf.org/api/openid/introspect",
+    "issuer": "https://auth.ietf.org/api/openid",
+    "authorization_endpoint": "https://auth.ietf.org/api/openid/authorize",
+    "token_endpoint": "https://auth.ietf.org/api/openid/token",
+    "userinfo_endpoint": "https://auth.ietf.org/api/openid/userinfo",
+    "end_session_endpoint": "https://auth.ietf.org/api/openid/end-session",
+    "introspection_endpoint": "https://auth.ietf.org/api/openid/introspect",
     "response_types_supported": [
       "code",
       "id_token",
@@ -413,7 +413,7 @@ DEFAULT_PROVIDER = ProviderInfo(**{
       "code id_token",
       "code id_token token"
     ],
-    "jwks_uri": "https://datatracker.ietf.org/api/openid/jwks",
+    "jwks_uri": "https://auth.ietf.org/api/openid/jwks",
     "id_token_signing_alg_values_supported": [
       "HS256",
       "RS256"
