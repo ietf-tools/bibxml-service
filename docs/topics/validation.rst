@@ -5,7 +5,7 @@ Bibliographic data validation
 This service deals with bibliographic data obtained
 from different sources compiled by external tools.
 
-The data models defined (see :mod:`bib_models.models`)
+The data models defined (see :mod:`bib_models`)
 handle data validation automatically, meaning constructed
 bibliographic items can be assumed to have the expected properties
 of correct types.

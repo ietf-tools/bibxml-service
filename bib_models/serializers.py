@@ -13,7 +13,8 @@ def register(id: str, content_type: str):
     """Parametrized decorator that, given ID and content_type,
     returns a function that will register a serializer function.
 
-    Serializer function must take a ``BibliographicItem`` instance
+    Serializer function must take
+    a :class:`relaton.models.bibdata.BibliographicItem` instance
     and return an utf-8-encoded string.
     """
     def wrapper(func: Callable[..., str]):

@@ -131,7 +131,8 @@ Code layout
    │       General templates.
    │
    ├── bib_models/
-   │       Bibliographic item dataclasses/Pydantic models.
+   │       Reimports bibliographic item dataclasses/Pydantic models from relaton-py
+   |       and provides some additional utilities.
    │
    ├── sources/
    │       Indexable sources. Async tasks, registry, etc.

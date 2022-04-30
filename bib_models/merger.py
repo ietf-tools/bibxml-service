@@ -1,6 +1,6 @@
 """
 Helpers for merging dictionary representations
-of :class:`bib_models.models.bibdata.BibliographicItem` instances.
+of :class:`relaton.models.bibdata.BibliographicItem` instances.
 """
 
 from typing import Any
@@ -51,6 +51,6 @@ bibitem_merger = Merger(
     [deduplicate_and_coerce_to_list],
 )
 """A ``deepmerge`` merger
-for :class:`~bib_models.models.bibdata.BibliographicItem`
+for :class:`~relaton.models.bibdata.BibliographicItem`
 dictionary representations.
 """
