@@ -406,24 +406,24 @@ DEFAULT_PROVIDER = ProviderInfo(**{
     "end_session_endpoint": "https://auth.ietf.org/api/openid/end-session",
     "introspection_endpoint": "https://auth.ietf.org/api/openid/introspect",
     "response_types_supported": [
-      "code",
-      "id_token",
-      "id_token token",
-      "code token",
-      "code id_token",
-      "code id_token token"
+        "code",
+        "id_token",
+        "id_token token",
+        "code token",
+        "code id_token",
+        "code id_token token",
     ],
     "jwks_uri": "https://auth.ietf.org/api/openid/jwks",
     "id_token_signing_alg_values_supported": [
-      "HS256",
-      "RS256"
+        "HS256",
+        "RS256",
     ],
     "subject_types_supported": [
-      "public"
+        "public",
     ],
     "token_endpoint_auth_methods_supported": [
-      "client_secret_post",
-      "client_secret_basic"
+        "client_secret_post",
+        "client_secret_basic",
     ],
 })
 """Datatracker OAuth2 provider info
