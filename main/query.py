@@ -453,7 +453,7 @@ def build_search_results(
     by merging ``RefData`` instances that share
     their primary document identifier.
 
-    Takes care of merging search headlines, if any.
+    Takes care of merging search headline annotations, if any.
 
     :param django.db.models.query.QuerySet[RefData] refs: found refs
     :rtype: List[FoundItem]
