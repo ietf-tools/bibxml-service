@@ -106,6 +106,54 @@ def merge_refs(
             return CompositeSourcedBibliographicItem.construct(**composite)
 
 
+def resolve_relations(
+    items: List[BibliographicItem],
+) -> Dict[str, BibliographicItem]:
+    """
+    For every given :class:`~relaton.models.bibdata.BibliographicItem`
+    of ``items``, scans for any relations that are ``formattedref``-only links.
+
+    Fetches all referenced documents and returns a dictionary
+    that maps each ``formattedref``
+    to corresponding :class:`~relaton.models.bibdata.BibliographicItem`.
+
+    The resulting dictionary can be used with :func:`.hydrate_bibitem()`.
+    """
+    raise NotImplementedError()
+
+
+def hydrate_bibitem(
+    item: BibliographicItem,
+    resolved_relations: Dict[str, BibliographicItem],
+) -> BibliographicItem:
+    """
+    Given a :class:`~relaton.models.bibdata.BibliographicItem` that:
+
+    1. Possibly contains ``formattedref``-only relations
+    2. Possibly itself is just a ``formattedref``
+
+    Tries to replace all ``formattedref`` occurrences with fully fledged
+    bibliographic items:
+
+    1. For relations, tries to retrieve all documents
+       referenced via ``formattedref``
+       via their ``primary`` docid in one query.
+    2. If item itself has a ``formattedref`` and is missing vital metadata,
+       such as title, attempts to fill in that metadata from relations.
+
+    :param dict resolved_relations:
+        If supplied, no DB queries are made
+        and the dictionary is used for resolving relations.
+        If caller is resolving many items, it may pre-fetch all relations
+        referenced via ``formattedref`` ahead of time.
+
+    :returns:
+        The same logical bibliographic item, ideally with fewer formattedrefs
+        and more suitable for displaying to the user.
+    """
+    raise NotImplementedError()
+
+
 def get_docid_struct_for_search(id: DocID) -> Dict[str, Any]:
     """Converts a given ``DocID`` instance into a structure
     suitable for being passed
