@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.http import Http404
 from django.contrib import messages
 
-from .types import CompositeSourcedBibliographicItem
+from .types import FoundItem
 from .models import RefData
 from .query import build_search_results
 from .query import search_refs_relaton_struct
@@ -198,11 +198,14 @@ class BaseCitationSearchView(BaseListView):
             else:
                 raise
 
-    def get_queryset(self) -> List[CompositeSourcedBibliographicItem]:
-        """Returns a ``QuerySet`` of ``RefData`` objects.
+    def get_queryset(self) -> List[FoundItem]:
+        """Returns a list of :class:`~.types.FoundItem` objects.
 
-        If query is present, delegates to :meth:`dispatch_handle_query`,
-        otherwise behavior depends on :attr:`show_all_by_default`."""
+        The actual query is delegated to :meth:`dispatch_handle_query`,
+        unless cached results are present for the exact combination
+        of :attr:`query`, :attr:`query_format`, :attr:`show_all_by_default`
+        and :attr:`limit`.
+        """
 
         if self.query is not None and self.query_format is not None:
             result_getter = (lambda: build_search_results(
