@@ -6,15 +6,13 @@ from urllib.parse import unquote_plus
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 
 from pydantic import ValidationError
+from relaton.serializers.bibxml.anchor import get_suitable_anchor
 
 from common.pydantic import unpack_dataclasses
-from bib_models.models.bibdata import BibliographicItem
-from bib_models import serializers
-from prometheus import metrics
-
-from doi import get_doi_ref as _get_doi_ref
 from common.util import as_list
-from xml2rfc_compat.serializer import get_suitable_anchor
+from bib_models import BibliographicItem, serializers
+from prometheus import metrics
+from doi import get_doi_ref as _get_doi_ref
 
 from .search import BaseCitationSearchView
 from .query import get_indexed_item

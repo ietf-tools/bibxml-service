@@ -1,11 +1,12 @@
 import json
 import re
-from typing import List
+from typing import List, Any
 from unittest import TestCase
 
 from django.core.management import call_command
 from django.db.models import QuerySet, Q
 
+from bib_models import DocID
 from main.exceptions import RefNotFoundError
 from main.models import RefData
 from main.query import (
@@ -36,7 +37,7 @@ class QueryTestCase(TestCase):
 
     def _get_list_of_docids_for_dataset_from_fixture(
         self, dataset="rfcs"
-    ) -> List[dict]:
+    ) -> List[dict[Any, Any]]:
         """
         Retrieves a list of docids for a given dataset given as parameter
         from the fixtures used to test this component.
@@ -78,7 +79,7 @@ class QueryTestCase(TestCase):
         Test that search_refs_relaton_struct returns an empty list of
         results when called with an empty list of objs.
         """
-        objs = []
+        objs: List[Any]
         refs = search_refs_relaton_struct(*objs)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertEqual(refs.count(), 0)
@@ -110,8 +111,8 @@ class QueryTestCase(TestCase):
 
     def test_search_refs_docids(self):
         docids = self._get_list_of_docids_for_dataset_from_fixture()
-        docids = [item["id"] for item in docids]
-        refs = search_refs_docids(*docids)
+        ids = [item["id"] for item in docids]
+        refs = search_refs_docids(*ids)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertGreater(refs.count(), 0)
 

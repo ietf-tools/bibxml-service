@@ -8,6 +8,7 @@ import logging
 from pydantic import BaseModel, Extra
 from requests_oauthlib import OAuth2Session
 from simplejson import JSONDecodeError
+import requests
 from requests.exceptions import SSLError
 
 from django.urls import reverse
@@ -16,7 +17,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.conf import settings
 
-from . import request
+from .request import BASE_AUTH_DOMAIN
 
 
 __all__ = (
@@ -380,14 +381,13 @@ class ProviderInfo(BaseModel, extra=Extra.ignore):
 
 def get_provider() -> ProviderInfo:
     """Tries to obtain up-to-date OAuth2 provider info
-    from Datatracker’s .well-known file,
+    from IETF auth’s .well-known file,
     falls back to :data:`.DEFAULT_PROVIDER` if failed.
     """
 
     try:
-        data = request.get(
-            '/api/openid/.well-known/openid-configuration',
-            format=None,
+        data = requests.get(
+            f'{BASE_AUTH_DOMAIN}api/openid/.well-known/openid-configuration',
         ).json()
     except (JSONDecodeError, SSLError):
         log.warn(
@@ -399,31 +399,31 @@ def get_provider() -> ProviderInfo:
 
 
 DEFAULT_PROVIDER = ProviderInfo(**{
-    "issuer": "https://datatracker.ietf.org/api/openid",
-    "authorization_endpoint": "https://datatracker.ietf.org/api/openid/authorize",
-    "token_endpoint": "https://datatracker.ietf.org/api/openid/token",
-    "userinfo_endpoint": "https://datatracker.ietf.org/api/openid/userinfo",
-    "end_session_endpoint": "https://datatracker.ietf.org/api/openid/end-session",
-    "introspection_endpoint": "https://datatracker.ietf.org/api/openid/introspect",
+    "issuer": "https://auth.ietf.org/api/openid",
+    "authorization_endpoint": "https://auth.ietf.org/api/openid/authorize",
+    "token_endpoint": "https://auth.ietf.org/api/openid/token",
+    "userinfo_endpoint": "https://auth.ietf.org/api/openid/userinfo",
+    "end_session_endpoint": "https://auth.ietf.org/api/openid/end-session",
+    "introspection_endpoint": "https://auth.ietf.org/api/openid/introspect",
     "response_types_supported": [
-      "code",
-      "id_token",
-      "id_token token",
-      "code token",
-      "code id_token",
-      "code id_token token"
+        "code",
+        "id_token",
+        "id_token token",
+        "code token",
+        "code id_token",
+        "code id_token token",
     ],
-    "jwks_uri": "https://datatracker.ietf.org/api/openid/jwks",
+    "jwks_uri": "https://auth.ietf.org/api/openid/jwks",
     "id_token_signing_alg_values_supported": [
-      "HS256",
-      "RS256"
+        "HS256",
+        "RS256",
     ],
     "subject_types_supported": [
-      "public"
+        "public",
     ],
     "token_endpoint_auth_methods_supported": [
-      "client_secret_post",
-      "client_secret_basic"
+        "client_secret_post",
+        "client_secret_basic",
     ],
 })
 """Datatracker OAuth2 provider info

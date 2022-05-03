@@ -1,16 +1,12 @@
-"""Utilities for working with Relaton bibliographic data."""
+"""Utilities for working with Relaton bibliographic data.
+
+Data models are re-exported from :mod:`relaton.models`.
+"""
 
 from . import merger
 from . import serializers
 
-from .models.bibdata import *
-from .models.copyrights import *
-from .models.people import *
-from .models.orgs import *
-from .models.contacts import *
-from .models.links import *
-from .models.dates import *
-from .models.strings import *
+from relaton.models import *
 
 
 __all__ = (

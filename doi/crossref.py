@@ -153,7 +153,7 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
 
     :param str role: contributor’s role
     :param dict crossref_author: structure from Crossref response
-    :rtype: bib_models.models.bibdata.Contributor
+    :rtype: relaton.models.bibdata.Contributor
     """
     return Contributor(
         role=[role],

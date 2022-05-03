@@ -87,6 +87,7 @@ intersphinx_mapping = {
     'django': ('https://docs.djangoproject.com/en/stable', 'https://docs.djangoproject.com/en/stable/_objects/'),
     'simplejson': ('https://simplejson.readthedocs.io/en/stable/', 'https://simplejson.readthedocs.io/en/stable/objects.inv'),
     'requests': ('https://docs.python-requests.org/en/stable/', 'https://docs.python-requests.org/en/stable/objects.inv'),
+    'relaton': ('https://relaton-py.readthedocs.io/en/latest/', 'https://relaton-py.readthedocs.io/en/latest/objects.inv'),
 }
 
 

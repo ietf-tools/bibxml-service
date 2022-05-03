@@ -15,7 +15,7 @@ import json
 import requests
 from pydantic import ValidationError
 
-from bib_models.models.bibdata import DocID, BibliographicItem
+from bib_models import DocID, BibliographicItem
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
 from main.exceptions import RefNotFoundError
 from main import external_sources

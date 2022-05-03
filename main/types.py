@@ -6,7 +6,7 @@ import datetime
 from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
 
-from bib_models.models.bibdata import BibliographicItem
+from bib_models import BibliographicItem
 
 
 # Sources

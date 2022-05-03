@@ -9,7 +9,7 @@ import logging
 from typing import cast, Union
 import re
 
-from bib_models.models.bibdata import BibliographicItem, DocID
+from bib_models import BibliographicItem, DocID
 from doi.crossref import get_bibitem as get_doi_bibitem
 from datatracker.internet_drafts import get_internet_draft, remove_version
 from datatracker.internet_drafts import version_re

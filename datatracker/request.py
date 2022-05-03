@@ -1,6 +1,9 @@
 import requests
 
 
+BASE_AUTH_DOMAIN = 'https://auth.ietf.org/'
+"""Base domain for Datatracker OIDC."""
+
 BASE_DOMAIN = 'https://datatracker.ietf.org'
 """Base domain for Datatracker API."""
 

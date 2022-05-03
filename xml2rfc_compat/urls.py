@@ -15,7 +15,7 @@ from django.http import HttpResponse, JsonResponse
 from pydantic import ValidationError
 
 from prometheus import metrics
-from bib_models.models.bibdata import BibliographicItem
+from bib_models import BibliographicItem
 from main.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
@@ -182,7 +182,7 @@ def make_xml2rfc_path_handler(fetcher_func: Callable[
     or did not resolve successfully.
 
     The automatically created view function handles filename
-    cleanup, constructing a :class:`bib_models.models.bibdata.BibliographicItem`
+    cleanup, constructing a :class:`relaton.models.bibdata.BibliographicItem`
     and serializing it into an XML string with proper anchor tag supplied.
 
     The view function behaves as following

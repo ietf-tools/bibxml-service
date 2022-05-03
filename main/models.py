@@ -42,7 +42,7 @@ class RefData(models.Model):
     """Contains canonical Relaton representation
     of :term:`bibliographic item`.
     Can be used to construct
-    a :class:`bib_models.models.bibdata.BibliographicItem` instance.
+    a :class:`relaton.models.bibdata.BibliographicItem` instance.
     """
 
     latest_date = models.DateField()
@@ -50,7 +50,7 @@ class RefData(models.Model):
     Used e.g. when ordering results.
     Do not use when displaying data, since this field does not preserve
     specificity (use bibliographic item’s
-    :attr:`~bib_models.models.bibdata.BibliographicItem.date` attribute
+    :attr:`~relaton.models.bibdata.BibliographicItem.date` attribute
     instead).
     """
 
