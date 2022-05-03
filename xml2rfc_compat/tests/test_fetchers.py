@@ -9,6 +9,12 @@ class XML2RFCFetchersTestCase(TestCase):
     fixtures = ['test_refdata.json']
 
     def setUp(self):
+        """
+        The list of references listed below represent real
+        references of datasets that are imported using the
+        fixture file. Each reference is passed to the
+        corresponding fetcher function.
+        """
         self.rfcs_ref = "RFC4037"
         self.misc_ref = "IEEE.802-3.1988"
         self.internet_drafts_ref = "I-D.ietf-hip-rfc5201-bis"
