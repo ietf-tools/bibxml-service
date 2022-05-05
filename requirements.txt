@@ -24,3 +24,5 @@ crossrefapi>=1.5,<2
 simplejson
 sentry-sdk
 relaton==0.1.7
+playwright
+coverage

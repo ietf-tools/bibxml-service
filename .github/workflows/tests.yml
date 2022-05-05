@@ -32,3 +32,6 @@ jobs:
       run: docker compose build
     - name: Run tests
       run: docker compose -f docker-compose.test.yml up
+    - name: Stop Containers
+      if: always()
+      run: docker-compose -f docker-compose.test.yml down
