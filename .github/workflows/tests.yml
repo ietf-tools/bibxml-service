@@ -29,9 +29,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker compose build
+      run: docker compose -f docker-compose.yml up --build
     - name: Run tests
-      run: docker compose -f docker-compose.test.yml up
+      run: docker compose exec web python manage.py test
     - name: Stop Containers
       if: always()
-      run: docker-compose -f docker-compose.test.yml down
+      run: docker-compose down
