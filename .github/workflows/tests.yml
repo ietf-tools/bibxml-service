@@ -14,6 +14,18 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      PORT: 8000
+      DB_NAME: indexer
+      DB_SECRET: secret
+      DJANGO_SECRET: "DJANGOSECRETEHEHEH(****#TEFF"
+      HOST: localhost
+      API_SECRET: "secret"
+      SERVICE_NAME: "IETF BibXML service test"
+      CONTACT_EMAIL: "test@gmail.com"
+      DEBUG: 1
+      SNAPSHOT: "testss"
+
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
