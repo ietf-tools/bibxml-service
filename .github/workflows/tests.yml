@@ -16,22 +16,20 @@ jobs:
 
     env:
       PORT: 8000
-      DB_NAME: indexer
+      DB_NAME: test
       DB_SECRET: secret
       DJANGO_SECRET: "DJANGOSECRETEHEHEH(****#TEFF"
       HOST: localhost
       API_SECRET: "secret"
       SERVICE_NAME: "IETF BibXML service test"
-      CONTACT_EMAIL: "test@gmail.com"
+      CONTACT_EMAIL: "test@email.com"
       DEBUG: 1
-      SNAPSHOT: "testss"
+      SNAPSHOT: "test"
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker compose -f docker-compose.yml up --build
-    - name: Run tests
-      run: docker compose exec web python manage.py test
+      run: docker compose -f docker-compose.test.yml up --build --exit-code-from test
     - name: Stop Containers
       if: always()
       run: docker-compose down

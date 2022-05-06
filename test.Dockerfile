@@ -62,4 +62,4 @@ COPY . /code
 
 RUN ["python", "manage.py", "collectstatic", "--noinput"]
 RUN ["python", "manage.py", "compress"]
-CMD coverage run --source='.' manage.py test
+CMD python manage.py test
