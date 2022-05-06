@@ -59,7 +59,7 @@ input, button, select, textarea {
   }
 
   .link {
-    @apply text-sky-700 underline underline-offset-1 dark:text-sky-500;
+    @apply text-sky-700 underline underline-offset-1 dark:text-sky-400;
   }
   .link:hover {
     @apply text-sky-800 no-underline dark:text-sky-200;
