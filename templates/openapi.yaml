@@ -5,8 +5,6 @@ info:
   description: |
     IETF BibXML service provides an open and public API for its users to fetch references from.
 
-    NOTE: Not all 500 responses are currently provided per the spec
-    (wrapped in JSON and with immutable error codes).
   contact:
     email: ietf-ribose@ribose.com
   license:
