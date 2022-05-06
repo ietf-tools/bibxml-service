@@ -46,7 +46,7 @@ Building base image
 1. In repository root, create file ``.env`` with following contents::
 
        PORT=8000
-       DB_NAME=indexer
+       DB_NAME=bibxml
        DB_SECRET=qwert
        DJANGO_SECRET="FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF"
        HOST=localhost
