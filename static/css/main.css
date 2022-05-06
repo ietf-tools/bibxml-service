@@ -192,4 +192,8 @@ input, button, select, textarea {
   a:hover {
     @apply underline;
   }
+
+  .muted-text {
+    @apply dark:text-dark-200/50 text-dark-700/50;
+  }
 }

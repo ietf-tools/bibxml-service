@@ -1,7 +1,7 @@
 {% if profiling.query_times %}
   <aside class="
     {% include "_side_block_classes.html" %}
-    p-4 dark:text-dark-200/50 text-dark-700/50 text-xs
+    p-4 muted-text text-xs
   ">
     {{ profiling.query_times|length }} database quer{{ profiling.query_times|pluralize:'y,ies' }}
     {% if total_indexed %}against {{ total_indexed }} items{% endif %}
