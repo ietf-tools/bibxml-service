@@ -29,7 +29,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker compose -f docker-compose.test.yml up --build --exit-code-from test
+      run: docker compose -f docker-compose.test.yml up
     - name: Stop Containers
       if: always()
       run: docker-compose down
