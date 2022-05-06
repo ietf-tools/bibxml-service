@@ -5,6 +5,8 @@ info:
   description: |
     IETF BibXML service provides an open and public API for its users to fetch references from.
 
+    For xml2rfc-style paths (e.g., <code>/public/rfc/bibxml/...</code>),
+    see <a href="{% url "openapi_readable_spec" "openapi_spec_legacy" %}">compatibility API reference</a>.
   contact:
     email: ietf-ribose@ribose.com
   license:
