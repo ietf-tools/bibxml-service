@@ -57,6 +57,12 @@ Service info
                 It can be extracted with something like
                 ``SNAPSHOT="${GITHUB_REF#refs/*/}"``.
 
+``SOURCE_REPO_URL``
+    accepted by Django and Compose, pass-through, recommended in production
+
+    If provided, some pages of the service will show visitors a link
+    to this source repository.
+
 ``SERVER_EMAIL`` 
     accepted by Django and Compose, pass-through, recommended in production
 

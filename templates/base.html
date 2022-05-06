@@ -72,7 +72,11 @@
           </a>
         </h1>
         <div class="text-xs whitespace-nowrap">
-          v{{ snapshot }}
+          {% if repo_url %}
+            v<a href="{{ repo_url }}">{{ snapshot }}</a>
+          {% else %}
+            v{{ snapshot }}
+          {% endif %}
         </div>
         <nav class="flex flex-row items-center">
           {% block nav %}

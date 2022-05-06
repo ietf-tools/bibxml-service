@@ -35,6 +35,9 @@ LOGGING = {
 SNAPSHOT = environ.get("SNAPSHOT")
 """Actual version of this service codebase at runtime."""
 
+SOURCE_REPOSITORY_URL = environ.get("SOURCE_REPO_URL", None)
+"""Where the source can be found (e.g., Git repository URL)."""
+
 SERVICE_NAME = environ.get("SERVICE_NAME")
 """Service title (short phrase)."""
 

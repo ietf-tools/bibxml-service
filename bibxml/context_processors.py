@@ -6,6 +6,7 @@ def service_meta(request):
     return dict(
         snapshot=settings.SNAPSHOT,
         service_name=settings.SERVICE_NAME,
+        repo_url=settings.SOURCE_REPOSITORY_URL,
     )
 
 
