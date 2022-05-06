@@ -125,6 +125,19 @@
 
     {% block extra_scripts %}{% endblock %}
 
+    {% block footer %}
+      <footer class="
+        py-3 px-4
+        md:bottom-0 md:left-0 md:absolute
+        text-xs
+        muted-text
+      ">
+        {% block footer_content %}
+          {% include "_about_links.html" %}
+        {% endblock %}
+      </footer>
+    {% endblock %}
+
   </body>
 
 </html>

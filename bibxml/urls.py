@@ -33,6 +33,10 @@ urlpatterns = [
     path('__debug__/', include('debug_toolbar.urls')),
     path('metrics/', auth.basic(prometheus_metrics)),
 
+    path('about', never_cache(require_safe(
+        views.about
+    )), name='about'),
+
     # API specs
     path('openapi.yaml', never_cache(require_safe(
         views.openapi_spec

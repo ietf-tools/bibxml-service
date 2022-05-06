@@ -12,6 +12,13 @@ from main.query import list_doctypes
 from main.api import CitationSearchResultListView
 
 
+def about(request):
+    """Serves an about/help page."""
+
+    return render(request, 'about.html', dict(
+    ))
+
+
 def openapi_spec(request):
     """Serves machine-readable spec for main API."""
 

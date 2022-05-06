@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious@2.7.4/dist/annotorious.min.css">
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious@2.7.4/dist/annotorious.min.js"></script>
+  <script src="{% static "js/image-annotation.js" %}"></script>
+{% endblock %}
+
+{% block header_extras %}
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    overflow-hidden bg-sky-600 text-sky-100 flex flex-col flex-nowrap p-4
+  ">
+    {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" only %}
+  </nav>
+
+  {{ block.super }}
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block container_grid_classes %}
+  md:thegrid-mini
+{% endblock %}
+
+{% block content_grid_classes %}
+  {{ block.super }}
+  !md:row-span-4
+  bg-dark-100
+  dark:bg-gray-800
+  !block
+  overflow-x-auto
+  p-4
+  text-sm
+{% endblock %}
+
+{% block content %}
+  <h1 class="text-2xl mb-4">About BibXML service</h1>
+  <div class="running-text">
+    <section class="text-base">
+      <p>
+        BibXML service can be thought of as a bibliographic item database.
+      <p>
+        It provides bibliographic data search interface
+        for people who work on IETF standards,
+        as well as programmatic retrieval facilities
+        for associated automated toolchains.
+      <div class="admonition see-also" aria-label="See also">
+        <ul>
+          <li>
+            <a href="{% url "api_index" %}">API reference</a>
+          {% if repo_url %}
+            <li>
+              <a href="{{ repo_url }}">Source code of this service</a>
+          {% endif %}
+        </ul>
+      </div>
+    </section>
+    <section>
+      <header>
+        <h2>Usage</h2>
+      </header>
+      <section>
+        <header>
+          <h3>Searching indexed data</h3>
+        </header>
+        <section>
+          <header>
+            <h4>Quick search</h4>
+          </header>
+          <p>
+            Quick search field attempts to interpret given query
+            as an exact identifier.
+          <p>
+            If that succeeds, the service redirects
+            to located resource’s bibliographic details directly.
+          <p>
+            Otherwise, the service passes the query string
+            to less exact search methods below,
+            starting from identifier substring match
+            and ending with web search,
+            and redirects to search results page.
+        </section>
+        <section>
+          <header>
+            <h4>Search modes</h4>
+          </header>
+          <p>
+            The service supports multiple ways of searching
+            across indexed bibliographic data.
+            Some of those (JSON substructure and JSON path match)
+            require awareness of Relaton bibliographic data schema specifics,
+            while others are less precise and require no such knowledge.
+          <p>
+            In many cases, the latter is enough.
+          <p>
+            See search help on landing page for more information
+            on how different search modes behave.
+        </section>
+      </section>
+      <section>
+        <header>
+          <h3>Querying external sources</h3>
+        </header>
+        <p>
+          It’s also possible to look up a document by its DOI
+          using Crossref.
+        <p>
+          Found bibliographic data, if any, is displayed the same way
+          indexed bibliographic items are shown, and can also be exported in BibXML.
+        <div class="admonition note" aria-label="Note">
+          <p>
+            Data available from Crossref API tends to be less complete
+            than authoritative data in indexed Relaton sources,
+            so if you have a DOI to look up it may be worth
+            using main search functionality first in case that resource is indexed.
+        </div>
+      </section>
+    </section>
+    <section>
+      <header>
+        <h2>Bibliographic data</h2>
+      </header>
+      <p>
+        Bibliographic data is sourced in Relaton format.
+        Relaton data model attempts to bridge the gap between
+        bibliographic data representations and identifiers
+        used across organizations.
+      <p>
+        Field labels below correspond to field names in Relaton data model.
+
+      <section>
+        <header>
+          <h3>Displayed bibliographic item details</h3>
+        </header>
+
+        <figure class="annotated">
+          <div class="image-container">
+            <img
+              src="{% static "img/about/bibitem-details.png" %}"
+              alt="Screenshot of bibliographic item details layout"
+              data-in-page-annotations='[
+                {"id": "source-info", "cssSelector": "[data-annotates=source-info]", "frag": "xywh=pixel:928.396240234375,421.4066467285156,905.3658447265625,79.01376342773438"},
+                {"id": "export-links", "cssSelector": "[data-annotates=export-links]", "frag": "xywh=pixel:928.396240234375,335.80841064453125,905.3658447265625,75.72152709960938"},
+                {"id": "doctype", "cssSelector": "[data-annotates=doctype]", "frag": "xywh=pixel:11.211050033569336,11.233012199401855,232.1489200592041,67.39807605743408"}
+                {"id": "smart-title", "cssSelector": "[data-annotates=smart-title]", "frag": "xywh=pixel:7.466712474822998,67.3980712890625,1231.887047290802,179.7281951904297"}
+                {"id": "docid", "cssSelector": "[data-annotates=docid]", "frag": "xywh=pixel:14.615692138671875,332.9395446777344,904.19384765625,151.1488037109375"},
+                {"id": "primary-docid", "cssSelector": "[data-annotates=primary-docid]", "frag": "xywh=pixel:27.784637451171875,349.40069580078125,538.4652404785156,45.66802978515625"}
+              ]'
+            />
+          </div>
+          <figcaption>
+            An overview of key fields shown on bibliographic item details page.
+          </figcaption>
+        </figure>
+
+        <dl>
+
+          <dt data-annotates="source-info">Source information</dt>
+          <dd data-annotates="source-info">
+            <p>
+              Displays the Relaton source from which the item was obtained
+              (either indexed or fetched on-demand).
+              Provides source and data issue reporting links where possible.
+          </dd>
+
+          <dt data-annotates="export-links">Export links</dt>
+          <dd data-annotates="export-links">
+            <p>
+              Allow to download bibliographic item in various formats,
+              most importantly XML (BibXML, also known as xml2rfc).
+            <div class="admonition note" aria-label="Note">
+              <p>
+                It may be required to authenticate with the service
+                in order to use export links.
+            </div>
+          </dd>
+
+          <dt data-annotates="doctype">Type (<code>type</code> or <code>doctype</code> field)</dt>
+          <dd data-annotates="doctype">
+            <p>
+              Shows organization-specific <code>doctype</code>
+              (e.g., “internet-draft”, “rfc”)
+              or, if not available,
+              basic <code>type</code> (e.g., “standard”).
+          </dd>
+
+          <dt data-annotates="smart-title">Inferred title</dt>
+          <dd data-annotates="smart-title">
+            <p>
+              Main title, or if an item represents a series
+              and doesn’t have a title of its own,
+              compound title is generated from primary identifier
+              and titles of documents included in the series.
+          </dd>
+
+          <dt data-annotates="docid">
+            Identifiers (<code>docid</code> field)
+          </dt>
+          <dd>
+            <p data-annotates="docid">
+              Identify the resource.
+            <p data-annotates="primary-docid">
+              In particular, a <em>primary</em> identifier
+              (shown in bold)
+              is used when citing or referencing the resource.
+            <p>
+              For example:
+            <ul>
+              <li>
+              <em>draft-ietf-ipsecme-rfc8229bis-04</em>
+              identifies version 4 of the Internet Draft titled “TCP Encapsulation of IKE and IPsec Packets”,
+              <li>
+              <em>RFC 9225</em> identifies the “Software Defects Considered Harmful” RFC from April 1st 2022,
+              and
+              <li>
+              <em>IEEE P1547-9/D-5.3.2022-02</em>
+              identifies a draft of an IEEE standard.
+            </ul>
+            <div class="admonition note" aria-label="Note">
+              <p>
+                There is no single standard to which all primary identifiers conform;
+                however, some SDOs are attempting to formalize their identifiers
+                with efforts such as NIST PubID.
+            </div>
+            <p>
+              Other, secondary identifiers
+              include DOI, ISBN, in-series anchors etc.
+              They are not generally used when, e.g., referencing a document from another document,
+              but they are still listed and can be searched by.
+          </dd>
+
+          <dt>Titles (<code>title</code> field)</dt>
+          <dd>
+            <p>
+              A resource can have more than one title,
+              and each title can have associated type
+              which if provided is used as part of field label.
+          </dd>
+
+        </dl>
+      </section>
+    </section>
+  </div>
+{% endblock %}
