@@ -73,15 +73,15 @@
     anno.setAnnotations(annotations);
 
     // anno.disableEditor = true;
-    anno.on('createAnnotation', function (anno) {
-      console.info('Created', anno);
-    });
+    // anno.on('createAnnotation', function (anno) {
+    //   console.info('Created', anno);
+    // });
 
-    anno.on('updateAnnotation', function (anno) {
-      console.info('Updated', anno);
-    });
+    // anno.on('updateAnnotation', function (anno) {
+    //   console.info('Updated', anno);
+    // });
 
-    //anno.readOnly = true;
+    anno.readOnly = true;
     //anno.setDrawingTool('polygon')
 
     function flashElement(el) {
