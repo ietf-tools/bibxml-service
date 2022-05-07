@@ -112,10 +112,18 @@ def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
     """
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
+    # More flexible in theory and could be annotated with headline,
+    # but may not yield exact string matches for some reason.
+    # return (
+    #     RefData.objects.
+    #     annotate(search=SearchVector(Cast('body', TextField()))).
+    #     filter(search=SearchQuery(text, search_type='websearch')).
+    #     only('ref', 'dataset', 'body').
+    #     order_by('-latest_date')[:limit])
+
     return (
         RefData.objects.
-        annotate(search=SearchVector(Cast('body', TextField()))).
-        filter(search=SearchQuery(text, search_type='websearch')).
+        filter(body__icontains=text).
         only('ref', 'dataset', 'body').
         order_by('-latest_date')[:limit])
 
