@@ -40,12 +40,17 @@ def bibitem_link(value: Any):
     id: Optional[str]
     type: Optional[str]
 
-    try:
-        docid = as_list(getattr(
+    if isinstance(value, dict):
+        docids = value.get('docid', [])
+    else:
+        docids = as_list(getattr(
             value,
             'docid',
-            None,
-        ) or value.get('docid', []))[0]
+            [],
+        ))
+
+    try:
+        docid = docids[0]
     except IndexError:
         id, type = None, None
     else:
