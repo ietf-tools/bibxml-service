@@ -479,6 +479,12 @@ def build_search_results(
             for id in ref.body.get('docid', [])
             if 'id' in id and 'scope' not in id and 'type' in id
         ])
+
+        # TODO: Skip ``fallback_formattedref`` cases with #196
+        fallback_formattedref = (
+            ref.body.
+            get('formattedref', {}).
+            get('content', None))
         if suitable_ids:
             primary_id = get_primary_docid(suitable_ids)
             if primary_id:
@@ -486,6 +492,8 @@ def build_search_results(
                 refs_by_primary_id[primary_id.id].append(idx)
             else:
                 refs_by_primary_id[suitable_ids[0]['id']] = [idx]
+        elif fallback_formattedref: #196
+            refs_by_primary_id[fallback_formattedref] = [idx]
 
     processed_docids = set[DocIDTuple]()
 
