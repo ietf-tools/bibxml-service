@@ -5,20 +5,27 @@
 <article class="{% include "_list_item_classes.html" %} bibitem-in-list">
   <div class="{% include "_list_item_inner_classes.html" %}">
     <p class="px-4 mb-1 bibitem-title font-serif tracking-tight leading-tight">
-      <a
-        class="link no-underline"
-        href="
-          {% if ref %}
-            {# We are browsing an indexed dataset (non-primary use case) #}
-            {% url "browse_indexed_ref" dataset_id ref %}
-          {% else %}
-            {# We are browsing search results (primary use case) #}
-            {% include "citation/srp_link_href.html" with bibitem=data query=request.GET.query query_format=query_format page=page_obj %}
-          {% endif %}
-        "
-      >
-        {% include "relaton/smart_title.html" with bibitem=data %}
-      </a>
+      {% with link=data|bibitem_link %}
+        {% if ref or link %}
+          <a
+            class="link no-underline"
+            href="
+              {% if ref %}
+                {# We are browsing an indexed dataset (non-primary use case) #}
+                {% url "browse_indexed_ref" dataset_id ref %}
+              {% else %}
+                {# We are browsing search results (primary use case) #}
+                {{ link }}&{% include "citation/srp_link_href_get_query.html" with query=request.GET.query query_format=query_format page=page_obj %}
+              {% endif %}
+            "
+          >
+            {% include "relaton/smart_title.html" with bibitem=data %}
+          </a>
+        {% else %}
+          {# TODO: #196, this occurs when bibitem_link fails due to missing docids #}
+          {% include "relaton/smart_title.html" with bibitem=data %}
+        {% endif %}
+      {% endwith %}
     </p>
 
     <div class="
