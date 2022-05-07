@@ -33,8 +33,10 @@ def bibitem_link(value: Any):
     This is necessary because source data may not pass
     Pydantic validation.
 
-    If neither is the case, the filter will fall back to search URL
-    using given item as query to avoid breaking GUI due to template error.
+    If neither is the case or item does not have a docid,
+    the filter will return nothing.
+
+    Otherwise, will return a link to bibliographic item details page.
     """
 
     id: Optional[str]
@@ -71,18 +73,8 @@ def bibitem_link(value: Any):
                 f'{id_query}&doctype={quote_plus(type)}')
         else:
             return id_query
-
-    elif isinstance(value, dict):
-        return (
-            f'{citation_search_base}'
-            f'?query={quote_plus(json.dumps(value))}'
-            f'&query_format=json_struct')
-
     else:
-        return (
-            f'{citation_search_base}'
-            f'?query={quote_plus(str(value))}'
-            f'&query_format=websearch')
+        return None
 
 
 
