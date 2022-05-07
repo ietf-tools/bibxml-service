@@ -192,10 +192,14 @@
           <dt data-annotates="smart-title">Inferred title</dt>
           <dd data-annotates="smart-title">
             <p>
-              Main title, or if an item represents a series
-              and doesn’t have a title of its own,
-              compound title is generated from primary identifier
-              and titles of documents included in the series.
+              Main title. For a resource that
+              doesn’t have titles of its own,
+              which may happen for e.g. a document series,
+              an attempt to “make up” a descriptive string
+              based on primary identifiers
+              and titles of resources included via relations is made.
+              Barring that, a machine-readable identifier
+              or a <code>formattedref</code> is used.
           </dd>
 
           <dt data-annotates="docid">
