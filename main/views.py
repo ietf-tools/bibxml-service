@@ -42,6 +42,7 @@ shared_context = dict(
     supported_search_formats=[
         (format, QUERY_FORMAT_LABELS.get(format, format))
         for format in BaseCitationSearchView.supported_query_formats
+        if format in QUERY_FORMAT_LABELS
     ],
 )
 """Shared context passed to GUI templates."""
