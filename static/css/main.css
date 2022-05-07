@@ -227,6 +227,10 @@ input, button, select, textarea {
         @apply list-disc list-outside pl-4;
       }
 
+      ol {
+        @apply list-decimal list-outside pl-4;
+      }
+
       dl {
         @apply my-2;
         > dt {
