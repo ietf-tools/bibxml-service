@@ -1,3 +1,13 @@
+/* Global */
+html, div.bottomnav {
+  background: unset;
+}
+
+div.bottomnav p {
+  margin: 0 40px;
+}
+
+
 /* References */
 
 a.reference.external .viewcode-link .pre {
@@ -87,6 +97,16 @@ body > div.content ul > li {
 
 div.header h1 {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: unset;
+}
+
+.topnav p,
+.bottomnav p {
+  white-space: nowrap;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 p {
