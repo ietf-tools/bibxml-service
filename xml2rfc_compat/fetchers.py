@@ -1,5 +1,6 @@
 """Functions responsible for retrieving bibliographic items
-from xml2rfc anchors. See :term:`xml2rfc fetcher`.
+from xml2rfc anchors (in other words, resolving /public/rfc/... paths).
+See :term:`xml2rfc fetcher`.
 
 Plug registered fetchers into root URL configuration
 via :func:`.urls.get_urls()`.
