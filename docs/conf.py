@@ -23,7 +23,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = 'IETF BibXML service'
-copyright = '2022'
+copyright = '2022 Ribose under the IETF BibXML SOW'
 author = 'Ribose under the IETF BibXML SOW'
 
 release = f"v{os.environ.get('SNAPSHOT', 'N/A') or 'N/A'}"
