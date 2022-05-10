@@ -10,10 +10,9 @@ Dependency overview
        A diagram describing dependencies between
        services and data sources, under and outside of IETF control.
 
-BibXML service requires indexable
-*:term:`bibliographic data sources <bibliographic data source>`*
-to be configured.
-
+BibXML service relies on indexable
+:term:`bibliographic data sources <bibliographic data source>`
+configured (registered).
 From those sources, BibXML service obtains bibliographic data
 in Relaton format and indexes it for search purposes.
 Indexing can be triggered either via management GUI or via API.
@@ -36,6 +35,7 @@ For :doc:`/topics/xml2rfc-compat` functionality,
 BibXML service requires an additional indexable source (not pictured above)
 that contains xml2rfc paths and associated XML data.
 This source is used for xml2rfc path resolution fallback functionality.
+Indexing can be triggered the same way as for bibliographic data sources.
 
 .. seealso::
 
