@@ -16,20 +16,22 @@ jobs:
 
     env:
       PORT: 8000
-      DB_NAME: test
-      DB_SECRET: secret
-      DJANGO_SECRET: "DJANGOSECRETEHEHEH(****#TEFF"
+      DB_NAME: indexer
+      DB_SECRET: qwert
+      DJANGO_SECRET: "FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF"
       HOST: localhost
-      API_SECRET: "secret"
-      SERVICE_NAME: "IETF BibXML service test"
+      API_SECRET: "test"
+      SERVICE_NAME: "IETF BibXML service"
       CONTACT_EMAIL: "test@email.com"
       DEBUG: 1
       SNAPSHOT: "test"
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image and run the tests
-      run: docker compose -f docker-compose.test.yml up --exit-code-from test
-    - name: Stop Containers
-      if: always()
-      run: docker-compose down
+      steps:
+      - uses: actions/checkout@v3
+      - name: Build the Docker image and run the tests
+        run: docker compose -f docker-compose.test.yml up --exit-code-from test
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v1
+      - name: Stop Containers
+        if: always()
+        run: docker-compose down
