@@ -144,6 +144,14 @@ Grafana dashboards
 Dashboards with BibXML metrics are automatically provisioned
 when ``grafana`` container is created by loading data fixtures.
 
+.. figure:: ./grafana-dashboard-gui.png
+   :alt: A screenshot of Grafana GUI access metrics dashboard
+
+   Grafana GUI access metrics dashboard
+   features two panels, home page hits
+   and bibliographic item details page hits
+   (labeled by document ID).
+
 Provisioned dashboards:
 
 - Can be found by navigating
