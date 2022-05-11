@@ -91,6 +91,8 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
     - Django cache.
 
 
+.. _monitoring-containers:
+
 Monitoring services
 ===================
 
@@ -105,7 +107,10 @@ with a command like::
 
     docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
 
-.. seealso:: :github:`docker-compose.monitor.yml`
+.. seealso::
+
+   - Important note :ref:`about metric collection and CDN caching <metrics-and-cdn>`
+   - :github:`docker-compose.monitor.yml` for monitoring service definition
 
 **flower** (third-party)
     Provides a generic GUI for Celery worker monitoring.
@@ -124,15 +129,47 @@ with a command like::
 
 **grafana** (third-party)
     Provisioned with Prometheus container as data source,
-    and with dashboards for monitoring GUI and API accesses
+    and with :ref:`dashboards <grafana-dashboards>`
+    for monitoring GUI and API accesses
     to bibliographic data.
 
     - You can log in on ``<host>:3000`` using “ietf” as username
       and ``API_SECRET`` provided via the environment as password.
 
-    - Find provisioned dashboards by navigating
-      to Dashboards -> Browse -> bibxml or searching dashboards by “bibxml”.
+.. _grafana-dashboards:
 
-    - The provisioned dashboards do not cover various internal metrics
-      provided by Python and Celery, e.g. you can query ``celery_worker_tasks_active{}``
-      and so on.
+Grafana dashboards
+------------------
+
+Dashboards with BibXML metrics are automatically provisioned
+when ``grafana`` container is created by loading data fixtures.
+
+Provisioned dashboards:
+
+- Can be found by navigating
+  to Dashboards -> Browse -> bibxml, or by searching dashboards for “bibxml”.
+
+- Are tied to provided Docker Compose and Prometheus configurations,
+  in particular by relying on specific names of Prometheus targets.
+  Namely, BibXML metrics query for ``instance`` matching ``web:8000``.
+
+- Are very minimal at the moment,
+  and do not cover all metrics available.
+
+  In other words, you can query more metrics than is shown by default
+  if you enter a specific metric ID into Grafana query prompt
+  (for example, a Celery-level metric such as
+  ``celery_worker_tasks_active{}``
+  or app-level metric such as ``api_search_hits{}`` or ``gui_search_hits{}``.)
+
+.. seealso::
+
+   - :mod:`prometheus.metrics` for exported app-level metrics
+   - :github:`docker-compose.monitor.yml`
+     for ``services.grafana.volumes``,
+     where Grafana data sources and dashboards are specified,
+     and for ``services.prometheus.build.args.TARGET_HOSTS``,
+     where Prometheus targets are listed
+   - :github:`ops/grafana-dashboard-api-usage.json`
+     and :github:`ops/grafana-dashboard-gui-usage.json`
+     for Grafana dashboard JSON fixtures
