@@ -3,8 +3,10 @@ Bundled container reference
 ===========================
 
 The bundled Docker Compose configurations run following containers.
-It’s intended as a reference, but could be used in production
-as long as :doc:`relevant precautions </topics/production-setup>` are followed.
+It’s intended as an example, but could be used in production
+as long as relevant precautions are taken.
+
+.. seealso:: :doc:`topics/production-setup`, :doc:`howto/run-in-production`
 
 .. note::
 
@@ -59,6 +61,12 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
                    a thread pool can be used after appropriate adjustments
                    to metric exporter.
 
+**celery-exporter** (third-party)
+    Exports Celery-level metrics (number of active tasks, etc.)
+    in Prometheus format on port 9808 in internal Docker network.
+
+    - See plain-text metrics via ``<host>:9081/metrics`` on host machine.
+
 **db** (third-party)
     Provides a PostgreSQL instance.
 
@@ -86,20 +94,21 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
 Monitoring services
 ===================
 
-Defined in ``docker-compose.monitor.yml``.
+These containers are included in ``docker-compose.monitor.yml``,
+not the main ``docker-compose.yml``.
+(It is anticipated
+that operations team would want to use Prometheus and Grafana
+installations maintained separately.)
 
-.. seealso::
+.. seealso:: :github:`docker-compose.monitor.yml`
 
-   - :doc:`/howto/run-in-production`
-   - :github:`docker-compose.monitor.yml`
+**flower** (third-party) [1]_
+    Provides a generic GUI for Celery worker monitoring.
 
-**celery-exporter** (third-party)
-    Exports Celery-level metrics (number of active tasks, etc.)
-    in Prometheus format on port 9808 in internal Docker network.
+    - When you open ``<host>:5555``, you should see current worker status
+      and some task-related statistics.
 
-    - See plain-text metrics via ``<host>:9081/metrics`` on host machine.
-
-**prometheus** (third-party)
+**prometheus** (third-party) [1]_
     Set up to import metrics from web, celery and celery-exporter.
 
     - The instance is made available at ``<host>:9090``
@@ -108,7 +117,7 @@ Defined in ``docker-compose.monitor.yml``.
     - You should be able to explore available metrics
       and see health for each of the three targets.
 
-**grafana** (third-party)
+**grafana** (third-party) [1]_
     Provisioned with Prometheus container as data source,
     and with dashboards for monitoring GUI and API accesses
     to bibliographic data.
@@ -122,9 +131,3 @@ Defined in ``docker-compose.monitor.yml``.
     - The provisioned dashboards do not cover various internal metrics
       provided by Python and Celery, e.g. you can query ``celery_worker_tasks_active{}``
       and so on.
-
-**flower** (third-party)
-    Provides a generic GUI for Celery worker monitoring.
-
-    - When you open ``<host>:5555``, you should see current worker status
-      and some task-related statistics.
