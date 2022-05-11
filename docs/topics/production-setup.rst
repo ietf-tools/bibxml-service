@@ -104,8 +104,8 @@ Celery worker process also exports metrics under port 9080.
    Prometheus, Grafana, Flower and Celery exporter utility image::
 
        docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
-   
-   .. seealso:: :doc:`/ref/containers`
+
+   .. seealso:: :ref:`monitoring-containers` in bundled container reference
 
 
 Scaling
