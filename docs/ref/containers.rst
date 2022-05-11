@@ -81,7 +81,7 @@ Defined in ``docker-compose.yml`` (see :github:`docker-compose.yml`).
 
 **redis** (third-party)
     Fast simple key-value store used as:
-    
+
     - Celery task queue backend.
 
       ``web`` container handles HTTP requests
