@@ -70,6 +70,27 @@ The path requires HTTP Basic authentication (see :doc:`/topics/auth`).
 
 Celery worker process also exports metrics under port 9080.
 
+.. _metrics-and-cdn:
+
+.. warning::
+
+   If you implement aggressive caching for all GET requests
+   (e.g., on CDN level), exported metrics **will not be correct**
+   and you should use metrics provided by your caching layer instead.
+
+   For GUI/API hits to be counted correctly, caching for GET requests
+   must be very selective.
+   You can cache static assets and some pages,
+   but requests to resources that matter for metric collection
+   must hit the web application—if, for example,
+   CDN short-circuits and returns cached result,
+   the metric will not be incremented by server-side logic.
+
+   These are probably the only paths
+   to which GET requests can be cached safely:
+
+   - ``/static/*`` (static assets such as CSS and JavaScript)
+   - ``/about`` (about page, hits currently not counted)
 
 .. note::
 
