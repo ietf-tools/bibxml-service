@@ -21,6 +21,7 @@ services:
       context: ops
       dockerfile: prometheus.Dockerfile
       args:
+        # These hostnames match service names in main docker-compose.yml
         TARGET_HOSTS: "['web:8000', 'celery:9080', 'celery-exporter:9808']"
         HTTP_BASIC_USERNAME: "ietf"
         HTTP_BASIC_PASSWORD: "${API_SECRET:?missing API secret}"

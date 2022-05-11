@@ -99,7 +99,7 @@
             "uid": "PB2DA4F72A83C3F44"
           },
           "exemplar": true,
-          "expr": "rate(bibxml_service_api_bibitem_hits_total{}[$__interval])",
+          "expr": "increase(bibxml_service_api_bibitem_hits_total{instance=\"web:8000\"}[$__range])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -184,7 +184,7 @@
             "uid": "PB2DA4F72A83C3F44"
           },
           "exemplar": true,
-          "expr": "rate(bibxml_service_xml2rfc_api_bibitem_hits_total{}[$__interval])",
+          "expr": "increase(bibxml_service_xml2rfc_api_bibitem_hits_total{instance=\"web:8000\"}[$__range])",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
