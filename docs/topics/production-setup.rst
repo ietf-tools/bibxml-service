@@ -52,7 +52,13 @@ AWS CloudFront/ELB, CloudFlare.
      are forwarded accurately to BibXML service.
 
    - Be minfdul of additional caching at LB/front-end proxy level
-     that can result in stale bibliographic data being displayed.
+     that can result in stale bibliographic data being displayed,
+     and for access metrics not being counted.
+
+   - If you use the server-side Prometheus metric export mechanisms,
+     your CDN configuration should let
+     every resource request that matters metrics-wise
+     hit the web application itself.
 
 
 Monitoring errors
