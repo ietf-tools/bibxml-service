@@ -1,8 +1,6 @@
 from typing import Dict
 from unittest import TestCase
 
-from django.core.management import call_command
-
 from bib_models import DocID
 from main.query_utils import get_docid_struct_for_search, get_primary_docid
 
@@ -11,17 +9,6 @@ class QueryTestCase(TestCase):
     """
     Test cases for query_utils.py
     """
-
-    # def setUp(self) -> None:
-    #     pass
-    #     # load fixtures (fixtures file is in a different app, thus it needs to be loaded manually)
-    #     call_command("loaddata", "xml2rfc_compat/fixtures/test_refdata.json")
-    #     #
-    #     # with open("xml2rfc_compat/fixtures/test_refdata.json", "r") as f:
-    #     #     self.json_fixtures = json.load(f)
-
-    def test_merge_refs(self):
-        pass
 
     def test_get_docid_struct_for_search(self):
         id_value = "ID"
