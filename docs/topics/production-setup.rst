@@ -68,6 +68,8 @@ The service can report to a Sentry instance.
 It is recommended to provide ``SENTRY_DSN`` environment variable.
 
 
+.. _tracking-metrics:
+
 Tracking metrics
 ================
 
