@@ -100,6 +100,11 @@ not the main ``docker-compose.yml``.
 that operations team would want to use Prometheus and Grafana
 installations maintained separately.)
 
+You can run multiple Compose configurations in conjunction
+with a command like::
+
+    docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
+
 .. seealso:: :github:`docker-compose.monitor.yml`
 
 **flower** (third-party)
