@@ -24,8 +24,8 @@ to be available at runtime.
 If you run via Compose, environment can be provided via ``.env`` file
 as a sibling of ``docker-compose.yml``.
 
-.. important:: No matter how you provide environment variables,
-               make sure ``DEBUG`` is not set in production.
+.. warning:: No matter how you provide environment variables,
+             make sure ``DEBUG`` is **not** set in production.
 
 
 HTTPS setup
@@ -112,19 +112,18 @@ It is possible to run multiple instances of the web service
 (the container that runs Hypercorn server)
 by spinning up multiple containers.
 
-.. note::
+.. warning:: Do **not** increase the number of Hypercorn workers
+             per instance. Prometheus Python client metric export,
+             as implemented, will not work in multiprocessing scenarios.
+             Run multiple containers instead, if needed.
 
-   If you run multiple instances of the web container,
-   make sure the Prometheus instance is able to discover all scaled containers
-   and scrapes bibliographic data access and other metrics
-   from all of them.
-  
-   This is currently not handled by the bundled Compose configuration.
+.. important::
 
-.. important:: Do **not** increase the number of Hypercorn workers
-               per instance. Prometheus Python client metric export,
-               as implemented, will not work in multiprocessing scenarios.
-               Scale the number of containers instead.
+   If you do run multiple instances of the web container,
+   make sure each instance is added as a target for Prometheus,
+   so that Prometheus scrapes complete bibliographic data access
+   and other metrics. Otherwise, metrics will undercount.
+   (This is currently not handled by the bundled Compose configuration.)
 
 Other services
 --------------
@@ -133,7 +132,7 @@ Other services are not intended to be run in parallel.
 I.e., there should be at most 1 instance of each container
 (DB, Celery async task processor, and so on).
 
-.. important:: Do **not** scale the number of async task workers
-               within the Celery container, either.
-               Indexing tasks, as currently implemented,
-               are not intended to be run in parallel.
+.. warning:: Do **not** scale the number of async task workers
+             within the Celery container, either.
+             Indexing tasks, as currently implemented,
+             are not intended to be run in parallel.
