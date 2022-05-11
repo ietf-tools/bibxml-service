@@ -102,13 +102,13 @@ installations maintained separately.)
 
 .. seealso:: :github:`docker-compose.monitor.yml`
 
-**flower** (third-party) [1]_
+**flower** (third-party)
     Provides a generic GUI for Celery worker monitoring.
 
     - When you open ``<host>:5555``, you should see current worker status
       and some task-related statistics.
 
-**prometheus** (third-party) [1]_
+**prometheus** (third-party)
     Set up to import metrics from web, celery and celery-exporter.
 
     - The instance is made available at ``<host>:9090``
@@ -117,7 +117,7 @@ installations maintained separately.)
     - You should be able to explore available metrics
       and see health for each of the three targets.
 
-**grafana** (third-party) [1]_
+**grafana** (third-party)
     Provisioned with Prometheus container as data source,
     and with dashboards for monitoring GUI and API accesses
     to bibliographic data.
