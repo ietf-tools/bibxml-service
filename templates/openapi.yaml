@@ -165,7 +165,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /management/datasets/{dataset}/get-index-status/:
+  /management/{dataset}/status/:
     parameters:
     - name: dataset
       in: path
@@ -186,7 +186,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IndexerStatus'
 
-  /management/datasets/{dataset}/reindex/:
+  /management/{dataset}/reindex/:
     parameters:
     - name: dataset
       in: path
@@ -239,7 +239,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
 
-  /management/datasets/{dataset}/reset-index/:
+  /management/{dataset}/reset-index/:
     parameters:
     - name: dataset
       in: path
