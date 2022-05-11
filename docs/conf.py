@@ -64,7 +64,7 @@ extlinks = {
     ),
     'github': (
         'https://github.com/ietf-ribose/bibxml-service/blob/main/%s',
-        '%s on GitHub',
+        '%s (on GitHub)',
     ),
 }
 
