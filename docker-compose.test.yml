@@ -23,5 +23,12 @@ services:
     depends_on:
       - test-db
       - test-redis
+    command: sh -c "/wait && python manage.py test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log"
+    environment:
+      - WAIT_HOSTS=test-db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - WAIT_BEFORE_HOSTS=60
     volumes:
       - ./test-artifacts:/code/test-artifacts
