@@ -26,7 +26,7 @@ on AWS infrastructure using the bundled Compose configuration.
 
 5. Clone this repository under ``ubuntu`` user home directory.
 
-6. Place a ``.env`` file at the root of the repository with following contents::
+6. Place a ``.env`` file at the root of the repository with following contents [3]_::
 
        DEBUG=0
        HOST=your.chosen.domain.name.com
@@ -48,7 +48,7 @@ on AWS infrastructure using the bundled Compose configuration.
 
        sudo docker-compose build && sudo docker-compose -f docker-compose.yml up
 
-   If you want to run the bundled monitoring services [3]_, this would be::
+   If you want to run the bundled monitoring services [4]_, this would be::
 
        sudo docker-compose build && sudo docker-compose -f docker-compose.yml -f docker-compose.monitor.yml up
 
@@ -68,7 +68,11 @@ the site should be available via https://your.chosen.domain.name.com.
 
 .. [2] https://docs.docker.com/compose/install/
 
-.. [3] The bundled ``docker-compose.monitor.yml`` is there primarily for illustrative purposes,
+.. [3] See `.env file syntax <https://docs.docker.com/compose/env-file/#syntax-rules>`_ in Compose documentation.
+
+       Notably, double quotes can be present in values and are left as is.
+
+.. [4] The bundled ``docker-compose.monitor.yml`` is there primarily for illustrative purposes,
        as typically you would already have a Prometheus instance set up.
 
        If you have a Prometheus instance, update it to scrape two additional targets:
