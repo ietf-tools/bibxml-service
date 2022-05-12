@@ -6,7 +6,7 @@ The bundled Docker Compose configurations run following containers.
 It’s intended as an example, but could be used in production
 as long as relevant precautions are taken.
 
-.. seealso:: :doc:`topics/production-setup`, :doc:`howto/run-in-production`
+.. seealso:: :doc:`/topics/production-setup`, :doc:`/howto/run-in-production`
 
 .. note::
 
