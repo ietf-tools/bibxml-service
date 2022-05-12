@@ -55,9 +55,12 @@ Building base image
        CONTACT_EMAIL=<ops contact email>
        DEBUG=1
 
-   .. seealso:: :doc:`/ref/env`
+   .. seealso::
 
-   .. important:: This environment is not suitable for production use.
+      - :doc:`/ref/env`
+      - `.env file syntax <https://docs.docker.com/compose/env-file/#syntax-rules>`_ in Compose documentation
+
+   .. warning:: This environment is not suitable for production use.
 
 2. In repository root, run ``docker compose build``.
 
