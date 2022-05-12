@@ -32,17 +32,17 @@ on AWS infrastructure using the bundled Compose configuration.
        HOST=your.chosen.domain.name.com
        PORT=12345
        DB_NAME=bibxml
-       DB_SECRET="random string without double quote characters"
-       DJANGO_SECRET="a very long and very random string without double quote characters"
-       API_SECRET="API secret to be used in management GUI and API authentication"
-       SERVICE_NAME="IETF BibXML service"
-       CONTACT_EMAIL="operating team contact email"
-       DATATRACKER_CLIENT_ID="Datatracker OAuth2 client ID"
-       DATATRACKER_CLIENT_SECRET="Datatracker OAuth2 client secret"
-       SOURCE_REPO_URL="https://github.com/ietf-ribose/bibxml-service"
-       SENTRY_DSN="your Sentry DSN string"
-       MATOMO_URL="Matomo URL"
-       MATOMO_SITE_ID="Matomo site ID"
+       DB_SECRET=random string
+       DJANGO_SECRET=a very long and very random string
+       API_SECRET=API secret to be used in management GUI and API authentication
+       SERVICE_NAME=IETF BibXML service
+       CONTACT_EMAIL=operating team contact email
+       DATATRACKER_CLIENT_ID=Datatracker OAuth2 client ID
+       DATATRACKER_CLIENT_SECRET=Datatracker OAuth2 client secret
+       SOURCE_REPO_URL=https://github.com/ietf-ribose/bibxml-service
+       SENTRY_DSN=your Sentry DSN string
+       MATOMO_URL=Matomo URL
+       MATOMO_SITE_ID=Matomo site ID
 
 7. Run the command::
 
