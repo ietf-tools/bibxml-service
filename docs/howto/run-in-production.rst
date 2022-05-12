@@ -82,6 +82,8 @@ the site should be available via https://your.chosen.domain.name.com.
        If you increase the number of web instances,
        make sure each target’s URL is added to your Prometheus instance for scraping.
 
+       .. seealso:: :doc:`/ref/containers`, :ref:`tracking-metrics`
+
 Updating
 ========
 
