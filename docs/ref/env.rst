@@ -19,7 +19,10 @@ or service’s custom setting.
 
 .. seealso:: :func:`bibxml.env_checker.env_checker()`
 
-.. seealso:: :doc:`/howto/develop-locally` for sample development environment
+.. seealso::
+
+   - :doc:`/howto/develop-locally` for sample development environment
+   - :doc:`/howto/run-in-production` for sample production environment
 
 
 Service info
