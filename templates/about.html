@@ -149,7 +149,16 @@
                 {"id": "doctype", "cssSelector": "[data-annotates=doctype]", "frag": "xywh=pixel:11.211050033569336,11.233012199401855,232.1489200592041,67.39807605743408"},
                 {"id": "smart-title", "cssSelector": "[data-annotates=smart-title]", "frag": "xywh=pixel:7.466712474822998,67.3980712890625,1231.887047290802,179.7281951904297"},
                 {"id": "docid", "cssSelector": "[data-annotates=docid]", "frag": "xywh=pixel:14.615692138671875,332.9395446777344,904.19384765625,151.1488037109375"},
-                {"id": "primary-docid", "cssSelector": "[data-annotates=primary-docid]", "frag": "xywh=pixel:27.784637451171875,349.40069580078125,538.4652404785156,45.66802978515625"}
+                {"id": "primary-docid", "cssSelector": "[data-annotates=primary-docid]", "frag": "xywh=pixel:27.784637451171875,349.40069580078125,538.4652404785156,45.66802978515625"},
+                {"id": "titles", "cssSelector": "[data-annotates=title]", "frag": "xywh=pixel:16.445898056030273,500.42041015625,902.0736331939697,85.59820556640625"},
+                {"id": "abstracts", "cssSelector": "[data-annotates=abstracts]", "frag": "xywh=pixel:19.73813819885254,599.1875610351562,1814.023946762085,161.31976318359375"},
+                {"id": "dates", "cssSelector": "[data-annotates=dates]", "frag": "xywh=pixel:941.565185546875,776.968505859375,892.1968994140625,62.55255126953125"},
+                {"id": "revdate", "cssSelector": "[data-annotates=revdate]", "frag": "xywh=pixel:23.030376434326172,859.2744750976562,911.9503364562988,65.84478759765625"},
+                {"id": "fetched", "cssSelector": "[data-annotates=fetched]", "frag": "xywh=pixel:944.857421875,855.9822387695312,888.9046630859375,69.1370849609375"},
+                {"id": "creators", "cssSelector": "[data-annotates=creators]", "frag": "xywh=pixel:23.030376434326172,944.8727416992188,911.9503364562988,62.55255126953125"},
+                {"id": "relations", "cssSelector": "[data-annotates=relations]", "frag": "xywh=pixel:23.030376434326172,1023.886474609375,911.9503364562988,75.7215576171875"},
+                {"id": "series", "cssSelector": "[data-annotates=series]", "frag": "xywh=pixel:944.857421875,1030.470947265625,885.6124267578125,72.4293212890625"},
+                {"id": "links", "cssSelector": "[data-annotates=links]", "frag": "xywh=pixel:26.322616577148438,1116.0692138671875,1804.147232055664,69.136962890625"}
               ]'
             />
           </div>
@@ -252,12 +261,81 @@
               but they are still listed and can be searched by.
           </dd>
 
-          <dt>Titles (<code>title</code> field)</dt>
-          <dd>
+          <dt data-annotates="titles">Titles (<code>title</code> field)</dt>
+          <dd data-annotates="titles">
             <p>
               A resource can have more than one title,
               and each title can have associated type
               which if provided is used as part of field label.
+            </p>
+          </dd>
+
+          <dt data-annotates="abstracts">Abstracts (<code>abstract</code> field)</dt>
+          <dd data-annotates="abstracts">
+            <p>
+              Abstract is a field that is often found describing a document.
+              There can be zero or more abstracts, typically using different languages/scripts.
+            </p>
+          </dd>
+
+          <dt data-annotates="dates">Lifecycle dates (<code>date</code> field)</dt>
+          <dd data-annotates="dates">
+            <p>
+              A list of dates corresponding to events in resource lifecycle.
+              There can be zero or more dates, usually at least one,
+              each date specifying what it is (creation, approval, publication and so on).
+            </p>
+          </dd>
+
+          <dt data-annotates="revdate">Latest revision date (<code>revdate</code> field)</dt>
+          <dd data-annotates="revdate">
+            <p>
+              Date of when resource was last updated.
+              Typically also found under “date”.
+            </p>
+          </dd>
+
+          <dt data-annotates="fetched">Latest fetch date (<code>fetched</code> field)</dt>
+          <dd data-annotates="fetched">
+            <p>
+              The date on which resource description was last fetched
+              from authoritative sources.
+            </p>
+          </dd>
+
+          <dt data-annotates="creators">Authors, editors, publishers (<code>contributor</code> field)</dt>
+          <dd data-annotates="creators">
+            <p>
+              A list of people and/or organizations that participated in the creation of the document.
+              Each entity is linked to search that matches corresponding substructure
+              across bibliographic items’ Relaton representations
+              (note that results may not be exhaustive due to possible variations
+              in JSON structures representing the same contributor entity on different resources).
+            </p>
+          </dd>
+
+          <dt data-annotates="relations">Relations (<code>relation</code> field)</dt>
+          <dd data-annotates="relations">
+            <p>
+              Related resources, with relation type. Can list superseding, superseded,
+              including (for series) or merely related documents and other resources.
+            </p>
+          </dd>
+
+          <dt data-annotates="series">Series (<code>series</code> field)</dt>
+          <dd data-annotates="series">
+            <p>
+              For a resource (typically a document) that is part of a series,
+              all series are listed here (alongside resource identifier within that series).
+            </p>
+          </dd>
+
+          <dt data-annotates="links">External links (<code>link</code> field)</dt>
+          <dd data-annotates="links">
+            <p>
+              Links to resource representations elsewhere.
+              Could be, for example, a PDF (or another file) hosted by publishing organization.
+            </p>
           </dd>
 
         </dl>
