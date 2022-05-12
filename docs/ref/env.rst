@@ -66,7 +66,7 @@ Service info
     If provided, some pages of the service will show visitors a link
     to this source repository.
 
-``SERVER_EMAIL`` 
+``SERVER_EMAIL``
     accepted by Django and Compose, pass-through, recommended in production
 
     For emails sent by the service directly,
@@ -201,7 +201,7 @@ Security
     Each will have the same effect and access privileges
     as ``API_SECRET``.
 
-``DEBUG`` 
+``DEBUG``
     accepted by Django and Compose, pass-through
 
     If set to 1, Django’s built-in ``runserver`` is used
@@ -220,7 +220,7 @@ Integrations
 Sentry
 ~~~~~~
 
-``SENTRY_DSN`` 
+``SENTRY_DSN``
     accepted by Django and Compose, pass-through
 
     Endpoint for reporting metrics & errors to Sentry.
@@ -235,13 +235,13 @@ All of these are required for Datatracker OAuth2 login to work.
 
 .. seealso:: :mod:`datatracker.oauth`
 
-``DATATRACKER_CLIENT_ID`` 
+``DATATRACKER_CLIENT_ID``
     accepted by Django and Compose, pass-through
 
-``DATATRACKER_CLIENT_SECRET`` 
+``DATATRACKER_CLIENT_SECRET``
     accepted by Django and Compose, pass-through
 
-``DATATRACKER_REDIRECT_URI`` 
+``DATATRACKER_REDIRECT_URI``
     accepted by Django
 
     Indicates the redirect URI configured for given client ID/secret
@@ -255,10 +255,10 @@ All of these are required for Datatracker OAuth2 login to work.
 Matomo
 ~~~~~~
 
-``MATOMO_URL`` 
+``MATOMO_URL``
     accepted by Django and Compose, pass-through
 
-``MATOMO_SITE_ID`` 
+``MATOMO_SITE_ID``
     accepted by Django and Compose, pass-through
 
 ``MATOMO_TAG_MANAGER_CONTAINER``
