@@ -43,17 +43,19 @@ Building base image
    Building base image is necessary both for running the service and building the docs,
    although full ``.env`` may not be strictly necessary if you only want to build the docs.
 
-1. In repository root, create a file called ``.env`` with following contents::
+1. In repository root, create a file called ``.env`` with following contents:
 
-       PORT=8000
-       DB_NAME=bibxml
-       DB_SECRET=qwert
-       DJANGO_SECRET=FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF
-       HOST=localhost
-       API_SECRET=test
-       SERVICE_NAME=IETF BibXML service
-       CONTACT_EMAIL=<ops contact email>
-       DEBUG=1
+   .. code-block:: text
+
+      PORT=8000
+      DB_NAME=bibxml
+      DB_SECRET=qwert
+      DJANGO_SECRET=FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF
+      HOST=localhost
+      API_SECRET=test
+      SERVICE_NAME=IETF BibXML service
+      CONTACT_EMAIL=<ops contact email>
+      DEBUG=1
 
    .. seealso::
 
