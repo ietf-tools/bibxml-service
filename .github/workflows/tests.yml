@@ -30,9 +30,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build the Docker image and run the tests
         run: docker compose -f docker-compose.test.yml up --exit-code-from test
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
-      - name: Stop Containers
-        if: always()
-        run: docker-compose down
