@@ -290,14 +290,19 @@ def delete_manual_map(request, subpath):
 
 
 class SerializedPathMap(BaseModel):
-    """Representation of :class:`xml2rfc_compat.models.ManualPathMap`
-    when map is exported to JSON."""
-
-    docid: str
-    """Mapped docid."""
+    """
+    Representation of :class:`xml2rfc_compat.models.ManualPathMap`
+    for mappings exported to JSON.
+    """
 
     path: str
-    """xml2rfc subpath."""
+    """xml2rfc subpath, relative to ``/public/rfc/`` root.
+
+    It **must** contain unaliased directory name first,
+    such as ``bibxml2``."""
+
+    docid: str
+    """``docid.id`` mapped to given path."""
 
 
 def export_manual_map(request):
@@ -315,6 +320,10 @@ def export_manual_map(request):
 
 
 def import_manual_map(request):
+    """
+    Handles upload of a JSON file with manual mappings.
+    JSON file must contain a list of :class:`.SerializedPathMap` items.
+    """
     json_file = request.FILES.get('map_json', None)
 
     if json_file:
