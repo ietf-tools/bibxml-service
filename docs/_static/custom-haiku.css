@@ -20,17 +20,6 @@ a.reference.external .viewcode-link .pre::after {
   margin-right: 1em;
 }
 
-/*
-  Hide external link if internal source link is available.
-  Sadly, Sphinx doesn’t make internal links available for variables.
-*/
-a.reference.internal + a.reference.external {
-  display: none;
-}
-.py.data:not(:first-of-type) a.reference.external {
-  display: none;
-}
-
 h4, h5, h6 {
   font-weight: bold;
 }
