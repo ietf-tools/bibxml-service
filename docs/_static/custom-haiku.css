@@ -95,7 +95,7 @@ body > div.content ul > li {
   padding-left: 2rem;
 }
 
-div.header h1 {
+div.header h1, div.header h2 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
