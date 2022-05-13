@@ -25,6 +25,16 @@ h4, h5, h6 {
 }
 
 
+/* Halve margins for narrow viewports */
+body > div.content {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+body > div.header {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
 /* Typography */
 body {
   min-width: unset;
