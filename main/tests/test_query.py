@@ -79,7 +79,7 @@ class QueryTestCase(TestCase):
         Test that search_refs_relaton_struct returns an empty list of
         results when called with an empty list of objs.
         """
-        objs: List[Any]
+        objs: List[None] = []
         refs = search_refs_relaton_struct(*objs)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertEqual(refs.count(), 0)
