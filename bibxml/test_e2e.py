@@ -50,4 +50,3 @@ class MyViewTests(StaticLiveServerTestCase):
         ))
 
         page.close()
-        # pass
