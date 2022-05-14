@@ -82,15 +82,16 @@ def internet_drafts(ref: str) -> BibliographicItem:
 
     bare_ref = ref.replace('I-D.', '', 1).replace('draft-', '', 1)
     unversioned_ref = remove_version(bare_ref)
+    ref_is_versioned = unversioned_ref != bare_ref
 
     ref_is_valid = all([
         # all references must have the I-D. prefix:
         ref.startswith('I-D.'),
         any([
             # and must be either versioned with the additional draft- prefix:
-            ref.startswith('I-D.draft-') and unversioned_ref != bare_ref,
+            ref.startswith('I-D.draft-') and ref_is_versioned,
             # or unversioned without the additional draft- prefix:
-            not ref.startswith('I-D.draft-') and unversioned_ref == bare_ref,
+            not ref.startswith('I-D.draft-') and not ref_is_versioned,
         ]),
     ])
     if not ref_is_valid:
