@@ -7,7 +7,7 @@ via :func:`.urls.get_urls()`.
 """
 
 import logging
-from typing import cast, Union
+from typing import cast, Optional, Match
 import re
 
 from bib_models import BibliographicItem, DocID
@@ -120,18 +120,20 @@ def internet_drafts(ref: str) -> BibliographicItem:
 
     # Obtain the newest draft version available in indexed sources
     # (both bibitem data and version number)
-    bibitem: Union[BibliographicItem, None]
+    bibitem: Optional[BibliographicItem]
+    version: Optional[str]
     if len(results) > 0:
         bibitem = BibliographicItem(**results[0].body)
         try:
-            version = [
-                version_re.match(d.id).group('version')
+            match = [
+                version_re.match(d.id)
                 for d in as_list(bibitem.docid or [])
-                if d.type == 'Internet-Draft' and version_re.match(d.id)
+                if d.type == 'Internet-Draft'
             ][0]
-        except:
+        except IndexError:
             version = None
-
+        else:
+            version = match.group('version') if match else None
     else:
         bibitem = None
         version = None
