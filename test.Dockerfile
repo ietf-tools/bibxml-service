@@ -34,6 +34,9 @@ RUN ["pip", "install", "playwright"]
 RUN ["python", "-m", "playwright", "install"]
 RUN ["playwright", "install-deps"]
 
+# Install Coverage (required for tests only)
+RUN ["pip", "install", "coverage"]
+
 COPY requirements.txt /code/requirements.txt
 COPY package.json /code/package.json
 COPY package-lock.json /code/package-lock.json
@@ -70,4 +73,4 @@ RUN chmod +x /wait
 RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
 RUN chmod +x codecov
 
-CMD python -m coverage run manage.py test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log && ./codecov
+CMD python -m coverage run manage.py test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log && ./codecov -t ${CODECOV_TOKEN}
