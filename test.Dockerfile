@@ -66,6 +66,5 @@ RUN ["python", "manage.py", "compress"]
 ENV WAIT_VERSION 2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
 RUN chmod +x /wait
-RUN ci_env=`bash <(curl -s https://codecov.io/env)`
 
 CMD python -m coverage run -m test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log && ./codecov
