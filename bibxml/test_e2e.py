@@ -40,7 +40,7 @@ class MyViewTests(StaticLiveServerTestCase):
         page = self.browser.new_page()
         page.goto(self.live_server_url)
         ref = "10.1093/benz/9780199773787.article.b00004912"
-        page.fill('#doiRefToSearch', quote_plus(ref))
+        page.fill('input[name="ref"]', quote_plus(ref))
         page.screenshot(path="test-artifacts/doi_search.png")
         page.click('#doiRefSearchForm button[type=submit]')
 
