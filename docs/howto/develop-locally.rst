@@ -170,6 +170,23 @@ If on macOS or Linux, instead you can:
 It’s also a good idea to run flake8. Where project conventions
 differ from flake8 style, use project conventions.
 
+
+Debugging
+---------
+
+The code can be debugged using an interactive tool such as ``ipdb``.
+The environment is already setup to accept stdin interactions.
+
+If you are running Docker using the command line, all you have to do is
+install ``ipdb`` in your container::
+
+    docker-compose exec web pip install ipdb
+
+See the documentation [1]_ for more information.
+
+.. [1]  https://pypi.org/project/ipdb/
+
+
 Automated testing
 -----------------
 
