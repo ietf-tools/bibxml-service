@@ -64,12 +64,6 @@ def get_bibitem(docid: DocID, strict: bool = True) \
           for isbn in resp.get('ISBN', [])
           if len(isbn) == 13),
     ]
-    isbn = resp.get('reference', {}).get('isbn')
-    if isbn and isbn not in docids:
-        docids.append(DocID(
-            type='ISBN',
-            id=isbn,
-        ))
 
     contributors: List[Contributor] = [
         *(to_contributor('author', author)
