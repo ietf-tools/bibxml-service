@@ -103,14 +103,7 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
             'content': data['title'],
         }],
         fetched=datetime.datetime.now(),
-        contributor=[{
-            'role': ['publisher'],
-            'organization': {
-                'name': ['IETF'],
-                'abbreviation': 'IETF',
-                'url': 'https://ietf.org/'
-            },
-        }],
+        contributor=[],
     )
 
     # Some data (e.g., authors and dates) is only available
