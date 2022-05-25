@@ -126,6 +126,9 @@ def internet_drafts(ref: str) -> BibliographicItem:
     bibitem: Optional[BibliographicItem]
     version: Optional[str]
     if len(results) > 0:
+        # We should catch (but log) a ValidationError here,
+        # making sure xml2rfc API consumers receive a suitable response
+        # whenever possible.
         try:
             bibitem = BibliographicItem(**results[0].body)
             try:
