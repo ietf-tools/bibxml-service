@@ -6,7 +6,7 @@ for “Internet-Draft” document identifier type.
 """
 
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 import ast
 import datetime
 import re
@@ -39,15 +39,21 @@ a version or a versionless name from an Internet Draft name
 that possibly has version."""
 
 
-def remove_version(id: str) -> str:
-    """Removes version suffix from an Internet Draft ID."""
+def remove_version(id: str) -> Tuple[str, str]:
+    """
+    Extracts a version from a possibly versioned Internet Draft ID,
+    and returns a 2-tuple of strings: versionless ID
+    and optionally version (or None).
+    """
 
     match = version_re.match(id)
 
     if not match or not match.group('versionless'):
         raise ValueError("Invalid Datatracker ID: %s" % id)
 
-    return match.group('versionless')
+    versionless = match.group('versionless')
+
+    return versionless, match.group('version')
 
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
@@ -62,7 +68,9 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
     :rtype: main.types.ExternalBibliographicItem
     """
 
-    versionless = remove_version(docid)
+    # We cannot request a particular I-D version from Datatracker,
+    # so we ignore the second tuple element (version)
+    versionless, _ = remove_version(docid)
 
     resp = get(f'/api/v1/doc/document/{versionless}/')
 
