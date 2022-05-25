@@ -10,6 +10,8 @@ import logging
 from typing import cast, Optional, Match
 import re
 
+from pydantic import ValidationError
+
 from bib_models import BibliographicItem, DocID
 from doi.crossref import get_bibitem as get_doi_bibitem
 from datatracker.internet_drafts import get_internet_draft, remove_version
@@ -124,17 +126,21 @@ def internet_drafts(ref: str) -> BibliographicItem:
     bibitem: Optional[BibliographicItem]
     version: Optional[str]
     if len(results) > 0:
-        bibitem = BibliographicItem(**results[0].body)
         try:
-            match = [
-                version_re.match(d.id)
-                for d in as_list(bibitem.docid or [])
-                if d.type == 'Internet-Draft'
-            ][0]
-        except IndexError:
+            bibitem = BibliographicItem(**results[0].body)
+            try:
+                match = [
+                    version_re.match(d.id)
+                    for d in as_list(bibitem.docid or [])
+                    if d.type == 'Internet-Draft'
+                ][0]
+            except IndexError:
+                version = None
+            else:
+                version = match.group('version') if match else None
+        except ValidationError:
+            bibitem = None
             version = None
-        else:
-            version = match.group('version') if match else None
     else:
         bibitem = None
         version = None
