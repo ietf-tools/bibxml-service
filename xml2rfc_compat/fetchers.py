@@ -139,6 +139,9 @@ def internet_drafts(ref: str) -> BibliographicItem:
             else:
                 version = match.group('version') if match else None
         except ValidationError:
+            log.exception(
+                "Failed to validate indexed bibliographic item "
+                "when resolving xml2rfc bibxml3")
             bibitem = None
             version = None
     else:
