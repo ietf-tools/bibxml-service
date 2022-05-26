@@ -7,7 +7,7 @@
       {{ own_title.content|default:fallback_formattedref|default:fallback_docid|default:"(no title)" }}
     {% endwith %}
   {% endif %}
-  {% if relations|length > 0 %}
+  {% if relations|length > 0 and not own_title.content %}
     <small>
     {% for relation in relations %}
       {% ifchanged relation.type %}{{ relation.type|default:"relates to" }}{% endifchanged %}
