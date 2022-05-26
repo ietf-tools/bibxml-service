@@ -30,7 +30,7 @@
   {% if not forloop or forloop.first %}
     {% include "deflist/entry.html" with key="export" val=data.docid|as_list|first tmpl="citation/export.html" htmlclass="bg-sky-600/25 sm:!border-transparent" %}
   {% endif %}
-  {% include "deflist/entry.html" with key="source" val=sourced_item tmpl="citation/sourced.html" htmlclass="" %}
+  {% include "deflist/entry.html" with key="source" expandable=1 val=sourced_item tmpl="citation/sourced.html" htmlclass="" %}
 
   {% for title in data.title|as_list %}
     {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content break_row=forloop.first wide=1 %}
@@ -49,14 +49,14 @@
   {% endif %}
 
   {% if data.date %}
-    {% include "deflist/entry_list.html" with key="dates" tmpl="relaton/date.html" items=data.date|as_list %}
+    {% include "deflist/entry_list.html" with key="dates" expandable=1 tmpl="relaton/date.html" items=data.date|as_list %}
   {% endif %}
 
   {% include "deflist/entry.html" with key="revdate" val=data.revdate|default:"—" %}
   {% include "deflist/entry.html" with key="fetched" val=data.fetched|default:"—" %}
 
   {% if data.contributor %}
-    {% include "deflist/entry_list.html" with key="creators" tmpl="relaton/contributor.html" items=data.contributor|as_list wide=True inline=True %}
+    {% include "deflist/entry_list.html" with key="creators" expandable=1 tmpl="relaton/contributor.html" items=data.contributor|as_list wide=True inline=True %}
   {% endif %}
 
   {% if data.place %}
@@ -64,7 +64,7 @@
   {% endif %}
 
   {% if data.relation %}
-    {% include "deflist/entry_list.html" with key="relations" items=data.relation|as_list tmpl="relaton/relation.html" %}
+    {% include "deflist/entry_list.html" with key="relations" expandable=1 items=data.relation|as_list tmpl="relaton/relation.html" %}
   {% endif %}
 
   {% for link in data.link|as_list %}
@@ -72,11 +72,11 @@
   {% endfor %}
 
   {% if data.series %}
-    {% include "deflist/entry_list.html" with key="series" items=data.series|as_list tmpl="relaton/series.html" %}
+    {% include "deflist/entry_list.html" with key="series" expandable=1 items=data.series|as_list tmpl="relaton/series.html" %}
   {% endif %}
 
   {% if data.copyright %}
-    {% include "deflist/entry_list.html" with key="copyrights" items=data.copyright|as_list tmpl="relaton/copyright.html" %}
+    {% include "deflist/entry_list.html" with key="copyrights" expandable=1 items=data.copyright|as_list tmpl="relaton/copyright.html" %}
   {% endif %}
   {% if data.keyword %}
     {% include "deflist/entry_list.html" with key="keywords" items=data.keyword|as_list inline=1 %}
