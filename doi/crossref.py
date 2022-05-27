@@ -115,6 +115,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
         )],
         abstract=[{
             'content': resp['abstract'],
+            'format': 'application/x-jats+xml',  # See GitHub issue 210
         }] if 'abstract' in resp else [],
         contributor=contributors,
     )
