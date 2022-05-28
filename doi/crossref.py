@@ -52,7 +52,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
     resp = works.doi(docid.id)
 
     if not resp:
-        raise RefNotFoundError
+        raise RefNotFoundError()
 
     docids: List[DocID] = [
         DocID(type='DOI', id=resp['DOI']),
