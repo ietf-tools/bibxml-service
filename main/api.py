@@ -1,12 +1,13 @@
 """View functions for API endpoints."""
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from urllib.parse import unquote_plus
 
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 
 from pydantic import ValidationError
 from relaton.serializers.bibxml.anchor import get_suitable_anchor
+from relaton.models import DocID
 
 from common.pydantic import unpack_dataclasses
 from common.util import as_list
@@ -18,6 +19,7 @@ from .search import BaseCitationSearchView
 from .query import get_indexed_item
 from .query import build_citation_for_docid
 from .exceptions import RefNotFoundError
+from .types import ExternalBibliographicItem
 from . import external_sources
 
 
@@ -108,13 +110,39 @@ def get_by_docid(request):
     outcome: str
 
     try:
-        composite_bibitem = build_citation_for_docid(
-            docid.strip(),
-            doctype.strip() if doctype else None,
-            strict=True)
+        try:
+            composite_bibitem = build_citation_for_docid(
+                docid.strip(),
+                doctype.strip() if doctype else None,
+                strict=True)
 
-        # This will be the latest sourced item.
-        bibitem = list(composite_bibitem.sources.values())[0].bibitem
+            # This will be the latest sourced item.
+            bibitem = list(composite_bibitem.sources.values())[0].bibitem
+
+        except RefNotFoundError:
+            if doctype is not None:
+                # As a fallback, try external sources.
+                sources = [
+                    ext_s
+                    for ext_s in external_sources.registry.values()
+                    if ext_s.applies_to(DocID(id=docid, type=doctype))
+                ]
+                for ext_s in sources:
+                    external_bibitem: Optional[ExternalBibliographicItem]
+                    try:
+                        external_bibitem = ext_s.get_item(docid)
+                    except (RefNotFoundError, RuntimeError):
+                        external_bibitem = None
+                    else:
+                        break
+                if external_bibitem:
+                    bibitem = external_bibitem.bibitem
+                else:
+                    # External sources didn’t help
+                    raise
+            else:
+                # Doctype is not specified, so we can’t try external sources.
+                raise
 
     except (RefNotFoundError, AttributeError, IndexError):
         outcome = 'not_found'
