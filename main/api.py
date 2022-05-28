@@ -137,8 +137,7 @@ def get_by_docid(request):
     else:
         headers = {
             'X-Xml2rfc-Anchor':
-                requested_anchor
-                or get_suitable_anchor(as_list(bibitem.docid or [])),
+                requested_anchor or get_suitable_anchor(bibitem),
         }
 
         if format == 'relaton':
