@@ -167,8 +167,12 @@ def get_docid_struct_for_search(id: DocID) -> Dict[str, Any]:
 
 
 def get_primary_docid(raw_ids: List[Dict[str, Any]]) -> Optional[DocID]:
-    """Extracts a primary document identifier from a list of objects
-    as it appears under 'docid' in deserialized Relaton data.
+    """Extracts a single primary document identifier from a list of objects
+    as it appears under “docid” in deserialized Relaton data.
+
+    Logs a warning if more than one primary identifier was found.
+
+    :rtype: relaton.models.bibdata.DocID or None
     """
 
     primary_docids: List[DocID] = [
