@@ -2,21 +2,17 @@
 
 from typing import List, Dict, Any
 
-from pydantic import ValidationError
 from crossref.restful import Works, Etiquette
-
 from django.conf import settings
-
-from common.util import as_list
+from pydantic import ValidationError
 
 from bib_models import DocID, BibliographicItem
-from bib_models import Title, Contributor, Organization
-from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import GenericStringValue, Link
-
-from main.types import ExternalBibliographicItem, ExternalSourceMeta
+from bib_models import Person, PersonAffiliation, PersonName
+from bib_models import Title, Contributor, Organization
+from common.util import as_list
 from main.exceptions import RefNotFoundError
-
+from main.types import ExternalBibliographicItem, ExternalSourceMeta
 
 etiquette = Etiquette(
     settings.SERVICE_NAME,
@@ -93,6 +89,27 @@ def get_bibitem(docid: DocID, strict: bool = True) \
           if tid in resp),
     ]
 
+    localities: List[Locality] = []
+    if resp.get("volume"):
+        localities.append(
+            Locality(type="volume", reference_from=resp["volume"])
+        )
+    if resp.get("journal-issue", False):
+        if resp["journal-issue"].get("issue", False):
+            localities.append(
+                Locality(type="issue", reference_from=resp["journal-issue"]["issue"])
+            )
+    if resp.get("page", False):
+        localities.append(
+            Locality(type="page", reference_from=resp["page"])
+        )
+    if not localities and resp.get('container-title'):
+        extent = resp['container-title'].split(" ")[-1]
+    elif localities:
+        extent: LocalityStack = LocalityStack(locality=localities)
+    else:
+        extent = None
+
     data = dict(
         # The following are not captured:
         # source
@@ -118,6 +135,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
             'format': 'application/x-jats+xml',  # See GitHub issue 210
         }] if 'abstract' in resp else [],
         contributor=contributors,
+        extent=extent
     )
 
     errors = []
