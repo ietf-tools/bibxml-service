@@ -104,7 +104,11 @@ def get_bibitem(docid: DocID, strict: bool = True) \
             Locality(type="page", reference_from=resp["page"])
         )
     if not localities and resp.get('container-title'):
-        extent = resp['container-title'].split(" ")[-1]
+        # https://github.com/cabo/kramdown-rfc2629/blob/d006536e2bab3aa9b8a70464710a725ca98a3051/bin/doilit#L91
+        # and
+        # https://github.com/ietf-ribose/doi2ietf-py/blob/6ac3904972ceaeb110e7711a222e93a564aa0250/doi2ietf/utils.py#L106
+        # very strange and unsafe, need explanation:
+        extent = resp['container-title'][0].split(" ")[-1]
     elif localities:
         extent: LocalityStack = LocalityStack(locality=localities)
     else:
