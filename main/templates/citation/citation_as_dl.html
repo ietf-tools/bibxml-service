@@ -24,7 +24,7 @@
   md:grid-flow-row-dense
   md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
   md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
-" data-source-entry='{# #}'>
+" data-source-entry='{# #}' {% if sourced_item %}id="{{ sourced_item.source.id }}"{% endif %}>
 
   {% include "deflist/entry.html" with key="document identifiers" ids=data.docid|as_list tmpl="relaton/doc_ids.html" show_type=0 htmlclass="sm:!border-transparent md:row-span-2 sm:mr-1 bibitem-docids" key_sr_only=1 %}
   {% if not forloop or forloop.first %}
