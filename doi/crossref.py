@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 from crossref.restful import Works, Etiquette
 from django.conf import settings
 from pydantic import ValidationError
+from relaton.models.bibdata import Locality, LocalityStack
 
 from bib_models import DocID, BibliographicItem
 from bib_models import GenericStringValue, Link
@@ -89,30 +90,24 @@ def get_bibitem(docid: DocID, strict: bool = True) \
           if tid in resp),
     ]
 
-    localities: List[Locality] = []
-    if resp.get("volume"):
-        localities.append(
-            Locality(type="volume", reference_from=resp["volume"])
-        )
-    if resp.get("journal-issue", False):
-        if resp["journal-issue"].get("issue", False):
-            localities.append(
-                Locality(type="issue", reference_from=resp["journal-issue"]["issue"])
-            )
-    if resp.get("page", False):
-        localities.append(
-            Locality(type="page", reference_from=resp["page"])
-        )
-    if not localities and resp.get('container-title'):
-        # https://github.com/cabo/kramdown-rfc2629/blob/d006536e2bab3aa9b8a70464710a725ca98a3051/bin/doilit#L91
-        # and
-        # https://github.com/ietf-ribose/doi2ietf-py/blob/6ac3904972ceaeb110e7711a222e93a564aa0250/doi2ietf/utils.py#L106
-        # very strange and unsafe, need explanation:
-        extent = resp['container-title'][0].split(" ")[-1]
-    elif localities:
-        extent: LocalityStack = LocalityStack(locality=localities)
-    else:
-        extent = None
+    # LocalityStack
+    ct = resp.get('container-title')
+    if ct:
+        volume = resp.get('volume', None)
+        issue = resp.get('journal-issue', {}).get("issue")
+        page = resp.get('page', None)
+        localities = [{"type": "container-title", "value": ct[0]}]
+        if volume:
+            localities.append({"type": "volume", "value": volume})
+        if issue:
+            localities.append({"type": "issue", "value": issue})
+        if volume:
+            localities.append({"type": "page", "value": page})
+
+        extent: LocalityStack = LocalityStack(locality=[
+            Locality(type=locality.get("type"), reference_from=locality.get("value"))
+            for locality in localities
+        ])
 
     data = dict(
         # The following are not captured:
