@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 from crossref.restful import Works, Etiquette
 from django.conf import settings
 from pydantic import ValidationError
-from relaton.models.bibdata import Locality, LocalityStack
+from relaton.models.bibitemlocality import Locality, LocalityStack
 
 from bib_models import DocID, BibliographicItem
 from bib_models import GenericStringValue, Link
