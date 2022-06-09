@@ -175,7 +175,7 @@ RFP requirement compliance
 
        Early on in the development a build process must be added such that commits to the repository
        will build an image and run tests in a container based on that image,
-       and when tests pass, will deploy a container on a staging site. 
+       and when tests pass, will deploy a container on a staging site.
        The image will be made available on a hub (such as hub.docker.com).
        We expect the same image to be useful for both production and development use.
        We anticipate a CD system that will allow us to deploy to potentially distributed
