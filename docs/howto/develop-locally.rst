@@ -153,7 +153,7 @@ Linting types properly requires mypy to be able to access imported modules.
 However, this does not require running Docker at all times.
 If on macOS or Linux, instead you can:
 
-1. Create and active a Python 3.9 virtual environment using ``virtualenv``.
+1. Create and active a Python 3.10 virtual environment using ``virtualenv``.
 2. Install requirements with ``pip install -r requirements.txt``.
    (Don’t forget to repeat this step if requirements change later.)
 3. Make sure your IDE resolves to Python within the virtualenv.
