@@ -30,7 +30,12 @@
   {% if not forloop or forloop.first %}
     {% include "deflist/entry.html" with key="export" val=data.docid|as_list|first tmpl="citation/export.html" htmlclass="bg-sky-600/25 sm:!border-transparent" %}
   {% endif %}
-  {% include "deflist/entry.html" with key="source" expandable=1 val=sourced_item tmpl="citation/sourced.html" htmlclass="" %}
+
+  {% if sourced_item %}
+    {% include "deflist/entry.html" with key="source" expandable=1 val=sourced_item tmpl="citation/sourced.html" htmlclass="" %}
+  {% elif data.sources %}
+    {% include "deflist/entry.html" with key="sources" expandable=1 val=data.sources tmpl="citation/sources.html" htmlclass="" %}
+  {% endif %}
 
   {% for title in data.title|as_list %}
     {% include "deflist/entry.html" with key=title.type|default:""|stringformat:"s (title)" val=title.content break_row=forloop.first wide=1 %}
