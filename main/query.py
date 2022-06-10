@@ -3,26 +3,24 @@
 import re
 import logging
 import json
-from typing import cast as typeCast, Set, FrozenSet, Optional, Callable
+from typing import cast as typeCast, Optional
 from typing import Dict, List, Union, Tuple, Any
 
 from pydantic import ValidationError
 
-from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchHeadline
 from django.db.models.functions import Cast
 from django.db.models import TextField
 from django.db.models.query import QuerySet, Q
 from django.db.models.expressions import RawSQL
-from django.db.utils import ProgrammingError, DataError
 from django.conf import settings
 
 # from sources import list_internal as list_internal_sources
 # from sources import InternalSource
 
 from common.util import as_list
-from bib_models import BibliographicItem, DocID
-from bib_models.merger import bibitem_merger
+from bib_models import DocID
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
@@ -363,10 +361,10 @@ def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
                 'docid[*]':
                 '@.id like_regex {id}{type_query}{primary_query}'.format(
                     id=id,
-                    type_query=
-                        ' && @.type like_regex {id_type}' if id_type else '',
-                    primary_query=
-                        ' && @.primary == true' if id_primary else '',
+                    type_query=(
+                        ' && @.type like_regex {id_type}' if id_type else ''),
+                    primary_query=(
+                        ' && @.primary == true' if id_primary else ''),
                 ),
                 # To exclude untyped add ' && exists (@.type)'
             }
