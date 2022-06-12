@@ -25,13 +25,14 @@ To make such situations less problematic,
 some functions responsible for constructing bibliographic item instances
 support a ``strict`` boolean keyword argument.
 
-By default it is ``True``, and item that fails validation
+By default it is ``True``, and any item that fails validation
 will make the function raise a :class:`pydantic.ValidationError`.
+The caller should never receive a malformed item.
 
 If explicitly set to ``False``, the item will be constructed anyway,
-but it may contain unexpected data structures. For example, it may
-have dictionaries instead of objects, and values that are invalid
-left as is.
+but it may contain unexpected data types. For example, it may
+have dictionaries instead of objects, or timestamps as strings
+instead of appropriate datetime objects.
 
 .. note::
 
