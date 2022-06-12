@@ -41,7 +41,7 @@ left as is.
 .. seealso::
 
    Some functions that use ``strict``:
-   
+
    - :func:`main.query.build_citation_for_docid`
    - :func:`main.query.get_indexed_item`
    - :func:`main.query_utils.merge_refs`
