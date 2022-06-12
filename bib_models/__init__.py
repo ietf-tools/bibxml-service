@@ -5,12 +5,14 @@ Data models are re-exported from :mod:`relaton.models`.
 
 from . import merger
 from . import serializers
+from .util import construct_bibitem
 
 from relaton.models import *
 
 
 __all__ = (
   'merger',
+  'construct_bibitem',
   'serializers',
   'BibliographicItem',
   'DocID',
