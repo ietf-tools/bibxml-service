@@ -147,9 +147,13 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
                     bibitem_data['contributor'] += [
                         {
                             'role': ['author'],
-                            'person': {'name': {'completename':
-                                {'content': a['name']}
-                            }},
+                            'person': {
+                                'name': {
+                                    'completename': {
+                                        'content': a['name']
+                                    },
+                                },
+                            },
                         }
                         for a in authors
                     ]
