@@ -138,6 +138,12 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
                         authors = json.loads(latest_submission_data['authors'])
                     except json.JSONDecodeError:
                         try:
+                            # IMPORTANT: Using literal_eval means we assume
+                            # Datatracker’s responses are always trustworthy.
+                            # The reason we’re using it is because Datatracker
+                            # appears to return something like Python’s repr()
+                            # of a list sometimes here
+                            # (i.e., not JSON-decodable)
                             authors = ast.literal_eval(
                                 latest_submission_data['authors'])
                         except (ValueError, SyntaxError):
