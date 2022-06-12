@@ -138,7 +138,8 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
                         authors = json.loads(latest_submission_data['authors'])
                     except json.JSONDecodeError:
                         try:
-                            authors = ast.literal_eval(latest_submission_data['authors'])
+                            authors = ast.literal_eval(
+                                latest_submission_data['authors'])
                         except (ValueError, SyntaxError):
                             authors = []
                 else:
