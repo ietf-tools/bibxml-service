@@ -21,7 +21,7 @@
    :members:
 
 
-``merger``: Merging bibliographic items representing the same document
+``merger``: Merging bibliographic items representing the same resource
 ======================================================================
 
 .. automodule:: bib_models.merger
