@@ -57,7 +57,10 @@ def remove_version(id: str) -> Tuple[str, str]:
 
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
-def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographicItem:
+def get_internet_draft(
+    docid: str,
+    strict: bool = True,
+) -> ExternalBibliographicItem:
     """Retrieves an Internet Draft from Datatracker in Relaton format.
 
     Makes necessary requests to Datatracker API
