@@ -236,7 +236,7 @@ def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
 
     Note that user input must obviously still be properly escaped.
     Escaping is delegated to Django’s ORM,
-    see e.g. :func:`.search_refs_relaton_field`.
+    see e.g. :func:`main.query.search_refs_relaton_field`.
     """
 
     err = repr(exc)
