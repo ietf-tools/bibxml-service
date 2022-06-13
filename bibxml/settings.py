@@ -332,8 +332,8 @@ DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '').strip()
 
 DATATRACKER_REDIRECT_URI = environ.get(
     "DATATRACKER_REDIRECT_URI",
-    f"https://{HOSTNAME or '(hostname at runtime)'}/datatracker-auth/callback/")
-"""Redirect URI configured on Datatracker side."""
+    f"https://{HOSTNAME or '(hostname at runtime)'}/"
+    "datatracker-auth/callback/")
 
 
 # Custom
