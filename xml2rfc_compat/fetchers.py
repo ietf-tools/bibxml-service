@@ -128,6 +128,7 @@ def internet_drafts(ref: str) -> BibliographicItem:
         try:
             indexed_bibitem = BibliographicItem(**results[0].body)
             try:
+                # TODO: mypy can’t infer the below... sigh
                 match = [
                     version_re.match(d.id)
                     for d in as_list(indexed_bibitem.docid or [])
