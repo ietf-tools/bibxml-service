@@ -2,14 +2,13 @@
 
 from typing import List, Dict, Any
 
-from pydantic import ValidationError
 from crossref.restful import Works, Etiquette
 
 from django.conf import settings
 
 from common.util import as_list
 
-from bib_models import DocID, BibliographicItem
+from bib_models import construct_bibitem, DocID
 from bib_models import Title, Contributor, Organization
 from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import GenericStringValue, Link
@@ -120,15 +119,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
         contributor=contributors,
     )
 
-    errors = []
-    if strict:
-        bibitem = BibliographicItem(**data)
-    else:
-        try:
-            bibitem = BibliographicItem(**data)
-        except ValidationError as e:
-            errors.append(str(e))
-            bibitem = BibliographicItem.construct(**data)
+    bibitem, errors = construct_bibitem(data, strict)
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(

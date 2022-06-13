@@ -1,23 +1,23 @@
-{% load relaton %}
+{% load relaton common %}
 
-{% if val.organization.abbreviation or org_name or val.person.name %}
+{% if val.organization.abbreviation or val.organization.name or val.person.name %}
 
   {% if val.role %}
-    <small class="text-xs opacity-50">{{ val.role|as_list|join:", " }}</small>
+    <span title="Participant role(s)" class="opacity-50">{{ val.role|as_list|join:", " }}</span>
   {% endif %}
 
-  {% if val.organization.abbreviation or org_name %}
+  {% if val.organization.abbreviation or val.organization.name %}
     {% with org_name=val.organization.name|as_list|first link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
-      <a class="link" href="{{ link }}">
+      <a class="link" href="{{ link }}" title="Organization’s name or abbreviation">
         {{ val.organization.abbreviation|default:org_name|default:"N/A" }}
       </a>
     {% endwith %}
   {% elif val.person.name %}
     {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=person.name.completename.content,person.name.surname.content,person.name.forename[*].content' %}
-      <a class="link" href="{{ link }}">
+      <a class="link" href="{{ link }}" title="Individual’s name">
         {% include "relaton/person_name.html" with val=val.person.name %}
       </a>
     {% endwith %}
   {% endif %}
-  
+
 {% endif %}

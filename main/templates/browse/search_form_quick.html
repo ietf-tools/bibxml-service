@@ -16,7 +16,7 @@
     id="quickSearchQuery"
     name="query"
     type="text"
-    placeholder="{% if detailed %}Document ID or anything…{% else %}Quick search…{% endif %}"
+    placeholder="{% if placeholder %}{{ placeholder }}{% else %}{% if detailed %}Document ID or anything…{% else %}Quick search…{% endif %}{% endif %}"
     class="min-w-0 grow input-on-blue {{ control_htmlclass }}"
   />
   <button type="submit" class="{% if detailed %}hidden md:!block{% else %}hidden{% endif %} button {{ control_htmlclass }}">

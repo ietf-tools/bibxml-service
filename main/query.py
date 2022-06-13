@@ -6,8 +6,6 @@ import json
 from typing import cast as typeCast, Optional
 from typing import Dict, List, Union, Tuple, Any
 
-from pydantic import ValidationError
-
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchHeadline
 from django.db.models.functions import Cast
@@ -20,15 +18,16 @@ from django.conf import settings
 # from sources import InternalSource
 
 from common.util import as_list
-from bib_models import DocID
+from bib_models import DocID, Relation
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
 from .types import CompositeSourcedBibliographicItem, FoundItem
 from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
-from .query_utils import query_suppressing_user_input_error, merge_refs
+from .query_utils import query_suppressing_user_input_error, compose_bibitem
 from .query_utils import get_primary_docid, get_docid_struct_for_search
+from .query_utils import construct_bibitem
 
 
 __all__ = (
@@ -36,6 +35,7 @@ __all__ = (
     'list_doctypes',
     'build_citation_for_docid',
     'build_search_results',
+    'hydrate_relations',
     'search_refs_docids',
     'search_refs_relaton_struct',
     'search_refs_relaton_field',
@@ -397,6 +397,9 @@ def build_citation_for_docid(
     id: str,
     id_type: Optional[str] = None,
     strict: bool = True,
+    hydrate_relation_levels: int = 1,
+    resolved_item_cache:
+    Optional[Dict[str, Optional[CompositeSourcedBibliographicItem]]] = None,
 ) -> CompositeSourcedBibliographicItem:
     """Retrieves and constructs a ``BibliographicItem``
     for given document identifier (``docid.id`` value).
@@ -411,10 +414,15 @@ def build_citation_for_docid(
     This also means that there can be multiple bibliographic items
     matching given document ID among different datasets,
     which is why a composite bibliographic item is returned.
+    This function is also more expensive and incurs multiple DB queries.
 
     :param str id: :term:`docid.id`
     :param str id_type: Optional :term:`document identifier type`
     :param bool strict: see :ref:`strict-validation`
+    :param int hydrate_relation_levels:
+        see ``depth`` in :func:`~.hydrate_relations()`
+    :param dict resolved_item_cache:
+        see :func:`~.hydrate_relations()`
 
     :rtype: main.types.CompositeSourcedBibliographicItem
     :raises main.exceptions.RefNotFoundError: if no matching refs were found.
@@ -429,10 +437,10 @@ def build_citation_for_docid(
     if len(refs) < 1:
         raise RefNotFoundError("Not found in indexed sources by docid", id)
 
-    # Retrieve bibliographic items with the same primary identifier.
-    # This is the preferred scenario.
+    # Retrieve additional bibliographic items
+    # with the same primary identifier, if one is available.
     primary_docid = get_primary_docid([
-        id
+        DocID(**id)
         for ref in refs
         for id in as_list(ref.body.get('docid', []))
     ])
@@ -441,10 +449,187 @@ def build_citation_for_docid(
             lambda: search_refs_docids(typeCast(DocID, primary_docid))
         ) or []
 
-    return merge_refs(
+    composite_item, valid = compose_bibitem(
         refs,
         primary_docid.id if primary_docid else None,
         strict)
+
+    # Do the same for relations, if requested
+    if valid and hydrate_relation_levels > 0 and composite_item.relation:
+        hydrate_relations(
+            composite_item.relation,
+            strict=strict,
+            depth=hydrate_relation_levels,
+            resolved_item_cache=resolved_item_cache or {},
+        )
+
+    return composite_item
+
+
+def hydrate_relations(
+    relations: List[Relation],
+    strict: bool = True,
+    depth: int = 1,
+    resolved_item_cache:
+        Optional[Dict[str, Optional[CompositeSourcedBibliographicItem]]] = None
+):
+    """
+    For every :class:`~relaton.models.bibdata.Relation`
+    of given list of ``relations``, calls :func:`~.build_citation_for_docid()`
+    on related bibliographic item,
+    and replaces relation’s ``bibitem`` with the result.
+
+    This lets sources avoid specifying full bibliographic data
+    on every relation, reducing duplication.
+    If full bibliographic data for related item
+    can be assumed to be provided by another authoritative source,
+    a ``docid`` with :term:`primary document identifier` is enough.
+
+    .. important::
+
+       The function alters an attribute on each list item
+       **in place** and returns nothing.
+
+       As a result, each relation’s ``bibitem`` can be expected to conform
+       to :class:`~main.types.CompositeSourcedBibliographicItem`,
+       rather than :class:`~relaton.models.bibdata.BibliographicItem`.
+
+       It should also have more complete data under its ``bibitem``
+       attribute, ideally.
+
+    :param list relations:
+        A list of :class:`~relaton.models.bibdata.Relation` instances,
+        possibly shallow (containing no data except primary identifier).
+
+    :param bool strict: see :ref:`strict-validation`
+
+    :param int depth:
+        How many relation levels to recurse
+        (through :func:`~.build_citation_for_docid()`) into.
+
+        If larger than zero, this function calls itself
+        to query available sources for each relation’s bibitem
+        and replaces it with CompositeSourcedBibliographicItem.
+        This value is decremented on each recursion level.
+        When zero, relations are left alone and recursion stops.
+
+    :param dict resolved_item_cache:
+        A cache containing document identifiers mapped to already-resolved
+        bibliographic item data.
+        If a given docid is found in the dictionary, no DB queries are made
+        for that relation.
+
+        .. note::
+
+           This structure is updated in place during function runtime.
+    """
+    cache: Dict[str, Optional[CompositeSourcedBibliographicItem]] = \
+        resolved_item_cache or {}
+
+    for relation in relations:
+        if _docid := get_primary_docid(relation.bibitem.docid):
+            _id = _docid.id
+            _type = _docid.type
+
+            id_key = f'{_type}:{_id}'
+
+            # Fill in cache for this item.
+            if id_key not in cache:
+                try:
+                    cache[id_key] = build_citation_for_docid(
+                        _id,
+                        _type,
+                        strict,
+                        depth - 1,
+                        # ^ it’s important to decrement this,
+                        # or we may recurse infinitely
+                        # since circular relations are very much
+                        # a possibility.
+                        cache,
+                    )
+                except:  # XXX: Catch more specific exceptions
+                    # We have failed to obtain a hydrated item
+                    # for this relation, store None in cache.
+                    log.warn(
+                        "Failed to hydrate bibitem for relation",
+                        _type,
+                        _id)
+                    cache[id_key] = None
+
+            # Switch original bibitem on this relation
+            # to hydrated item in cache, if any. Hydrated item,
+            # which is CompositeSourcedBibliographicItem,
+            # inherits from Relaton’s BibliographicItem
+            # and thus is safe to use in its place.
+            #
+            # TODO: Express this using Python type system somehow,
+            # if possible without excess duplication and workarounds.
+            #
+            # NOTE: mypy doesn’t seem to type check this assignment.
+            if id_key in cache and cache[id_key]:
+                relation.bibitem = typeCast(
+                    CompositeSourcedBibliographicItem,
+                    cache[id_key],
+                )
+
+
+def refdata_to_bibitem(
+    ref_data: Dict[str, Any],
+    resolved_items:
+        Optional[Dict[str, CompositeSourcedBibliographicItem]] = None,
+    hydrate_relation_levels: int = 1,
+) -> CompositeSourcedBibliographicItem:
+    """
+    Given a representation of bibliographic item as found on ``RefData.body``
+    (aka Relaton bibitem YAML deserialized into a generic dictionary),
+    attempts to complete its data by querying available sources.
+
+    :returns:
+        The same logical bibliographic item, but represented by
+        :class:`main.types.CompositeSourcedBibliographicItem`
+        and ideally with more complete data.
+
+    In some cases, an item in the source may contain
+    as little as just a ``docid`` property.
+    Typically this happens when the item is present as a relation
+    on another item.
+
+    The logic for completing such item’s data is:
+
+    1. Find bibliographic item’s :term:`primary document identifier`
+
+    2. Query available bibliographic data sources for any items
+       that have the same primary docid,
+       and merge results
+       into a :class:`main.types.CompositeSourcedBibliographicItem`
+       (see :func:`.compose_bibitem()`)
+
+    4. If ``hydrate_relation_levels`` is larger than zero,
+       do the above for each relation
+       (call this function recursively
+       with ``hydrate_relation_levels`` decremented by one),
+       replace relation’s ``bibitem`` with the result
+
+    5. Return the composite item created on step 3.
+
+    :param dict resolved_items:
+        A cache containing primary docid mapped to already-resolved
+        bibliographic item data.
+
+        - If an item is found in this cache, no DB query is made.
+        - The cache is updated as a side-effect of this function run.
+
+        If item is found in the dictionary, no DB queries are made
+        and the dictionary is used for resolving relations.
+
+    :param int hydrate_relation_levels:
+        How many relation levels to recurse into.
+        Decremented on each recursion.
+        If zero, relations are left alone.
+
+    :rtype: main.types.CompositeSourcedBibliographicItem
+    """
+    raise NotImplementedError()
 
 
 DocIDTuple = Tuple[Tuple[str, str], Tuple[str, str]]
@@ -472,8 +657,8 @@ def build_search_results(
     results: List[FoundItem] = []
 
     for idx, ref in enumerate(refs):
-        suitable_ids: List[Dict[str, Any]] = as_list([
-            id
+        suitable_ids: List[DocID] = as_list([
+            DocID(**id)
             for id in ref.body.get('docid', [])
             if 'id' in id and 'scope' not in id and 'type' in id
         ])
@@ -489,11 +674,9 @@ def build_search_results(
                 refs_by_primary_id.setdefault(primary_id.id, [])
                 refs_by_primary_id[primary_id.id].append(idx)
             else:
-                refs_by_primary_id[suitable_ids[0]['id']] = [idx]
+                refs_by_primary_id[suitable_ids[0].id] = [idx]
         elif fallback_formattedref: #196
             refs_by_primary_id[fallback_formattedref] = [idx]
-
-    processed_docids = set[DocIDTuple]()
 
     for _docid, ref_indexes in refs_by_primary_id.items():
         refs_to_merge: List[RefData] = [refs[idx] for idx in ref_indexes]
@@ -503,9 +686,9 @@ def build_search_results(
                 getattr(r, 'headline', '')
                 for r in refs_to_merge
             ])
-            found_item = typeCast(
-                FoundItem,
-                merge_refs(refs_to_merge, _docid, strict=False))
+            found_item, valid = typeCast(
+                Tuple[FoundItem, bool],
+                compose_bibitem(refs_to_merge, _docid, strict=False))
             found_item.headline = ' … '.join(headlines)
             results.append(found_item)
 
@@ -520,32 +703,23 @@ def get_indexed_item(
     """Retrieves a bibliographic item by :term:`reference`
     from an indexed internal dataset.
 
-    Different from :func:`~.build_citation_for_docid` in that this function
-    uses a dataset-specific reference (such as filename).
-    As such, this function is not suitable for handling user queries
-    (users are not expected to know dataset-specific references).
-
     :param bool strict: see :ref:`strict-validation`
     :rtype: IndexedBibliographicItem
     :raises RefNotFoundError: either reference or requested format not found
+    :raises pydantic.ValidationError:
+        if ``strict`` is True and ``BibliographicItem`` instance
+        did not validate at construction.
     """
 
     ref = get_indexed_ref_by_query(dataset_id, Q(ref__iexact=ref))
+    bibitem, errors = construct_bibitem(ref.body, strict)
 
-    params = {
-        'bibitem': ref.body,
-        'source': get_source_meta(dataset_id),
-        'indexed_object': get_indexed_object_meta(dataset_id, ref.ref),
-    }
-
-    if strict:
-        return IndexedBibliographicItem(**params)
-    else:
-        try:
-            return IndexedBibliographicItem(**params)
-        except ValidationError as e:
-            params['validation_errors'] = [str(e)]
-            return IndexedBibliographicItem.construct(**params)
+    return IndexedBibliographicItem(
+        source=get_source_meta(dataset_id),
+        indexed_object=get_indexed_object_meta(dataset_id, ref.ref),
+        validation_errors=errors,
+        bibitem=bibitem,
+    )
 
 
 def get_indexed_ref_by_query(

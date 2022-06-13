@@ -1,4 +1,4 @@
-{% load relaton %}
+{% load common %}
 
 {# TODO: (#196) below accounts for bibitems without docid but with formattedref, which should be addressed after #196 #}
 {% with own_title=bibitem.title|as_list|first relations=bibitem.relation|as_list %}

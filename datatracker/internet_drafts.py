@@ -13,9 +13,8 @@ import re
 import json
 
 import requests
-from pydantic import ValidationError
 
-from bib_models import DocID, BibliographicItem
+from bib_models import construct_bibitem
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
 from main.exceptions import RefNotFoundError
 from main import external_sources
@@ -168,15 +167,7 @@ def get_internet_draft(
                         for a in authors
                     ]
 
-    errors: List[str] = []
-    if strict:
-        bibitem = BibliographicItem(**bibitem_data)
-    else:
-        try:
-            bibitem = BibliographicItem(**bibitem_data)
-        except ValidationError as err:
-            errors.append(str(err))
-            bibitem = BibliographicItem.construct(**bibitem_data)
+    bibitem, errors = construct_bibitem(bibitem_data, strict)
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(
@@ -185,5 +176,5 @@ def get_internet_draft(
         ),
         bibitem=bibitem,
         validation_errors=errors,
-        requests=[],
+        requests=[],  # TODO: Provide requests incurred later
     )

@@ -1,1 +1,7 @@
-<a href="{{ val }}">{{ val }}</a>
+{% if "http" in val.content %}
+  <span class="opacity-50">external link</span>
+  <a class="link" href="{{ val.content }}">{{ val.type|default:val.content }}</a>
+{% else %}
+  <span class="opacity-50">{{ val.type|default:"external link" }}</span>
+  {{ val.content }}
+{% endif %}

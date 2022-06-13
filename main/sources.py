@@ -85,7 +85,7 @@ get_github_web_data_root = (
 )
 get_github_web_issues = (
     lambda repo_home:
-    f'{repo_home}/issues'
+    f'{repo_home}/issues/new'
 )
 
 

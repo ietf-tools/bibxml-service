@@ -1,0 +1,92 @@
+{% extends "browse/base.html" %}
+{# A details template for an indexed bibliographic item, as a raw table. #}
+
+{% load common %}
+
+{% block content_grid_classes %}
+  md:h-screen
+
+  md:grid-cols-2
+  md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
+  md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
+
+  bg-dark-200
+  dark:bg-dark-800
+
+  bibitem-full
+{% endblock %}
+
+{% block header_extras %}
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    md:row-span-2
+    overflow-hidden flex flex-col flex-nowrap
+  ">
+    <div class="p-4">
+      Viewing indexed reference.
+    </div>
+    {% if data.bibitem.docid %}
+      {% with docid=data.bibitem.docid|as_list|first %}
+        <a
+          href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
+          class="button bg-emerald-600 text-emerald-100">
+          Locate corresponding bibliographic&nbsp;item&nbsp;&rarr;</a>
+      {% endwith %}
+    {% endif %}
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <header class="p-4 sm:col-span-2 sm:row-span-2">
+    {% include "citation/bibitem_source.html" with sourced_item=data indexed=1 links="external" only %}
+  </header>
+
+  <div class="px-4 mb-4 row-span-4 text-sm">
+    <ul>
+      <li>
+        <a class="link" href="{% url "browse_dataset" data.source.id|cut:"relaton-data-" %}">
+          Entire index of {{ data.source.id }}
+        </a>
+      {% if data.indexed_object.external_url %}
+        <li>
+          <a class="link" href="{{ data.indexed_object.external_url }}">
+            ↗ HEAD revision of this item at the source
+          </a>
+      {% endif %}
+      {% if data.source.home_url %}
+        <li>
+          <a class="link" href="{{ data.source.home_url }}">
+            ↗ Source home page
+          </a>
+      {% endif %}
+      {% if data.source.issues_url %}
+        <li>
+          <a class="link" href="{{ data.source.issues_url }}?labels=bug&title=Problem+with+`{{ data.indexed_object.name|urlencode }}`:+">
+            ↗ File an issue about this data
+          </a>
+      {% endif %}
+    </ul>
+  </div>
+
+  {% if data.validation_errors %}
+    <div class="px-4 mb-4 row-span-4 text-sm">
+      <p class="font-semibold">There are validation errors:</p>
+      <p class="whitespace-pre-line font-light overflow-y-scroll">{% include "citation/validation_errors.html" with validation_errors=data.validation_errors in_page_links=1 %}</p>
+    </div>
+  {% endif %}
+
+  <div class="
+    col-span-2
+    row-[span_6_/_span_6]
+    overflow-visible
+    z-20
+
+    flex
+    flex-col
+    relative
+  ">
+    <div class="flex-grow relative">
+      {% include "citation/sourced_bibitem_raw_table.html" with bibitem=data.bibitem sourced_item=data show_docid_as_link=1 only %}
+    </div>
+  </div>
+{% endblock %}

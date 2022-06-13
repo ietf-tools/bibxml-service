@@ -18,11 +18,9 @@ from django.contrib import messages
 
 from pydantic import ValidationError
 
-from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
 from bib_models import serializers, BibliographicItem
-from doi import get_doi_ref
 
 from .models import RefData
 from .query import get_indexed_item, list_refs
@@ -230,39 +228,50 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
 # ================
 
 def browse_external_reference(request, dataset_id):
-    """Allows to view a reference from
-    ``dataset_id`` (must be a registered :term:`external source`).
+    """Allows to view a bibliographic item
+    from registered :term:`external source` ``dataset_id``
+    by reference passed in request’s GET query parameter ``ref``.
     """
     ref = request.GET.get('ref')
 
     if ref:
-        if dataset_id not in external_sources.registry:
-            return HttpResponseBadRequest(
-                "Unknown external source %s" % dataset_id)
-
-        source = external_sources.registry[dataset_id]
-
-        try:
-            _data = source.get_item(ref.strip()).dict()
-            data = unpack_dataclasses(_data)
-        except RuntimeError as exc:
-            log.exception(
-                "Failed to retrieve or unpack "
-                "external bibliographic item %s from %s",
-                ref,
+        if source := external_sources.registry.get(dataset_id, None):
+            try:
+                # external_item = source.get_item(ref.strip())
+                _data = source.get_item(ref.strip()).dict()
+                data = unpack_dataclasses(_data)
+            except RuntimeError as exc:
+                log.exception(
+                    "Failed to retrieve or unpack "
+                    "external bibliographic item %s from %s",
+                    ref,
+                    dataset_id)
+                messages.error(
+                    request,
+                    "Couldn’t retrieve citation: {}".format(
+                        str(exc)))
+            else:
+                composed = {
+                    **data['bibitem'],
+                    'primary_docid': ref.strip(),
+                    'sources': {
+                        dataset_id: data,
+                    },
+                }
+                return render(request, 'browse/citation_details.html', dict(
+                    dataset_id=dataset_id,
+                    ref=ref,
+                    available_serialization_formats=serializers.registry.keys(),
+                    data=composed,
+                    **shared_context,
+                ))
+        else:
+            log.warn(
+                "Unknown external source requested: %s",
                 dataset_id)
             messages.error(
                 request,
-                "Couldn’t retrieve citation: {}".format(
-                    str(exc)))
-        else:
-            return render(request, 'browse/citation_details.html', dict(
-                dataset_id=dataset_id,
-                ref=ref,
-                available_serialization_formats=serializers.registry.keys(),
-                data={**data['bibitem'], 'sources': {dataset_id: data}},
-                **shared_context,
-            ))
+                "Unknown external source “%s”" % dataset_id)
     else:
         messages.error(
             request,
@@ -276,11 +285,15 @@ def browse_external_reference(request, dataset_id):
 # ===================================
 
 def browse_indexed_reference(request, dataset_id, ref):
+    """Allows to view an bibliographic item
+    from registered :term:`indexed source` ``dataset_id``
+    by reference ``ref``.
+    """
     parsed_ref = unquote_plus(ref)
 
     try:
-        data = unpack_dataclasses(get_indexed_item(
-            dataset_id,
+        indexed_bibitem = unpack_dataclasses(get_indexed_item(
+            dataset_id.removeprefix('relaton-data-'),
             parsed_ref,
             strict=False,
         ).dict())
@@ -294,10 +307,10 @@ def browse_indexed_reference(request, dataset_id, ref):
                 dataset_id))
 
     else:
-        return render(request, 'browse/citation_details.html', dict(
+        return render(request, 'browse/indexed_bibitem_details.html', dict(
             dataset_id=dataset_id,
             ref=ref,
-            data={**data['bibitem'], 'sources': {dataset_id: data}},
+            data=indexed_bibitem,
             available_serialization_formats=serializers.registry.keys(),
             **shared_context,
         ))

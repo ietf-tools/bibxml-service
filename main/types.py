@@ -6,6 +6,8 @@ import datetime
 from pydantic.dataclasses import dataclass
 from pydantic import BaseModel
 
+from common.pydantic import ValidationErrorDict
+
 from bib_models import BibliographicItem
 
 
@@ -81,8 +83,12 @@ class SourcedBibliographicItem(BaseModel):
     """
 
     bibitem: BibliographicItem
+    """Bibliographic data."""
 
-    validation_errors: Optional[List[str]] = None
+    validation_errors: Optional[List[ValidationErrorDict]] = None
+    """Validation errors that occurred
+    while deserializing ``bibitem``’s data.
+    """
 
     details: Optional[str] = None
     """Extra details about this sourcing, human-readable."""
@@ -120,7 +126,7 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     .. seealso::
 
        - :mod:`bib_models.merger`
-       - :func:`main.query_utils.merge_refs`
+       - :func:`main.query_utils.compose_bibitem`
     """
 
     sources: Mapping[str, SourcedBibliographicItem]

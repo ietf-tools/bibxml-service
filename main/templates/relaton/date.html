@@ -1,4 +1,4 @@
-{% if val.type %}
-  <small class="text-xs opacity-50">{{ val.type }}</small>
-{% endif %}
+<span class="opacity-50">
+  {{ val.type|default:"date" }}
+</span>
 {{ val.value }}

@@ -1,5 +1,11 @@
 <span class="{{ htmlclass }}">
+  {% if repo_url %}
+    v<a href="{{ repo_url }}">{{ snapshot }}</a>
+  {% else %}
+    v{{ snapshot }}
+  {% endif %}
+  &ensp;•&ensp;
   <a href="{% url "about" %}">About</a>
   &ensp;•&ensp;
-  <a href="{% url "api_index" %}">API reference</a>
+  <a href="{% url "api_index" %}">API</a>
 </span>

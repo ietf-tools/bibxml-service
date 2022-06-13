@@ -8,15 +8,19 @@
       {% include "_side_block_classes.html" %}
       md:row-span-2
       leading-tight
-      flex flex-col bg-sky-600 text-sky-100
+      flex flex-col
+      bg-sky-600 text-sky-100
+      py-4
     "
   >
-    <div class="p-4">
-      Results
-      <span class="whitespace-nowrap">for {{ query_format_label|default:"N/A" }}</span>
+    <div class="px-4">
+      Search results
+      {% if query_format_label %}
+        <span class="whitespace-nowrap">for {{ query_format_label }}:</span>
+      {% endif %}
     </div>
     <pre class="
-      p-2 m-2 bg-sky-700 grow text-sm font-bold whitespace-pre-wrap overflow-y-auto
+      px-4 mt-2 grow text-sm font-bold whitespace-pre-wrap overflow-y-auto
       {% if query|length > 30 %}
         !text-xs
       {% endif %}

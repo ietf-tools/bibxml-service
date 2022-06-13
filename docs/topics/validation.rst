@@ -44,7 +44,9 @@ instead of appropriate datetime objects.
    Some functions that use ``strict``:
 
    - :func:`main.query.build_citation_for_docid`
-   - :func:`main.query.get_indexed_item`
-   - :func:`main.query_utils.merge_refs`
-   - :func:`datatracker.internet_drafts.get_internet_draft`
-   - :func:`doi.get_doi_ref`
+   - :func:`bib_models.util.construct_bibitem`, with callers:
+
+     - :func:`main.query.get_indexed_item`
+     - :func:`main.query_utils.compose_bibitem`
+     - :func:`datatracker.internet_drafts.get_internet_draft`
+     - :func:`doi.get_doi_ref`

@@ -1,25 +1,34 @@
-{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only #}
+{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only, inline, comma_sep #}
 
 <div class="
-  deflist-entry
-  {% if expandable %}deflist-entry-expandable{% endif %}
-  {% if wide %}deflist-entry-wide{% endif %}
-  {% if break_row %}md:col-start-1{% endif %}
   {{ htmlclass }}
 ">
-  <dt class="{% if key_sr_only %}sr-only{% endif %}">
-    {{ key|default:"N/A" }}{% if idx %}&nbsp;({{ idx }}){% endif %}:
+  <dt class="{% if key_sr_only %}sr-only{% endif %} opacity-50">
+    {{ key|default:"N/A" }}{% if idx %}&nbsp;({{ idx }}){% endif %}
   </dt>
   <dd class="" title="{% if key_sr_only %}{{ key }}{% endif %} {{ items|length }} item(s)">
-    <ul class="val {% if inline %}flex flex-row flex-wrap items-center gap-x-2{% endif %}">
+    <ul class="
+      val
+      {% if inline %}
+        flex flex-row flex-wrap
+        {% if inline == "nowrap" %}sm:flex-nowrap sm:overflow-x-auto {% endif %}
+        items-center gap-x-2
+      {% endif %}
+    ">
       {% for val in items %}
-        <li title="Item #{{ forloop.counter }}{% if not tmpl %}: {{ val }}{% endif %}">
+        <li
+          title="{{ val|pprint|truncatewords:10 }}"
+          class="
+            {% if inline and comma_sep %}flex after:inline after:content-[',_'] last:after:content-none{% endif %}
+            {% if inline == "nowrap" %}whitespace-nowrap{% endif %}
+          "
+        >
           {% if tmpl %}
             {% include tmpl with key="item "|add:forloop.counter key_sr_only=True val=val %}
           {% else %}
             {{ val|default:"—" }}
           {% endif %}
-        </li>
+       </li>
       {% endfor %}
     </ul>
   </dd>

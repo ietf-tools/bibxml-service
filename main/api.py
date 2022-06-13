@@ -112,13 +112,10 @@ def get_by_docid(request):
 
     try:
         try:
-            composite_bibitem = build_citation_for_docid(
+            bibitem: BibliographicItem = build_citation_for_docid(
                 docid.strip(),
                 doctype.strip() if doctype else None,
                 strict=True)
-
-            # This will be the latest sourced item.
-            bibitem = list(composite_bibitem.sources.values())[0].bibitem
 
         except RefNotFoundError:
             if doctype is not None:

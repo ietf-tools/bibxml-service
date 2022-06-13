@@ -1,9 +1,12 @@
-{% load relaton %}
+{% load common %}
 
-{% with rel_type=val.description.content|default:val.type %}
-  {% if rel_type %}
-    <small class="text-xs opacity-50">{{ rel_type }}</small>
-  {% endif %}
+{% with rel_type=val.description.content %}
+  <span class="opacity-50">
+    {{ val.type|split_camel_case|join:" " }}
+    {% if rel_type %}
+      <span>({{ rel_type }})</span>
+    {% endif %}
+  </span>
 {% endwith %}
 
 {% with formattedref_content=val.bibitem.formattedref.content formattedref=val.bibitem.formattedref rel_docid=val.bibitem.docid|as_list|first rel_title=val.bibitem.title|as_list|first %}

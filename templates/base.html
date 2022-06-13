@@ -36,7 +36,7 @@
   <body class="
       font-sans
       bg-dark-300
-      !bg-gradient-to-bl from-dark-100 to-dark-400
+      !bg-gradient-to-bl from-dark-200 to-dark-400
       text-dark-600
       dark:bg-dark-600
       dark:from-dark-500 dark:to-dark-700
@@ -73,16 +73,11 @@
           </a>
         </h1>
         <div class="text-xs whitespace-nowrap">
-          {% if repo_url %}
-            v<a href="{{ repo_url }}">{{ snapshot }}</a>
-          {% else %}
-            v{{ snapshot }}
-          {% endif %}
+          {% include "_datatracker_user_link.html" %}
         </div>
       </header>
 
       {% block header_extras %}
-        {% include "_datatracker_user_block.html" %}
       {% endblock %}
 
       <main class="
@@ -130,6 +125,8 @@
         py-3 px-4
         md:bottom-0 md:left-0 md:absolute
         text-xs
+        tracking-tight
+        leading-tight
         muted-text
       ">
         {% block footer_content %}
