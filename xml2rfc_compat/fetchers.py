@@ -64,7 +64,7 @@ def internet_drafts(ref: str) -> BibliographicItem:
     """Returns either latest indexed version,
     or latest version at Datatracker if it’s newer.
 
-    .. note:: Datatracker structures may contain less data than indexed sources.
+    .. note:: Datatracker may provide less data than indexed sources.
 
     Paths should work as follows:
 
