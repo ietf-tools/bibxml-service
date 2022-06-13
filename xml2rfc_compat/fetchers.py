@@ -7,7 +7,7 @@ via :func:`.urls.get_urls()`.
 """
 
 import logging
-from typing import cast, Optional, Match
+from typing import Optional
 import re
 
 from pydantic import ValidationError
