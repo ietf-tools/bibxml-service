@@ -104,9 +104,15 @@ def internet_drafts(ref: str) -> BibliographicItem:
     if requested_version:
         docid_variants = [f'draft-{unversioned_ref}-{requested_version}']
     else:
-        docid_variants = [f'draft-{unversioned_ref}']
+        # We don’t want unversioned Relaton resources for Internet Drafts here;
+        # if version was not requested, we are assumed to get the latest one
+        # instead of ending up with a <referencegroup>
+        # (tools wouldn’t expect it).
+        # Request all versioned identifiers here
+        # and let the sorting later put latest version first:
+        docid_variants = [f'draft-{unversioned_ref}-' r'[\d+]']
     id_query = ' || '.join([
-        '@.id == "%s"' % variant
+        '@.id like_regex "%s"' % re.escape(variant)
         for variant in docid_variants
     ])
     results = sorted(
