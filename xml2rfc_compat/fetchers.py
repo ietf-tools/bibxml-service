@@ -22,7 +22,7 @@ from main.models import RefData
 from main.query import search_refs_relaton_field
 from main.exceptions import RefNotFoundError
 
-from .urls import register_fetcher
+from .resolvers import register_fetcher, register_anchor_formatter
 
 
 log = logging.getLogger(__name__)
@@ -57,6 +57,15 @@ def misc(ref: str) -> BibliographicItem:
         return BibliographicItem(**results[0].body)
     else:
         raise RefNotFoundError()
+
+
+@register_anchor_formatter('bibxml3')
+def format_internet_draft_anchor(
+    ref: str,
+    item: Optional[BibliographicItem] = None,
+) -> str:
+    """Just return the anchor from requested path in URL."""
+    return ref
 
 
 @register_fetcher('bibxml3')

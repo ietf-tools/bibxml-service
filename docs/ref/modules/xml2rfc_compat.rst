@@ -21,15 +21,29 @@ URL patterns
 .. automodule:: xml2rfc_compat.urls
    :members:
 
-Management views
-================
+Fetcher and formatter registry
+==============================
+
+.. automodule:: xml2rfc_compat.resolvers
+   :members:
+   :undoc-members:
+
+xml2rfc API views
+=================
 
 .. automodule:: xml2rfc_compat.views
    :members:
    :show-inheritance:
 
-Fetcher functions
-=================
+Management views
+================
+
+.. automodule:: xml2rfc_compat.management_views
+   :members:
+   :show-inheritance:
+
+Fetchers and anchor formatters for xml2rfc directories
+======================================================
 
 .. automodule:: xml2rfc_compat.fetchers
    :members:

@@ -3,12 +3,22 @@ from django.db import models
 
 
 dir_subpath_regex = (
-    r'(?P<xml2rfc_subpath>%s/'
+    r'(?P<xml2rfc_subpath>'
+    r'(?P<dirname>%s)/'
     r'_?reference\.(?P<anchor>[-A-Za-z0-9./_]+)\.xml'
     r')$'
 )
-"""Regular expression for an :term:`xml2rfc-style path`,
-excluding :data:`bibxml.settings.XML2RFC_PATH_PREFIX`."""
+"""Django’s URL path regular expression
+for an :term:`xml2rfc-style path`,
+excluding :data:`bibxml.settings.XML2RFC_PATH_PREFIX`.
+
+Provides the following components to view functions:
+
+- ``xml2rfc_subpath``: the whole subpath after the prefix.
+- ``dirname``: dirname only, e.g. bibxml3 or bibxml-ids.
+- ``anchor``: the part after ``reference.`` prefix
+  and before file extension.
+"""
 
 
 def get_dir_subpath_regex(dirname: str):
@@ -48,7 +58,7 @@ class ManualPathMap(models.Model):
     """Manually maps an xml2rfc path to a bibliographic item,
     overriding any automatic resolution.
 
-    .. seealso:: :func:`xml2rfc_compat.urls.resolve_manual_map()`
+    .. seealso:: :func:`xml2rfc_compat.views.resolve_manual_map()`
     """
 
     xml2rfc_subpath = models.CharField(

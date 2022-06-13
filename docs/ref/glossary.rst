@@ -91,7 +91,7 @@ Glossary
    xml2rfc fetcher function
    xml2rfc fetcher
       A function registered and associated with a top-level xml2rfc subpath
-      via :func:`xml2rfc_compat.urls.register_fetcher`.
+      via :func:`xml2rfc_compat.resolvers.register_fetcher`.
 
       Fetcher function is passed the ``anchor`` argument as a string,
       for which it must return
@@ -100,3 +100,12 @@ Glossary
       or :class:`pydantic.ValidationError`.
 
       .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`
+
+   anchor formatter function
+      A function that can be optionally registered for a top-level xml2rfc subpath
+      via :func:`xml2rfc_compat.resolvers.register_anchor_formatter`.
+
+      If provided for given xml2rfc directory, it will be called when formatting
+      the anchor attribute in resulting XML.
+
+      (Has no effect if an anchor is given in GET query.)

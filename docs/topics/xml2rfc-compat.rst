@@ -28,8 +28,7 @@ xml2rfc tool compatibility tries to achieve the following goals:
 BibXML format support
 =====================
 
-Output format support is implemented
-via a custom ``BibliographicItem`` :mod:`~xml2rfc_compat.serializer`.
+Output format support is implemented via :mod:`~xml2rfc_compat.serializer`.
 
 .. _xml2rfc-path-resolution-algorithm:
 
@@ -56,7 +55,12 @@ Each path is handled the following way:
    Only a path for which an :term:`xml2rfc fetcher` is registered will be handled,
    even though that fetcher function is not necessarily called.
 
-.. seealso:: :func:`xml2rfc_compat.urls.make_xml2rfc_path_pattern()`
+.. note::
+
+   The anchor in resulting XML is overridden using a :term:`anchor formatter function`,
+   if one is registered. Anchor in GET query takes precedence.
+
+.. seealso:: :func:`xml2rfc_compat.views.handle_xml2rfc_path()`
 
 Manual mapping
 --------------
@@ -68,17 +72,17 @@ A map associates given xml2rfc path with a :term:`docid.id`.
 When that path is requested, this service looks up that identifier
 in :term:`bibliographic data sources <bibliographic data source>`.
 
-.. seealso:: :func:`xml2rfc_compat.urls.resolve_manual_map()`
+.. seealso:: :func:`xml2rfc_compat.views.resolve_manual_map()`
 
 Fetcher functions
 -----------------
 
 :term:`Fetcher functions <xml2rfc fetcher>` are associated with subdirectories
-(e.g., ``bibxml9``) via :func:`xml2rfc_compat.urls.register_fetcher`.
+(e.g., ``bibxml9``) via :func:`xml2rfc_compat.resolvers.register_fetcher`.
 
 Fetcher functions are currently defined in :mod:`xml2rfc_compat.fetchers`.
 
-.. seealso:: :func:`xml2rfc_compat.urls.resolve_automatically()`
+.. seealso:: :func:`xml2rfc_compat.views.resolve_automatically()`
 
 Fallback
 --------
@@ -94,7 +98,7 @@ storing path and associated XML data in the DB without further validation.
 The ``anchor`` property in obtained fallback XML
 is replaced with effective anchor at during request.
 
-.. seealso:: :func:`xml2rfc_compat.urls.obtain_fallback_xml()`
+.. seealso:: :func:`xml2rfc_compat.views.obtain_fallback_xml()`
 
 Tracked metrics
 ---------------
