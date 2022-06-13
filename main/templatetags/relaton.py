@@ -67,7 +67,6 @@ def bibitem_link(value: Any):
         return None
 
 
-
 @register.filter
 def substruct_search_link(value: Any, query: str):
     """
