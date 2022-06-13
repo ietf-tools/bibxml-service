@@ -49,6 +49,10 @@ def get(id: str) -> ExternalSource:
 
 
 def register_for_types(id: str, doc_types: Dict[str, bool]):
+    """
+    Registers external source with given ID for specified document types
+    (``docid.type`` values in Relaton model).
+    """
     def applies_to(docid: DocID) -> bool:
         return doc_types.get(docid.type, None) is not None
 
