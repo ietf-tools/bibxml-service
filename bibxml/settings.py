@@ -332,8 +332,20 @@ DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '').strip()
 
 DATATRACKER_REDIRECT_URI = environ.get(
     "DATATRACKER_REDIRECT_URI",
+    # TODO: Might want to hard-code hostname as well
     f"https://{HOSTNAME or '(hostname at runtime)'}/"
     "datatracker-auth/callback/")
+"""Redirect URI configured on Datatracker side.
+
+.. note::
+
+   This value is supposed to be manually kept in sync
+   with the one configured on IETF/Datatracker auth side.
+   It is used to sanity-check Datatracker auth configuration
+   by comparing it against the corresponding reversed Django URL pattern,
+   if they differ then Datatracker OIDC is assumed to be misconfigured
+   since Datatracker’s redirect would not be handled by this service.
+"""
 
 
 # Custom
