@@ -208,8 +208,8 @@ def internet_drafts(ref: str) -> BibliographicItem:
                 "indexed sources have version %s, "
                 "returning Datatracker’s version %s. ",
                 requested_version,
-                dt_version,
-                indexed_version)
+                indexed_version,
+                dt_version)
             return dt_bibitem
 
     if indexed_bibitem and any([
