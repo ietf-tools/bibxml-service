@@ -36,18 +36,18 @@ via a custom ``BibliographicItem`` :mod:`~xml2rfc_compat.serializer`.
 xml2rfc-style path resolution algorithm
 =======================================
 
-Root URL configuration includes xml2rfc-style paths via 
+Root URL configuration includes xml2rfc-style paths via
 :func:`xml2rfc_compat.urls.get_urls()`.
 Each path is handled the following way:
 
 1. A manual mapping is looked up for requested path.
    If found, bibliographic item with mapped docid
    is attempted to be retrieved and returned as XML.
-   
+
 2. If the above fails, the path is passed to registered fetcher function,
    which parses the anchor, performs necessary DB queries and is expected
    to return a ``BibliographicItem``.
-   
+
 3. If no bibliographic item can be located, URL handler falls back
    to pre-indexed xml2rfc web server data.
 

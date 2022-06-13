@@ -14,7 +14,7 @@ Glossary
        - More than one source can provide data for the bibliographic items
          with the same :term:`document identifier`.
        - One source can provide bibliographic items of more than one document type.
-       
+
        Can either be an :term:`indexable source` or an :term:`external source`.
 
    indexable source
