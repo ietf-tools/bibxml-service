@@ -1,5 +1,4 @@
 {% if datatracker_oauth_enabled %}
-{% else %}
   {% if datatracker_user %}
     <span class="truncate">
       <a class="font-semibold" href="{% url "datatracker_oauth_logout" %}">Log&nbsp;out</a>
