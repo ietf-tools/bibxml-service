@@ -5,7 +5,7 @@ from pydantic import ValidationError
 
 from common.pydantic import ValidationErrorDict
 
-from . import BibliographicItem
+from relaton.models.bibdata import BibliographicItem
 
 
 log = logging.getLogger(__name__)
