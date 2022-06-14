@@ -17,7 +17,7 @@
   xl:text-base
 ">
   <dl>
-    <dt class="opacity-50 inline">Bib. data sources</span>
+    <dt class="opacity-50 inline">bib. source{{ bibitem.sources.values|pluralize }}</span>
     <dd class="inline">{% include "citation/sources.html" with items=bibitem.sources.values %}</dd>
     {% if bibitem.copyright %}
       {% include "deflist/entry_list.html" with key="Copyrights" key_sr_only=1 expandable=1 items=bibitem.copyright|as_list tmpl="relaton/copyright.html" %}
