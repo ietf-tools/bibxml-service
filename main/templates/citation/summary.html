@@ -114,7 +114,7 @@
         "
         id="{{ sourced_item.source.id }}"
       >
-        {% include "citation/bibitem_source.html" with sourced_item=sourced_item indexed=sourced_item.indexed_object show_internal_links=1 show_error_icon=1 htmlclass="sm:bg-dark-300 sm:dark:bg-dark-900 px-2 sm:px-4 sm:py-1 rounded-tl-lg" %}
+        {% include "citation/bibitem_source.html" with sourced_item=sourced_item indexed=sourced_item.indexed_object show_internal_links=1 show_error_icon=1 htmlclass="sm:bg-dark-300 sm:dark:bg-dark-900 px-2 sm:px-4 sm:py-1" %}
       </h4>
       {% include "citation/sourced_bibitem_raw_table.html" with bibitem=sourced_item.bibitem sourced_item=sourced_item only %}
     {% endfor %}
