@@ -414,7 +414,7 @@ Settings following below define how the service obtains Git repository
 URL and branch corresponding to those datasets at indexing stage.
 """
 
-DEFAULT_DATASET_REPO_URL_TEMPLATE = "https://github.com/ietf-ribose/relaton-data-{dataset_id}"
+DEFAULT_DATASET_REPO_URL_TEMPLATE = "https://github.com/ietf-tools/relaton-data-{dataset_id}"
 """Used to obtain default Git repository URL for a Relaton source,
 if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
 
@@ -434,7 +434,7 @@ if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
 DATASET_SOURCE_OVERRIDES = {
     'ieee': {
         'relaton_data': {
-            'repo_url': 'https://github.com/ietf-ribose/relaton-data-ieee',
+            'repo_url': 'https://github.com/ietf-tools/relaton-data-ieee',
         },
     },
 }

@@ -71,7 +71,7 @@ RFP requirement compliance
    The service does not currently expose data using rsync,
    but source data used by the service is available
    via repositories named after ``relaton-data-*`` pattern
-   within https://github.com/ietf-ribose/.
+   within https://github.com/ietf-tools/.
 
    .. seealso:: :mod:`main.sources` for Relaton source implementation
 
@@ -160,7 +160,8 @@ RFP requirement compliance
        Development must use a public github repository under the IETF Tools Organisation
 
    The service and associated data source and infrastructure repositories
-   are hosted under https://github.com/ietf-ribose/.
+   are hosted under https://github.com/ietf-ribose/
+   (being migrated under https://github.com/ietf-tools/).
 
 .. rfp:req::
    :id: 9

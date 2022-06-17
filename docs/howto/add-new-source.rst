@@ -6,15 +6,15 @@ New Relaton source
 ==================
 
 For a Relaton source that conforms to the same layout
-as existing ``ietf-ribose/relaton-data-*``/``ietf-ribose/bibxml-data-*``
+as existing ``ietf-tools/relaton-data-*``/``ietf-tools/bibxml-data-*``
 repositories on GitHub, it should be sufficient to add
 new source ID under :data:`bibxml.settings.RELATON_DATASETS`.
 
 New source ID must not clash with any of the other IDs
 of an internal or external source,
 and requires that both repositories
-``ietf-ribose/relaton-data-<your source ID>``
-and ``ietf-ribose/bibxml-data-<your source ID>``
+``ietf-tools/relaton-data-<your source ID>``
+and ``ietf-tools/bibxml-data-<your source ID>``
 exist and use the exact same layout as the preexisting data repositories.
 
 Other sources
