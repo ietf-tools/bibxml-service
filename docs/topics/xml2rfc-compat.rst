@@ -65,12 +65,20 @@ Each path is handled the following way:
 Manual mapping
 --------------
 
-Manual maps are stored in the DB as :class:`xml2rfc_compat.models.ManualPathMap`
-instances. The management GUI provides an utility for managing these mappings.
-
-A map associates given xml2rfc path with a :term:`docid.id`.
+A map associates given xml2rfc path with a :term:`primary document identifier`.
 When that path is requested, this service looks up that identifier
 in :term:`bibliographic data sources <bibliographic data source>`.
+
+Manual mappings are obtained
+from :term:`xml2rfc sidecar metadata files <xml2rfc sidecar metadata file>`,
+provided within the :term:`xml2rfc archive source`
+and named after the preexisting XML files in it.
+
+During indexing, this data is stored in DB
+as part of the relevant :class:`xml2rfc_compat.models.Xml2rfcItem`
+instance.
+
+The management GUI may provide a utility for exploring manual mappings.
 
 .. seealso:: :func:`xml2rfc_compat.views.resolve_manual_map()`
 
@@ -90,7 +98,7 @@ Fallback
 If manual map is not present or failed, and fetcher function failed,
 fallback document is attempted to be used.
 
-Fallback data is provided via :mod:`xml2rfc source <xml2rfc_compat.source>`,
+Fallback data is provided via the :term:`xml2rfc archive source`,
 *which has to be indexed* in order for fallback to work.
 The source consumer the hard-coded xml2rfc mirror Git repository,
 storing path and associated XML data in the DB without further validation.

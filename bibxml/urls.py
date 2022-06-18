@@ -132,18 +132,6 @@ urlpatterns = [
                     template_name='management/xml2rfc.html',
                 )
             ))), name='manage_xml2rfc'),
-            path('import-map/', require_POST(auth.basic(
-                xml2rfc_views.import_manual_map,
-            )), name='manage_xml2rfc_import_manual_map'),
-            path('export-map/', require_safe(auth.basic(
-                xml2rfc_views.export_manual_map,
-            )), name='manage_xml2rfc_export_manual_map'),
-            path('edit-manual-map/<path:subpath>/', require_POST(auth.basic(
-                xml2rfc_views.edit_manual_map,
-            )), name='manage_xml2rfc_directory_map_path'),
-            path('delete-manual-map/<path:subpath>/', require_POST(auth.basic(
-                xml2rfc_views.delete_manual_map,
-            )), name='manage_xml2rfc_directory_unmap_path'),
             path('<path:subpath>/', require_safe(auth.basic(never_cache(
                 xml2rfc_views.ExploreDirectory.as_view(
                     template_name='management/xml2rfc_directory.html',

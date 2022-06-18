@@ -3,31 +3,28 @@ and checking xml2rfc path resolution.
 
 Intended to be exposed via private management GUI
 and assigned custom templates.
-(This module does not supply any templates of its own.)
 """
 
 from typing import Dict, List, Union, Tuple, Any, Optional
 from dataclasses import dataclass
-from pydantic import BaseModel, ValidationError
 import time
 import logging
 import json
 import simplejson
 
 from django.views.generic import TemplateView
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.http import JsonResponse, Http404, HttpResponseBadRequest
-from django.db import transaction
 from django.db.models.query import QuerySet
 from django.conf import settings
 from django.core.cache import cache
-from django.contrib import messages
 
 from sources import indexable
 from bib_models import BibliographicItem
 
 from .aliases import get_aliases
-from .models import ManualPathMap, Xml2rfcItem
+from .models import Xml2rfcItem
+from .models import get_mapped_xml2rfc_items, get_xml2rfc_items_for_dir
 from .resolvers import fetcher_registry
 from .views import resolve_manual_map, resolve_automatically
 
@@ -51,18 +48,15 @@ class DirectoryOverview(TemplateView):
         for subpath in Xml2rfcItem.objects.values_list('subpath', flat=True):
             dirname: str = subpath.split('/')[0]
             if dirname not in available_paths:
-                prefix = f'{dirname}/'
                 fetcher = fetcher_registry.get(dirname)
                 if fetcher:
                     available_paths[dirname] = Xml2rfcDirectoryMeta(
                         name=dirname,
                         aliases=get_aliases(dirname),
-                        total_count=Xml2rfcItem.objects.
-                        filter(subpath__startswith=prefix).
-                        count(),
-                        manually_mapped_count=ManualPathMap.objects.
-                        filter(xml2rfc_subpath__startswith=prefix).
-                        count(),
+                        total_count=get_xml2rfc_items_for_dir(dirname).count(),
+                        manually_mapped_count=(
+                            get_mapped_xml2rfc_items(dirname).
+                            count()),
                         fetcher_name=f'{fetcher.__module__}.{fetcher.__name__}'
                         if fetcher else None,
                     )
@@ -204,8 +198,8 @@ class ExploreDirectory(TemplateView):
         else:
             indexed_count = indexable.registry['xml2rfc'].count_indexed()
             mapped_paths = frozenset([
-                f'{m.xml2rfc_subpath}:{m.docid}'
-                for m in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
+                f"{m.subpath}:{m.sidecar_meta['primary_docid']}"
+                for m in get_mapped_xml2rfc_items().order_by('subpath')
             ])
             return json.dumps({
                 'total_indexed': indexed_count,
@@ -251,127 +245,3 @@ class ExploreDirectory(TemplateView):
             ).order_by('subpath'),
             self.item_list_cache_seconds)
         return result
-
-
-def edit_manual_map(request, subpath):
-    docid = request.POST.get('docid')
-    if docid:
-        ManualPathMap.objects.update_or_create(
-            xml2rfc_subpath=subpath,
-            defaults=dict(
-                docid=docid,
-            ),
-        )
-    else:
-        messages.error(
-            request,
-            "Cannot map <code class=\"font-monospace\">%s</code>: "
-            "document identifier was not specified"
-            % subpath)
-
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))
-
-
-def delete_manual_map(request, subpath):
-    try:
-        ManualPathMap.objects.get(
-            xml2rfc_subpath=subpath,
-        ).delete()
-    except ManualPathMap.DoesNotExist:
-        messages.info(
-            request,
-            "No manual map was found "
-            "for <code class=\"font-monospace\">%s</code>, "
-            "so no action was performed."
-            % subpath)
-
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))
-
-
-class SerializedPathMap(BaseModel):
-    """
-    Representation of :class:`xml2rfc_compat.models.ManualPathMap`
-    for mappings exported to JSON.
-    """
-
-    path: str
-    """xml2rfc subpath, relative to ``/public/rfc/`` root.
-
-    It **must** contain unaliased directory name first,
-    such as ``bibxml2``."""
-
-    docid: str
-    """``docid.id`` mapped to given path."""
-
-
-def export_manual_map(request):
-    mappings = [
-        dict(path=i.xml2rfc_subpath, docid=i.docid)
-        for i in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
-    ]
-    return JsonResponse(
-        {'mappings': mappings},
-        headers={
-            'Content-Disposition':
-                'attachment; filename=bibxml-service-xml2rfc-path-map.json',
-        },
-        json_dumps_params=dict(indent=4))
-
-
-def import_manual_map(request):
-    """
-    Handles upload of a JSON file with manual mappings.
-    JSON file must contain a list of :class:`.SerializedPathMap` items.
-    """
-    json_file = request.FILES.get('map_json', None)
-
-    if json_file:
-        try:
-            data = simplejson.loads(json_file.read())
-            mappings = (
-                SerializedPathMap.parse_obj(item)
-                for item in data['mappings']
-            )
-        except (simplejson.JSONDecodeError, KeyError):
-            messages.error(
-                request,
-                "Error decoding xml2rfc map JSON")
-        except ValidationError:
-            messages.error(
-                request,
-                "xml2rfc map contains invalid data")
-        except RuntimeError:
-            messages.error(
-                request,
-                "Unknown error reading the uploaded xml2rfc map")
-            log.exception("Error reading imported xml2rfc map")
-
-        else:
-            clear = request.POST.get('clear', False)
-
-            total_read = 0
-            with transaction.atomic():
-                if clear:
-                    ManualPathMap.objects.all().delete()
-                    for item in mappings:
-                        ManualPathMap.objects.update_or_create(
-                            xml2rfc_subpath=item.path,
-                            defaults=dict(docid=item.docid),
-                        )
-                        total_read += 1
-                else:
-                    for item in mappings:
-                        ManualPathMap.objects.get_or_create(
-                            xml2rfc_subpath=item.path,
-                            defaults=dict(docid=item.docid),
-                        )
-                        total_read += 1
-            messages.success(
-                request,
-                f"Created or updated {total_read} xml2rfc path mappings")
-    else:
-        messages.error(
-            request,
-            "Did not receive a file to load xml2rfc map from")
-
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))

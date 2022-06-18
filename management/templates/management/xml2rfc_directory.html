@@ -50,38 +50,7 @@
       </h3>
 
       <div class="mb-2 md:flex flex-row items-center space-x-2 flex-nowrap">
-        <form
-          method="POST"
-          action="{% url "manage_xml2rfc_directory_map_path" selected_item.subpath %}"
-          id="editManualMapForm"
-          class="flex flex-row"
-        >
-          {% csrf_token %}
-          <input
-            type="text"
-            class="grow input-on-blue"
-            name="docid"
-            value="{{ selected_item_map.manual.config|default:"" }}"
-            placeholder="Enter docid.id…"
-          />
-          <button type="submit" class="button">
-            {% if selected_item_map.manual.config %}
-              Remap
-            {% else %}
-              Map
-            {% endif %}
-          </button>
-        </form>
-        <form
-          method="POST"
-          action="{% url "manage_xml2rfc_directory_unmap_path" selected_item.subpath %}"
-          id="deleteManualMapForm"
-        >
-          {% csrf_token %}
-          <button type="submit" class="button" title="Remove manual map & use automatic resolution">
-            Unmap
-          </button>
-        </form>
+        <!-- Could provide a link to edit/create Github sidecar file. -->
       </div>
 
       <div class="text-xs">

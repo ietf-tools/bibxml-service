@@ -61,9 +61,17 @@ Indexable source
 .. automodule:: xml2rfc_compat.source
    :members:
 
-Data models
-===========
+Data models (ORM)
+=================
 
 .. automodule:: xml2rfc_compat.models
    :show-inheritance:
    :members:
+
+Data models (dataclasses)
+=========================
+
+.. automodule:: xml2rfc_compat.types
+   :show-inheritance:
+   :members:
+   :exclude-members: __init__

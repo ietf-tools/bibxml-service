@@ -81,6 +81,37 @@ Glossary
           - :doc:`/topics/xml2rfc-compat` for overview
           - :data:`xml2rfc_compat.models.dir_subpath_regex` for the regular expression
 
+   xml2rfc archive source
+   xml2rfc mirror source
+      An :term:`indexable source` (living in a Git repository)
+      that contains two kinds of data:
+
+      - Original XML files as served by xml2rfc tools web server.
+
+        These files are supposed to be periodically overwritten using rsync
+        from rsync mirror.
+
+      - :term:`Optional “sidecar” YAML files <xml2rfc sidecar metadata file>`.
+
+      .. seealso:: :mod:`xml2rfc_compat.source`
+
+   xml2rfc sidecar metadata file
+      A YAML file named after an XML file existing in :term:`xml2rfc archive source`,
+      describing e.g. which bibliographic item it maps to.
+
+      Among other things, it can describe which :term:`document identifier`
+      the relevant XML file maps to, in order for the service to prefer an up-to-date
+      document if it exists
+      among available indexed :term:`bibliographic data sources <bibliographic data source>`.
+
+      These YAML files can be edited using external tooling or by hand,
+      and are not overwritten when xml2rfc archive source is automatically updated.
+
+      .. seealso::
+
+         - :attr:`xml2rfc_compat.models.Xml2rfcItem.sidecar_meta`
+         - :class:`xml2rfc_compat.types.Xml2rfcPathMetadata`
+
    xml2rfc anchor
       Part of the filename in an :term:`xml2rfc-style path`
       without “reference” or “_reference” prefix and file extension.

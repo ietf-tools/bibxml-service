@@ -12,7 +12,7 @@ from prometheus import metrics
 from main.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
-from .models import ManualPathMap, Xml2rfcItem
+from .models import Xml2rfcItem
 from .resolvers import FetcherFunc, fetcher_registry
 from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
 from .serializer import to_xml_string
@@ -35,33 +35,42 @@ def resolve_manual_map(subpath: str) -> Tuple[
     resolved_item: Optional[BibliographicItem]
     error: Optional[str]
     try:
-        manual_map = ManualPathMap.objects.get(xml2rfc_subpath=subpath)
-    except ManualPathMap.DoesNotExist:
+        manual_map = Xml2rfcItem.objects.get(subpath=subpath)
+    except Xml2rfcItem.DoesNotExist:
         mapped_docid = None
         resolved_item = None
         error = "not found"
     else:
-        mapped_docid = manual_map.docid
-        try:
-            resolved_item = build_citation_for_docid(cast(str, mapped_docid))
-        except ValidationError:
-            log.exception(
-                "Unable to validate item manually mapped to xml2rfc path %s "
-                "via docid %s",
-                subpath,
-                mapped_docid)
-            error = "validation problem"
+        mapped_docid = (
+            (manual_map.sidecar_meta or {}).
+            get('primary_docid', None))
+
+        if mapped_docid is None:
             resolved_item = None
-        except RefNotFoundError:
-            log.exception(
-                "Unable to resolve an item for xml2rfc path %s, "
-                "despite it being manually mapped via docid %s",
-                subpath,
-                mapped_docid)
-            error = "not found"
-            resolved_item = None
+            error = "not mapped"
         else:
-            error = None
+            try:
+                resolved_item = build_citation_for_docid(
+                    cast(str, mapped_docid))
+            except ValidationError:
+                log.exception(
+                    "Unable to validate item "
+                    "manually mapped to xml2rfc path %s "
+                    "via docid %s",
+                    subpath,
+                    mapped_docid)
+                error = "validation problem"
+                resolved_item = None
+            except RefNotFoundError:
+                log.exception(
+                    "Unable to resolve an item for xml2rfc path %s, "
+                    "despite it being manually mapped via docid %s",
+                    subpath,
+                    mapped_docid)
+                error = "not found"
+                resolved_item = None
+            else:
+                error = None
 
     return mapped_docid, resolved_item, error
 
