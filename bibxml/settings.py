@@ -462,6 +462,7 @@ XML2RFC_COMPAT_DIR_ALIASES = {
     'bibxml7': ['bibxml-doi'],
     'bibxml8': ['bibxml-iana'],
     'bibxml9': ['bibxml-rfcsubseries'],
+    'bibxml-nist': [],
 }
 """Maps dirname to a list of aliases to reflect
 IETF xml2rfc web server behavior.
