@@ -8,14 +8,14 @@ def server_error(request, *args, **kwargs):
     """Handler for HTTP 500 errors."""
 
     exc = kwargs.get('exception', None)
-    return _render_error(request, "Server error (500)", exc)
+    return _render_error(request, "Server error (500)", 500, exc)
 
 
 def not_authorized(request, *args, **kwargs):
     """Handler for HTTP 403 errors."""
 
     exc = kwargs.get('exception', None)
-    return _render_error(request, "Not authorized (403)", exc)
+    return _render_error(request, "Not authorized (403)", 403, exc)
 
 
 def not_found(request, *args, **kwargs):
@@ -34,7 +34,7 @@ def not_found(request, *args, **kwargs):
         else:
             exc_repr = str(exc)
 
-    return _render_error(request, "Not found (404)", exc_repr)
+    return _render_error(request, "Not found (404)", 404, exc_repr)
 
 
 _get_resolver_404_path = (
@@ -50,6 +50,7 @@ otherwise ``None``."""
 def _render_error(
     request,
     title: str,
+    status_code: int,
     exc: Union[Exception, None, str],
 ):
     """Generic error view.
@@ -67,5 +68,6 @@ def _render_error(
         request,
         'error.html',
         dict(
-          error_description=exc_repr,
-          error_title=title))
+            error_description=exc_repr,
+            error_title=title),
+        status=status_code)
