@@ -53,9 +53,11 @@ def _render_error(
     exc: Union[Exception, None, str],
 ):
     """Generic error view.
-    Renders the error.html template with given title and error description.
 
-    If error description is an instance of Exception, casts it to string."""
+    Renders the ``error.html`` template with given title and error description.
+
+    If error description is an instance of :class:`Exception`,
+    casts it to string."""
 
     exc_repr = (
         exc
