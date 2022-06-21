@@ -22,6 +22,16 @@ from .aliases import unalias
 log = logging.getLogger(__name__)
 
 
+__all__ = (
+    'handle_xml2rfc_path',
+    'resolve_manual_map',
+    'resolve_automatically',
+    'obtain_fallback_xml',
+    'ResolutionOutcome',
+    '_replace_anchor',
+)
+
+
 def resolve_manual_map(subpath: str) -> Tuple[
     Optional[str],
     Optional[BibliographicItem],
