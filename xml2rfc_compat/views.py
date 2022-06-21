@@ -10,7 +10,7 @@ from bib_models import BibliographicItem
 from prometheus import metrics
 
 from main.exceptions import RefNotFoundError
-from main.query import build_citation_for_docid
+from main.query import build_citation_for_docid, hydrate_relations
 
 from .models import Xml2rfcItem
 from .resolvers import FetcherFunc, fetcher_registry
@@ -230,6 +230,19 @@ def handle_xml2rfc_path(
                 normalized_dirname)
 
     if item:
+        if item.relation:
+            try:
+                hydrate_relations(
+                    item.relation,
+                    strict=True,
+                    depth=1,
+                )
+            except:
+                log.exception(
+                    "xml2rfc path (%s): "
+                    "Failed to hydrate resolved item",
+                    xml2rfc_subpath)
+
         try:
             xml_repr = to_xml_string(item, anchor=requested_anchor)
         except:
