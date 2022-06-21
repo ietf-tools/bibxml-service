@@ -172,8 +172,9 @@ def handle_xml2rfc_path(
         ``application/json`` response with error description.
     """
     resp: HttpResponse
-    item: Union[BibliographicItem, None]
-    xml_repr: Union[str, None]
+
+    item: Optional[BibliographicItem] = None
+    xml_repr: Optional[str] = None
 
     requested_anchor = request.GET.get('anchor', None)
 
@@ -208,14 +209,27 @@ def handle_xml2rfc_path(
         )
 
     if anchor_formatter_func and not requested_anchor:
-        requested_anchor = anchor_formatter_func(anchor, item)
+        try:
+            requested_anchor = anchor_formatter_func(anchor, item)
+        except:
+            log.exception(
+                "xml2rfc path (%s): "
+                "Error in custom anchor formatter "
+                "registered for %s",
+                xml2rfc_subpath,
+                normalized_dirname)
 
     if item:
-        xml_repr = to_xml_string(
-            item,
-            anchor=requested_anchor,
-        )
-    else:
+        try:
+            xml_repr = to_xml_string(item, anchor=requested_anchor)
+        except:
+            log.exception(
+                "xml2rfc path (%s): "
+                "Failed to serialize resolved item, "
+                "attempting fallback",
+                xml2rfc_subpath)
+
+    if not xml_repr:
         xml_repr = obtain_fallback_xml(
             xml2rfc_subpath,
             anchor=requested_anchor)
@@ -246,6 +260,9 @@ def handle_xml2rfc_path(
             xml2rfc_subpath,
             'not_found',
         ).inc()
+
+        # It would be more consistent to return a plain-text 404,
+        # but API declares a JSON response so…
         resp = JsonResponse({
             "error": {
                 "message":
@@ -284,8 +301,11 @@ def handle_xml2rfc_path(
 def obtain_fallback_xml(
     subpath: str,
     anchor: Optional[str] = None,
-) -> Union[str, None]:
-    """Obtains XML fallback for given subpath, if possible."""
+) -> Optional[str]:
+    """Obtains XML fallback for given subpath, if possible.
+
+    Does not raise exceptions.
+    """
 
     requested_dirname = subpath.split('/')[-2]
     try:
