@@ -218,6 +218,9 @@ def handle_xml2rfc_path(
             error='' if item else (error or "no error information"),
         )
 
+    # Below code attempts to catch anything
+    # and return fallback XML in any problematic scenario.
+
     if anchor_formatter_func and not requested_anchor:
         try:
             requested_anchor = anchor_formatter_func(anchor, item)
