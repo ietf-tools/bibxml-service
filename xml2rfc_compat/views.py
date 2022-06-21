@@ -1,4 +1,4 @@
-from typing import cast, Tuple, Optional, Union, TypedDict, Dict
+from typing import cast, Tuple, Optional, TypedDict, Dict
 import re
 import logging
 
@@ -81,15 +81,15 @@ def resolve_automatically(
     fetcher_func: FetcherFunc,
 ) -> Tuple[
     str,
-    Union[BibliographicItem, None],
-    Union[str, None],
+    Optional[BibliographicItem],
+    Optional[str],
 ]:
     """Returns a 3-tuple of resolver function name, resolved item,
     and error as a string, any can be None.
     Does not raise exceptions.
     """
-    item: Union[BibliographicItem, None]
-    error: Union[str, None]
+    item: Optional[BibliographicItem]
+    error: Optional[str]
     try:
         item = fetcher_func(anchor)
     except RefNotFoundError as e:
