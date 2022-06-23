@@ -7,7 +7,7 @@ from django.db.models.query import QuerySet
 dir_subpath_regex = (
     r'(?P<xml2rfc_subpath>'
     r'(?P<dirname>%s)/'
-    r'_?reference\.(?P<anchor>[-+;A-Za-z0-9./_]+)\.xml'
+    r'_?reference\.(?P<anchor>[-+;()A-Za-z0-9./_]+)\.xml'
     r')$'
 )
 """Django’s URL path regular expression
