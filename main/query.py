@@ -551,7 +551,7 @@ def hydrate_relations(
                     # We have failed to obtain a hydrated item
                     # for this relation, store None in cache.
                     log.warn(
-                        "Failed to hydrate bibitem for relation",
+                        "Failed to hydrate bibitem for relation: %s, %s",
                         _type,
                         _id)
                     cache[id_key] = None
