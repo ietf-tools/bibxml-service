@@ -17,19 +17,16 @@ from up-to-date sources.
   for the subdirectory in question.
 
 - Otherwise, you can create a manual mapping
-  using the xml2rfc path resolution management GUI.
+  by updating sidecar metadata YAML file within :term:`xml2rfc mirror source`
+  repository (and reindexing the source in BibXML service).
 
-  Locate an item using service’s general-purpose search functionality,
-  and copy the first citeable identifier
-  from bibliographic item details page.
+  1. Locate an item using service’s general-purpose search functionality,
+     and copy the first citeable identifier
+     from bibliographic item details page.
 
-  Use that identifier when creating a mapping.
+  2. Use that identifier when creating a YAML file with contents like this::
 
-  .. note::
-  
-     Manual maps will be lost if the database is completely wiped.
-     Use management GUI to export or import mappings to/from a JSON file
-     to protect against that scenario.
+         primary_docid: "<copied string>"
 
 .. seealso::
 
