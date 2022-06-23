@@ -104,7 +104,7 @@
           {% endwith %}
           &ensp;•&ensp;
           export:
-          {% include "citation/export.html" with available_serialization_formats=available_serialization_formats docid=data.docid|as_list|first only %}
+          {% include "citation/export.html" with available_serialization_formats=available_serialization_formats docid=data.docid|as_list|first datatracker_user=datatracker_user datatracker_oauth_enabled=datatracker_oauth_enabled only %}
         </span>
         {% with item_count=data.sources.items|dictsort:0|length %}
           {% if data.primary_docid and item_count > 1 %}
