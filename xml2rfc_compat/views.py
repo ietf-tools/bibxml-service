@@ -224,7 +224,7 @@ def handle_xml2rfc_path(
     if anchor_formatter_func and not requested_anchor:
         try:
             requested_anchor = anchor_formatter_func(anchor, item)
-        except:
+        except Exception:
             log.exception(
                 "xml2rfc path (%s): "
                 "Error in custom anchor formatter "
@@ -240,7 +240,7 @@ def handle_xml2rfc_path(
                     strict=True,
                     depth=1,
                 )
-            except:
+            except Exception:
                 log.exception(
                     "xml2rfc path (%s): "
                     "Failed to hydrate resolved item",
@@ -248,7 +248,7 @@ def handle_xml2rfc_path(
 
         try:
             xml_repr = to_xml_string(item, anchor=requested_anchor)
-        except:
+        except Exception:
             log.exception(
                 "xml2rfc path (%s): "
                 "Failed to serialize resolved item, "
