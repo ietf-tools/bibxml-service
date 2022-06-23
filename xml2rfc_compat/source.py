@@ -54,6 +54,9 @@ def index_xml2rfc_source(
 
     indexed_paths = set()
 
+    # Unconditionally drop all first
+    Xml2rfcItem.objects.all().delete()
+
     with transaction.atomic():
         for idx, xml_fpath in enumerate(source_xml_files):
             on_progress(total, idx)
@@ -91,9 +94,6 @@ def index_xml2rfc_source(
             )
 
             indexed_paths.add(relative_fpath)
-
-        # Delete all preexisting files not found in source anymore
-        Xml2rfcItem.objects.exclude(subpath__in=indexed_paths).delete()
 
     return total, len(indexed_paths)
 
