@@ -268,19 +268,24 @@ def threegpp(ref: str) -> BibliographicItem:
 
 @register_fetcher('bibxml6')
 def ieee(ref: str) -> BibliographicItem:
-    rough_docid = ref.replace('.', ' ').replace('-', ' ').replace('_', ' ')
-    parts = rough_docid.split(' ')
-    regex = '.*'.join(parts)
+    # We give up on automatically resolving bibxml6/IEEE paths.
+    # This is intended to trigger fallback behavior
+    # for any path that is not manually mapped.
+    raise RefNotFoundError()
 
-    results = search_refs_relaton_field({
-        'docid[*]': '@.type == "IEEE" && @.id like_regex "(?i)%s"'
-        % re.escape(regex),
-    }, limit=10, exact=True)
+    # rough_docid = ref.replace('.', ' ').replace('-', ' ').replace('_', ' ')
+    # parts = rough_docid.split(' ')
+    # regex = '.*'.join(parts)
 
-    if len(results) > 0:
-        return BibliographicItem(**results[0].body)
-    else:
-        raise RefNotFoundError()
+    # results = search_refs_relaton_field({
+    #     'docid[*]': '@.type == "IEEE" && @.id like_regex "(?i)%s"'
+    #     % re.escape(regex),
+    # }, limit=10, exact=True)
+
+    # if len(results) > 0:
+    #     return BibliographicItem(**results[0].body)
+    # else:
+    #     raise RefNotFoundError()
 
 
 @register_fetcher('bibxml7')
