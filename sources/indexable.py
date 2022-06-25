@@ -8,7 +8,7 @@ and don’t necessarily need to contain bibliographic data.
 import functools
 import hashlib
 from dataclasses import dataclass
-from typing import Callable, Union, List, Tuple, Dict, TypedDict
+from typing import Callable, Optional, List, Tuple, Dict, TypedDict
 from os import path, makedirs
 
 from celery.utils.log import get_task_logger
@@ -46,9 +46,9 @@ class IndexableSource:
 
     index: Callable[
         [
-            Union[List[str], None],
-            Union[Callable[[str, int, int], None], None],
-            Union[Callable[[str, str], None], None],
+            Optional[List[str]],
+            Optional[Callable[[str, int, int], None]],
+            Optional[Callable[[str, str], None]],
         ],
         Tuple[int, int],
     ]
@@ -91,7 +91,7 @@ class IndexableSourceToRegister(TypedDict, total=True):
     indexer: Callable[
         [
             List[str],
-            Union[List[str], None],
+            Optional[List[str]],
             Callable[[int, int], None],
             Callable[[str, str], None],
         ],
@@ -166,9 +166,9 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
 
         @functools.wraps(index_info['indexer'])
         def handle_index(
-            refs: Union[List[str], None],
-            on_progress: Union[Callable[[str, int, int], None], None],
-            on_item_error: Union[Callable[[str, str], None], None],
+            refs: Optional[List[str]],
+            on_progress: Optional[Callable[[str, int, int], None]],
+            on_item_error: Optional[Callable[[str, str], None]],
         ) -> Tuple[int, int]:
             work_dir_paths: List[str] = []
             repo_heads: List[str] = []
