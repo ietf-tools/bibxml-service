@@ -7,8 +7,6 @@ from django.shortcuts import render
 from django.conf import settings
 from django.http.request import split_domain_port
 
-from main.models import RefData
-
 from sources.task_status import get_dataset_task_history
 from sources.task_status import describe_indexing_task
 from sources.task_status import list_running_tasks
