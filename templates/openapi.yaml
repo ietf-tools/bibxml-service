@@ -24,6 +24,10 @@ paths:
       summary: Get bibliographic item by document ID
       description: >
         Retrieve a bibliographic item by document identifier.
+
+        If no match is found in indexed bibliographic data sources,
+        and a suitable `doctype` is supplied, external sources are attempted
+        unless `check_external_sources` flag is set to `never`.
       operationId: getBibItemByDocId
 
       parameters:
@@ -74,6 +78,19 @@ paths:
           ``anchor`` attribute set to this value.
         schema:
           type: string
+
+      - name: check_external_sources
+        in: query
+        description: |
+          Whether to check external sources (such as Crossref or Datatracker).
+          Only has effect if suitable `doctype` is provided with request.
+
+          `last_resort` means only if nothing could be found in indexed sources,
+          `never` means never.
+        schema:
+          type: string
+          default: last_resort
+          enum: [last_resort, never]
 
       security:
       - DatatrackerAPIKeyAuth: []

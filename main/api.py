@@ -110,6 +110,9 @@ def get_by_docid(request):
     resp: HttpResponse
     outcome: str
 
+    check_external = (
+        request.GET.get('check_external_sources', None) or 'last_resort')
+
     try:
         try:
             bibitem: BibliographicItem = build_citation_for_docid(
@@ -118,7 +121,7 @@ def get_by_docid(request):
                 strict=True)
 
         except RefNotFoundError:
-            if doctype is not None:
+            if doctype is not None and check_external == 'last_resort':
                 # As a fallback, try external sources.
                 sources = [
                     ext_s
