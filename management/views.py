@@ -69,7 +69,9 @@ def datasets(request):
         sources.append(IndexableSourceStatus(
             name=source_id,
             status=status,
-            task_progress=task['progress'] if task and 'progress' in task else None,
+            task_progress=task['progress']
+            if task and 'progress' in task
+            else None,
             item_count=str(source.count_indexed()),
         ))
 
