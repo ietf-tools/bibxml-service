@@ -18,7 +18,7 @@ from django.conf import settings
 # from sources import InternalSource
 
 from common.util import as_list
-from bib_models import DocID, Relation
+from bib_models import construct_bibitem, DocID, Relation
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
@@ -27,7 +27,6 @@ from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
 from .query_utils import query_suppressing_user_input_error, compose_bibitem
 from .query_utils import get_primary_docid, get_docid_struct_for_search
-from .query_utils import construct_bibitem
 
 
 __all__ = (
