@@ -110,13 +110,14 @@ def get_latest_outcome(dataset_name: str) -> Optional[IndexingTaskDescription]:
     try:
         latest_task_id = get_task_ids(dataset_name, limit=1)[0]
     except IndexError:
-        try:
-            latest_task_id = (
-                SourceIndexationOutcome.objects.
-                filter(source_id=dataset_name).
-                order_by('-timestamp').
-                first()).task_id
-        except SourceIndexationOutcome.DoesNotExist:
+        latest_outcome = (
+            SourceIndexationOutcome.objects.
+            filter(source_id=dataset_name).
+            order_by('-timestamp').
+            first())
+        if latest_outcome:
+            latest_task_id = latest_outcome.task_id
+        else:
             return None
 
     return describe_indexing_task(latest_task_id)
