@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'main.app.Config',
     'management.app.Config',
+    'sources.app.Config',
     'xml2rfc_compat.app.Config',
     'compressor',
     'debug_toolbar',

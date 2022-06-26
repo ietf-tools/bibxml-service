@@ -1,4 +1,4 @@
-<article class="p-4">
+<article>
   <div class="flex flex-col md:flex-row mb-2 md:items-center md:space-x-2">
     <span class="text-xs font-mono px-4 py-2">
       {{ task.task_id }}
@@ -28,8 +28,8 @@
       <p class="text-sm">{{ task.error.type }}</p>
       <p class="text-xs">{{ task.error.message }}</p>
     {% endif %}
-    {% if task.action %}
-      <p class="mb-2 text-xs">
+    {% if task.progress %}
+      <p class="mb-2 text-xs overflow-x-auto">
         {{ task.action }}
         <br />
         {% if task.progress %}
@@ -40,9 +40,6 @@
     {% if task.progress %}
       {% url "api_stop_task" task.task_id as stop_task_url %}
       {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" %}
-    {% endif %}
-    {% if task.outcome_summary %}
-      <p class="text-sm mt-2">{{ task.outcome_summary }}</p>
     {% endif %}
   </div>
 
@@ -68,5 +65,8 @@
         —
       {% endif %}
     </p>
+    {% if show_summary and task.outcome_summary %}
+      <pre class="text-xs mt-2 overflow-x-auto">{{ task.outcome_summary }}</pre>
+    {% endif %}
   {% endif %}
 </article>

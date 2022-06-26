@@ -1,13 +1,16 @@
 """
 Celery task for working with indexable sources.
 """
+from typing import List, Tuple
 import traceback
+from textwrap import indent
 from celery.utils.log import get_task_logger
 
 from .celery import app
 
 from .indexable import registry
 from .task_status import IndexingTaskCeleryMeta
+from .models import SourceIndexationOutcome
 
 
 logger = get_task_logger(__name__)
@@ -55,8 +58,26 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
         },
     ))
 
+    item_errors: List[Tuple[str, str]] = []
+
+    on_error = (lambda item, err: item_errors.append((item, err)))
+
+    outcome = SourceIndexationOutcome(
+        source_id=dataset_id,
+        task_id=task.request.id,
+        notes=f"Requested for: {','.join(refs or []) or 'all'}\n",
+    )
+
+    def try_save_failed_outcome(err: str):
+        try:
+            outcome.notes += f"Failed with error:\n{err}"
+            outcome.successful = False
+            outcome.save()
+        except Exception:
+            pass
+
     try:
-        found, indexed = indexable_source.index(refs, update_status, None)
+        found, indexed = indexable_source.index(refs, update_status, on_error)
 
     except SystemExit:
         logger.exception(
@@ -64,17 +85,33 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
             dataset_id)
         traceback.print_exc()
         print("Indexing {}: Task aborted with SystemExit".format(dataset_id))
+        try_save_failed_outcome("SystemExit")
         raise
 
-    except:  # noqa: E722
+    except Exception as err:
         logger.exception(
             "Failed to index dataset %s: Task failed",
             dataset_id)
         traceback.print_exc()
         print("Indexing {}: Task failed to complete".format(dataset_id))
+        try_save_failed_outcome(f"{err}")
         raise
 
     else:
+        outcome.successful = True
+        outcome.notes += (
+            f"Total: {found}\n"
+            f"Indexed: {indexed}\n"
+            f"Problem items: {len(item_errors)}\n"
+        )
+        if len(item_errors) > 0:
+            errors = '\n'.join([
+                f"{item}:\n{indent(err, '    ')}"
+                for item, err in item_errors
+            ]) or 'N/A'
+            outcome.notes += f"Problem items:\n{errors}\n"
+
+        outcome.save()
         return {
             **task_desc,
             'progress': {

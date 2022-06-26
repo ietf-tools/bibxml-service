@@ -1,6 +1,6 @@
 """View functions for management GUI."""
 
-from typing import List, Union, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 from django.shortcuts import render
@@ -10,7 +10,7 @@ from django.http.request import split_domain_port
 from sources.task_status import get_dataset_task_history
 from sources.task_status import describe_indexing_task
 from sources.task_status import list_running_tasks
-from sources.task_status import IndexingTaskDescription, TaskProgress
+from sources.task_status import get_latest_outcome, TaskProgress
 from sources import indexable
 
 
@@ -48,11 +48,7 @@ def datasets(request):
 
     sources: List[IndexableSourceStatus] = []
     for source_id, source in indexable.registry.items():
-        task: Union[IndexingTaskDescription, None]
-        try:
-            task = get_dataset_task_history(source_id, limit=1)[0]
-        except IndexError:
-            task = None
+        task = get_latest_outcome(source_id)
 
         status: str
         if task is None:

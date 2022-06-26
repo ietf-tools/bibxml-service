@@ -12,19 +12,21 @@ under ``/data/`` directory under repository root
 
 .. seealso:: :rfp:req:`3`
 """
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List, Dict, Any, cast
 import glob
 from os import path
 import datetime
 
 import yaml
 from celery.utils.log import get_task_logger
-from relaton.models import dates
+from relaton.models import dates, BibliographicItem
+from pydantic import ValidationError
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import transaction
 
 from common.util import as_list
+from common.pydantic import ValidationErrorDict, pretty_print_loc
 from sources import indexable
 
 from .types import IndexedSourceMeta, IndexedObject
@@ -234,6 +236,17 @@ def index_dataset(ds_id, relaton_path, refs=None,
                             representations=dict(),
                         ),
                     )
+
+                    if on_error:
+                        try:
+                            BibliographicItem(**ref_data)
+                        except ValidationError as e:
+                            errs = cast(List[ValidationErrorDict], e.errors())
+                            on_error(ref, '\n'.join([
+                                f"{pretty_print_loc(d['loc'])}: "
+                                f"{d['type']}: {d['msg']}"
+                                for d in errs
+                            ]))
 
                     indexed_refs.add(ref)
 

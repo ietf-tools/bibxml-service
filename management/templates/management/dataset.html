@@ -11,7 +11,7 @@
   p-4
   h-screen
   overflow-y-auto
-  space-y-2
+  space-y-4
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,11 @@
     {% include "api_button.html" with label="Queue reindex" endpoint=reindex_url method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" %}
   </div>
 
+  <h4 class="font-semibold leading-loose">Latest indexing run</h4>
   {% for task in history %}
-    {% include "indexing_task.html" with task=task %}
+    {% include "indexing_task.html" with task=task show_summary=forloop.first %}
+    {% if forloop.first %}
+    <h4 class="leading-loose">Past runs</h4>
+    {% endif %}
   {% endfor %}
 {% endblock %}
