@@ -54,10 +54,10 @@ def index_xml2rfc_source(
 
     indexed_paths = set()
 
-    # Unconditionally drop all first
-    Xml2rfcItem.objects.all().delete()
-
     with transaction.atomic():
+        # Unconditionally drop all first
+        Xml2rfcItem.objects.all().delete()
+
         for idx, xml_fpath in enumerate(source_xml_files):
             on_progress(total, idx)
 
