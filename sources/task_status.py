@@ -1,6 +1,7 @@
 """Primitives for working with indexing task status."""
 
 from typing import List, Optional, TypedDict, Union, cast
+import datetime
 import traceback
 
 from celery.result import AsyncResult
@@ -62,7 +63,7 @@ class IndexingTaskDescription(TypedDict):
     outcome_summary: Union[str, None]
     """Outcome description, normally for a successful task."""
 
-    completed_at: Union[str, None]
+    completed_at: Optional[datetime.datetime]
     """Completion timestamp as a string, normally for a successful task."""
 
     action: Union[str, None]
@@ -160,8 +161,7 @@ def describe_indexing_task(tid: str) -> IndexingTaskDescription:
     # Try outcome record stored in DB
     if outcome:
         task['dataset_id'] = outcome.source_id
-        task['completed_at'] = \
-            outcome.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+        task['completed_at'] = outcome.timestamp
         if outcome.successful:
             task['outcome_summary'] = outcome.notes
         else:
@@ -194,8 +194,7 @@ def describe_indexing_task(tid: str) -> IndexingTaskDescription:
                         total if total is not None else 'N/A',
                         current if current is not None else 'N/A')
                 if result.date_done:
-                    task['completed_at'] = \
-                        result.date_done.strftime('%Y-%m-%dT%H:%M:%SZ')
+                    task['completed_at'] = result.date_done
 
             elif result.failed():
                 err_msg = meta.get('exc_message', ['N/A'])

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from django.shortcuts import render
 from django.conf import settings
 from django.http.request import split_domain_port
+from django.utils.timesince import timesince
 
 from sources.task_status import get_dataset_task_history
 from sources.task_status import describe_indexing_task
@@ -52,13 +53,19 @@ def datasets(request):
 
         status: str
         if task is None:
-            status = "no task history"
+            status = "status unknown"
         elif task['progress']:
             status = f"in progress ({task['action'] or 'N/A'})"
         elif task['completed_at']:
-            status = f"last indexed {task['completed_at']}"
+            try:
+                ago = timesince(task['completed_at'], depth=1)
+            except Exception:
+                ago = ''
+            status = (
+                f"last indexed {ago} ago "
+                f"({task['completed_at'].strftime('%Y-%m-%dT%H:%M:%SZ')})")
         else:
-            status = "queued"
+            status = "status unknown"
         # TODO: Annotate/aggregate indexed item counts in management GUI?
         sources.append(IndexableSourceStatus(
             name=source_id,
