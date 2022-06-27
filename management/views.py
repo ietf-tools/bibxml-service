@@ -58,7 +58,7 @@ def datasets(request):
         elif task['completed_at']:
             status = f"last indexed {task['completed_at']}"
         else:
-            status = "task status expired"
+            status = "queued"
         # TODO: Annotate/aggregate indexed item counts in management GUI?
         sources.append(IndexableSourceStatus(
             name=source_id,
