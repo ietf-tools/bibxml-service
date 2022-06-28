@@ -98,13 +98,20 @@ def push_task(dataset_id, task_id):
 
 def get_dataset_task_history(dataset_name, limit=10) -> \
         List[IndexingTaskDescription]:
-    task_ids = get_task_ids(dataset_name, limit)
-    tasks = []
 
-    for tid in task_ids:
-        tasks.append(describe_indexing_task(tid))
+    task_ids = (
+        get_task_ids(dataset_name, limit)
+        or
+        SourceIndexationOutcome.objects.
+        filter(source_id=dataset_name).
+        order_by('-timestamp').
+        values_list('task_id', flat=True)
+    )
 
-    return tasks
+    return [
+        describe_indexing_task(tid)
+        for tid in task_ids
+    ]
 
 
 def get_latest_outcome(dataset_name: str) -> Optional[IndexingTaskDescription]:
