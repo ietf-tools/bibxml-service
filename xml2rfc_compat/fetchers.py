@@ -187,7 +187,7 @@ def internet_drafts(ref: str) -> BibliographicItem:
                     f"Malformed I-D version (not a positive integer): "
                     f"{dt_version}")
 
-    except:
+    except Exception:
         log.exception(
             "Failed to fetch or validate latest draft from Datatracker "
             "when resolving xml2rfc bibxml3 path")
