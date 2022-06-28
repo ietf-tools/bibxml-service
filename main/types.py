@@ -145,6 +145,11 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     but during merging we may end up with multiple.
     """
 
+    docnumber: Union[str, List[str], None] = None
+    """Parent defines ``docnumber`` as an optional string,
+    but during merging we may end up with multiple.
+    """
+
     primary_docid: Optional[str] = None
     """Primary identifier shared by all items.
     If not present, it may indicate source data integrity issue.
