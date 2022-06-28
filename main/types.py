@@ -1,6 +1,6 @@
 """Type helpers specific to bibliographic item retrieval."""
 
-from typing import Mapping, List, Optional
+from typing import Mapping, List, Optional, Union
 import datetime
 
 from pydantic.dataclasses import dataclass
@@ -138,6 +138,11 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
 
     Additionally, documents are supposed to be added in order
     “the latest document to the oldest”.
+    """
+
+    doctype: Union[str, List[str], None] = None
+    """Parent defines ``doctype`` as an optional string,
+    but during merging we may end up with multiple.
     """
 
     primary_docid: Optional[str] = None
