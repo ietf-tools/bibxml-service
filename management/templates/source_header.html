@@ -5,7 +5,7 @@
       {{ source.id }}</a>:
     source indexing task status &amp; history
   </h2>
-  <div class="text-sm">
+  <div class="text-xs">
     {% for repo_url in source.list_repository_urls %}
       <a href="{{ repo_url }}">{{ repo_url }}</a>{% if not forloop.last %}, {% endif %}
     {% endfor %}
