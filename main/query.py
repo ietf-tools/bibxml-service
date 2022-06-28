@@ -546,7 +546,7 @@ def hydrate_relations(
                         # a possibility.
                         cache,
                     )
-                except:  # XXX: Catch more specific exceptions
+                except Exception:  # XXX: Catch more specific exceptions?
                     # We have failed to obtain a hydrated item
                     # for this relation, store None in cache.
                     log.warn(
