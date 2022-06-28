@@ -16,7 +16,7 @@ from bib_models import BibliographicItem
 
 @dataclass
 class SourceMeta:
-    """Describes a bibliographic data source."""
+    """Describes a Relaton bibliographic data source."""
 
     id: str
     """Source ID."""
