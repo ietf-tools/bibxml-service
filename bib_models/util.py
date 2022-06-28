@@ -71,6 +71,8 @@ def normalize_relaxed(data: Dict[str, Any]):
     Useful with (deserialized) handwritten or poorly normalized JSON/YAML.
 
     .. important:: Modifies ``data`` in place.
+
+    :rtype dict:
     """
     versions = as_list(data.get('version', []))
     if versions:
@@ -93,6 +95,8 @@ def normalize_relaxed(data: Dict[str, Any]):
                 for item in contacts
                 if isinstance(item, dict)
             ]
+
+    return data
 
 
 def normalize_version(raw: str) -> Dict[str, Any]:
