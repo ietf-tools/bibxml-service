@@ -81,7 +81,11 @@ def normalize_relaxed(data: Dict[str, Any]):
         ]
 
     for contributor in data.get('contributor', []):
-        person_or_org = contributor.get('person', contributor.get('org', {}))
+        person_or_org = contributor.get(
+            'person',
+            contributor.get(
+                'organization',
+                {}))
         contacts = as_list(person_or_org.get('contact', []))
         if contacts:
             person_or_org['contact'] = [
