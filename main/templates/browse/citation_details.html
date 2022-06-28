@@ -108,12 +108,12 @@
         </span>
         {% with item_count=data.sources.items|dictsort:0|length %}
           {% if data.primary_docid and item_count > 1 %}
-            <span title="Primary identifier shared by documents">
+            <span title="Primary identifier shared by documents: {{ data.primary_docid }}" class="truncate">
               {{ data.primary_docid }}
             </span>
           {% endif %}
           {% if item_count > 1 %}
-            <span>{{ item_count }} document{{ item_count|pluralize:',s' }}</span>
+            <span class="whitespace-nowrap">{{ item_count }} document{{ item_count|pluralize:',s' }}</span>
           {% endif %}
         {% endwith %}
       </div>
