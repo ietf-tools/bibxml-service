@@ -140,6 +140,8 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     “the latest document to the oldest”.
     """
 
+    # TODO: mypy complains about the following overrides. Ignore?
+
     doctype: Union[str, List[str], None] = None
     """Parent defines ``doctype`` as an optional string,
     but during merging we may end up with multiple.
