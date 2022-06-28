@@ -7,7 +7,9 @@
 {% endblock %}
 
 {% block content %}
-  {% include "source_header.html" %}
+  {% if source %}
+    {% include "source_header.html" %}
+  {% endif %}
 
   <div class="
     md:overflow-visible
