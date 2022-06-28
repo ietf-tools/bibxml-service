@@ -13,6 +13,7 @@ import re
 from pydantic import ValidationError
 
 from bib_models import BibliographicItem, DocID
+from bib_models.util import normalize_relaxed
 from doi.crossref import get_bibitem as get_doi_bibitem
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
@@ -54,7 +55,7 @@ def misc(ref: str) -> BibliographicItem:
     }, limit=10, exact=True)
 
     if len(results) > 0:
-        return BibliographicItem(**results[0].body)
+        return BibliographicItem(**normalize_relaxed(results[0].body))
     else:
         raise RefNotFoundError()
 
@@ -141,7 +142,8 @@ def internet_drafts(ref: str) -> BibliographicItem:
         # making sure xml2rfc API consumers receive a suitable response
         # whenever possible.
         try:
-            indexed_bibitem = BibliographicItem(**results[0].body)
+            bibdata = results[0].body
+            indexed_bibitem = BibliographicItem(**normalize_relaxed(bibdata))
             try:
                 # TODO: mypy can’t infer the below... sigh
                 match = [
@@ -246,7 +248,7 @@ def w3c(ref: str) -> BibliographicItem:
     }, limit=10, exact=True)
 
     if len(results) > 0:
-        return BibliographicItem(**results[0].body)
+        return BibliographicItem(**normalize_relaxed(results[0].body))
     else:
         raise RefNotFoundError()
 
@@ -261,7 +263,7 @@ def threegpp(ref: str) -> BibliographicItem:
     }, limit=10, exact=True)
 
     if len(results) > 0:
-        return BibliographicItem(**results[0].body)
+        return BibliographicItem(**normalize_relaxed(results[0].body))
     else:
         raise RefNotFoundError()
 
