@@ -101,7 +101,7 @@ def normalize_relaxed(data: Dict[str, Any]):
 
 def normalize_version(raw: str) -> Dict[str, Any]:
     """Given a string, returns a dict
-    representing a :class:`relaton.bibdata.Versioninfo`.
+    representing a :class:`relaton.models.bibdata.Versioninfo`.
     """
     if not isinstance(raw, str):
         raise TypeError("normalize_version() takes a string")
@@ -114,7 +114,8 @@ def normalize_version(raw: str) -> Dict[str, Any]:
 def normalize_contact(raw: Dict[str, Any]) -> Dict[str, Any]:
     """Given a dict that may represent an address or something else,
     tries to interpret it appropriately
-    and return a dict conforming to :class:`relaton.contacts.ContactMethod`.
+    and return a dict conforming
+    to :class:`relaton.models.contacts.ContactMethod`.
 
     May return the same dict as given.
     """
