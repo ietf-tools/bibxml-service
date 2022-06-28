@@ -31,9 +31,9 @@ class QueryTestCase(TestCase):
     def test_get_primary_docid(self):
         primary_id_value = "primary_id_value"
         raw_ids = [
-            {"id": primary_id_value, "type": "type", "primary": True},
-            {"id": "id2", "type": "type2"},
-            {"id": "id3", "type": "type3", "scope": "scope"}
+            DocID(id=primary_id_value, type="type", primary=True),
+            DocID(id="id2", type="type2"),
+            DocID(id="id3", type="type3", scope="scope")
         ]
         primary_id = get_primary_docid(raw_ids)
         self.assertIsInstance(primary_id, DocID)
@@ -45,8 +45,8 @@ class QueryTestCase(TestCase):
         """
         primary_id_value = "primary_id_value"
         raw_ids = [
-            {"id": primary_id_value, "type": "type", "primary": False},
-            {"id": "id2", "type": "type2"},
-            {"id": "id3", "type": "type3", "scope": "scope"}
+            DocID(id=primary_id_value, type="type", primary=False),
+            DocID(id="id2", type="type2"),
+            DocID(id="id3", type="type3", scope="scope")
         ]
         self.assertIsNone(get_primary_docid(raw_ids))
