@@ -163,8 +163,10 @@ def describe_indexing_task(tid: str) -> IndexingTaskDescription:
         task['dataset_id'] = outcome.source_id
         task['completed_at'] = outcome.timestamp
         if outcome.successful:
+            task['status'] = 'SUCCESS'
             task['outcome_summary'] = outcome.notes
         else:
+            task['status'] = 'FAILURE'
             task['error'] = outcome.notes
 
     # Otherwise, try task state in Celery backend
