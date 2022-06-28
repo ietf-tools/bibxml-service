@@ -97,9 +97,13 @@ def normalize_relaxed(data: Dict[str, Any]):
         if contacts:
             try:
                 person_or_org['contact'] = [
-                    normalize_contact(item)
-                    for item in contacts
-                    if isinstance(item, dict)
+                    normalized
+                    for normalized in [
+                        normalize_contact(item)
+                        for item in contacts
+                        if isinstance(item, dict)
+                    ]
+                    if normalized is not None
                 ]
             except Exception:
                 pass
@@ -119,7 +123,7 @@ def normalize_version(raw: str) -> Dict[str, Any]:
     )
 
 
-def normalize_contact(raw: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_contact(raw: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """Given a dict that may represent an address or something else,
     tries to interpret it appropriately
     and return a dict conforming
@@ -130,21 +134,25 @@ def normalize_contact(raw: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(raw, dict):
         raise TypeError("normalize_contact() takes a dictionary")
 
-    if (_type := raw.get('type')) and (value := raw.get('value')):
-        if _type == 'email':
-            return dict(
-                email=value,
-            )
-        if _type in ['uri', 'url']:
-            return dict(
-                uri=value,
-            )
-        if _type == 'phone':
-            return dict(
-                phone=dict(
-                    content=value,
-                ),
-            )
+    if (_type := raw.get('type')) and 'value' in raw:
+        if value := raw['value']:
+            if _type == 'email':
+                return dict(
+                    email=value,
+                )
+            if _type in ['uri', 'url']:
+                return dict(
+                    uri=value,
+                )
+            if _type == 'phone':
+                return dict(
+                    phone=dict(
+                        content=value,
+                    ),
+                )
+        else:
+            # We have a type and a falsey value (probably an empty string)
+            return None
 
     if 'city' in raw or 'country' in raw:
         return dict(
