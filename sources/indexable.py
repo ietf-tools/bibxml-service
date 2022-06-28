@@ -75,6 +75,12 @@ class IndexableSource:
     """A function that wipes all indexed data for this source.
     Takes no arguments and returns nothing."""
 
+    list_repository_urls: Callable[[], List[str]]
+    """Returns a list of repository URLs backing this source."""
+
+    id: str
+    """Source identifier."""
+
 
 registry: Dict[str, IndexableSource] = {}
 """
@@ -233,9 +239,11 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
                 return 0, 0
 
         indexable_source = IndexableSource(
+            id=source_id,
             index=handle_index,
             reset_index=index_info['reset_index'],
             count_indexed=index_info['count_indexed'],
+            list_repository_urls=lambda: [r[0] for r in repos],
         )
 
         registry[source_id] = indexable_source

@@ -6,13 +6,18 @@
   indexing task {{ task.task_id }}
 {% endblock %}
 
-{% block content_grid_classes %}
-  md:!block
-  p-4
-  bg-white
-{% endblock %}
-
 {% block content %}
-  {% include "indexing_task.html" with task=task show_summary=1 %}
+  {% include "source_header.html" %}
+
+  <div class="
+    md:overflow-visible
+    md:row-[span_6_/_span_6]
+    md:overflow-y-auto
+    bg-dark-200
+    dark:bg-dark-800
+    py-4
+  ">
+    {% include "indexing_task.html" with task=task show_summary=1 %}
+  </div>
 {% endblock %}
 

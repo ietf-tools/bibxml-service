@@ -1,0 +1,13 @@
+{# Expects source. #}
+<header class="snap-start bg-dark-700 text-dark-100 p-4 leading-tight tracking-tight">
+  <h2 class="mb-1">
+    <a href="{% url "manage_indexable_source" source.id %}" class="font-monospace font-bold tracking-tight">
+      {{ source.id }}</a>:
+    source indexing task status &amp; history
+  </h2>
+  <div class="text-sm">
+    {% for repo_url in source.list_repository_urls %}
+      <a href="{{ repo_url }}">{{ repo_url }}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </div>
+</header>

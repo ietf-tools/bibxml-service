@@ -1,7 +1,7 @@
-<div class="flex flex-col md:flex-row mb-2 md:items-center md:space-x-2">
-  <span class="text-xs font-mono px-4 py-2">
+<div class="flex flex-col md:flex-row mb-2 md:items-center md:space-x-4 md:px-4">
+  <span class="text-xs font-mono py-2 px-4">
     {% if do_link %}
-      <a class="link" href="{% url "manage_indexing_task" task.task_id %}">
+      <a class="link" href="{% url "manage_indexing_task" task.task_id %}?{% if task.dataset_id %}dataset_id={{ task.dataset_id }}{% endif %}">
         {{ task.task_id }}
       </a>
     {% else %}
@@ -25,6 +25,8 @@
       max="{{ task.progress.total }}"
       title="{{ task.progress.current }} of {{ task.progress.total }}">
     </progress>
+    {% url "api_stop_task" task.task_id as stop_task_url %}
+    {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" htmlclass="text-xs uppercase" %}
   {% endif %}
 </div>
 
@@ -42,15 +44,15 @@
       {% endif %}
     </p>
   {% endif %}
-  {% if task.progress %}
-    {% url "api_stop_task" task.task_id as stop_task_url %}
-    {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" %}
-  {% endif %}
 </div>
 
 {% if task.status != "PENDING" %}
   <p class="px-4 text-sm">
-    Requested for <strong class="ttu">{{ task.dataset_id }}</strong>:
+    {% if task.dataset_id %}
+      Requested for
+      <a href="{% url "manage_indexable_source" task.dataset_id %}" class="font-bold tracking-tight">
+        {{ task.dataset_id }}</a>:
+    {% endif %}
     {% if task.requested_refs %}
       <ul class="py-3">
         {% for ref in task.requested_refs %}

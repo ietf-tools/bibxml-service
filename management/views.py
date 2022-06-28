@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from django.shortcuts import render
 from django.conf import settings
 from django.http.request import split_domain_port
+from django.http import HttpResponseNotFound
 from django.utils.timesince import timesince
 
 from sources.task_status import get_dataset_task_history
@@ -87,9 +88,15 @@ def datasets(request):
 def dataset(request, dataset_id: str):
     """:term:`indexable source` indexing history & running tasks."""
 
+    try:
+        source = indexable.registry[dataset_id]
+    except KeyError:
+        return HttpResponseNotFound(f"Source {dataset_id} not found")
+
     return render(request, 'management/dataset.html', dict(
         **shared_context,
         dataset_id=dataset_id,
+        source=source,
         history=get_dataset_task_history(dataset_id),
     ))
 
@@ -97,8 +104,17 @@ def dataset(request, dataset_id: str):
 def indexing_task(request, task_id: str):
     """Indexing task run for an indexable source."""
 
+    dataset_id = request.GET.get('dataset_id', None)
+    if dataset_id:
+        try:
+            source = indexable.registry[dataset_id]
+        except KeyError:
+            source = None
+    else:
+        source = None
+
     return render(request, 'management/task.html', dict(
         **shared_context,
-        dataset_id=request.GET.get('dataset_id', None),
+        source=source,
         task=describe_indexing_task(task_id),
     ))

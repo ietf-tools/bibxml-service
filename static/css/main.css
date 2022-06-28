@@ -42,16 +42,16 @@ input, button, select, textarea {
   .custom-progress {
     @apply appearance-none border-none;
     @apply bg-none;
-    @apply text-white/40;
+    @apply text-dark-500;
   }
   .custom-progress::-webkit-progress-value {
-    @apply bg-white/40;
+    @apply bg-dark-500;
   }
   .custom-progress::-webkit-progress-bar {
     @apply bg-transparent;
   }
   .custom-progress::-moz-progress-bar {
-    @apply bg-white/40;
+    @apply bg-dark-500;
   }
 
   mark {
