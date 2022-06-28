@@ -546,13 +546,15 @@ def hydrate_relations(
                         # a possibility.
                         cache,
                     )
-                except Exception:  # XXX: Catch more specific exceptions?
+                except Exception as err:
+                    # XXX: Catch more specific exceptions?
                     # We have failed to obtain a hydrated item
                     # for this relation, store None in cache.
                     log.warn(
-                        "Failed to hydrate bibitem for relation: %s, %s",
+                        "Failed to hydrate related bibitem %s, %s: %s",
                         _type,
-                        _id)
+                        _id,
+                        err)
                     cache[id_key] = None
 
             # Switch original bibitem on this relation
