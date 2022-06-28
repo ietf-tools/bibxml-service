@@ -1,0 +1,18 @@
+{% extends "management/datasets.html" %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  indexing task {{ task.task_id }}
+{% endblock %}
+
+{% block content_grid_classes %}
+  md:!block
+  p-4
+  bg-white
+{% endblock %}
+
+{% block content %}
+  {% include "indexing_task.html" with task=task show_summary=1 %}
+{% endblock %}
+

@@ -126,6 +126,14 @@ urlpatterns = [
             ])),
         ])),
 
+        path('tasks/', include([
+            path('<task_id>/', include([
+                path('', require_safe(auth.basic(never_cache(
+                    mgmt_views.indexing_task
+                ))), name='manage_indexing_task'),
+            ])),
+        ])),
+
         path('xml2rfc-compat/', include([
             path('', require_safe(auth.basic(never_cache(
                 xml2rfc_views.DirectoryOverview.as_view(

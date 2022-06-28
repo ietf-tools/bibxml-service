@@ -28,44 +28,43 @@
 
 {% block home_link %}{% url "manage" %}{% endblock %}
 
-{% block header_extras %}
-  <a
-    class="
-      block
-      {% include "_side_block_classes.html" %}
-      p-4 bg-dark-700 text-dark-100
-    "
-    href="{% url "manage_indexable_sources" %}"
-  >
-    Source&nbsp;indexing
-  </a>
-
-  <a class="
-    {% include "_side_block_classes.html" %}
-    block p-4 bg-dark-700 text-dark-100
-  " href="{% url "manage_xml2rfc" %}">
-    xml2rfc&nbsp;compatibility
-  </a>
+{% block after_site_header_content %}
+  Management dashboard
 {% endblock %}
 
 {% block after_content %}
   <div class="
     {% include "_side_block_classes.html" %}
     p-4
-    dark:text-dark-200/50 text-dark-700/50 
+    dark:text-dark-200 text-dark-700
+    md:row-span-2
   ">
-    <a class="whitespace-nowrap" href="{% url "browse" %}">Public-facing service</a>
+    <a class="whitespace-nowrap font-bold" href="{% url "manage_indexable_sources" %}">
+      Indexable&nbsp;sources
+    </a>
     <br />
-    <a class="whitespace-nowrap" href="{% url "api_index" %}">API reference</a>
+    <a class="whitespace-nowrap font-bold" href="{% url "manage_xml2rfc" %}">
+      xml2rfc&nbsp;compatibility
+    </a>
     <br />
-    <a class="whitespace-nowrap" href="/static/docs/index.html">Docs</a>
+    <a class="whitespace-nowrap opacity-50" href="{% url "browse" %}">
+      Public-facing service
+    </a>
+    <br />
+    <a class="whitespace-nowrap opacity-50" href="{% url "api_index" %}">
+      API reference
+    </a>
+    <br />
+    <a class="whitespace-nowrap opacity-50" href="/static/docs/index.html">
+      Docs
+    </a>
   </div>
 
   {% if monitoring.flower %}
     <a class="
       {% include "_side_block_classes.html" %}
       block p-4
-      dark:text-dark-200/50 text-dark-700/50 
+      dark:text-dark-200/50 text-dark-700/50
     " href="{{ monitoring.flower }}">
       Worker dashboard at {{ task_monitor_host }} &rarr;
     </a>

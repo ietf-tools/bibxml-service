@@ -73,7 +73,9 @@
           </a>
         </h1>
         <div class="text-xs whitespace-nowrap">
-          {% include "_datatracker_user_link.html" %}
+          {% block after_site_header_content %}
+            {% include "_datatracker_user_link.html" %}
+          {% endblock %}
         </div>
       </header>
 

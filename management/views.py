@@ -41,6 +41,7 @@ class IndexableSourceStatus:
     name: str
     status: str
     item_count: str
+    task_id: Optional[str]
     task_progress: Optional[TaskProgress]
 
 
@@ -70,6 +71,7 @@ def datasets(request):
         sources.append(IndexableSourceStatus(
             name=source_id,
             status=status,
+            task_id=task['task_id'] if task else None,
             task_progress=task['progress']
             if task and 'progress' in task
             else None,
@@ -83,10 +85,20 @@ def datasets(request):
 
 
 def dataset(request, dataset_id: str):
-    """Indexable source indexing history & running tasks."""
+    """:term:`indexable source` indexing history & running tasks."""
 
     return render(request, 'management/dataset.html', dict(
         **shared_context,
         dataset_id=dataset_id,
         history=get_dataset_task_history(dataset_id),
+    ))
+
+
+def indexing_task(request, task_id: str):
+    """Indexing task run for an indexable source."""
+
+    return render(request, 'management/task.html', dict(
+        **shared_context,
+        dataset_id=request.GET.get('dataset_id', None),
+        task=describe_indexing_task(task_id),
     ))
