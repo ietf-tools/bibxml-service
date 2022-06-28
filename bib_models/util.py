@@ -72,15 +72,20 @@ def normalize_relaxed(data: Dict[str, Any]):
 
     .. important:: Modifies ``data`` in place.
 
+    Is not expected to raise anything.
+
     :rtype dict:
     """
     versions = as_list(data.get('version', []))
     if versions:
-        data['version'] = [
-            normalize_version(item)
-            for item in versions
-            if isinstance(item, str)
-        ]
+        try:
+            data['version'] = [
+                normalize_version(item)
+                for item in versions
+                if isinstance(item, str)
+            ]
+        except Exception:
+            pass
 
     for contributor in data.get('contributor', []):
         person_or_org = contributor.get(
@@ -90,11 +95,14 @@ def normalize_relaxed(data: Dict[str, Any]):
                 {}))
         contacts = as_list(person_or_org.get('contact', []))
         if contacts:
-            person_or_org['contact'] = [
-                normalize_contact(item)
-                for item in contacts
-                if isinstance(item, dict)
-            ]
+            try:
+                person_or_org['contact'] = [
+                    normalize_contact(item)
+                    for item in contacts
+                    if isinstance(item, dict)
+                ]
+            except Exception:
+                pass
 
     return data
 
