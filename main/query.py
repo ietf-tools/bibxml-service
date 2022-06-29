@@ -603,7 +603,7 @@ def refdata_to_bibitem(
        that have the same primary docid,
        and merge results
        into a :class:`main.types.CompositeSourcedBibliographicItem`
-       (see :func:`.compose_bibitem()`)
+       (see :func:`main.query_utils.compose_bibitem()`)
 
     4. If ``hydrate_relation_levels`` is larger than zero,
        do the above for each relation
