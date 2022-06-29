@@ -29,6 +29,13 @@ from .resolvers import register_fetcher, register_anchor_formatter
 log = logging.getLogger(__name__)
 
 
+@register_anchor_formatter('bibxml')
+def format_rfc_anchor(
+    ref: str,
+    item: Optional[BibliographicItem] = None,
+) -> str:
+    return ref.replace('.', '')
+
 @register_fetcher('bibxml')
 def rfcs(ref: str) -> BibliographicItem:
     parts = ref.split('.')
