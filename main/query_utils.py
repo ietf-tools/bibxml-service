@@ -68,8 +68,8 @@ def compose_bibitem(
         obj = get_indexed_object_meta(ref.dataset, ref.ref)
         sourced_id = f'{ref.ref}@{source.id}'
 
-        bibitem_merger.merge(base, ref.body)
         bibitem, validation_errors = construct_bibitem(ref.body, strict)
+        bibitem_merger.merge(base, ref.body)
 
         if validation_errors is not None:
             validation_errors_encountered = True
