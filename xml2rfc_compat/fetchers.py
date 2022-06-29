@@ -31,18 +31,27 @@ log = logging.getLogger(__name__)
 
 @register_fetcher('bibxml')
 def rfcs(ref: str) -> BibliographicItem:
-    rfc_anchor_docid = ref.replace('.', '')
+    parts = ref.split('.')
 
-    results = search_refs_relaton_field({
-        'docid[*]':
-            '@.type == "IETF" && '
-            '@.scope == "anchor" && '
-            '@.id == "%s"'
-        % re.escape(rfc_anchor_docid),
-    }, limit=10, exact=True)
+    if len(parts) == 2:
+        raw_num = parts[1]
+        try:
+            rfc_num = int(raw_num)
+        except ValueError:
+            raise RefNotFoundError()
+        else:
+            results = search_refs_relaton_field({
+                'docid[*]':
+                    '@.type == "IETF" && '
+                    '@.primary == true && '
+                    '@.id == "RFC %s"'
+                % rfc_num,
+            }, limit=10, exact=True)
 
-    if len(results) > 0:
-        return BibliographicItem(**results[0].body)
+            if len(results) > 0:
+                return BibliographicItem(**results[0].body)
+            else:
+                raise RefNotFoundError()
     else:
         raise RefNotFoundError()
 
