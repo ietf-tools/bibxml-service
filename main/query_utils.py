@@ -69,6 +69,11 @@ def compose_bibitem(
         sourced_id = f'{ref.ref}@{source.id}'
 
         bibitem, validation_errors = construct_bibitem(ref.body, strict)
+        # NOTE: construct_bibitem() does loose YAML normalization
+        # on ``ref.body`` IN-PLACE as a side-effect,
+        # so we must call it first or CompositeSourcedBibliographicItem
+        # may get bad YAML and fail validation.
+        # XXX: Make normalization more explicit
         bibitem_merger.merge(base, ref.body)
 
         if validation_errors is not None:
