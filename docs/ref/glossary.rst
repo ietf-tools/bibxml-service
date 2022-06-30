@@ -17,6 +17,11 @@ Glossary
 
        Can either be an :term:`indexable source` or an :term:`external source`.
 
+   BibXML format
+       XML using schema defined
+       by `RFC 7991 <https://datatracker.ietf.org/doc/html/rfc7991>`_
+       or newer `Xml2rfc vocabulary <https://xml2rfc.tools.ietf.org/xml2rfc-doc.html>`_.
+
    indexable source
        An external data source periodically compiled by external tools
        from authoritative source(s).
