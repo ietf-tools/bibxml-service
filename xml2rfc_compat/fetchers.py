@@ -187,23 +187,26 @@ def internet_drafts(ref: str) -> BibliographicItem:
             f'draft-{bare_ref}',
             strict=indexed_bibitem is None,
         ).bibitem
-        dt_version = dt_bibitem.edition.content
 
-        if not isinstance(dt_version, str):
-            raise ValueError(
-                f"Malformed I-D version (not a string): "
-                f"{dt_version}")
-        try:
-            parsed_version = int(dt_version)
-        except (ValueError, TypeError):
-            raise ValueError(
-                f"Malformed I-D version (doesn’t parse to an integer): "
-                f"{dt_version}")
-        else:
-            if parsed_version < 0:
+        if len(dt_bibitem.version) > 0:
+            dt_version = dt_bibitem.version[0].draft
+            if not isinstance(dt_version, str):
                 raise ValueError(
-                    f"Malformed I-D version (not a positive integer): "
+                    "Malformed I-D version (not a string): "
                     f"{dt_version}")
+            try:
+                parsed_version = int(dt_version)
+            except (ValueError, TypeError):
+                raise ValueError(
+                    "Malformed I-D version (doesn’t parse to an integer): "
+                    f"{dt_version}")
+            else:
+                if parsed_version < 0:
+                    raise ValueError(
+                        "Malformed I-D version (not a positive integer): "
+                        f"{dt_version}")
+        else:
+            raise ValueError("Missing I-D version")
 
     except Exception:
         log.exception(
