@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from common.util import as_list
 from common.pydantic import ValidationErrorDict
 
-from relaton.models.bibdata import BibliographicItem
+from relaton.models.bibdata import BibliographicItem, DocID
 
 
 log = logging.getLogger(__name__)
@@ -61,6 +61,41 @@ def construct_bibitem(data: Dict[str, Any], strict=True) -> Tuple[
             bibitem = BibliographicItem.construct(**data)
 
     return bibitem, errors
+
+
+def get_primary_docid(raw_ids: List[DocID]) -> Optional[DocID]:
+    """Extracts a single primary document identifier from a list of objects
+    as it appears under “docid” in deserialized Relaton data.
+
+    Logs a warning if more than one primary identifier was found.
+
+    :rtype: relaton.models.bibdata.DocID or None
+    """
+
+    primary_docids: List[DocID] = [
+        docid for docid in raw_ids
+        if all([
+            docid.primary is True,
+            # As a further sanity check, require id and type, but no scope:
+            docid.id is not None,
+            docid.type is not None,
+            docid.scope is None,
+        ])
+    ]
+
+    deduped = set([frozenset([id.id, id.type]) for id in primary_docids])
+
+    if len(deduped) != 1:
+        log.warn(
+            "get_primary_docid(): unexpected number of primary docids "
+            "found for %s: %s",
+            raw_ids,
+            len(primary_docids))
+
+    try:
+        return primary_docids[0]
+    except IndexError:
+        return None
 
 
 def normalize_relaxed(data: Dict[str, Any]):
