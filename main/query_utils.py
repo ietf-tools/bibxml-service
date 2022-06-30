@@ -33,7 +33,8 @@ def compose_bibitem(
     strict: bool = True,
 ) -> Tuple[CompositeSourcedBibliographicItem, bool]:
     """
-    Converts multiple physical ``RefData`` instances
+    Converts multiple physical ``RefData`` instances,
+    possibly from different bibliographic data sources,
     into a single logical bibliographic item.
 
     This function assumes that you have ensured to collect ``RefData``
