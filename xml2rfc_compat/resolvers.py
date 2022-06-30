@@ -29,10 +29,10 @@ def register_fetcher(dirname: str):
     for :term:`xml2rfc fetcher function` to be associated with given top-level
     xml2rfc directory name.
     """
-    def register(fetcher_func: Callable[[str], BibliographicItem]):
-        fetcher_registry[dirname] = fetcher_func
-        return fetcher_func
-    return register
+    def _register_fetcher(func: FetcherFunc):
+        fetcher_registry[dirname] = func
+        return func
+    return _register_fetcher
 
 
 def register_anchor_formatter(dirname: str):
@@ -40,7 +40,7 @@ def register_anchor_formatter(dirname: str):
     for an :term:`anchor formatter function` to be associated with given
     xml2rfc directory name.
     """
-    def register(anchor_formatter_func: AnchorFormatterFunc):
-        anchor_formatter_registry[dirname] = anchor_formatter_func
-        return anchor_formatter_func
-    return register
+    def _register_anchor_formatter(func: AnchorFormatterFunc):
+        anchor_formatter_registry[dirname] = func
+        return func
+    return _register_anchor_formatter
