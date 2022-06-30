@@ -117,12 +117,16 @@ Glossary
          - :attr:`xml2rfc_compat.models.Xml2rfcItem.sidecar_meta`
          - :class:`xml2rfc_compat.types.Xml2rfcPathMetadata`
 
-   xml2rfc anchor
-      Part of the filename in an :term:`xml2rfc-style path`
-      without “reference” or “_reference” prefix and file extension.
 
-      It also appears as the “anchor” attribute on the ``<reference>``
-      element in returned XML.
+   anchor
+   xml2rfc anchor
+      Used to mean two different strings, which may be the same
+      but are conceptually different:
+
+      - Part of the filename in an :term:`xml2rfc-style path`,
+        without “reference” or “_reference” prefix and file extension.
+      - The value of the “anchor” attribute on the ``<reference>``
+        element in BibXML.
 
    xml2rfc fetcher function
    xml2rfc fetcher
