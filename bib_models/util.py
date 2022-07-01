@@ -115,9 +115,8 @@ def normalize_relaxed(data: Dict[str, Any]):
     if versions:
         try:
             data['version'] = [
-                normalize_version(item)
+                (normalize_version(item) if isinstance(item, str) else item)
                 for item in versions
-                if isinstance(item, str)
             ]
         except Exception:
             pass
