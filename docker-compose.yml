@@ -116,7 +116,6 @@ services:
   # Single instance only.
   celery:
     image: local/web-precheck:latest
-    restart: always
     command:
       - /bin/sh
       - -c
