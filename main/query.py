@@ -676,7 +676,7 @@ def build_search_results(
             if 'id' in id and 'scope' not in id and 'type' in id
         ])
 
-        # TODO: Skip ``fallback_formattedref`` cases with #196
+        # TODO: Skip ``fallback_formattedref`` cases when #196 is confirmed
         fallback_formattedref = (
             ref.body.
             get('formattedref', {}).
