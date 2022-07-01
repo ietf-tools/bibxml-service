@@ -154,7 +154,7 @@ def normalize_relaxed(data: Dict[str, Any]):
 
 def normalize_version(raw: str) -> Dict[str, Any]:
     """Given a string, returns a dict
-    representing a :class:`relaton.models.bibdata.Versioninfo`.
+    representing a :class:`relaton.models.bibdata.VersionInfo`.
     """
     if not isinstance(raw, str):
         raise TypeError("normalize_version() takes a string")
