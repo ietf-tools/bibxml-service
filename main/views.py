@@ -200,9 +200,13 @@ def export_citation(request):
         return resp
 
     else:
+        # If API failed, redirect back with a message
         message = ""
         if resp.status_code == 403:
+            # 403 assumed to mean likely Datatracker token in session expired
             message += "Please re-authenticate and try again. "
+
+        # Inspect API response to extract error message
         message += "Could not export this item, the error was: "
         content = ''.join(resp.content.decode('utf-8'))
         if resp['Content-Type'].startswith('application/json'):
@@ -349,6 +353,7 @@ class IndexedDatasetCitationListView(ListView):
         )
         for item in ctx['object_list']:
             try:
+                # XXX: Normalize loose YAML here?
                 item.bibitem = BibliographicItem(**item.body)
             except ValidationError:
                 pass
