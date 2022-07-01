@@ -23,7 +23,12 @@ services:
   # Must be run once, pre deploy.
   # Built image is reused by "web" and "celery".
   web-precheck:
-    restart: "on-failure:10" # Restart, typically if DB is not ready to accept connections yet
+    deploy:
+      restart_policy:
+        # Restart, typically if DB is not ready to accept connections yet
+        condition: on-failure
+        delay: 2s
+        max_attempts: 4
     build:
       context: .
       dockerfile: Dockerfile
