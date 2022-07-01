@@ -685,7 +685,7 @@ def build_search_results(
                 refs_by_primary_id[primary_id.id].append(idx)
             else:
                 refs_by_primary_id[suitable_ids[0].id] = [idx]
-        elif fallback_formattedref: #196
+        elif fallback_formattedref:  # TODO: #196
             refs_by_primary_id[fallback_formattedref] = [idx]
 
     for _docid, ref_indexes in refs_by_primary_id.items():
