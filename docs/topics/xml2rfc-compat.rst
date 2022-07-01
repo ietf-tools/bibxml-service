@@ -5,7 +5,7 @@ xml2rfc tools compatibility
 .. contents::
    :local:
 
-xml2rfc tool compatibility tries to achieve the following goals:
+xml2rfc tool compatibility aims to:
 
 - Offer XML output in line with RFC 7991
   (with bias towards preexisting xml2rfc tools web server output,
@@ -64,15 +64,15 @@ Each path is handled the following way:
 
 .. seealso:: :func:`xml2rfc_compat.views.handle_xml2rfc_path()`
 
-Manual mapping
---------------
+Mapping
+-------
 
 A map associates given xml2rfc path with a :term:`primary document identifier`.
 When that path is requested, this service looks up that identifier
 in :term:`bibliographic data sources <bibliographic data source>`.
 
-Manual mappings are obtained
-from :term:`xml2rfc sidecar metadata files <xml2rfc sidecar metadata file>`,
+Mappings are obtained from
+:term:`xml2rfc sidecar metadata files <xml2rfc sidecar metadata file>`,
 provided within the :term:`xml2rfc archive source`
 and named after the preexisting XML files in it.
 
