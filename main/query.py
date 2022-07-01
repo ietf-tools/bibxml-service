@@ -202,7 +202,11 @@ def search_refs_relaton_field(
 
           Example::
 
-              { 'docid': 'IEEE', 'keyword': 'foo -bar OR "foo bar"' }
+              {
+                  'docid': 'IEEE',
+                  'keyword': 'foo -bar OR "foo bar"',
+                  'some.field': 'some +query',
+              }
 
           Empty field spec is treated specially, matching the whole body::
 
