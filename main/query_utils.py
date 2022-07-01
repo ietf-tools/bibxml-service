@@ -1,6 +1,6 @@
 """Query-related utilities."""
 
-from typing import Callable, Union, List, Dict, Any, Optional, Tuple
+from typing import Callable, Union, Sequence, Dict, Any, Optional, Tuple
 import logging
 
 from django.db.models.query import QuerySet
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 
 def compose_bibitem(
-    refs: List[RefData],
+    refs: Sequence[RefData],
     primary_id: Optional[str] = None,
     strict: bool = True,
 ) -> Tuple[CompositeSourcedBibliographicItem, bool]:
