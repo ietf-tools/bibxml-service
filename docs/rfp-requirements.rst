@@ -112,7 +112,7 @@ RFP requirement compliance
 
    xml2rfc-style paths are supported. Requested path is used
    to construct a query against Relaton bibliographic item JSON,
-   and obtained item is returned serialized in XML.
+   and obtained item is returned serialized in :term:`BibXML format`.
 
    A manual map to a document identifier, if present,
    overrides automatic resolution.

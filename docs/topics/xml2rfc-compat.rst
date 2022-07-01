@@ -20,6 +20,8 @@ xml2rfc tool compatibility tries to achieve the following goals:
 
    - :rfp:req:`5`
 
+   - :term:`BibXML foramt`
+
    - If you have cases where paths are resolved incorrectly,
      :doc:`/howto/adjust-xml2rfc-paths`.
 
