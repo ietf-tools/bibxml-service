@@ -122,6 +122,12 @@ def normalize_relaxed(data: Dict[str, Any]):
         except Exception:
             pass
 
+    if edition := data.get('edition', None):
+        if isinstance(edition, str):
+            data['edition'] = {
+                'content': edition
+            }
+
     for contributor in data.get('contributor', []):
         person_or_org = contributor.get(
             'person',
