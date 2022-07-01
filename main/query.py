@@ -369,7 +369,8 @@ def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
                 '@.id like_regex {id}{type_query}{primary_query}'.format(
                     id=id,
                     type_query=(
-                        ' && @.type like_regex {id_type}' if id_type else ''),
+                        f' && @.type like_regex {id_type}'
+                        if id_type else ''),
                     primary_query=(
                         ' && @.primary == true' if id_primary else ''),
                 ),
