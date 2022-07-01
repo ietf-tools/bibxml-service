@@ -9,10 +9,6 @@ from django import template
 from common.util import as_list
 
 
-citation_search_base = reverse('search_citations')
-get_by_docid_base = reverse('get_citation_by_docid')
-
-
 register = template.Library()
 
 
@@ -55,6 +51,7 @@ def bibitem_link(value: Any):
                 id, type = None, None
 
     if id:
+        get_by_docid_base = reverse('get_citation_by_docid')
         id_query = (
             f'{get_by_docid_base}'
             f'?docid={quote_plus(id)}')
@@ -107,6 +104,7 @@ def substruct_search_link(value: Any, query: str):
     else:
         serializable = value
 
+    citation_search_base = reverse('search_citations')
     substruct_json = json.dumps(select_keys(serializable, key_checker))
     query_json = subfield % substruct_json
     return (
