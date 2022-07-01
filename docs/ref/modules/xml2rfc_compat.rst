@@ -21,13 +21,6 @@ URL patterns
 .. automodule:: xml2rfc_compat.urls
    :members:
 
-Fetcher and formatter registry
-==============================
-
-.. automodule:: xml2rfc_compat.resolvers
-   :members:
-   :undoc-members:
-
 xml2rfc API views
 =================
 
@@ -42,12 +35,11 @@ Management views
    :members:
    :show-inheritance:
 
-Fetchers and anchor formatters for xml2rfc directories
-======================================================
+Adapters for xml2rfc paths
+==========================
 
-.. automodule:: xml2rfc_compat.fetchers
+.. automodule:: xml2rfc_compat.adapters
    :members:
-   :undoc-members:
 
 Serializing per RFC 7991
 ========================

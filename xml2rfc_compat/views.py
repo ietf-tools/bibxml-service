@@ -10,11 +10,11 @@ from bib_models import BibliographicItem
 from prometheus import metrics
 
 from main.exceptions import RefNotFoundError
-from main.query import build_citation_for_docid, hydrate_relations
+from main.query import build_citation_for_docid
 
 from .models import Xml2rfcItem
-from .resolvers import FetcherFunc, fetcher_registry
-from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
+from .adapters import Xml2rfcAdapter, adapters
+# from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
 from .serializer import to_xml_string
 from .aliases import unalias
 
@@ -88,7 +88,7 @@ def resolve_manual_map(subpath: str) -> Tuple[
 def resolve_automatically(
     subpath: str,
     anchor: str,
-    fetcher_func: FetcherFunc,
+    adapter: Xml2rfcAdapter,
 ) -> Tuple[
     str,
     Optional[BibliographicItem],
@@ -98,26 +98,35 @@ def resolve_automatically(
     and error as a string, any can be None.
     Does not raise exceptions.
     """
-    item: Optional[BibliographicItem]
-    error: Optional[str]
+    item: Optional[BibliographicItem] = None
+    error: Optional[str] = None
     try:
-        item = fetcher_func(anchor)
+        item = adapter.resolve()
     except RefNotFoundError as e:
         log.exception(
             "Unable to resolve xml2rfc path automatically: %s",
             subpath)
         error = f"not found ({str(e)})"
-        item = None
     except ValidationError:
         log.exception(
             "Item found for xml2rfc path did not validate: %s",
             subpath)
         error = "validation problem"
-        item = None
-    else:
-        error = None
+    except Exception:
+        log.exception(
+            "Failed to automatically resolve item for path: %s",
+            subpath)
+        error = "uncategorized issue"
 
-    return fetcher_func.__name__, item, error
+    config_str = adapter.__class__.__name__
+    try:
+        config_str = '%s: %s' % (
+            config_str,
+            ' -> '.join([i.replace(',', ' ') for i in adapter._log])
+        )
+    except Exception:
+        pass
+    return config_str, item, error
 
 
 class ResolutionOutcome(TypedDict, total=True):
@@ -131,15 +140,17 @@ def handle_xml2rfc_path(
     dirname: str,
     anchor: str,
 ):
-    """View function that invokes :term:`xml2rfc fetcher`
-    and anchor formatter functions.
+    """View function that resolves an xml2rfc path.
 
-    Fetcher function will only be called if manual map was not found
-    or did not resolve successfully.
+    Requires an :term:`xml2rfc adapter` to be registered for given
+    ``dirname``.
+    Adapter’s ``resolve()`` method will only be called
+    if manual map was not found or did not resolve successfully.
 
-    The function handles filename
-    cleanup, constructing a :class:`relaton.models.bibdata.BibliographicItem`
-    and serializing it into an XML string with proper anchor tag supplied.
+    This function handles filename
+    cleanup, obtaining a :class:`relaton.models.bibdata.BibliographicItem`
+    instance, serializing it into an XML string with proper anchor tag supplied,
+    incrementing relevant metrics.
 
     The view function behaves as following
     (see also :ref:`xml2rfc-path-resolution-algorithm`):
@@ -191,12 +202,14 @@ def handle_xml2rfc_path(
     normalized_dirname = unalias(dirname)
 
     try:
-        fetcher_func = fetcher_registry[normalized_dirname]
+        adapter_cls = adapters[normalized_dirname]
     except KeyError:
-        return HttpResponseNotFound("Unknown directory name: %s", dirname)
+        return HttpResponseNotFound("No xml2rfc adapter for %s", dirname)
 
-    anchor_formatter_func: Optional[AnchorFormatterFunc] = \
-        anchor_formatter_registry.get(normalized_dirname, None)
+    # Below code attempts to catch anything
+    # and return fallback XML in any problematic scenario.
+
+    adapter = adapter_cls(xml2rfc_subpath, normalized_dirname, anchor)
 
     methods = ["manual", "auto", "fallback"]
     method_results: Dict[str, ResolutionOutcome] = {}
@@ -209,43 +222,25 @@ def handle_xml2rfc_path(
         )
 
     if not item:
-        func_name, item, error = resolve_automatically(
+        config, item, error = resolve_automatically(
             xml2rfc_subpath,
             anchor,
-            fetcher_func)
+            adapter)
         method_results['auto'] = dict(
-            config=func_name,
+            config=config,
             error='' if item else (error or "no error information"),
         )
 
-    # Below code attempts to catch anything
-    # and return fallback XML in any problematic scenario.
-
-    if anchor_formatter_func and not requested_anchor:
-        try:
-            requested_anchor = anchor_formatter_func(anchor, item)
-        except Exception:
-            log.exception(
-                "xml2rfc path (%s): "
-                "Error in custom anchor formatter "
-                "registered for %s",
-                xml2rfc_subpath,
-                normalized_dirname)
+    try:
+        if adapter_anchor := adapter.format_anchor():
+            requested_anchor = adapter_anchor
+    except Exception:
+        log.exception(
+            "xml2rfc path (%s): "
+            "Adapter failed at format_anchor()",
+            xml2rfc_subpath)
 
     if item:
-        if item.relation:
-            try:
-                hydrate_relations(
-                    item.relation,
-                    strict=True,
-                    depth=1,
-                )
-            except Exception:
-                log.exception(
-                    "xml2rfc path (%s): "
-                    "Failed to hydrate resolved item",
-                    xml2rfc_subpath)
-
         try:
             xml_repr = to_xml_string(item, anchor=requested_anchor)
         except Exception:

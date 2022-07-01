@@ -10,11 +10,10 @@ from up-to-date sources.
 - If it’s a general case
   and the :term:`xml2rfc anchor`
   is enough to deduce Relaton bibliographic item lookup,
-  edit the fetcher function:
+  edit the adapter subclass (in particular, the ``resolve()`` method):
   adjust the query e.g. by adding an OR condition.
 
-  Use root URL config to locate which fetcher function is responsible
-  for the subdirectory in question.
+  .. seealso:: :mod:`bibxml.xml2rfc_adapters`
 
 - Otherwise, you can create a manual mapping
   by updating sidecar metadata YAML file within :term:`xml2rfc mirror source`

@@ -21,6 +21,7 @@ from pydantic import ValidationError
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
 from bib_models import serializers, BibliographicItem
+from xml2rfc_compat import adapters as xml2rfc_adapters
 
 from .models import RefData
 from .query import get_indexed_item, list_refs
@@ -37,6 +38,10 @@ log = logging.getLogger(__name__)
 
 
 shared_context = dict(
+    available_serialization_formats=[
+        *serializers.registry.keys(),
+        'relaton',
+    ],
     supported_search_formats=[
         (format, QUERY_FORMAT_LABELS.get(format, format))
         for format in BaseCitationSearchView.supported_query_formats
@@ -160,11 +165,18 @@ def browse_citation_by_docid(request):
         ))
 
     else:
-        result = unpack_dataclasses(citation.dict())
+        citation_dict = unpack_dataclasses(citation.dict())
+        try:
+            xml2rfc_urls = xml2rfc_adapters.list_xml2rfc_urls(
+                citation,
+                request,
+            )
+        except Exception:
+            xml2rfc_urls = []
         metrics.gui_bibitem_hits.labels(docid, 'success').inc()
         return render(request, 'browse/citation_details.html', dict(
-            data=result,
-            available_serialization_formats=serializers.registry.keys(),
+            data=citation_dict,
+            xml2rfc_urls=xml2rfc_urls,
             **shared_context,
         ))
 
@@ -261,7 +273,6 @@ def browse_external_reference(request, dataset_id):
                 return render(request, 'browse/citation_details.html', dict(
                     dataset_id=dataset_id,
                     ref=ref,
-                    available_serialization_formats=serializers.registry.keys(),
                     data=composed,
                     **shared_context,
                 ))
@@ -311,7 +322,6 @@ def browse_indexed_reference(request, dataset_id, ref):
             dataset_id=dataset_id,
             ref=ref,
             data=indexed_bibitem,
-            available_serialization_formats=serializers.registry.keys(),
             **shared_context,
         ))
 

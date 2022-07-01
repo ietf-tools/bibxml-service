@@ -8,8 +8,7 @@ from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
 from xml2rfc_compat import management_views as xml2rfc_views
-# TODO: Register xml2rfc fetchers in app config
-from xml2rfc_compat import fetchers  # Imported for registration side-effect
+from . import xml2rfc_adapters  # Imported for registration side-effect
 from xml2rfc_compat.urls import get_urls as get_xml2rfc_urls
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth

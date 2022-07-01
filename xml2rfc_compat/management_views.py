@@ -25,7 +25,7 @@ from bib_models import BibliographicItem
 from .aliases import get_aliases
 from .models import Xml2rfcItem
 from .models import get_mapped_xml2rfc_items, get_xml2rfc_items_for_dir
-from .resolvers import fetcher_registry
+from .adapters import adapters
 from .views import resolve_manual_map, resolve_automatically
 
 
@@ -48,8 +48,7 @@ class DirectoryOverview(TemplateView):
         for subpath in Xml2rfcItem.objects.values_list('subpath', flat=True):
             dirname: str = subpath.split('/')[0]
             if dirname not in available_paths:
-                fetcher = fetcher_registry.get(dirname)
-                if fetcher:
+                if adapter_cls := adapters.get(dirname):
                     available_paths[dirname] = Xml2rfcDirectoryMeta(
                         name=dirname,
                         aliases=get_aliases(dirname),
@@ -57,8 +56,9 @@ class DirectoryOverview(TemplateView):
                         manually_mapped_count=(
                             get_mapped_xml2rfc_items(dirname).
                             count()),
-                        fetcher_name=f'{fetcher.__module__}.{fetcher.__name__}'
-                        if fetcher else None,
+                        fetcher_name=(
+                            f'{adapter_cls.__module__}.{adapter_cls.__name__}'
+                            if adapter_cls else None),
                     )
         return dict(
             available_paths=available_paths.values(),
@@ -83,7 +83,7 @@ class Xml2rfcDirectoryMeta:
     were manually mapped."""
 
     fetcher_name: Optional[str]
-    """Associated :term:`xml2rfc fetcher` function name."""
+    """Associated :term:`xml2rfc adapter` name."""
 
 
 class ExploreDirectory(TemplateView):
@@ -157,13 +157,16 @@ class ExploreDirectory(TemplateView):
             manual_map, manual_map_item, _ = resolve_manual_map(
                 selected_item.subpath)
 
-            automatic_map_fetcher = fetcher_registry.get(dirname, None)
-
-            if automatic_map_fetcher:
+            if adapter_cls := adapters.get(dirname, None):
+                adapter = adapter_cls(
+                    selected_item.subpath,
+                    dirname,
+                    selected_item.format_anchor(),
+                )
                 _, automatic_map_item, _ = resolve_automatically(
                     selected_item.subpath,
                     selected_item.format_anchor(),
-                    automatic_map_fetcher)
+                    adapter)
             else:
                 automatic_map_item = None
         else:

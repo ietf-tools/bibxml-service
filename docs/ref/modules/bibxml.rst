@@ -7,6 +7,12 @@
 .. contents::
    :local:
 
+xml2rfc adapters
+================
+
+.. automodule:: bibxml.xml2rfc_adapters
+   :members:
+
 URLs
 ====
 
