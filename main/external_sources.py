@@ -17,10 +17,7 @@ log = logging.getLogger(__name__)
 class ExternalSource:
     """Represents a registered external source."""
 
-    get_item: Union[
-        Callable[[str, bool], ExternalBibliographicItem],
-        Callable[[str], ExternalBibliographicItem],
-    ]
+    get_item: Callable[[str, Optional[bool]], ExternalBibliographicItem]
     """Returns an item given docid.id. The ``strict`` argument
     is True by default and means the method must throw
     if received item did not pass validation.
