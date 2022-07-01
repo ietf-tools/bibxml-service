@@ -296,6 +296,8 @@ def search_refs_relaton_field(
                             'translate(jsonb_extract_path_text(body, {fieldpath}), \'/\', \' \')'.format(
                                 # {fieldpath} is not properly escaped,
                                 # callers must not pass user input here.
+                                # Couldn’t make use of Django’s SQL escaping
+                                # in this case.
                                 fieldpath=','.join([
                                     "'%s'" % part
                                     for part in fieldpath.split('.')]),
