@@ -12,7 +12,7 @@
   {% include "api_button.html" with label="Queue reindex task" endpoint=reindex_url method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" htmlclass="w-full md:flex md:items-center md:justify-center text-center" %}
 
   {% for task in history %}
-    <article class="{% include "_list_item_classes.html" %} {% if forloop.first %}row-span-2{% endif %}">
+    <article class="{% include "_list_item_classes.html" %}">
       <div class="{% include "_list_item_inner_classes.html" %}">
         {% include "indexing_task.html" with task=task show_summary=forloop.first do_link=1 %}
       </div>
