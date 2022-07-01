@@ -19,7 +19,7 @@ from django.conf import settings
 
 from common.util import as_list
 from bib_models import DocID, Relation
-from bib_modles.util import construct_bibitem, get_primary_docid
+from bib_models.util import construct_bibitem, get_primary_docid
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
