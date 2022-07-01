@@ -374,7 +374,8 @@ def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
                         f' && @.type like_regex {id_type}'
                         if id_type else ''),
                     primary_query=(
-                        ' && @.primary == true' if id_primary else ''),
+                        ' && @.primary == true'
+                        if id_primary else ''),
                 ),
                 # To exclude untyped add ' && exists (@.type)'
             }
