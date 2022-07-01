@@ -17,7 +17,6 @@ from .types import IndexedBibliographicItem
 
 __all__ = (
     'compose_bibitem',
-    'get_primary_docid',
     'get_docid_struct_for_search',
     'query_suppressing_user_input_error',
     'is_benign_user_input_error',
