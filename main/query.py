@@ -290,6 +290,9 @@ def search_refs_relaton_field(
                     '''
                     anded_queries.append(tpl.format(
                         json_selectors=', '.join([
+                            # TODO: why replace slashes with whitespace
+                            # in json_extract_path_text() output?
+                            # That’s what translate() does.
                             'translate(jsonb_extract_path_text(body, {fieldpath}), \'/\', \' \')'.format(
                                 # {fieldpath} is not properly escaped,
                                 # callers must not pass user input here.
