@@ -4,7 +4,6 @@ import yaml
 
 from django.http import HttpResponseBadRequest
 from django.urls import reverse, NoReverseMatch
-from django.conf import settings
 from django.shortcuts import render
 
 from bib_models import BibliographicItem
