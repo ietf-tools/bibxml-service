@@ -244,12 +244,12 @@ COMPRESS_PRECOMPILERS = (
    # ('text/jsx', 'cat {infile} | babel --config-file %s > {outfile}' % BABEL_CONFIG),
    (
        'text/javascript',
-       '%s {infile} --config-file %s --source-maps --out-file {outfile}'
+       '%s {infile} --config-file %s --source-maps'
        % (BABEL_EXECUTABLE, BABEL_CONFIG),
    ),
    (
        'text/css',
-       '%s {infile} -o {outfile}'
+       '%s {infile}'
        % (POSTCSS_EXECUTABLE, ),
    ),
 )
