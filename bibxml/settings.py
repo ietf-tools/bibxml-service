@@ -249,7 +249,11 @@ COMPRESS_PRECOMPILERS = (
    ),
    (
        'text/css',
-       '%s {infile}'
+       # NOTE: We set DEBUG=0, because otherwise on some Node/NPM versions
+       # the global DEBUG may cause PostCSS/Tailwind to output Tailwind JIT
+       # debug stats to stdout, disabling the first actual TW CSS rule
+       # by making it syntactically invalid due to immediately preceding stats.
+       'DEBUG=0 %s {infile}'
        % (POSTCSS_EXECUTABLE, ),
    ),
 )
