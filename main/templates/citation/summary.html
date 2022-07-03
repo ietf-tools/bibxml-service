@@ -9,12 +9,14 @@
   z-10
   sticky
   top-[max(5rem,12.5vh)]
-  sm:pt-4 px-4 mb-4
+  sm:pt-4 px-4 pb-4
 
   bg-dark-200
   dark:bg-dark-800
   text-sm
   xl:text-base
+
+  border-t-dark-300 dark:border-t-dark-900 md:border-t
 ">
   <dl>
     <dt class="opacity-50 inline">bib. source{{ bibitem.sources.values|pluralize }}</span>
@@ -41,12 +43,14 @@
   z-10
   sticky
   top-[max(5rem,12.5vh)]
-  sm:pt-4 px-4 mb-4
+  sm:pt-4 px-4 pb-4
 
   bg-dark-200
   dark:bg-dark-800
   text-sm
   xl:text-base
+
+  border-t-dark-300 dark:border-t-dark-900 md:border-t
 ">
   <dl>
     {% include "deflist/entry.html" with key="document identifiers" ids=bibitem.docid|as_list tmpl="relaton/doc_ids.html" show_type=1 key_sr_only=1 as_links=0 %}
@@ -83,6 +87,7 @@
   overflow-visible
   z-20
 
+  mt-2
   flex
   flex-col
   relative
@@ -106,15 +111,15 @@
       <h4
         class="
           sm:sticky
-          top-0 right-0 z-30
-          text-sm tracking-tight font-light
+          top-2 right-0 pr-2 z-30
+          text-sm tracking-tight
           flex flex-row flex-wrap
           sm:text-right sm:justify-end
           mb-2 sm:mb-0
         "
         id="{{ sourced_item.source.id }}"
       >
-        {% include "citation/bibitem_source.html" with sourced_item=sourced_item indexed=sourced_item.indexed_object show_internal_links=1 show_error_icon=1 htmlclass="sm:bg-dark-300 sm:dark:bg-dark-900 px-2 sm:px-4 sm:py-1" %}
+        {% include "citation/bibitem_source.html" with sourced_item=sourced_item indexed=sourced_item.indexed_object show_internal_links=1 show_error_icon=1 htmlclass="sm:bg-dark-300 sm:dark:bg-dark-900 px-2 sm:py-1" %}
       </h4>
       {% include "citation/sourced_bibitem_raw_table.html" with bibitem=sourced_item.bibitem sourced_item=sourced_item only %}
     {% endfor %}

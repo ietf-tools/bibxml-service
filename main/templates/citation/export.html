@@ -1,7 +1,7 @@
 {# Expects datatracker_user, docid, available_serialization_formats, xml2rfc_urls, item_htmlclass #}
 {# Uses Heroicons #}
 
-{% with item_htmlclass="text-sm flex flex-row overflow-hidden" label_htmlclass="bg-dark-300 dark:bg-dark-700 text-sm whitespace-nowrap flex-1 py-1 px-2" icon_htmlclass="bg-dark-500 text-dark-100 py-1 px-1 shrink-0 ml-px" %}
+{% with item_htmlclass="text-sm flex flex-row items-center overflow-hidden" label_htmlclass="bg-dark-300 dark:bg-dark-900 text-sm whitespace-nowrap flex-1 py-1 px-2" icon_htmlclass="bg-dark-300 dark:bg-dark-900 py-1 px-1 shrink-0 ml-px" %}
 
   {% if datatracker_user %}
     {% for subpath, url, desc in xml2rfc_urls %}
@@ -13,8 +13,8 @@
         data-full-url="{{ url }}"
         data-copy-button-class="{{ icon_htmlclass }}"
       >
-        <input class="{{ label_htmlclass }} md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
-        <a href="{{ url }}" class="{{ icon_htmlclass }}" title="Open">
+        <input title="{{ desc|default:"" }}" class="{{ label_htmlclass }} md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
+        <a href="{{ url }}" class="link {{ icon_htmlclass }}" title="Open">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
           </svg>
@@ -23,7 +23,7 @@
     {% endfor %}
     {% for format in available_serialization_formats %}
       <a
-        class="{{ item_htmlclass }} shrink-0 grow-0"
+        class="link {{ item_htmlclass }} shrink-0 grow-0"
         href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
       >
         <span class="{{ label_htmlclass }}">
@@ -38,7 +38,7 @@
     {% endfor %}
   {% else %}
     <a
-      class="{{ item_htmlclass }} grow-0"
+      class="link {{ item_htmlclass }} grow-0"
       href="{% url "datatracker_oauth_initiate" %}"
       title="Log in to export bibliographic data"
     >
