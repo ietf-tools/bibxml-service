@@ -13,7 +13,7 @@
   {% with linked_id=rel_docid.id|default:formattedref_content|default:formattedref %}
     {% if linked_id %}
       {% include "citation/docid_search_link.html" with val=linked_id %}
-      {% if rel_title %}
+      {% if rel_title.content and rel_title.content != bibitem.title.0.content %}
         <span class="tracking-tight text-xs font-serif italic">{{ rel_title.content }}</span>
       {% endif %}
     {% endif %}
