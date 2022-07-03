@@ -12,7 +12,7 @@
 {% with formattedref_content=val.bibitem.formattedref.content formattedref=val.bibitem.formattedref rel_docid=val.bibitem.docid|as_list|first rel_title=val.bibitem.title|as_list|first %}
   {% with linked_id=rel_docid.id|default:formattedref_content|default:formattedref %}
     {% if linked_id %}
-      {% include "citation/docid_search_link.html" with val=linked_id %}
+      {% include "citation/docid_search_link.html" with val=linked_id htmlclass="whitespace-nowrap" %}
       {% if rel_title.content and rel_title.content != bibitem.title.0.content %}
         <span class="tracking-tight text-xs font-serif italic">{{ rel_title.content }}</span>
       {% endif %}
