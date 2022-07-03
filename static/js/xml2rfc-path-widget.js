@@ -1,4 +1,9 @@
+// NOTE: this module relies on TailwindCSS classes.
+
 (function () {
+  const els = document.querySelectorAll('[data-xml2rfc-subpath]')
+
+  // Heroicons
   const copyButtonSVG = `
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
       <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
@@ -11,81 +16,139 @@
     </svg>
   `;
 
-  function appendButton(el, title, iconHTML, clickHandler) {
-    const btnEl = document.createElement('span');
-    btnEl.setAttribute('class', el.dataset.copyButtonClass ?? '');
-    btnEl.setAttribute('title', title);
-    btnEl.innerHTML = iconHTML;
-    btnEl.addEventListener('click', clickHandler);
-    el.appendChild(btnEl);
-    btnEl.classList.add('cursor-pointer');
+  // If we support permissions
+  if (navigator.permissions) {
+    navigator.permissions.query({name: "clipboard-write"}).then(result => {
+      // And we get them
+      if (result.state == "granted" || result.state == "prompt") {
+        // Initialize widget with copy button
+        els.forEach(initCopyWidget);
+      } else {
+        // Otherwise, initialize widget with select-all button
+        els.forEach(initSelectWidget);
+      }
+    });
+  } else {
+    // Otherwise, initialize widget with select-all button
+    els.forEach(initCopyWidget);
   }
 
-  function autoExpand(el) {
-    const input = el.querySelector('input');
-    const short = document.createElement('span');
-    short.setAttribute('class', input.getAttribute('class'));
-    short.innerText = el.dataset.xml2rfcSubpath;
-    el.prepend(short);
-    input.classList.add('hidden');
-    el.addEventListener('mouseenter', () => {
-      short.classList.add('hidden');
-      input.classList.remove('hidden');
-    });
-    el.addEventListener('mouseleave', () => {
-      input.classList.add('hidden');
-      short.classList.remove('hidden');
-    });
-  }
-
+  /** Initialize with copy button. */
   function initCopyWidget(el) {
     const subpath = el.dataset.xml2rfcSubpath;
     const fullURL = el.dataset.fullUrl;
     const input = el.querySelector('input');
 
+    let destroyAbbreviator = abbreviateUntilHover(el, input);
+
+    function reinitialize() {
+      input.value = fullURL;
+      destroyAbbreviator = abbreviateUntilHover(el, input);
+    }
+
     function handleXml2rfcUrlCopy() {
       input.select();
+
       navigator.clipboard.writeText(fullURL).then(function() {
         console.info("Copied xml2rfc path to clipboard");
+        destroyAbbreviator();
+        input.value = "Copied!";
+        setTimeout(reinitialize, 2000);
       }, function(err) {
         console.error("Couldn’t copy xml2rfc path to clipboard", fullURL, err);
+        // At least select the text for easier copying
+        input.select();
       });
     }
 
     if (subpath && fullURL) {
-      appendButton(
+      addButton(
         el,
         "Copy this xml2rfc URL to clipboard",
         copyButtonSVG,
         handleXml2rfcUrlCopy,
+        input.nextSibling,
       );
     } else {
       console.warning("Cannot initialize copy xml2rfc path widget: missing data attributes", el);
     }
   }
 
+  /** Initialize with select-all button. */
   function initSelectWidget(el) {
     const input = el.querySelector('input');
-    appendButton(
+    const destroyAbbreviator = abbreviateUntilHover(el, input);
+    addButton(
       el,
       "Select this xml2rfc URL",
       selectButtonSVG,
-      function () { input.select() },
+      function () {
+        input.select();
+        destroyAbbreviator();
+      },
+      input.nextSibling,
     );
   }
 
-  const els = document.querySelectorAll('[data-xml2rfc-subpath]')
+  /**
+   * Inserts a button within given element.
+   *
+   * @param {HTMLElement} el container in which to add the button,
+   * should contain data-copy-button-class attribute to specify button class
+   * @param {string} title button tooltip text
+   * @param {string} iconHTML button inner HTML (SVG)
+   * @param {function} clickHandler button click handler
+   * @param {HTMLElement} (optional) beforeEl child before which to insert the button
+   */
+  function addButton(el, title, iconHTML, clickHandler, beforeEl) {
+    const btnEl = document.createElement('span');
+    btnEl.setAttribute('class', el.dataset.copyButtonClass ?? '');
+    btnEl.setAttribute('title', title);
+    btnEl.innerHTML = iconHTML;
+    btnEl.addEventListener('click', clickHandler);
+    if (beforeEl) {
+      el.insertBefore(btnEl, beforeEl);
+    } else {
+      el.appendChild(btnEl);
+    }
+    btnEl.classList.add('cursor-pointer');
+  }
 
-  els.forEach(autoExpand);
-  if (navigator.permissions) {
-    navigator.permissions.query({name: "clipboard-write"}).then(result => {
-      if (result.state == "granted" || result.state == "prompt") {
-        els.forEach(initCopyWidget);
-      } else {
-        els.forEach(initSelectWidget);
-      }
-    });
-  } else {
-    els.forEach(initCopyWidget);
+  /**
+   * Replaces reference element with a span containing
+   * abbreviated version, showing the reference on hover.
+   *
+   * @param {HTMLElement} el container
+   * with the data-abbreviate-as attribute.
+   * @param {HTMLElement} reference
+   * a child of el that contains the full version of the string
+   * to abbreviate.
+   */
+  function abbreviateUntilHover(el, reference) {
+    const short = document.createElement('span');
+    short.setAttribute('class', reference.getAttribute('class'));
+    short.innerText = el.dataset.abbreviateAs;
+    el.prepend(short);
+
+    function handleExpand() {
+      short.classList.add('hidden');
+      reference.classList.remove('hidden');
+    }
+    function handleAbbreviate() {
+      reference.classList.add('hidden');
+      short.classList.remove('hidden');
+    }
+
+    handleAbbreviate();
+
+    el.addEventListener('mouseenter', handleExpand);
+    el.addEventListener('mouseleave', handleAbbreviate);
+
+    return function destroyAbbreviator() {
+      el.removeEventListener('mouseenter', handleExpand);
+      el.removeEventListener('mouseleave', handleAbbreviate);
+      el.removeChild(short);
+      handleExpand();
+    }
   }
 })();
