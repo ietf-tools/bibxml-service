@@ -14,7 +14,7 @@
     {% if linked_id %}
       {% include "citation/docid_search_link.html" with val=linked_id %}
       {% if rel_title %}
-        <small>{{ rel_title.content }}</small>
+        <span class="tracking-tight text-xs font-serif italic">{{ rel_title.content }}</span>
       {% endif %}
     {% endif %}
   {% endwith %}
