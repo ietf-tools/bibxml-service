@@ -86,11 +86,11 @@ def get_internet_draft(
         abstract=[{
             'content': data['abstract'],  # .replace('\n', ' '),
         }] if 'abstract' in data else None,
-        edition={
-            'content': data['rev'],
-        },
         link=[{
             'content': f'{BASE_DOMAIN}%s' % data['resource_uri'],
+        }],
+        version=[{
+            'draft': data['rev'],
         }],
         docid=[{
             'type': 'IETF',

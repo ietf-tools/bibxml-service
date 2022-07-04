@@ -2,7 +2,8 @@ from typing import Dict
 from unittest import TestCase
 
 from bib_models import DocID
-from main.query_utils import get_docid_struct_for_search, get_primary_docid
+from bib_models.util import get_primary_docid
+from main.query_utils import get_docid_struct_for_search
 
 
 class QueryTestCase(TestCase):

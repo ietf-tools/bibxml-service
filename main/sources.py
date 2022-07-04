@@ -25,6 +25,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import transaction
 
+from bib_models.util import normalize_relaxed
 from common.util import as_list
 from common.pydantic import ValidationErrorDict, pretty_print_loc
 from sources import indexable
@@ -227,6 +228,28 @@ def index_dataset(ds_id, relaton_path, refs=None,
                         or [datetime.datetime.now().date()]
                     )
 
+                    if on_error:
+                        try:
+                            BibliographicItem(**ref_data)
+                        except ValidationError as validation_error:
+                            err_desc = '\n'.join([
+                                f"{d['type']} at "
+                                f"{pretty_print_loc(d['loc'])}: {d['msg']}"
+                                for d in cast(
+                                    List[ValidationErrorDict],
+                                    validation_error.errors()
+                                )
+                            ])
+                            try:
+                                normalize_relaxed(ref_data)
+                                BibliographicItem(**ref_data)
+                            except Exception:
+                                on_error(ref, err_desc)
+                            else:
+                                on_error(
+                                    ref,
+                                    'resolved (normalized):\n%s' % err_desc)
+
                     RefData.objects.update_or_create(
                         ref=ref,
                         dataset=ds_id,
@@ -236,17 +259,6 @@ def index_dataset(ds_id, relaton_path, refs=None,
                             representations=dict(),
                         ),
                     )
-
-                    if on_error:
-                        try:
-                            BibliographicItem(**ref_data)
-                        except ValidationError as e:
-                            errs = cast(List[ValidationErrorDict], e.errors())
-                            on_error(ref, '\n'.join([
-                                f"{pretty_print_loc(d['loc'])}: "
-                                f"{d['type']}: {d['msg']}"
-                                for d in errs
-                            ]))
 
                     indexed_refs.add(ref)
 

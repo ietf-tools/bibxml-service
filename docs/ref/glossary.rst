@@ -17,6 +17,11 @@ Glossary
 
        Can either be an :term:`indexable source` or an :term:`external source`.
 
+   BibXML format
+       XML using schema defined
+       by `RFC 7991 <https://datatracker.ietf.org/doc/html/rfc7991>`_
+       or newer `Xml2rfc vocabulary <https://xml2rfc.tools.ietf.org/xml2rfc-doc.html>`_.
+
    indexable source
        An external data source periodically compiled by external tools
        from authoritative source(s).
@@ -112,31 +117,34 @@ Glossary
          - :attr:`xml2rfc_compat.models.Xml2rfcItem.sidecar_meta`
          - :class:`xml2rfc_compat.types.Xml2rfcPathMetadata`
 
+
+   anchor
    xml2rfc anchor
-      Part of the filename in an :term:`xml2rfc-style path`
-      without “reference” or “_reference” prefix and file extension.
+      Used to mean two different strings, which may be the same
+      but are conceptually different:
 
-      It also appears as the “anchor” attribute on the ``<reference>``
-      element in returned XML.
+      - Part of the filename in an :term:`xml2rfc-style path`,
+        without “reference” or “_reference” prefix and file extension.
+      - The value of the “anchor” attribute on the ``<reference>``
+        element in BibXML.
 
-   xml2rfc fetcher function
-   xml2rfc fetcher
-      A function registered and associated with a top-level xml2rfc subpath
-      via :func:`xml2rfc_compat.resolvers.register_fetcher`.
+   xml2rfc adapter
+      A set of functions registered and associated with a top-level xml2rfc subpath
+      via :func:`xml2rfc_compat.adapters.register_adapter`.
 
-      Fetcher function is passed the ``anchor`` argument as a string,
-      for which it must return
-      a :class:`~relaton.models.bibdata.BibliographicItem` instance,
-      and is expected to raise either :class:`main.exceptions.RefNotFoundError`
-      or :class:`pydantic.ValidationError`.
+      Generally should be a :class:`xml2rfc_compat.adapters.Xml2rfcAdapter` subclass.
+
+      Consists of resolve and reverse functions.
+
+      Resolve function is invoked when handling a request to an xml2rfc path.
+      It’s passed the ``anchor`` argument as a string,
+      for which it must return a representation of the corresponding
+      bibliographic item in :term:`BibXML format`.
+
+      Reverse function is invoked when displaying a bibliographic item to the user,
+      to obtain an xml2rfc path through which the same item can be obtained.
+      It’s passed a :class:`relaton.models.bibdata.BibliographicItem` instance,
+      and should return the :term:`anchor` part of xml2rfc-style path filename,
+      or ``None`` if it’s not applicable to given item.
 
       .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`
-
-   anchor formatter function
-      A function that can be optionally registered for a top-level xml2rfc subpath
-      via :func:`xml2rfc_compat.resolvers.register_anchor_formatter`.
-
-      If provided for given xml2rfc directory, it will be called when formatting
-      the anchor attribute in resulting XML.
-
-      (Has no effect if an anchor is given in GET query.)

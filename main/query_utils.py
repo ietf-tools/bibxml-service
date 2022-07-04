@@ -1,6 +1,6 @@
 """Query-related utilities."""
 
-from typing import Callable, Union, List, Dict, Any, Optional, Tuple
+from typing import Callable, Union, Sequence, Dict, Any, Optional, Tuple
 import logging
 
 from django.db.models.query import QuerySet
@@ -17,7 +17,6 @@ from .types import IndexedBibliographicItem
 
 __all__ = (
     'compose_bibitem',
-    'get_primary_docid',
     'get_docid_struct_for_search',
     'query_suppressing_user_input_error',
     'is_benign_user_input_error',
@@ -28,12 +27,13 @@ log = logging.getLogger(__name__)
 
 
 def compose_bibitem(
-    refs: List[RefData],
+    refs: Sequence[RefData],
     primary_id: Optional[str] = None,
     strict: bool = True,
 ) -> Tuple[CompositeSourcedBibliographicItem, bool]:
     """
-    Converts multiple physical ``RefData`` instances
+    Converts multiple physical ``RefData`` instances,
+    possibly from different bibliographic data sources,
     into a single logical bibliographic item.
 
     This function assumes that you have ensured to collect ``RefData``
@@ -68,8 +68,13 @@ def compose_bibitem(
         obj = get_indexed_object_meta(ref.dataset, ref.ref)
         sourced_id = f'{ref.ref}@{source.id}'
 
-        bibitem_merger.merge(base, ref.body)
         bibitem, validation_errors = construct_bibitem(ref.body, strict)
+        # NOTE: construct_bibitem() does loose YAML normalization
+        # on ``ref.body`` IN-PLACE as a side-effect,
+        # so we must call it first or CompositeSourcedBibliographicItem
+        # may get bad YAML and fail validation.
+        # XXX: Make normalization more explicit
+        bibitem_merger.merge(base, ref.body)
 
         if validation_errors is not None:
             validation_errors_encountered = True
@@ -120,41 +125,6 @@ def get_docid_struct_for_search(id: DocID) -> Dict[str, Any]:
     if id.primary:
         struct['primary'] = True
     return struct
-
-
-def get_primary_docid(raw_ids: List[DocID]) -> Optional[DocID]:
-    """Extracts a single primary document identifier from a list of objects
-    as it appears under “docid” in deserialized Relaton data.
-
-    Logs a warning if more than one primary identifier was found.
-
-    :rtype: relaton.models.bibdata.DocID or None
-    """
-
-    primary_docids: List[DocID] = [
-        docid for docid in raw_ids
-        if all([
-            docid.primary is True,
-            # As a further sanity check, require id and type, but no scope:
-            docid.id is not None,
-            docid.type is not None,
-            docid.scope is None,
-        ])
-    ]
-
-    deduped = set([frozenset([id.id, id.type]) for id in primary_docids])
-
-    if len(deduped) != 1:
-        log.warn(
-            "build_citation_by_docid: unexpected number of primary docids "
-            "found for %s: %s",
-            raw_ids,
-            len(primary_docids))
-
-    try:
-        return primary_docids[0]
-    except IndexError:
-        return None
 
 
 def query_suppressing_user_input_error(

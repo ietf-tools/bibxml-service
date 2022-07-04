@@ -5,7 +5,7 @@ xml2rfc tools compatibility
 .. contents::
    :local:
 
-xml2rfc tool compatibility tries to achieve the following goals:
+xml2rfc tool compatibility aims to:
 
 - Offer XML output in line with RFC 7991
   (with bias towards preexisting xml2rfc tools web server output,
@@ -16,9 +16,14 @@ xml2rfc tool compatibility tries to achieve the following goals:
   up-to-date bibliographic data in the abovementioned XML format
   when possible.
 
+- Provide xml2rfc path for bibliographic item in service GUI
+  (per :issue:`225`).
+
 .. seealso::
 
    - :rfp:req:`5`
+
+   - :term:`BibXML foramt`
 
    - If you have cases where paths are resolved incorrectly,
      :doc:`/howto/adjust-xml2rfc-paths`.
@@ -43,7 +48,7 @@ Each path is handled the following way:
    If found, bibliographic item with mapped docid
    is attempted to be retrieved and returned as XML.
 
-2. If the above fails, the path is passed to registered fetcher function,
+2. If the above fails, the path is passed to registered adapters,
    which parses the anchor, performs necessary DB queries and is expected
    to return a ``BibliographicItem``.
 
@@ -52,25 +57,23 @@ Each path is handled the following way:
 
 .. note::
 
-   Only a path for which an :term:`xml2rfc fetcher` is registered will be handled,
-   even though that fetcher function is not necessarily called.
+   Only a path for which an :term:`xml2rfc adapter` is registered will be handled.
 
 .. note::
 
-   The anchor in resulting XML is overridden using a :term:`anchor formatter function`,
-   if one is registered. Anchor in GET query takes precedence.
+   Anchor in GET query, if given, will replace top-level reference anchor in XML.
 
 .. seealso:: :func:`xml2rfc_compat.views.handle_xml2rfc_path()`
 
-Manual mapping
---------------
+Mapping
+-------
 
 A map associates given xml2rfc path with a :term:`primary document identifier`.
 When that path is requested, this service looks up that identifier
 in :term:`bibliographic data sources <bibliographic data source>`.
 
-Manual mappings are obtained
-from :term:`xml2rfc sidecar metadata files <xml2rfc sidecar metadata file>`,
+Mappings are obtained from
+:term:`xml2rfc sidecar metadata files <xml2rfc sidecar metadata file>`,
 provided within the :term:`xml2rfc archive source`
 and named after the preexisting XML files in it.
 
@@ -82,21 +85,22 @@ The management GUI may provide a utility for exploring manual mappings.
 
 .. seealso:: :func:`xml2rfc_compat.views.resolve_manual_map()`
 
-Fetcher functions
+Adapter
 -----------------
 
-:term:`Fetcher functions <xml2rfc fetcher>` are associated with subdirectories
-(e.g., ``bibxml9``) via :func:`xml2rfc_compat.resolvers.register_fetcher`.
+:term:`Adapters <xml2rfc adapter>` are associated with subdirectories
+(e.g., ``bibxml9``) via :func:`xml2rfc_compat.adapters.register_adapter`.
 
-Fetcher functions are currently defined in :mod:`xml2rfc_compat.fetchers`.
+Concrete adapters can be found in :mod:`bibxml.xml2rfc_adapters`.
+This module must be imported at service startup to ensure registration is done.
 
 .. seealso:: :func:`xml2rfc_compat.views.resolve_automatically()`
 
 Fallback
 --------
 
-If manual map is not present or failed, and fetcher function failed,
-fallback document is attempted to be used.
+If manual map is not present or failed, and adapters failed,
+fallback XML string is attempted to be used.
 
 Fallback data is provided via the :term:`xml2rfc archive source`,
 *which has to be indexed* in order for fallback to work.

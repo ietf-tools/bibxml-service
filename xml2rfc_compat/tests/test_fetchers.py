@@ -2,7 +2,6 @@ from django.test import TestCase
 
 from bib_models import BibliographicItem
 from main.exceptions import RefNotFoundError
-from xml2rfc_compat import fetchers
 
 
 class XML2RFCFetchersTestCase(TestCase):

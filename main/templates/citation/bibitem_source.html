@@ -36,7 +36,7 @@ Note: this may be caused either by malformed source data, or by this service’s
     {% else %}
       requested via
     {% endif %}
-    {% if show_internal_links %}
+    {% if show_internal_links and indexed %}
       <a
         class="link"
         href="{% url "browse_dataset" sourced_item.source.id|cut:"relaton-data-" %}"

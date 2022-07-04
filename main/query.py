@@ -18,7 +18,8 @@ from django.conf import settings
 # from sources import InternalSource
 
 from common.util import as_list
-from bib_models import construct_bibitem, DocID, Relation
+from bib_models import DocID, Relation
+from bib_models.util import construct_bibitem, get_primary_docid
 
 from .exceptions import RefNotFoundError
 from .types import IndexedBibliographicItem
@@ -26,7 +27,7 @@ from .types import CompositeSourcedBibliographicItem, FoundItem
 from .sources import get_source_meta, get_indexed_object_meta
 from .models import RefData
 from .query_utils import query_suppressing_user_input_error, compose_bibitem
-from .query_utils import get_primary_docid, get_docid_struct_for_search
+from .query_utils import get_docid_struct_for_search
 
 
 __all__ = (
@@ -201,7 +202,11 @@ def search_refs_relaton_field(
 
           Example::
 
-              { 'docid': 'IEEE', 'keyword': 'foo -bar OR "foo bar"' }
+              {
+                  'docid': 'IEEE',
+                  'keyword': 'foo -bar OR "foo bar"',
+                  'some.field': 'some +query',
+              }
 
           Empty field spec is treated specially, matching the whole body::
 
@@ -285,9 +290,14 @@ def search_refs_relaton_field(
                     '''
                     anded_queries.append(tpl.format(
                         json_selectors=', '.join([
+                            # TODO: why replace slashes with whitespace
+                            # in json_extract_path_text() output?
+                            # That’s what translate() does.
                             'translate(jsonb_extract_path_text(body, {fieldpath}), \'/\', \' \')'.format(
                                 # {fieldpath} is not properly escaped,
                                 # callers must not pass user input here.
+                                # Couldn’t make use of Django’s SQL escaping
+                                # in this case.
                                 fieldpath=','.join([
                                     "'%s'" % part
                                     for part in fieldpath.split('.')]),
@@ -361,9 +371,11 @@ def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
                 '@.id like_regex {id}{type_query}{primary_query}'.format(
                     id=id,
                     type_query=(
-                        ' && @.type like_regex {id_type}' if id_type else ''),
+                        f' && @.type like_regex {id_type}'
+                        if id_type else ''),
                     primary_query=(
-                        ' && @.primary == true' if id_primary else ''),
+                        ' && @.primary == true'
+                        if id_primary else ''),
                 ),
                 # To exclude untyped add ' && exists (@.type)'
             }
@@ -546,13 +558,15 @@ def hydrate_relations(
                         # a possibility.
                         cache,
                     )
-                except:  # XXX: Catch more specific exceptions
+                except Exception as err:
+                    # XXX: Catch more specific exceptions?
                     # We have failed to obtain a hydrated item
                     # for this relation, store None in cache.
                     log.warn(
-                        "Failed to hydrate bibitem for relation: %s, %s",
+                        "Failed to hydrate related bibitem %s, %s: %s",
                         _type,
-                        _id)
+                        _id,
+                        err)
                     cache[id_key] = None
 
             # Switch original bibitem on this relation
@@ -601,7 +615,7 @@ def refdata_to_bibitem(
        that have the same primary docid,
        and merge results
        into a :class:`main.types.CompositeSourcedBibliographicItem`
-       (see :func:`.compose_bibitem()`)
+       (see :func:`main.query_utils.compose_bibitem()`)
 
     4. If ``hydrate_relation_levels`` is larger than zero,
        do the above for each relation
@@ -662,7 +676,7 @@ def build_search_results(
             if 'id' in id and 'scope' not in id and 'type' in id
         ])
 
-        # TODO: Skip ``fallback_formattedref`` cases with #196
+        # TODO: Skip ``fallback_formattedref`` cases when #196 is confirmed
         fallback_formattedref = (
             ref.body.
             get('formattedref', {}).
@@ -674,7 +688,7 @@ def build_search_results(
                 refs_by_primary_id[primary_id.id].append(idx)
             else:
                 refs_by_primary_id[suitable_ids[0].id] = [idx]
-        elif fallback_formattedref: #196
+        elif fallback_formattedref:  # TODO: #196
             refs_by_primary_id[fallback_formattedref] = [idx]
 
     for _docid, ref_indexes in refs_by_primary_id.items():

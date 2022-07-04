@@ -1,16 +1,13 @@
 """Provides an external source registry."""
 
-from typing import Dict, Callable, Any, Optional, Union
+from typing import Dict, Callable, Optional, Union
 import logging
-from functools import wraps
 
 from pydantic.dataclasses import dataclass
-from pydantic import ValidationError
 
 from bib_models import DocID
 
 from .types import ExternalBibliographicItem
-from .exceptions import RefNotFoundError
 
 
 log = logging.getLogger(__name__)
@@ -20,10 +17,7 @@ log = logging.getLogger(__name__)
 class ExternalSource:
     """Represents a registered external source."""
 
-    get_item: Union[
-        Callable[[str, bool], ExternalBibliographicItem],
-        Callable[[str], ExternalBibliographicItem],
-    ]
+    get_item: Callable[[str, Optional[bool]], ExternalBibliographicItem]
     """Returns an item given docid.id. The ``strict`` argument
     is True by default and means the method must throw
     if received item did not pass validation.

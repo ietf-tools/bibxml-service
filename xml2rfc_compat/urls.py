@@ -8,19 +8,19 @@ from django.views.decorators.http import require_safe
 
 from .aliases import get_aliases
 from .models import dir_subpath_regex
-from .resolvers import fetcher_registry
+from .adapters import adapters
 from .views import handle_xml2rfc_path
 
 
 def get_urls():
     """Returns a list of URL patterns suitable for inclusion
-    in site’s root URL configuration, based on registered fetcher functions.
+    in site’s root URL configuration, based on registered adapters.
 
-    The directory name for each registered fetcher is automatically
+    The directory name for each registered adapter is automatically
     expanded to include aliases
     (e.g., “bibxml-ids” is included in addition to canonical “bibxml3”).
 
-    Fetcher functions should have been all registered prior
+    Adapters should have been all registered prior
     to calling this function.
 
     Each generated URL pattern is in the shape of
@@ -32,7 +32,7 @@ def get_urls():
     """
     dirnames_with_aliases = [
         d
-        for dirname in fetcher_registry.keys()
+        for dirname in adapters.keys()
         for d in [dirname, *get_aliases(dirname)]
     ]
     return [
