@@ -113,6 +113,7 @@ class Xml2rfcAdapter:
         self._log.append(msg)
 
     def fetch_refs(self) -> Sequence[RefData]:
+        # import ipdb; ipdb.set_trace()
         if (query := self.get_docid_query()):
             self.log(f"using query {query}")
             return search_refs_relaton_field({
