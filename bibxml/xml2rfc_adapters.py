@@ -369,7 +369,26 @@ class IeeeAdapter(Xml2rfcAdapter):
     which are considered reliably formatted but are not compatible
     with preexisting paths.
 
-    For other paths, returns nothing, leaving caller to fall back.
+    :term:`docid.id` -> :term:`xml2rfc anchor` conversion logic:
+
+    - Split the path into prefix and the rest of the anchor.
+
+    - In prefix, slashes are replaced with underscores, e.g.:
+
+      - IEEE documents start with ``R.IEEE.``,
+      - mixed-published documents start with e.g. ``R.ANSI_IEEE.``.
+
+    - In rest of the anchor, whitespace are replaced with
+      underscores. (Slashes are left as is.)
+
+    - Prefix and rest are recombined, separated by period;
+      and everything is prefixed with ``R.``.
+
+    The anchor is converted back to docid using the same logic in reverse.
+
+    For anchors that don’t start with ``R.``,
+    adapter doesn’t resolve the xml2rfc path, letting the view fall back
+    to archive XML data.
     """
     exact_docid_match = True
 
