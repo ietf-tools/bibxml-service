@@ -188,8 +188,8 @@ def list_xml2rfc_urls(
     urls: List[Tuple[str, str, Optional[str]]] = []
 
     for dirname, adapter_cls in adapters.items():
-        if (refs := adapter_cls.reverse(item)):
-            for anchor, desc in refs:
+        if (anchors := adapter_cls.reverse(item)):
+            for anchor, desc in anchors:
                 try:
                     subpath = f'{dirname}/reference.{anchor}.xml'
                     url = reverse(
