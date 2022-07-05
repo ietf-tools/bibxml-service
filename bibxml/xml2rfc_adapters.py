@@ -377,14 +377,13 @@ class IeeeAdapter(Xml2rfcAdapter):
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IEEE'):
-            return [(
-                f"R.IEEE.{docid.id.removeprefix('IEEE ').replace(' ', '_')}",
-                None,
-            )]
+            prefix, rest = docid.id.split(' ', 1)
+            anchor = f"R.{prefix.replace('/', '_')}.{rest.replace(' ', '_')}"
+            return [(anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        is_legacy = not self.anchor.startswith('R.IEEE.')
+        is_legacy = not self.anchor.startswith('R.')
         if is_legacy:
             # We give up on automatically resolving legacy bibxml6/IEEE paths.
             # This is intended to trigger fallback behavior
@@ -393,8 +392,12 @@ class IeeeAdapter(Xml2rfcAdapter):
         else:
             # However, we support automatically generated IEEE paths
             # that we can be sure to resolve
-            docid = self.anchor.removeprefix('R.IEEE.').replace('_', ' ')
-            return DocID(type="IEEE", id=f'IEEE {docid}')
+            unprefixed = self.anchor.removeprefix('R.')
+            id_prefix, rest = unprefixed.split('.', 1)
+            return DocID(
+                type="IEEE",
+                id=f"{id_prefix.replace('_', '/')} {rest.replace('_', ' ')}",
+            )
 
 
 @register_adapter('bibxml8')
