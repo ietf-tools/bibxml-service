@@ -50,16 +50,21 @@ class Xml2rfcItem(models.Model):
     a :class:`relaton.models.bibdata.BibliographicItem` instance.
     """
 
+    def format_dirname(self):
+        """Extracts xml2rfc dirname from this item’s ``subpath``."""
+
+        return self.subpath.split('/', 1)[0]
+
     def format_filename(self):
         """Extracts filename from this item’s ``subpath``."""
 
-        dirname = self.subpath.split('/')[0]
+        dirname = self.format_dirname()
         return self.subpath.replace(f'{dirname}/', '', 1)
 
     def format_anchor(self):
         """Extracts :term:`xml2rfc anchor` from this item’s ``subpath``."""
 
-        dirname = self.subpath.split('/')[0]
+        dirname = self.format_dirname()
         match = re.match(get_dir_subpath_regex(dirname), self.subpath)
         if match:
             return match.group('anchor')
