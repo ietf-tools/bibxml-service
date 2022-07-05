@@ -178,7 +178,7 @@ def make_xml2rfc_url(
     subpath: str,
     desc: Optional[str] = None,
     request=None,
-) -> Tuple[str, str, Optional[str]]:
+) -> Optional[Tuple[str, str, Optional[str]]]:
     try:
         # Use Django’s ``reverse()`` to ensure all
         # returned xml2rfc paths actually resolve
