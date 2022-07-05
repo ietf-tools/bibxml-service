@@ -437,7 +437,7 @@ class BaseCitationSearchView(BaseListView):
 
     def parse_docid_regex_query(self, query: str) -> str:
         if not is_websearch(query) and not is_jsonpath(query):
-            return query
+            return query.strip()
         else:
             raise ValueError("Query does not look like a regex query")
 
