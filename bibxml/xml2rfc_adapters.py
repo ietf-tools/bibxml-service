@@ -405,18 +405,22 @@ class IanaAdapter(Xml2rfcAdapter):
     Note that these are not well-tested, since bibxml-iana
     snapshot is not available.
     """
+    exact_docid_match = True
+
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IANA'):
-            return [(
-                f"IANA.{docid.id.removeprefix('IANA ').replace(' ', '_')}",
-                None,
-            )]
+            xml2rfc_anchor = 'IANA.' + (
+                docid.id.
+                removeprefix('IANA ').
+                replace('/', '_')
+            )
+            return [(xml2rfc_anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        id = self.anchor.replace('IANA.', 'IANA ').replace('_', ' ')
+        id = self.anchor.replace('IANA.', 'IANA ').replace('_', '/')
         return DocID(type="IANA", id=id)
 
 
