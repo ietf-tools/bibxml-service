@@ -6,6 +6,7 @@ via :func:`xml2rfc_compat.urls.get_urls()`.
 
 from typing import Dict, List, Tuple, Optional, TypeAlias, Type, Sequence
 import re
+import logging
 
 from django.urls import reverse, NoReverseMatch
 
@@ -19,6 +20,9 @@ from main.query import hydrate_relations, search_refs_relaton_field
 from main.exceptions import RefNotFoundError
 
 from .models import Xml2rfcItem
+
+
+log = logging.getLogger(__name__)
 
 
 ReversedRef: TypeAlias = Tuple[str, Optional[str]]
@@ -192,8 +196,10 @@ def make_xml2rfc_url(
             if request else url,
             desc,
         )
-    except NoReverseMatch as err:
-        pass
+    except NoReverseMatch:
+        # XXX: Log reversion failure
+        log.exception("Failed to reverse xml2rfc path")
+        return None
 
 
 def list_xml2rfc_urls(
