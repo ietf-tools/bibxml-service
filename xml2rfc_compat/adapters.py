@@ -5,7 +5,6 @@ via :func:`xml2rfc_compat.urls.get_urls()`.
 """
 
 from typing import Dict, List, Tuple, Optional, TypeAlias, Type, Sequence
-import re
 import logging
 
 from django.urls import reverse, NoReverseMatch
@@ -13,6 +12,7 @@ from django.urls import reverse, NoReverseMatch
 from relaton.models.bibdata import BibliographicItem, DocID
 
 from bib_models.util import get_primary_docid
+from common.util import get_fuzzy_match_regex
 
 from main.models import RefData
 from main.query_utils import compose_bibitem
@@ -128,25 +128,27 @@ class Xml2rfcAdapter:
 
     def get_docid_query(self) -> Optional[str]:
         if (docid := self.resolve_docid()):
-            self.log(f"using docid {docid.type} {docid.id}")
-            q = '@.type == "%s" && @.primary == true' % docid.type
-            if self.exact_docid_match:
-                q = '%s && @.id == "%s"' % (q, docid.id)
+            if isinstance(docid, list):
+                queries: List[str] = []
+                for d in docid:
+                    self.log(f"using docid {d.type} {d.id}")
+                    queries.append(get_docid_query(
+                        d,
+                        exact=self.exact_docid_match))
+                query = ' || '.join([f'({q})' for q in queries])
             else:
-                q = '%s && @.id like_regex "(?i)^%s$"' % (
-                    q,
-                    '[^a-zA-Z0-9]'.join([
-                        '%s' % re.escape(part)
-                        for part in re.split(r'[^a-zA-Z0-9]', docid.id)
-                    ])
-                )
-            return q
+                self.log(f"using docid {docid.type} {docid.id}")
+                query = get_docid_query(
+                    docid,
+                    exact=self.exact_docid_match)
+
+            return query
         else:
             return None
 
-    def resolve_docid(self) -> Optional[DocID]:
+    def resolve_docid(self) -> List[DocID] | Optional[DocID]:
         doctype, docid = self.anchor.split('.', 1)
-        return DocID(type=doctype, id=docid)
+        return DocID(type=doctype, id=f'{doctype} {docid}')
 
     def build_bibitem(self, refs: Sequence[RefData]) -> BibliographicItem:
         if len(refs) > 0:
@@ -175,6 +177,17 @@ def register_adapter(dirname: str):
         adapters[dirname] = cls
         return cls
     return _register_xml2rfc_adapter
+
+
+def get_docid_query(docid: DocID, exact=False) -> str:
+    q = '@.type == "%s" && @.primary == true' % docid.type
+    if exact:
+        return '%s && @.id == "%s"' % (q, docid.id)
+    else:
+        return '%s && @.id like_regex "(?i)^%s$"' % (
+            q,
+            get_fuzzy_match_regex(docid.id),
+        )
 
 
 def make_xml2rfc_url(
