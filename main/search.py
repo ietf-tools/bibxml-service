@@ -91,10 +91,10 @@ class BaseCitationSearchView(BaseListView):
 
     supported_query_formats = (
         'docid_regex',
+        'websearch',
         'json_struct',
         'json_path',
         'json_repr',
-        'websearch',
     )
     """Allowed values of query format in request.
 
