@@ -314,12 +314,21 @@ class W3cAdapter(Xml2rfcAdapter):
             return [(f"W3C.{docid.id.removeprefix('W3C ')}", None)]
         return []
 
-    def resolve_docid(self) -> Optional[DocID]:
-        with_proper_prefix = self.anchor.replace('W3C.', 'W3C ')
+    # def get_docid_query(self) -> Optional[str]:
+
+    def resolve_docid(self) -> DocID:
+        unprefixed = (
+            self.anchor.
+            removeprefix('W3C.').
+            removeprefix('NOTE-').
+            removeprefix('SPSR-').
+            removeprefix('CR-').
+            removeprefix('PR-').
+            removeprefix('WD-'))
         # We throw away trailing date, because available sources
         # appear to not have the old versions in bibxml-w3c.
-        without_trailing_date = re.sub(r'\-[\d]{8}$', '', with_proper_prefix)
-        return DocID(type="W3C", id=without_trailing_date)
+        without_trailing_date = re.sub(r'\-[\d]{8}$', '', unprefixed)
+        return DocID(type="W3C", id=f'W3C {without_trailing_date}')
 
 
 @register_adapter('bibxml5')
