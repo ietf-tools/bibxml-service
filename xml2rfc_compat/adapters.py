@@ -18,6 +18,8 @@ from main.query_utils import compose_bibitem
 from main.query import hydrate_relations, search_refs_relaton_field
 from main.exceptions import RefNotFoundError
 
+from .models import Xml2rfcItem
+
 
 ReversedRef: TypeAlias = Tuple[str, Optional[str]]
 """Describes a reversed xml2rfc path, possibly with a description."""
@@ -171,6 +173,29 @@ def register_adapter(dirname: str):
     return _register_xml2rfc_adapter
 
 
+def make_xml2rfc_url(
+    dirname: str,
+    subpath: str,
+    desc: Optional[str] = None,
+    request=None,
+) -> Tuple[str, str, Optional[str]]:
+    try:
+        # Use Django’s ``reverse()`` to ensure all
+        # returned xml2rfc paths actually resolve
+        url = reverse(
+            f'xml2rfc_{dirname}',
+            args=[subpath],
+        )
+        return (
+            subpath,
+            request.build_absolute_uri(url)
+            if request else url,
+            desc,
+        )
+    except NoReverseMatch as err:
+        pass
+
+
 def list_xml2rfc_urls(
     item: BibliographicItem,
     request=None,
@@ -187,24 +212,35 @@ def list_xml2rfc_urls(
     """
     urls: List[Tuple[str, str, Optional[str]]] = []
 
-    for dirname, adapter_cls in adapters.items():
-        if (anchors := adapter_cls.reverse(item)):
-            for anchor, desc in anchors:
-                try:
-                    subpath = f'{dirname}/reference.{anchor}.xml'
-                    url = reverse(
-                        f'xml2rfc_{dirname}',
-                        args=[subpath],
-                    )
-                    urls.append((
-                        subpath,
-                        request.build_absolute_uri(url)
-                        if request else url,
+    # Use reverse mapping, if any
+    if ((
+        docid := get_primary_docid(item.docid)
+    ) and (
+        xml2rfc_item := Xml2rfcItem.objects.
+        filter(sidecar_meta__primary_docid=docid.id).
+        first()
+    ) and (
+        url := make_xml2rfc_url(
+            xml2rfc_item.format_dirname(),
+            xml2rfc_item.subpath,
+            None,
+            request)
+    )):
+        urls.append(url)
+
+    # Try adapters’ automatic reversion
+    if not urls:
+        for dirname, adapter_cls in adapters.items():
+            if reversed_anchors := adapter_cls.reverse(item):
+                urls.extend([
+                    url
+                    for anchor, desc in reversed_anchors
+                    if (url := make_xml2rfc_url(
+                        dirname,
+                        f'{dirname}/reference.{anchor}.xml',
                         desc,
+                        request,
                     ))
-                except NoReverseMatch as err:
-                    print(err)
-                    raise
-                    pass
+                ])
 
     return urls
