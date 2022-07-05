@@ -12,6 +12,8 @@ from django.core.cache import cache
 from django.http import Http404
 from django.contrib import messages
 
+from common.util import get_fuzzy_match_regex
+
 from .types import FoundItem
 from .models import RefData
 from .query import build_search_results
@@ -461,10 +463,12 @@ class BaseCitationSearchView(BaseListView):
     # Handlers
 
     def handle_docid_regex_query(self, query: str) -> QuerySet[RefData]:
+        fuzzy_q = r'@.id like_regex "(?i)%s"' % get_fuzzy_match_regex(
+            query,
+            match_sep=r'[[:digit:]]*[^a-zA-Z0-9]',
+        )
         return search_refs_relaton_field(
-            {
-                'docid[*]': '@.id like_regex "(?i)%s"' % re.escape(query),
-            },
+            {'docid[*]': fuzzy_q},
             limit=self.limit_to,
             exact=True,
         )
