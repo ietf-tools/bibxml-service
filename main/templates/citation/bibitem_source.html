@@ -30,7 +30,7 @@ Note: this may be caused either by malformed source data, or by this service’s
       {% endif %}
     {% endif %}
   {% endif %}
-  <span class="">
+  <span class="font-light">
     {% if indexed %}
       indexed from
     {% else %}
@@ -38,11 +38,11 @@ Note: this may be caused either by malformed source data, or by this service’s
     {% endif %}
     {% if show_internal_links and indexed %}
       <a
-        class="link"
+        class="font-normal link"
         href="{% url "browse_dataset" sourced_item.source.id|cut:"relaton-data-" %}"
       >{{ sourced_item.source.id }}</a>
     {% else %}
-      <span>{{ sourced_item.source.id }}</span>
+      <span class="font-normal">{{ sourced_item.source.id }}</span>
     {% endif %}
   </span>
 </span>
