@@ -31,7 +31,8 @@ specifying URL and/or branch name explicitly).
 
 .. seealso::
 
-   - :mod:`main.sources`
+   - :doc:`/howto/auto-reindex-sources`
+   - :mod:`main.sources` for Relaton source implementation
 
 External sources
 ================

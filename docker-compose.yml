@@ -144,6 +144,7 @@ services:
       CONTACT_EMAIL: ${CONTACT_EMAIL:?missing service name}
       SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
+      AUTO_REINDEX_INTERVAL: ${AUTO_REINDEX_INTERVAL}
     depends_on:
       - web-precheck
       - redis
