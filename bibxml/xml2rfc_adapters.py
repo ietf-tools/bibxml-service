@@ -3,6 +3,7 @@ Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
 
 from typing import Optional, List, cast, Sequence
+import urllib
 import logging
 import re
 
@@ -406,7 +407,7 @@ class IeeeAdapter(Xml2rfcAdapter):
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IEEE'):
             prefix, rest = docid.id.split(' ', 1)
-            anchor = f"R.{prefix.replace('/', '_')}.{rest.replace(' ', '_')}"
+            anchor = f"R.{prefix.replace('/', '_')}.{urllib.parse.quote(rest)}"
             return [(anchor, None)]
         return []
 
@@ -424,7 +425,7 @@ class IeeeAdapter(Xml2rfcAdapter):
             id_prefix, rest = unprefixed.split('.', 1)
             return DocID(
                 type="IEEE",
-                id=f"{id_prefix.replace('_', '/')} {rest.replace('_', ' ')}",
+                id=f"{id_prefix.replace('_', '/')} {urllib.parse.unquote(rest)}",
             )
 
 
