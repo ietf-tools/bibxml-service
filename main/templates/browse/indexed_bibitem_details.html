@@ -29,7 +29,7 @@
       {% with docid=data.bibitem.docid|as_list|first %}
         <a
           href="{% url "get_citation_by_docid" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}"
-          class="button bg-emerald-600 text-emerald-100">
+          class="button bg-emerald-600 text-emerald-100 p-4">
           Locate corresponding bibliographic&nbsp;item&nbsp;&rarr;</a>
       {% endwith %}
     {% endif %}
@@ -37,7 +37,7 @@
 {% endblock %}
 
 {% block content %}
-  <header class="p-4 sm:col-span-2 sm:row-span-2">
+  <header class="p-4 sm:col-span-2 sm:row-span-2 leading-tight">
     {% include "citation/bibitem_source.html" with sourced_item=data indexed=1 links="external" only %}
   </header>
 
