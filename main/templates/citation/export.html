@@ -1,54 +1,51 @@
 {# Expects datatracker_user, docid, available_serialization_formats, xml2rfc_urls, item_htmlclass #}
 {# Uses Heroicons #}
 
-{% with item_htmlclass="text-sm flex flex-row items-center overflow-hidden" label_htmlclass="bg-dark-300 dark:bg-dark-900 text-sm whitespace-nowrap flex-1 py-1 px-2" icon_htmlclass="bg-dark-300 dark:bg-dark-900 py-1 px-1 shrink-0 ml-px" %}
 
-  {% if datatracker_user %}
-    {% for subpath, url, desc in xml2rfc_urls %}
-      <span
-        class="{{ item_htmlclass }} flex-1"
-        title="{{ desc|default:"" }}"
-        data-xml2rfc-subpath="{{ subpath }}"
-        data-abbreviate-as="{{ subpath }}"
-        data-full-url="{{ url }}"
-        data-copy-button-class="{{ icon_htmlclass }}"
-      >
-        <input title="{{ desc|default:"" }}" class="{{ label_htmlclass }} md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
-        <a href="{{ url }}" class="link {{ icon_htmlclass }}" title="Open">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </a>
-      </span>
-    {% endfor %}
-    {% for format in available_serialization_formats %}
-      <a
-        class="link {{ item_htmlclass }} shrink-0 grow-0"
-        href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
-      >
-        <span class="{{ label_htmlclass }}">
-          {{ format }}
-        </span>
-        <span class="{{ icon_htmlclass }}">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </span>
-      </a>
-    {% endfor %}
-  {% else %}
-    <a
-      class="link {{ item_htmlclass }} grow-0"
-      href="{% url "datatracker_oauth_initiate" %}"
-      title="Log in to export bibliographic data"
+{% if datatracker_user %}
+  {% for subpath, url, desc in xml2rfc_urls %}
+    <span
+      class="button-v2 flex-1"
+      title="{{ desc|default:"" }}"
+      data-xml2rfc-subpath="{{ subpath }}"
+      data-abbreviate-as="{{ subpath }}"
+      data-full-url="{{ url }}"
+      data-copy-button-class="icon"
     >
-      <span class="{{ label_htmlclass }}">log in via Datatracker</span>
-      <span class="{{ icon_htmlclass }}">
+      <input title="{{ desc|default:"" }}" class="text-sm label md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
+      <a href="{{ url }}" class="link icon" title="Open">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </a>
+    </span>
+  {% endfor %}
+  {% for format in available_serialization_formats %}
+    <a
+      class="link button-v2 shrink-0 grow-0"
+      href="{% url "export_citation" %}?doctype={{ docid.type }}&docid={{ docid.id|urlencode:"" }}&format={{ format }}"
+    >
+      <span class="label">
+        {{ format }}
+      </span>
+      <span class="icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </span>
     </a>
-  {% endif %}
-
-{% endwith %}
+  {% endfor %}
+{% else %}
+  <a
+    class="link button-v2 grow-0"
+    href="{% url "datatracker_oauth_initiate" %}"
+    title="Log in to export bibliographic data"
+  >
+    <span class="label">log in via Datatracker</span>
+    <span class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd" />
+      </svg>
+    </span>
+  </a>
+{% endif %}
