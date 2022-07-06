@@ -6,6 +6,7 @@ via :func:`xml2rfc_compat.urls.get_urls()`.
 
 from typing import Dict, List, Tuple, Optional, TypeAlias, Type, Sequence
 import logging
+import re
 
 from django.urls import reverse, NoReverseMatch
 
@@ -95,8 +96,17 @@ class Xml2rfcAdapter:
         """
         Performs final anchor mangling,
         regardless of how the nachor was obtained.
+
+        By default, does minimal substitutions to attempt to comply
+        with ``xs:ID`` schema.
         """
-        return anchor.replace(' ', '.')
+        return re.sub(
+            r'^\d',
+            r'_\g<0>',
+            anchor.
+            replace(' ', '.').
+            replace(':', '.')
+        )
 
     @classmethod
     def reverse(
