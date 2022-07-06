@@ -91,6 +91,13 @@ class Xml2rfcAdapter:
         """
         return None
 
+    def mangle_anchor(self, anchor: str) -> str:
+        """
+        Performs final anchor mangling,
+        regardless of how the nachor was obtained.
+        """
+        return anchor.replace(' ', '.')
+
     @classmethod
     def reverse(
         cls,
