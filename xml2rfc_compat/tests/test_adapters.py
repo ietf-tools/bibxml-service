@@ -1,7 +1,4 @@
-import os
-
 from django.test import TestCase
-from lxml import etree
 
 from bib_models import BibliographicItem
 from bibxml.settings import XML2RFC_PATH_PREFIX
@@ -32,10 +29,6 @@ class XML2RFCAdaptersTestCase(TestCase):
         self.doi_ref = "10.1093/benz/9780199773787.article.b00004912"
 
         self.dirname = XML2RFC_PATH_PREFIX
-
-        module_dir = os.path.dirname(__file__)
-        file_path = os.path.join(module_dir, "static/schemas/v3.xsd")
-        self.xmlschema = etree.XMLSchema(file=file_path)
 
     def _assert_refs_equal(self, bibitem, ref):
         for id in bibitem.docid:
