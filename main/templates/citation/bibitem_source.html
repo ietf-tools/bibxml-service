@@ -2,6 +2,7 @@
 <span
   class="
     flex flex-row flex-wrap overflow-hidden
+    gap-x-1
     {% if sourced_item.validation_errors|length > 0 %}pointer-help{% endif %}
     {{ htmlclass }}
   "
@@ -17,20 +18,19 @@ Note: this may be caused either by malformed source data, or by this service’s
     {% if sourced_item.indexed_object %}
       {% if show_internal_links %}
         <a
-          class="truncate link"
+          class="link"
           href="{% url "browse_indexed_ref" sourced_item.source.id|cut:"relaton-data-" sourced_item.indexed_object.name %}"
         >
           {{ sourced_item.indexed_object.name }}
         </a>
       {% else %}
-        <span class="truncate">
+        <span class="">
           {{ sourced_item.indexed_object.name }}
         </span>
       {% endif %}
     {% endif %}
   {% endif %}
-  &ensp;
-  <span class="truncate">
+  <span class="">
     {% if indexed %}
       indexed from
     {% else %}
