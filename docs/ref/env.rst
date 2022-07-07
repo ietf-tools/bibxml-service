@@ -142,6 +142,8 @@ Main database
     User password for PostgreSQL server authentication.
 
 
+.. _indexing-env-variables:
+
 Indexing
 --------
 
@@ -152,6 +154,14 @@ Indexing
     Must be an absolute path.
 
     See :data:`bibxml.settings.DATASET_TMP_ROOT`.
+
+``AUTO_REINDEX_INTERVAL``
+    accepted by Django and Compose, pass-through
+
+    How many seconds to wait before reindexing.
+    Must be larger than zero for reindexing to be enabled.
+
+    See :data:`bibxml.settings.AUTO_REINDEX_INTERVAL` for more.
 
 
 Celery & Redis

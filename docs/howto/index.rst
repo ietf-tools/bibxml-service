@@ -15,3 +15,4 @@ How-to guides
    mark-releases
    update-container-build
    run-in-production
+   auto-reindex-sources

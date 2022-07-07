@@ -1,6 +1,7 @@
 """Primitives for working with indexing task status."""
 
 from typing import List, Optional, TypedDict, Union, cast
+import time
 import datetime
 import traceback
 
@@ -76,7 +77,7 @@ class IndexingTaskDescription(TypedDict):
     """Error description, for a failed task."""
 
 
-def get_task_ids(dataset_id, limit=10):
+def get_task_ids(dataset_id, limit=10) -> List[str]:
     """Retrieves Celery task IDs for dataset indexing runs,
     ordered from most recently started to least recently started.
 
@@ -96,22 +97,30 @@ def push_task(dataset_id, task_id):
     cache.lpush(dataset_id, task_id)
 
 
+def _sort_by_task_timestamp(task: IndexingTaskDescription) -> float:
+    if date := task.get('completed_at', None):
+        return time.mktime(date.timetuple())
+    elif task.get('progress', None):
+        return time.mktime(datetime.datetime.now().timetuple())
+    else:
+        return 0
+
+
 def get_dataset_task_history(dataset_name, limit=10) -> \
         List[IndexingTaskDescription]:
 
-    task_ids = (
-        get_task_ids(dataset_name, limit)
-        or
-        SourceIndexationOutcome.objects.
+    task_ids = list(dict.fromkeys([
+        *get_task_ids(dataset_name, limit),
+        *SourceIndexationOutcome.objects.
         filter(source_id=dataset_name).
         order_by('-timestamp').
-        values_list('task_id', flat=True)
-    )
+        values_list('task_id', flat=True),
+    ]))
 
-    return [
+    return sorted([
         describe_indexing_task(tid)
         for tid in task_ids
-    ]
+    ], key=_sort_by_task_timestamp, reverse=True)
 
 
 def get_latest_outcome(dataset_name: str) -> Optional[IndexingTaskDescription]:

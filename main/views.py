@@ -172,6 +172,9 @@ def browse_citation_by_docid(request):
                 request,
             )
         except Exception:
+            log.exception(
+                "Failed to reverse xml2rfc URLs for item with docid %s",
+                docid)
             xml2rfc_urls = []
         metrics.gui_bibitem_hits.labels(docid, 'success').inc()
         return render(request, 'browse/citation_details.html', dict(

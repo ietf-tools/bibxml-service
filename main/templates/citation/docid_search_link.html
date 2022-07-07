@@ -1,5 +1,5 @@
 {% load relaton %}
 {% with link=val|substruct_search_link:'{"docid": [{"id": %s}]}' %}
-  <a class="link" href="{{ link }}"
+  <a class="link {{ htmlclass|default:"" }}" href="{{ link }}"
     >{{ val }}</a>
 {% endwith %}

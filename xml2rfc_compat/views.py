@@ -1,4 +1,4 @@
-from typing import cast, Tuple, Optional, TypedDict, Dict
+from typing import cast, Tuple, Optional, TypedDict, Dict, Callable
 import re
 import logging
 
@@ -242,7 +242,10 @@ def handle_xml2rfc_path(
 
     if item:
         try:
-            xml_repr = to_xml_string(item, anchor=requested_anchor)
+            xml_repr = to_xml_string(
+                item,
+                anchor=requested_anchor,
+            ).decode('utf-8')  # relaton-py’s serializer encodes.
         except Exception:
             log.exception(
                 "xml2rfc path (%s): "
@@ -262,6 +265,11 @@ def handle_xml2rfc_path(
     metric_label: str
 
     if xml_repr:
+        xml_repr = _replace_anchor(
+            xml_repr,
+            lambda anchor: adapter.mangle_anchor(anchor),
+        )
+
         if item:
             metric_label = 'success'
         else:
@@ -349,15 +357,36 @@ def obtain_fallback_xml(
                 return xml_repr
 
 
-def _replace_anchor(xml_repr: str, anchor: str) -> str:
+anchor_regex = re.compile(r'anchor=\"([^\"]*)\"')
+"""Regular expression used for mangling anchor in an XML string."""
+
+
+def _replace_anchor(xml_repr: str, anchor: str | Callable[[str], str]) -> str:
     """Replace the top-level anchor property with provided anchor.
 
-    Intended to be used with fallback XML that can possibly have
+    Intended to be used with XML string that could possibly have
     malformed anchors.
+
+    :param anchor:
+        Either a string (anchor to replace with),
+        or a callable that takes an existing anchor and returns a new one.
 
     .. note:: Does not add anchor if it’s missing,
               and does not validate/deserialize given XML."""
 
-    anchor_regex = re.compile(r'anchor=\"([^\"]*)\"')
+    if not isinstance(anchor, str):
+        if match := anchor_regex.search(xml_repr):
+            old_anchor = match.group(1)
+            try:
+                new_anchor = anchor(old_anchor)
+            except Exception:
+                return xml_repr
+        else:
+            return xml_repr
+    else:
+        new_anchor = anchor
 
-    return anchor_regex.sub(r'anchor="%s"' % anchor, xml_repr, count=1)
+    return anchor_regex.sub(
+        r'anchor="%s"' % new_anchor,
+        xml_repr,
+        count=1)

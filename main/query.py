@@ -17,7 +17,7 @@ from django.conf import settings
 # from sources import list_internal as list_internal_sources
 # from sources import InternalSource
 
-from common.util import as_list
+from common.util import as_list, get_fuzzy_match_regex
 from bib_models import DocID, Relation
 from bib_models.util import construct_bibitem, get_primary_docid
 
@@ -121,7 +121,9 @@ def search_refs_json_repr_match(text: str, limit=None) -> QuerySet[RefData]:
 
     return (
         RefData.objects.
-        filter(body__icontains=text).
+        filter(
+            body__iregex=r'(?i)%s'
+            % get_fuzzy_match_regex(text, match_sep=r'.*?')).
         only('ref', 'dataset', 'body').
         order_by('-latest_date')[:limit])
 

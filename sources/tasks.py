@@ -1,19 +1,27 @@
 """
 Celery task for working with indexable sources.
 """
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import traceback
 from textwrap import indent
 from celery.utils.log import get_task_logger
 
+from django.conf import settings
+
 from .celery import app
 
 from .indexable import registry
-from .task_status import IndexingTaskCeleryMeta
+from .task_status import IndexingTaskCeleryMeta, push_task
 from .models import SourceIndexationOutcome
 
 
 logger = get_task_logger(__name__)
+
+
+AUTO_REINDEX_INTERVAL: Optional[int] = getattr(
+    settings,
+    'AUTO_REINDEX_INTERVAL',
+    None)
 
 
 def fetch_and_index_task(task, dataset_id: str, refs=None):
@@ -76,6 +84,18 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
         except Exception:
             pass
 
+    def maybe_requeue():
+        if AUTO_REINDEX_INTERVAL is not None and refs is None:
+            result = task.apply_async(
+                kwargs=dict(
+                    dataset_id=dataset_id,
+                    refs=None,
+                ),
+                countdown=AUTO_REINDEX_INTERVAL,
+            )
+            if task_id := result.id:
+                push_task(dataset_id, task_id)
+
     try:
         found, indexed = indexable_source.index(refs, update_status, on_error)
 
@@ -94,7 +114,11 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
             dataset_id)
         traceback.print_exc()
         print("Indexing {}: Task failed to complete".format(dataset_id))
+
         try_save_failed_outcome(f"{err}")
+
+        maybe_requeue()
+
         raise
 
     else:
@@ -112,6 +136,9 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
             outcome.notes += f"Problem items:\n{errors}\n"
 
         outcome.save()
+
+        maybe_requeue()
+
         return {
             **task_desc,
             'progress': {

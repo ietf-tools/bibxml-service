@@ -7,17 +7,17 @@
       {{ own_title.content|default:fallback_formattedref|default:fallback_docid|default:"(no title)" }}
     {% endwith %}
   {% endif %}
-  {% if relations|length > 0 and not own_title.content %}
+  {% if not plain_only and relations|length > 0 and not own_title.content %}
     <small>
-    {% for relation in relations %}
-      {% ifchanged relation.type %}{{ relation.type|default:"relates to" }}{% endifchanged %}
-      {% with title=relation.bibitem.title|as_list|first docid=relation.bibitem.docid|as_list|first formattedref=relation.bibitem.formattedref.content %}
-        {% if docid or formattedref %}{{ docid.id|default:formattedref }}{% endif %}{% if not forloop.last %}, {% endif %}
-        {% if relations|length < 2 and title.content %}
-          {{ title.content }}
-        {% endif %}
-      {% endwith %}
-    {% endfor %}
+      {% for relation in relations %}
+        {% ifchanged relation.type %}{{ relation.type|default:"relates to" }}{% endifchanged %}
+        {% with title=relation.bibitem.title|as_list|first docid=relation.bibitem.docid|as_list|first formattedref=relation.bibitem.formattedref.content %}
+          {% if docid or formattedref %}{{ docid.id|default:formattedref }}{% endif %}{% if not forloop.last %}, {% endif %}
+          {% if relations|length < 2 and title.content %}
+            {{ title.content }}
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
     </small>
   {% endif %}
 {% endwith %}

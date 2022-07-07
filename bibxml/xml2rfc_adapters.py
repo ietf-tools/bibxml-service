@@ -3,6 +3,7 @@ Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
 
 from typing import Optional, List, cast, Sequence
+import urllib
 import logging
 import re
 
@@ -168,7 +169,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             query = (
                 '(@.type == "Internet-Draft") && '
                 r'(@.id like_regex "%s[\d+]")'
-                % re.escape(f'draft-{unversioned}-'),
+                % re.escape(f'draft-{unversioned}-')
             )
             self.log(f"using query {query}")
             return [sorted(
@@ -314,12 +315,21 @@ class W3cAdapter(Xml2rfcAdapter):
             return [(f"W3C.{docid.id.removeprefix('W3C ')}", None)]
         return []
 
-    def resolve_docid(self) -> Optional[DocID]:
-        with_proper_prefix = self.anchor.replace('W3C.', 'W3C ')
+    # def get_docid_query(self) -> Optional[str]:
+
+    def resolve_docid(self) -> DocID:
+        unprefixed = (
+            self.anchor.
+            removeprefix('W3C.').
+            removeprefix('NOTE-').
+            removeprefix('SPSR-').
+            removeprefix('CR-').
+            removeprefix('PR-').
+            removeprefix('WD-'))
         # We throw away trailing date, because available sources
         # appear to not have the old versions in bibxml-w3c.
-        without_trailing_date = re.sub(r'\-[\d]{8}$', '', with_proper_prefix)
-        return DocID(type="W3C", id=without_trailing_date)
+        without_trailing_date = re.sub(r'\-[\d]{8}$', '', unprefixed)
+        return DocID(type="W3C", id=f'W3C {without_trailing_date}')
 
 
 @register_adapter('bibxml5')
@@ -369,7 +379,26 @@ class IeeeAdapter(Xml2rfcAdapter):
     which are considered reliably formatted but are not compatible
     with preexisting paths.
 
-    For other paths, returns nothing, leaving caller to fall back.
+    :term:`docid.id` -> :term:`xml2rfc anchor` conversion logic:
+
+    - Split the path into prefix and the rest of the anchor.
+
+    - In prefix, slashes are replaced with underscores, e.g.:
+
+      - IEEE documents start with ``R.IEEE.``,
+      - mixed-published documents start with e.g. ``R.ANSI_IEEE.``.
+
+    - In rest of the anchor, whitespace are replaced with
+      underscores. (Slashes are left as is.)
+
+    - Prefix and rest are recombined, separated by period;
+      and everything is prefixed with ``R.``.
+
+    The anchor is converted back to docid using the same logic in reverse.
+
+    For anchors that don’t start with ``R.``,
+    adapter doesn’t resolve the xml2rfc path, letting the view fall back
+    to archive XML data.
     """
     exact_docid_match = True
 
@@ -377,14 +406,13 @@ class IeeeAdapter(Xml2rfcAdapter):
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IEEE'):
-            return [(
-                f"R.IEEE.{docid.id.removeprefix('IEEE ').replace(' ', '_')}",
-                None,
-            )]
+            prefix, rest = docid.id.split(' ', 1)
+            anchor = f"R.{prefix.replace('/', '_')}.{urllib.parse.quote(rest)}"
+            return [(anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        is_legacy = not self.anchor.startswith('R.IEEE.')
+        is_legacy = not self.anchor.startswith('R.')
         if is_legacy:
             # We give up on automatically resolving legacy bibxml6/IEEE paths.
             # This is intended to trigger fallback behavior
@@ -393,8 +421,12 @@ class IeeeAdapter(Xml2rfcAdapter):
         else:
             # However, we support automatically generated IEEE paths
             # that we can be sure to resolve
-            docid = self.anchor.removeprefix('R.IEEE.').replace('_', ' ')
-            return DocID(type="IEEE", id=f'IEEE {docid}')
+            unprefixed = self.anchor.removeprefix('R.')
+            id_prefix, rest = unprefixed.split('.', 1)
+            return DocID(
+                type="IEEE",
+                id=f"{id_prefix.replace('_', '/')} {urllib.parse.unquote(rest)}",
+            )
 
 
 @register_adapter('bibxml8')
@@ -405,18 +437,22 @@ class IanaAdapter(Xml2rfcAdapter):
     Note that these are not well-tested, since bibxml-iana
     snapshot is not available.
     """
+    exact_docid_match = True
+
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IANA'):
-            return [(
-                f"IANA.{docid.id.removeprefix('IANA ').replace(' ', '_')}",
-                None,
-            )]
+            xml2rfc_anchor = 'IANA.' + (
+                docid.id.
+                removeprefix('IANA ').
+                replace('/', '_')
+            )
+            return [(xml2rfc_anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        id = self.anchor.replace('IANA.', 'IANA ').replace('_', ' ')
+        id = self.anchor.replace('IANA.', 'IANA ').replace('_', '/')
         return DocID(type="IANA", id=id)
 
 
