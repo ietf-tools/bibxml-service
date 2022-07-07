@@ -1,0 +1,5 @@
+{% load relaton %}
+{% with link=val|substruct_search_link:'{"keyword": [%s]}' %}
+  <a class="link whitespace-nowrap" href="{{ link }}"
+    >{{ val }}</a>
+{% endwith %}

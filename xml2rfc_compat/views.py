@@ -1,378 +1,363 @@
-"""Generic view functions related to xml2rfc path mapping
-and checking xml2rfc path resolution.
-
-Intended to be exposed via private management GUI
-and assigned custom templates.
-(This module does not supply any templates of its own.)
-"""
-
-from typing import Dict, List, Union, Tuple, Any, Optional
-from dataclasses import dataclass
-from pydantic import BaseModel, ValidationError
-from pydantic.json import pydantic_encoder
-import time
+from typing import cast, Tuple, Optional, TypedDict, Dict
+import re
 import logging
-import json
-import simplejson
 
-from django.views.generic import TemplateView
-from django.http import HttpResponse, HttpResponseRedirect
-from django.http import JsonResponse, Http404, HttpResponseBadRequest
-from django.db import transaction
-from django.db.models.query import QuerySet
-from django.conf import settings
-from django.core.cache import cache
-from django.contrib import messages
+from pydantic import ValidationError
 
-from sources import indexable
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
+
 from bib_models import BibliographicItem
+from prometheus import metrics
 
-from .aliases import get_aliases
-from .models import ManualPathMap, Xml2rfcItem
-from .urls import fetcher_registry, resolve_automatically
-from .urls import resolve_manual_map
+from main.exceptions import RefNotFoundError
+from main.query import build_citation_for_docid
+
+from .models import Xml2rfcItem
+from .adapters import Xml2rfcAdapter, adapters
+# from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
+from .serializer import to_xml_string
+from .aliases import unalias
 
 
 log = logging.getLogger(__name__)
 
 
-class DirectoryOverview(TemplateView):
+__all__ = (
+    'handle_xml2rfc_path',
+    'resolve_manual_map',
+    'resolve_automatically',
+    'obtain_fallback_xml',
+    'ResolutionOutcome',
+    '_replace_anchor',
+)
+
+
+def resolve_manual_map(subpath: str) -> Tuple[
+    Optional[str],
+    Optional[BibliographicItem],
+    Optional[str],
+]:
+    """Returns a 3-tuple of mapping configuration, resolved item,
+    and error as a string, any can be None.
+    Does not raise exceptions.
     """
-    Renders an overview of top-level directories,
-    based on currently indexed :class:`.models.Xml2rfcItem` objects.
-
-    Template will receive ``available_paths``, which is
-    a list of :class:`.Xml2rfcDirectoryMeta`.
-
-    Template must be supplied by view user via ``template_name``.
-    """
-
-    def get_context_data(self, **kwargs):
-        available_paths: Dict[str, Xml2rfcDirectoryMeta] = dict()
-        for subpath in Xml2rfcItem.objects.values_list('subpath', flat=True):
-            dirname: str = subpath.split('/')[0]
-            if dirname not in available_paths:
-                prefix = f'{dirname}/'
-                fetcher = fetcher_registry.get(dirname)
-                if fetcher:
-                    available_paths[dirname] = Xml2rfcDirectoryMeta(
-                        name=dirname,
-                        aliases=get_aliases(dirname),
-                        total_count=Xml2rfcItem.objects.
-                        filter(subpath__startswith=prefix).
-                        count(),
-                        manually_mapped_count=ManualPathMap.objects.
-                        filter(xml2rfc_subpath__startswith=prefix).
-                        count(),
-                        fetcher_name=f'{fetcher.__module__}.{fetcher.__name__}'
-                        if fetcher else None,
-                    )
-        return dict(
-            available_paths=available_paths.values(),
-        )
-
-
-@dataclass
-class Xml2rfcDirectoryMeta:
-    """Describes a top-level xml2rfc directory."""
-
-    name: str
-
-    aliases: List[str]
-    """Alternative names this directory is known as
-    (see :mod:`.aliases`)."""
-
-    total_count: int
-    """How many paths are within this directory."""
-
-    manually_mapped_count: int
-    """How many paths within this directory
-    were manually mapped."""
-
-    fetcher_name: Optional[str]
-    """Associated :term:`xml2rfc fetcher` function name."""
-
-
-class ExploreDirectory(TemplateView):
-    """
-    Renders an overview of given :term:`xml2rfc-style path`.
-    The path can be a subdirectory or a file
-    (see :meth:`.get_selection()`).
-
-    If HTTP Accept header is ``application/json``,
-    renders a JSON response (see :meth:`.get_json_response()`).
-
-    Otherwise, renders a template
-    (see :meth:`get_context_data()` for context).
-    Template must be supplied by view user via ``template_name``.
-    """
-
-    item_list_cache_seconds = 300
-    """How many seconds to cache given directory item listing for."""
-
-    def get(self, request, *args, **kwargs):
-        accept = self.request.META['HTTP_ACCEPT']
-
-        if 'application/json' in accept:
-            return self.get_json_response(request, *args, **kwargs)
-
-        return super().get(request, *args, **kwargs)
-
-    def get_json_response(self, request, *args, **kwargs):
-        """JSON response only returns ``items`` and ``total_items``."""
-
-        self.request = request
-
-        raw_item_idx = request.GET.get('item_at', None)
-        item_idx: Union[int, None]
-        if raw_item_idx:
-            try:
-                item_idx = int(raw_item_idx)
-            except (ValueError, TypeError):
-                return HttpResponseBadRequest("Invalid item index")
-        else:
-            item_idx = None
-
-        items = self.get_items(**kwargs)
-        item_dicts = [dict(path=i.subpath) for i in items]
-
-        data: Dict[str, Any]
-        if item_idx is not None:
-            try:
-                item = item_dicts[item_idx]
-            except IndexError:
-                return HttpResponse(
-                    "Item at specified index not found",
-                    status_code=404)
-            else:
-                data = dict(item=item)
-        else:
-            data = dict(
-                items=item_dicts,
-                total_items=len(items),
-            )
-
-        return JsonResponse(data)
-
-    def get_context_data(self, **kwargs):
-        dirname, selected_item = self.get_selection(**kwargs)
-
-        manual_map_item: Union[BibliographicItem, None]
-        automatic_map_item: Union[BibliographicItem, None]
-
-        if selected_item:
-            manual_map, manual_map_item, _ = resolve_manual_map(
-                selected_item.subpath)
-
-            automatic_map_fetcher = fetcher_registry.get(dirname, None)
-
-            if automatic_map_fetcher:
-                _, automatic_map_item, _ = resolve_automatically(
-                    selected_item.subpath,
-                    selected_item.format_anchor(),
-                    automatic_map_fetcher)
-            else:
-                automatic_map_item = None
-        else:
-            manual_map = None
-            manual_map_item = None
-            automatic_map_item = None
-
-        return dict(
-            selected_item=selected_item,
-            selected_item_map=dict(
-                manual=dict(
-                    config=manual_map,
-                    item=manual_map_item,
-                ),
-                automatic_item=automatic_map_item,
-                effective_item=manual_map_item or automatic_map_item,
-            ),
-            items=self.get_items(**kwargs),
-            dirname=dirname,
-            global_prefix=settings.XML2RFC_PATH_PREFIX,
-            cache_key=self.get_cache_key(dirname),
-        )
-
-    def get_cache_key(self, dirname) -> str:
-        """
-        A cache key that is guaranteed to change if any mapped path changes,
-        or if the number of indexed xml2rfc paths is different.
-        """
-        no_cache = self.request.GET.get('bypass_cache', None)
-        if no_cache:
-            return str(time.time())
-        else:
-            indexed_count = indexable.registry['xml2rfc'].count_indexed()
-            mapped_paths = frozenset([
-                f'{m.xml2rfc_subpath}:{m.docid}'
-                for m in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
-            ])
-            return json.dumps({
-                'total_indexed': indexed_count,
-                'map_hash': hash(mapped_paths),
-                'dirname': dirname,
-            })
-
-    def get_selection(self, **kwargs) -> Tuple[str, Union[Xml2rfcItem, None]]:
-        """
-        Returns a 2-tuple
-        (selected dirname: str, selected item subpath: str or None).
-
-        Obtains them using ``subpath`` passed in via URL kwargs.
-        """
-        if 'subpath' not in kwargs:
-            raise RuntimeError("Subpath must be specified in path kwargs.")
-
-        subpath = kwargs['subpath']
-
-        if '/' in subpath:
-            dirname = subpath.split('/')[0]
-            try:
-                selected_item = Xml2rfcItem.objects.get(subpath=subpath)
-            except Xml2rfcItem.DoesNotExist:
-                raise Http404("Unable to locate selected item")
-        else:
-            dirname = subpath
-            selected_item = None
-
-        return dirname, selected_item
-
-    def get_items(self, **kwargs) -> QuerySet[Xml2rfcItem]:
-        """
-        Lists all items within currently selected dirname.
-        Caches the result by :attr:`.item_list_cache_seconds`.
-        """
-        dirname, _ = self.get_selection(**kwargs)
-
-        result = cache.get_or_set(
-            self.get_cache_key(dirname),
-            lambda: Xml2rfcItem.objects.filter(
-                subpath__startswith='%s/' % dirname,
-            ).order_by('subpath'),
-            self.item_list_cache_seconds)
-        return result
-
-
-def edit_manual_map(request, subpath):
-    docid = request.POST.get('docid')
-    if docid:
-        ManualPathMap.objects.update_or_create(
-            xml2rfc_subpath=subpath,
-            defaults=dict(
-                docid=docid,
-            ),
-        )
-    else:
-        messages.error(
-            request,
-            "Cannot map <code class=\"font-monospace\">%s</code>: "
-            "document identifier was not specified"
-            % subpath)
-
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))
-
-
-def delete_manual_map(request, subpath):
+    mapped_docid: Optional[str]
+    resolved_item: Optional[BibliographicItem]
+    error: Optional[str]
     try:
-        ManualPathMap.objects.get(
-            xml2rfc_subpath=subpath,
-        ).delete()
-    except ManualPathMap.DoesNotExist:
-        messages.info(
-            request,
-            "No manual map was found "
-            "for <code class=\"font-monospace\">%s</code>, "
-            "so no action was performed."
-            % subpath)
-
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))
-
-
-class SerializedPathMap(BaseModel):
-    """
-    Representation of :class:`xml2rfc_compat.models.ManualPathMap`
-    for mappings exported to JSON.
-    """
-
-    path: str
-    """xml2rfc subpath, relative to ``/public/rfc/`` root.
-
-    It **must** contain unaliased directory name first,
-    such as ``bibxml2``."""
-
-    docid: str
-    """``docid.id`` mapped to given path."""
-
-
-def export_manual_map(request):
-    mappings = [
-        dict(path=i.xml2rfc_subpath, docid=i.docid)
-        for i in ManualPathMap.objects.all().order_by('xml2rfc_subpath')
-    ]
-    return JsonResponse(
-        {'mappings': mappings},
-        headers={
-            'Content-Disposition':
-                'attachment; filename=bibxml-service-xml2rfc-path-map.json',
-        },
-        json_dumps_params=dict(indent=4))
-
-
-def import_manual_map(request):
-    """
-    Handles upload of a JSON file with manual mappings.
-    JSON file must contain a list of :class:`.SerializedPathMap` items.
-    """
-    json_file = request.FILES.get('map_json', None)
-
-    if json_file:
-        try:
-            data = simplejson.loads(json_file.read())
-            mappings = (
-                SerializedPathMap.parse_obj(item)
-                for item in data['mappings']
-            )
-        except (simplejson.JSONDecodeError, KeyError):
-            messages.error(
-                request,
-                "Error decoding xml2rfc map JSON")
-        except ValidationError:
-            messages.error(
-                request,
-                "xml2rfc map contains invalid data")
-        except RuntimeError:
-            messages.error(
-                request,
-                "Unknown error reading the uploaded xml2rfc map")
-            log.exception("Error reading imported xml2rfc map")
-
-        else:
-            clear = request.POST.get('clear', False)
-
-            total_read = 0
-            with transaction.atomic():
-                if clear:
-                    ManualPathMap.objects.all().delete()
-                    for item in mappings:
-                        ManualPathMap.objects.update_or_create(
-                            xml2rfc_subpath=item.path,
-                            defaults=dict(docid=item.docid),
-                        )
-                        total_read += 1
-                else:
-                    for item in mappings:
-                        ManualPathMap.objects.get_or_create(
-                            xml2rfc_subpath=item.path,
-                            defaults=dict(docid=item.docid),
-                        )
-                        total_read += 1
-            messages.success(
-                request,
-                f"Created or updated {total_read} xml2rfc path mappings")
+        manual_map = Xml2rfcItem.objects.get(subpath=subpath)
+    except Xml2rfcItem.DoesNotExist:
+        mapped_docid = None
+        resolved_item = None
+        error = "not found"
     else:
-        messages.error(
-            request,
-            "Did not receive a file to load xml2rfc map from")
+        mapped_docid = (
+            (manual_map.sidecar_meta or {}).
+            get('primary_docid', None))
 
-    return HttpResponseRedirect(request.headers.get('referer', '/management/'))
+        if mapped_docid is None:
+            resolved_item = None
+            error = "not mapped"
+        else:
+            try:
+                resolved_item = build_citation_for_docid(
+                    cast(str, mapped_docid))
+            except ValidationError:
+                log.exception(
+                    "Unable to validate item "
+                    "manually mapped to xml2rfc path %s "
+                    "via docid %s",
+                    subpath,
+                    mapped_docid)
+                error = "validation problem"
+                resolved_item = None
+            except RefNotFoundError:
+                log.exception(
+                    "Unable to resolve an item for xml2rfc path %s, "
+                    "despite it being manually mapped via docid %s",
+                    subpath,
+                    mapped_docid)
+                error = "not found"
+                resolved_item = None
+            else:
+                error = None
+
+    return mapped_docid, resolved_item, error
+
+
+def resolve_automatically(
+    subpath: str,
+    anchor: str,
+    adapter: Xml2rfcAdapter,
+) -> Tuple[
+    str,
+    Optional[BibliographicItem],
+    Optional[str],
+]:
+    """Returns a 3-tuple of resolver function name, resolved item,
+    and error as a string, any can be None.
+    Does not raise exceptions.
+    """
+    item: Optional[BibliographicItem] = None
+    error: Optional[str] = None
+    try:
+        item = adapter.resolve()
+    except RefNotFoundError as e:
+        log.exception(
+            "Unable to resolve xml2rfc path automatically: %s",
+            subpath)
+        error = f"not found ({str(e)})"
+    except ValidationError:
+        log.exception(
+            "Item found for xml2rfc path did not validate: %s",
+            subpath)
+        error = "validation problem"
+    except Exception:
+        log.exception(
+            "Failed to automatically resolve item for path: %s",
+            subpath)
+        error = "uncategorized issue"
+
+    config_str = adapter.__class__.__name__
+    try:
+        config_str = '%s: %s' % (
+            config_str,
+            ' -> '.join([i.replace(',', ' ') for i in adapter._log])
+        )
+    except Exception:
+        pass
+    return config_str, item, error
+
+
+class ResolutionOutcome(TypedDict, total=True):
+    config: str
+    error: str
+
+
+def handle_xml2rfc_path(
+    request,
+    xml2rfc_subpath: str,
+    dirname: str,
+    anchor: str,
+):
+    """View function that resolves an xml2rfc path.
+
+    Requires an :term:`xml2rfc adapter` to be registered for given
+    ``dirname``.
+    Adapter’s ``resolve()`` method will only be called
+    if manual map was not found or did not resolve successfully.
+
+    This function handles filename
+    cleanup, obtaining a :class:`relaton.models.bibdata.BibliographicItem`
+    instance, serializing it into an XML string with proper anchor tag supplied,
+    incrementing relevant metrics.
+
+    The view function behaves as following
+    (see also :ref:`xml2rfc-path-resolution-algorithm`):
+
+    - Inspects ``X-Requested-With`` request header, and does not increment
+      access metric if it’s the internal ``xml2rfcResolver`` tool.
+
+    - The ``anchor`` component of URL pattern
+      (see :data:`xml2rfc_compat.models.dir_subpath_regex`)
+      is always used when attempting to auto-resolve to Relaton resource,
+      and *may* be used by anchor formatter
+      to obtain the value of ``anchor`` attributes in resulting XML.
+
+    :returns:
+
+      - In case of success, ``application/xml`` response
+        with custom headers aiming to simplify troubleshooting path resolution:
+
+        ``X-Resolution-Methods``
+            semicolon-separated string of resolution methods tried.
+
+        ``X-Resolution-Outcome``
+            semicolon-separated string of resolution outcomes.
+            Each tried outcome is a comma-separated string
+            “method configuration,error info”.
+
+            Substrings can be empty, e.g. if method was not tried,
+            there was no error, not configuration, etc.
+
+        .. note::
+
+           - The ``anchor`` *XML attribute value* is generated according
+             to the logic in :mod:`xml2rfc_compat.serializer`
+             and may not match anchor given in URL pattern string.
+
+           - The optional ``anchor`` passed *as GET parameter*
+             will override ``anchor`` attribute in XML.
+
+      - In case of failure (and no fallback available),
+        ``application/json`` response with error description.
+    """
+    resp: HttpResponse
+
+    item: Optional[BibliographicItem] = None
+    xml_repr: Optional[str] = None
+
+    requested_anchor = request.GET.get('anchor', None)
+
+    normalized_dirname = unalias(dirname)
+
+    try:
+        adapter_cls = adapters[normalized_dirname]
+    except KeyError:
+        return HttpResponseNotFound("No xml2rfc adapter for %s", dirname)
+
+    # Below code attempts to catch anything
+    # and return fallback XML in any problematic scenario.
+
+    adapter = adapter_cls(xml2rfc_subpath, normalized_dirname, anchor)
+
+    methods = ["manual", "auto", "fallback"]
+    method_results: Dict[str, ResolutionOutcome] = {}
+
+    mapped_docid, item, error = resolve_manual_map(xml2rfc_subpath)
+    if mapped_docid:
+        method_results['manual'] = dict(
+            config=mapped_docid,
+            error='' if item else (error or "no error information"),
+        )
+
+    if not item:
+        config, item, error = resolve_automatically(
+            xml2rfc_subpath,
+            anchor,
+            adapter)
+        method_results['auto'] = dict(
+            config=config,
+            error='' if item else (error or "no error information"),
+        )
+
+    try:
+        if adapter_anchor := adapter.format_anchor():
+            requested_anchor = adapter_anchor
+    except Exception:
+        log.exception(
+            "xml2rfc path (%s): "
+            "Adapter failed at format_anchor()",
+            xml2rfc_subpath)
+
+    if item:
+        try:
+            xml_repr = to_xml_string(item, anchor=requested_anchor)
+        except Exception:
+            log.exception(
+                "xml2rfc path (%s): "
+                "Failed to serialize resolved item, "
+                "attempting fallback",
+                xml2rfc_subpath)
+
+    if not xml_repr:
+        xml_repr = obtain_fallback_xml(
+            xml2rfc_subpath,
+            anchor=requested_anchor)
+        method_results['fallback'] = dict(
+            config='',
+            error='' if xml_repr else "not indexed",
+        )
+
+    metric_label: str
+
+    if xml_repr:
+        if item:
+            metric_label = 'success'
+        else:
+            metric_label = 'success_fallback'
+            metrics.xml2rfc_api_bibitem_hits.labels(
+                xml2rfc_subpath,
+                'success_fallback',
+            ).inc()
+        resp = HttpResponse(
+            xml_repr,
+            content_type="application/xml",
+            charset="utf-8")
+
+    else:
+        metric_label = 'not_found'
+        metrics.xml2rfc_api_bibitem_hits.labels(
+            xml2rfc_subpath,
+            'not_found',
+        ).inc()
+
+        # It would be more consistent to return a plain-text 404,
+        # but API declares a JSON response so…
+        resp = JsonResponse({
+            "error": {
+                "message":
+                    "Error resolving bibliographic item. "
+                    "Tried methods: %s"
+                    % ', '.join([
+                        '{0} ({config}): {error}'.format(
+                            method,
+                            **method_results[method])
+                        for method in methods
+                        if method in method_results
+                    ])
+            }
+        }, status=404)
+
+    # Do not increment the metric if it comes from an internal tool.
+    if request.headers.get('x-requested-with', None) != 'xml2rfcResolver':
+        metrics.xml2rfc_api_bibitem_hits.labels(
+            xml2rfc_subpath,
+            metric_label,
+        ).inc()
+
+    resp.headers['X-Resolution-Methods'] = ';'.join(methods)
+    resp.headers['X-Resolution-Outcomes'] = ';'.join([
+        (
+            '{config},{error}'.format(**method_results[method])
+            if method in method_results
+            else ''
+        )
+        for method in methods
+    ])
+
+    return resp
+
+
+def obtain_fallback_xml(
+    subpath: str,
+    anchor: Optional[str] = None,
+) -> Optional[str]:
+    """Obtains XML fallback for given subpath, if possible.
+
+    Does not raise exceptions.
+    """
+
+    requested_dirname = subpath.split('/')[-2]
+    try:
+        actual_dirname = unalias(requested_dirname)
+    except ValueError:
+        return None
+    else:
+        subpath = subpath.replace(
+            requested_dirname,
+            actual_dirname,
+            1)
+        try:
+            xml_repr = Xml2rfcItem.objects.get(subpath=subpath).xml_repr
+        except Xml2rfcItem.DoesNotExist:
+            return None
+        else:
+            if anchor:
+                return _replace_anchor(xml_repr, anchor)
+            else:
+                return xml_repr
+
+
+def _replace_anchor(xml_repr: str, anchor: str) -> str:
+    """Replace the top-level anchor property with provided anchor.
+
+    Intended to be used with fallback XML that can possibly have
+    malformed anchors.
+
+    .. note:: Does not add anchor if it’s missing,
+              and does not validate/deserialize given XML."""
+
+    anchor_regex = re.compile(r'anchor=\"([^\"]*)\"')
+
+    return anchor_regex.sub(r'anchor="%s"' % anchor, xml_repr, count=1)

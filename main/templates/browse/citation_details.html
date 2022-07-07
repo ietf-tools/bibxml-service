@@ -1,6 +1,7 @@
 {% extends "browse/base.html" %}
+{# Main details template for a bibliographic item. #}
 
-{% load relaton %}
+{% load common static %}
 
 {% block title %}
   {{ block.super }}
@@ -12,6 +13,10 @@
   {% include "relaton/smart_title.html" with bibitem=data %}
 {% endblock %}
 
+{% block extra_scripts %}
+  <script src="{% static "js/xml2rfc-path-widget.js" %}"></script>
+{% endblock %}
+
 {% block content_grid_classes %}
   md:h-screen
 
@@ -19,20 +24,42 @@
   md:auto-rows-[minmax(max(2.5rem,6.25vh),1fr)]
   md:grid-rows-[repeat(auto-fill,minmax(max(2.5rem,6.25vh),1fr))]
 
-  bg-dark-100
-  dark:bg-dark-700
-
-  snap-y
+  bg-dark-200
+  dark:bg-dark-800
 
   bibitem-full
 {% endblock %}
 
 {% block header_extras %}
+  <nav class="
+    {% include "_side_block_classes.html" %}
+    md:row-span-2
+    overflow-hidden flex flex-col flex-nowrap
+    bg-emerald-600 text-emerald-100
+    py-4
+  ">
+    <div class="px-4">
+      Bibliographic&nbsp;item with&nbsp;identifier:
+    </div>
+    {% with primary_docid=data.primary_docid|default:"N/A" %}
+      {% with docid=request.GET.docid|default:primary_docid %}
+        <pre class="
+          px-4 mt-2 grow text-sm font-bold whitespace-pre-wrap overflow-y-auto
+          {% if docid|length > 30 %}
+            !text-xs
+          {% endif %}
+        ">{{ docid }}</pre>
+      {% endwith %}
+    {% endwith %}
+  </nav>
+
   {% if request.GET.query %}
     <a
       role="nav" class="
         {% include "_side_block_classes.html" %}
-        overflow-hidden bg-sky-700 text-sky-100 flex flex-col flex-nowrap
+        overflow-hidden
+        bg-sky-700 text-sky-100
+        flex flex-col flex-nowrap
         p-4 block
       "
       href="{% url "search_citations" %}?{% if request.GET.query %}query={{ request.GET.query|urlencode:"" }}{% if request.GET.query_format %}&query_format={{ request.GET.query_format }}{% endif %}{% if request.GET.page %}&page={{ request.GET.page }}{% endif %}{% endif %}"
@@ -43,9 +70,10 @@
 
   <nav class="
     {% include "_side_block_classes.html" %}
-    overflow-hidden bg-sky-600 text-sky-100 flex flex-col flex-nowrap p-4
+    bg-sky-600 text-sky-100
+    overflow-hidden flex flex-col flex-nowrap p-4
   ">
-    {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" only %}
+    {% include "browse/search_form_quick.html" with htmlclass="grow" control_htmlclass="py-2 px-3" placeholder="New search…" only %}
   </nav>
 
   {{ block.super }}
@@ -59,13 +87,13 @@
   <header class="
     md:col-span-2 md:row-span-4 xl:row-span-2 py-4 md:pr-16
     sticky top-0
-    text-dark-900 dark:text-dark-200
-    bg-dark-400/30 dark:bg-dark-800/50 backdrop-blur-lg z-10
+
+    z-10
     overflow-hidden
   ">
     {% with data=data.bibitem|default:data %}
       <div class="
-        px-4 leading-tight
+        px-4
         md:flex flex-row items-center md:space-x-4
         text-sm
         mb-1
@@ -78,12 +106,12 @@
         </span>
         {% with item_count=data.sources.items|dictsort:0|length %}
           {% if data.primary_docid and item_count > 1 %}
-            <span title="Primary identifier shared by documents">
+            <span title="Primary identifier shared by documents: {{ data.primary_docid }}" class="truncate">
               {{ data.primary_docid }}
             </span>
           {% endif %}
           {% if item_count > 1 %}
-            <span>{{ item_count }} document{{ item_count|pluralize:',s' }}</span>
+            <span class="whitespace-nowrap">{{ item_count }} document{{ item_count|pluralize:',s' }}</span>
           {% endif %}
         {% endwith %}
       </div>
@@ -98,10 +126,25 @@
     {% endwith %}
   </header>
 
-  {% for ref, sourced_item in data.sources.items|dictsort:0 reversed %}
-    {# The case with an indexed item #}
-    {% include "citation/citation_as_dl.html" with data=sourced_item.bibitem sourced_item=sourced_item %}
-  {% endfor %}
+  {% if datatracker_oauth_enabled %}
+    <div class="
+      md:col-span-2 mb-4 md:mb-0
+      z-20
+      sticky
+      top-[max(5rem,12.5vh)]
+      flex flex-col gap-y-px
+      md:flex-row md:overflow-hidden md:items-start md:gap-x-1 md:gap-y-0
+      md:justify-end
+      px-2
+
+      {# Must match parent’s background #}
+      bg-dark-200 dark:bg-dark-800
+    ">
+      {% include "citation/export.html" with xml2rfc_urls=xml2rfc_urls available_serialization_formats=available_serialization_formats docid=data.docid|as_list|first datatracker_user=datatracker_user only %}
+    </div>
+  {% endif %}
+
+  {% include "citation/summary.html" with bibitem=data only %}
 {% endblock %}
 
 {% block after_content %}

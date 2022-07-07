@@ -17,20 +17,29 @@ focus-within:overflow-visible
 hover:z-20
 focus-within:z-10
 
+relative
+
+{# Below is a little buggy for items that end up shorter than grid division #}
+{# (often happens on small viewport heights when there are not enough search results, and may be indicative of grid rules issue) #}
+
+{# This implements slight shadow serving as a border between adjacent items. #}
+{# May be redundant if there is enough vertical whitespace. #}
 shadow
 shadow-dark-500
 dark:shadow-dark-900
 hover:shadow-none
 
-relative
-after:absolute
-  after:bottom-0
-  after:w-full
-  after:h-8
-  after:bg-gradient-to-t
-  after:from-[white]
-    after:[--tw-gradient-stops:var(--tw-gradient-from),rgb(255_255_255/0)]
-  dark:after:from-dark-800
-    dark:after:[--tw-gradient-stops:var(--tw-gradient-from),theme('colors.dark700transparentfix')]
-hover:after:!hidden
-focus-within:after:!hidden
+{% comment %}
+  {# This implements fadeout-to-white at the bottom of the item. #}
+  after:absolute
+    after:bottom-0
+    after:w-full
+    after:h-8
+    after:bg-gradient-to-t
+    after:from-[white]
+      after:[--tw-gradient-stops:var(--tw-gradient-from),rgb(255_255_255/0)]
+    dark:after:from-dark-800
+      dark:after:[--tw-gradient-stops:var(--tw-gradient-from),theme('colors.dark700transparentfix')]
+  hover:after:!hidden
+  focus-within:after:!hidden
+{% endcomment %}

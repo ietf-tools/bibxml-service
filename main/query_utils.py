@@ -1,26 +1,22 @@
 """Query-related utilities."""
 
-from typing import Callable, Union, List, Dict, Any, Optional
+from typing import Callable, Union, Sequence, Dict, Any, Optional, Tuple
 import logging
 
 from django.db.models.query import QuerySet
 from django.db.utils import ProgrammingError, DataError
 
-from pydantic import ValidationError
-
-from bib_models import BibliographicItem, DocID
+from bib_models import construct_bibitem, DocID
 from bib_models.merger import bibitem_merger
 
 from .models import RefData
 from .sources import get_source_meta, get_indexed_object_meta
-from .exceptions import RefNotFoundError
 from .types import CompositeSourcedBibliographicItem
 from .types import IndexedBibliographicItem
 
 
 __all__ = (
-    'merge_refs',
-    'get_primary_docid',
+    'compose_bibitem',
     'get_docid_struct_for_search',
     'query_suppressing_user_input_error',
     'is_benign_user_input_error',
@@ -30,13 +26,14 @@ __all__ = (
 log = logging.getLogger(__name__)
 
 
-def merge_refs(
-    refs: List[RefData],
+def compose_bibitem(
+    refs: Sequence[RefData],
     primary_id: Optional[str] = None,
     strict: bool = True,
-) -> CompositeSourcedBibliographicItem:
+) -> Tuple[CompositeSourcedBibliographicItem, bool]:
     """
-    Converts multiple physical ``RefData`` instances
+    Converts multiple physical ``RefData`` instances,
+    possibly from different bibliographic data sources,
     into a single logical bibliographic item.
 
     This function assumes that you have ensured to collect ``RefData``
@@ -55,7 +52,7 @@ def merge_refs(
 
     :param bool strict: see :ref:`strict-validation`
 
-    :rtype: main.types.CompositeSourcedBibliographicItem
+    :returns: 2-tuple (main.types.CompositeSourcedBibliographicItem, is_valid)
     """
 
     base: Dict[str, Any] = {}
@@ -64,21 +61,23 @@ def merge_refs(
     sources: Dict[str, IndexedBibliographicItem] = {}
     # Their sources
 
+    validation_errors_encountered = False
+
     for ref in refs:
         source = get_source_meta(ref.dataset)
         obj = get_indexed_object_meta(ref.dataset, ref.ref)
         sourced_id = f'{ref.ref}@{source.id}'
 
+        bibitem, validation_errors = construct_bibitem(ref.body, strict)
+        # NOTE: construct_bibitem() does loose YAML normalization
+        # on ``ref.body`` IN-PLACE as a side-effect,
+        # so we must call it first or CompositeSourcedBibliographicItem
+        # may get bad YAML and fail validation.
+        # XXX: Make normalization more explicit
         bibitem_merger.merge(base, ref.body)
-        try:
-            bibitem = BibliographicItem(**ref.body)
-            validation_errors = []
-        except ValidationError as e:
-            log.warn(
-                "Incorrect bibliographic item format: %s, %s",
-                ref.ref, e)
-            bibitem = BibliographicItem.construct(**ref.body)
-            validation_errors = [str(e)]
+
+        if validation_errors is not None:
+            validation_errors_encountered = True
 
         sources[sourced_id] = IndexedBibliographicItem(
             indexed_object=obj,
@@ -92,66 +91,28 @@ def merge_refs(
         'sources': sources,
         'primary_docid': primary_id,
     }
-    if strict is not False:
-        return CompositeSourcedBibliographicItem(**composite)
+
+    if not strict and validation_errors_encountered:
+        log.error(
+            "Failed to validate composite sourced bibliographic item "
+            "with primary docid %s "
+            "(suppressed with strict=False)",
+            primary_id)
+        # We wouldn’t be able to initialize this instance normally
+        # due to validation errors.
+        return (
+            CompositeSourcedBibliographicItem.construct(**composite),
+            False,
+        )
     else:
-        try:
-            return CompositeSourcedBibliographicItem(**composite)
-        except ValidationError:
-            log.exception(
-                "Failed to validate composite sourced bibliographic item "
-                "with primary docid %s "
-                "(suppressed with strict=False)",
-                primary_id)
-            return CompositeSourcedBibliographicItem.construct(**composite)
-
-
-def resolve_relations(
-    items: List[BibliographicItem],
-) -> Dict[str, BibliographicItem]:
-    """
-    For every given :class:`~relaton.models.bibdata.BibliographicItem`
-    of ``items``, scans for any relations that are ``formattedref``-only links.
-
-    Fetches all referenced documents and returns a dictionary
-    that maps each ``formattedref``
-    to corresponding :class:`~relaton.models.bibdata.BibliographicItem`.
-
-    The resulting dictionary can be used with :func:`.hydrate_bibitem()`.
-    """
-    raise NotImplementedError()
-
-
-def hydrate_bibitem(
-    item: BibliographicItem,
-    resolved_relations: Dict[str, BibliographicItem],
-) -> BibliographicItem:
-    """
-    Given a :class:`~relaton.models.bibdata.BibliographicItem` that:
-
-    1. Possibly contains ``formattedref``-only relations
-    2. Possibly itself is just a ``formattedref``
-
-    Tries to replace all ``formattedref`` occurrences with fully fledged
-    bibliographic items:
-
-    1. For relations, tries to retrieve all documents
-       referenced via ``formattedref``
-       via their ``primary`` docid in one query.
-    2. If item itself has a ``formattedref`` and is missing vital metadata,
-       such as title, attempts to fill in that metadata from relations.
-
-    :param dict resolved_relations:
-        If supplied, no DB queries are made
-        and the dictionary is used for resolving relations.
-        If caller is resolving many items, it may pre-fetch all relations
-        referenced via ``formattedref`` ahead of time.
-
-    :returns:
-        The same logical bibliographic item, ideally with fewer formattedrefs
-        and more suitable for displaying to the user.
-    """
-    raise NotImplementedError()
+        # Either strict validation was requested,
+        # or we didn’t encounter any validation errors above.
+        # Validation errors at this stage would be considered bugs
+        # in this codebase, and not an issue in source data.
+        return (
+            CompositeSourcedBibliographicItem(**composite),
+            True,
+        )
 
 
 def get_docid_struct_for_search(id: DocID) -> Dict[str, Any]:
@@ -164,38 +125,6 @@ def get_docid_struct_for_search(id: DocID) -> Dict[str, Any]:
     if id.primary:
         struct['primary'] = True
     return struct
-
-
-def get_primary_docid(raw_ids: List[Dict[str, Any]]) -> Optional[DocID]:
-    """Extracts a primary document identifier from a list of objects
-    as it appears under 'docid' in deserialized Relaton data.
-    """
-
-    primary_docids: List[DocID] = [
-        DocID(id=docid['id'], type=docid['type'], primary=True)
-        for docid in raw_ids
-        if all([
-            docid.get('primary', False),
-            # As a further sanity check, require id and type, but no scope:
-            docid.get('id', None),
-            docid.get('type', None),
-            not docid.get('scope', None),
-        ])
-    ]
-
-    deduped = set([frozenset([id.id, id.type]) for id in primary_docids])
-
-    if len(deduped) != 1:
-        log.warn(
-            "build_citation_by_docid: unexpected number of primary docids "
-            "found for %s: %s",
-            raw_ids,
-            len(primary_docids))
-
-    try:
-        return primary_docids[0]
-    except IndexError:
-        return None
 
 
 def query_suppressing_user_input_error(
@@ -232,7 +161,7 @@ def is_benign_user_input_error(exc: Union[ProgrammingError, DataError]) \
 
     Note that user input must obviously still be properly escaped.
     Escaping is delegated to Django’s ORM,
-    see e.g. :func:`.search_refs_relaton_field`.
+    see e.g. :func:`main.query.search_refs_relaton_field`.
     """
 
     err = repr(exc)

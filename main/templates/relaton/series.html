@@ -2,6 +2,8 @@
   {% if val.formattedref %}
     {% include "citation/series_search_link.html" with val=val.formattedref %}
   {% else %}
-    {{ val.number }} in {% include "citation/series_search_link.html" with val=val.title.content %}
+    <span class="opacity-50">in series</span>
+    {% include "citation/series_search_link.html" with val=val.title.content %}
+    <small>as {{ val.number }}</small>
   {% endif %}
 </span>

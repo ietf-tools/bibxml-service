@@ -21,7 +21,7 @@ def run_indexer(request, dataset_name):
     result = fetch_and_index.delay(dataset_name, refs)
     task_id = result.id
 
-    if (task_id):
+    if task_id:
         push_task(dataset_name, task_id)
 
     return JsonResponse({

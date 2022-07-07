@@ -1,4 +1,4 @@
-{% load relaton %}
+{% load common %}
 
 {# TODO: (#196) below accounts for bibitems without docid but with formattedref, which should be addressed after #196 #}
 {% with own_title=bibitem.title|as_list|first relations=bibitem.relation|as_list %}
@@ -13,8 +13,8 @@
       {% ifchanged relation.type %}{{ relation.type|default:"relates to" }}{% endifchanged %}
       {% with title=relation.bibitem.title|as_list|first docid=relation.bibitem.docid|as_list|first formattedref=relation.bibitem.formattedref.content %}
         {% if docid or formattedref %}{{ docid.id|default:formattedref }}{% endif %}{% if not forloop.last %}, {% endif %}
-        {% if relations|length < 2 %}
-          {{ title.content|default:formattedref|default:"unknown title" }}
+        {% if relations|length < 2 and title.content %}
+          {{ title.content }}
         {% endif %}
       {% endwith %}
     {% endfor %}

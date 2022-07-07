@@ -4,13 +4,12 @@ from typing import List, Dict, Any
 
 from crossref.restful import Works, Etiquette
 from django.conf import settings
-from pydantic import ValidationError
 from relaton.models.bibitemlocality import Locality, LocalityStack
 
-from bib_models import DocID, BibliographicItem
 from bib_models import GenericStringValue, Link
 from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import Title, Contributor, Organization
+from bib_models import construct_bibitem, DocID
 from common.util import as_list
 from main.exceptions import RefNotFoundError
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
@@ -137,15 +136,7 @@ def get_bibitem(docid: DocID, strict: bool = True) \
         extent=extent
     )
 
-    errors = []
-    if strict:
-        bibitem = BibliographicItem(**data)
-    else:
-        try:
-            bibitem = BibliographicItem(**data)
-        except ValidationError as e:
-            errors.append(str(e))
-            bibitem = BibliographicItem.construct(**data)
+    bibitem, errors = construct_bibitem(data, strict)
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(

@@ -1,5 +1,5 @@
 """Pluggable serializer registry
-for :class:`~.models.bibdata.BibliographicItem` instances.
+for :class:`relaton.models.bibdata.BibliographicItem` instances.
 
 Currently, only serialization
 into various utf-8 strings is supported.

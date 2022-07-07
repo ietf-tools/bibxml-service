@@ -1,0 +1,123 @@
+{# Takes bibitem, which should be a CompositeSourcedBibliographicItem instance. #}
+{# Compared to sourced_bibitem_raw_table, this shows a nicely formatted summary. #}
+
+{% load common %}
+
+<div class="
+  row-[span_7_/_span_7]
+  overflow-y-auto
+  z-10
+  sticky
+  top-[max(5rem,12.5vh)]
+  sm:pt-4 px-4 mb-4
+
+  bg-dark-200
+  dark:bg-dark-800
+  text-sm
+  xl:text-base
+">
+  <dl>
+    <dt class="opacity-50 inline">bib. source{{ bibitem.sources.values|pluralize }}</span>
+    <dd class="inline">{% include "citation/sources.html" with items=bibitem.sources.values %}</dd>
+    {% if bibitem.copyright %}
+      {% include "deflist/entry_list.html" with key="Copyrights" key_sr_only=1 expandable=1 items=bibitem.copyright|as_list tmpl="relaton/copyright.html" %}
+    {% endif %}
+  </dl>
+
+  <br />
+
+  <dl>
+    {% if bibitem.abstract %}
+      {% include "deflist/entry_list.html" with key="abstract" key_sr_only=1 items=bibitem.abstract|default:"N/A"|as_list tmpl="relaton/formatted_string.html" wide="1" htmlclass="font-light relative before:block before:absolute before:leading-none before:top-[-.25em] before:left-[-.15em] before:text-white dark:before:text-black before:-z-10 before:text-[6rem] before:font-serif before:content-['“']" multiline=1 %}
+    {% else %}
+      Abstract is not available.
+    {% endif %}
+  </dl>
+</div>
+
+<div class="
+  row-[span_7_/_span_7]
+  overflow-y-auto
+  z-10
+  sticky
+  top-[max(5rem,12.5vh)]
+  sm:pt-4 px-4 mb-4
+
+  bg-dark-200
+  dark:bg-dark-800
+  text-sm
+  xl:text-base
+">
+  <dl>
+    {% include "deflist/entry.html" with key="document identifiers" ids=bibitem.docid|as_list tmpl="relaton/doc_ids.html" show_type=1 key_sr_only=1 as_links=0 %}
+
+    {% if bibitem.contributor %}
+      {% include "deflist/entry_list.html" with key="creators" inline=1 key_sr_only=1 tmpl="relaton/contributor.html" items=bibitem.contributor|as_list %}
+    {% endif %}
+
+    {% if bibitem.date %}
+      {% include "deflist/entry_list.html" with key="dates" inline=1 key_sr_only=1 tmpl="relaton/date.html" items=bibitem.date|as_list %}
+    {% endif %}
+
+    {% if bibitem.relation %}
+      {% include "deflist/entry_list.html" with key="relations" inline=1 key_sr_only=1 tmpl="relaton/relation.html" items=bibitem.relation|as_list %}
+    {% endif %}
+
+    {% if bibitem.series %}
+      {% include "deflist/entry_list.html" with key="series" key_sr_only=1 expandable=1 inline=1 items=bibitem.series|as_list tmpl="relaton/series.html" %}
+    {% endif %}
+
+    {% if bibitem.link %}
+      {% include "deflist/entry_list.html" with key="links" key_sr_only=1 items=bibitem.link|as_list inline=1 tmpl="relaton/link.html" %}
+    {% endif %}
+
+    {% if bibitem.keyword %}
+      {% include "deflist/entry_list.html" with key="keywords" tmpl="relaton/keyword.html" inline=1 items=bibitem.keyword|as_list comma_sep=1 htmlclass="overflow-x-hidden" only %}
+    {% endif %}
+  </dl>
+</div>
+
+<div class="
+  col-span-2
+  row-[span_6_/_span_6]
+  overflow-visible
+  z-20
+
+  flex
+  flex-col
+  relative
+">
+
+  <h3 class="
+    sm:absolute top-0 left-0
+    text-sm
+    uppercase
+    font-light
+    tracking-tight dark:tracking-normal
+    col-span-2
+    px-2
+    sm:px-4
+    py-1
+  ">
+    Source data
+  </h3>
+  <div class="flex-grow relative">
+    {% for ref, sourced_item in bibitem.sources.items|dictsort:0 reversed %}
+      <h4
+        class="
+          sm:sticky
+          top-0 right-0 z-30
+          text-sm tracking-tight font-light
+          flex flex-row flex-wrap
+          sm:text-right sm:justify-end
+          mb-2 sm:mb-0
+        "
+        id="{{ sourced_item.source.id }}"
+      >
+        {% include "citation/bibitem_source.html" with sourced_item=sourced_item indexed=sourced_item.indexed_object show_internal_links=1 show_error_icon=1 htmlclass="sm:bg-dark-300 sm:dark:bg-dark-900 px-2 sm:px-4 sm:py-1" %}
+      </h4>
+      {% include "citation/sourced_bibitem_raw_table.html" with bibitem=sourced_item.bibitem sourced_item=sourced_item only %}
+    {% endfor %}
+  </div>
+
+</div>

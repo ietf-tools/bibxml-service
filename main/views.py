@@ -18,11 +18,10 @@ from django.contrib import messages
 
 from pydantic import ValidationError
 
-from bibxml import error_views
 from common.pydantic import unpack_dataclasses
 from prometheus import metrics
 from bib_models import serializers, BibliographicItem
-from doi import get_doi_ref
+from xml2rfc_compat import adapters as xml2rfc_adapters
 
 from .models import RefData
 from .query import get_indexed_item, list_refs
@@ -39,6 +38,10 @@ log = logging.getLogger(__name__)
 
 
 shared_context = dict(
+    available_serialization_formats=[
+        *serializers.registry.keys(),
+        'relaton',
+    ],
     supported_search_formats=[
         (format, QUERY_FORMAT_LABELS.get(format, format))
         for format in BaseCitationSearchView.supported_query_formats
@@ -162,11 +165,18 @@ def browse_citation_by_docid(request):
         ))
 
     else:
-        result = unpack_dataclasses(citation.dict())
+        citation_dict = unpack_dataclasses(citation.dict())
+        try:
+            xml2rfc_urls = xml2rfc_adapters.list_xml2rfc_urls(
+                citation,
+                request,
+            )
+        except Exception:
+            xml2rfc_urls = []
         metrics.gui_bibitem_hits.labels(docid, 'success').inc()
         return render(request, 'browse/citation_details.html', dict(
-            data=result,
-            available_serialization_formats=serializers.registry.keys(),
+            data=citation_dict,
+            xml2rfc_urls=xml2rfc_urls,
             **shared_context,
         ))
 
@@ -181,18 +191,19 @@ def export_citation(request):
     resp = auth.api(get_by_docid)(request)
 
     if resp.status_code == 200:
-        anchor = (
-            resp.headers.get('X-Xml2rfc-Anchor', None)
-            or request.GET.get('docid'))
         ext = 'xml' if request.GET.get('format') == 'bibxml' else 'json'
-        filename = f'reference.{anchor}.{ext}'
-        resp.headers['Content-Disposition'] = f'attachment; filename={filename}'
+        fname = f"{request.GET.get('docid')}.{ext}"
+        resp.headers['Content-Disposition'] = f'attachment; filename={fname}'
         return resp
 
     else:
+        # If API failed, redirect back with a message
         message = ""
         if resp.status_code == 403:
+            # 403 assumed to mean likely Datatracker token in session expired
             message += "Please re-authenticate and try again. "
+
+        # Inspect API response to extract error message
         message += "Could not export this item, the error was: "
         content = ''.join(resp.content.decode('utf-8'))
         if resp['Content-Type'].startswith('application/json'):
@@ -230,39 +241,49 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
 # ================
 
 def browse_external_reference(request, dataset_id):
-    """Allows to view a reference from
-    ``dataset_id`` (must be a registered :term:`external source`).
+    """Allows to view a bibliographic item
+    from registered :term:`external source` ``dataset_id``
+    by reference passed in request’s GET query parameter ``ref``.
     """
     ref = request.GET.get('ref')
 
     if ref:
-        if dataset_id not in external_sources.registry:
-            return HttpResponseBadRequest(
-                "Unknown external source %s" % dataset_id)
-
-        source = external_sources.registry[dataset_id]
-
-        try:
-            _data = source.get_item(ref.strip()).dict()
-            data = unpack_dataclasses(_data)
-        except RuntimeError as exc:
-            log.exception(
-                "Failed to retrieve or unpack "
-                "external bibliographic item %s from %s",
-                ref,
+        if source := external_sources.registry.get(dataset_id, None):
+            try:
+                # external_item = source.get_item(ref.strip())
+                _data = source.get_item(ref.strip()).dict()
+                data = unpack_dataclasses(_data)
+            except RuntimeError as exc:
+                log.exception(
+                    "Failed to retrieve or unpack "
+                    "external bibliographic item %s from %s",
+                    ref,
+                    dataset_id)
+                messages.error(
+                    request,
+                    "Couldn’t retrieve citation: {}".format(
+                        str(exc)))
+            else:
+                composed = {
+                    **data['bibitem'],
+                    'primary_docid': ref.strip(),
+                    'sources': {
+                        dataset_id: data,
+                    },
+                }
+                return render(request, 'browse/citation_details.html', dict(
+                    dataset_id=dataset_id,
+                    ref=ref,
+                    data=composed,
+                    **shared_context,
+                ))
+        else:
+            log.warn(
+                "Unknown external source requested: %s",
                 dataset_id)
             messages.error(
                 request,
-                "Couldn’t retrieve citation: {}".format(
-                    str(exc)))
-        else:
-            return render(request, 'browse/citation_details.html', dict(
-                dataset_id=dataset_id,
-                ref=ref,
-                available_serialization_formats=serializers.registry.keys(),
-                data={**data['bibitem'], 'sources': {dataset_id: data}},
-                **shared_context,
-            ))
+                "Unknown external source “%s”" % dataset_id)
     else:
         messages.error(
             request,
@@ -276,11 +297,15 @@ def browse_external_reference(request, dataset_id):
 # ===================================
 
 def browse_indexed_reference(request, dataset_id, ref):
+    """Allows to view an bibliographic item
+    from registered :term:`indexed source` ``dataset_id``
+    by reference ``ref``.
+    """
     parsed_ref = unquote_plus(ref)
 
     try:
-        data = unpack_dataclasses(get_indexed_item(
-            dataset_id,
+        indexed_bibitem = unpack_dataclasses(get_indexed_item(
+            dataset_id.removeprefix('relaton-data-'),
             parsed_ref,
             strict=False,
         ).dict())
@@ -294,11 +319,10 @@ def browse_indexed_reference(request, dataset_id, ref):
                 dataset_id))
 
     else:
-        return render(request, 'browse/citation_details.html', dict(
+        return render(request, 'browse/indexed_bibitem_details.html', dict(
             dataset_id=dataset_id,
             ref=ref,
-            data={**data['bibitem'], 'sources': {dataset_id: data}},
-            available_serialization_formats=serializers.registry.keys(),
+            data=indexed_bibitem,
             **shared_context,
         ))
 
@@ -326,6 +350,7 @@ class IndexedDatasetCitationListView(ListView):
         )
         for item in ctx['object_list']:
             try:
+                # XXX: Normalize loose YAML here?
                 item.bibitem = BibliographicItem(**item.body)
             except ValidationError:
                 pass

@@ -6,23 +6,21 @@
   {{ dataset_id }}
 {% endblock %}
 
-{% block content_grid_classes %}
-  md:!block
-  p-4
-  h-screen
-  overflow-y-auto
-  space-y-2
-{% endblock %}
-
 {% block content %}
-  <div class="flex items-center gap-x-2">
-    <h2 class="font-bold">{{ dataset_id }}</h2>
-    {% url "api_run_indexer" dataset_id as reindex_url %}
-    &emsp;
-    {% include "api_button.html" with label="Queue reindex" endpoint=reindex_url method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" %}
+  {% include "source_header.html" %}
+  {% url "api_run_indexer" dataset_id as reindex_url %}
+  {% url "api_reset_index" dataset_id as reset_url %}
+
+  <div class="w-full md:flex md:items-center md:justify-center text-center gap-x-2">
+    {% include "api_button.html" with label="Queue reindex task" endpoint=reindex_url method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" htmlclass="" %}
+    {% include "api_button.html" with label="Reset index" endpoint=reset_url method="POST" openapi_op_id="resetDatasetIndex" openapi_spec_root="/api/v1/" htmlclass="" %}
   </div>
 
   {% for task in history %}
-    {% include "indexing_task.html" with task=task %}
+    <article class="{% include "_list_item_classes.html" %}">
+      <div class="{% include "_list_item_inner_classes.html" %}">
+        {% include "indexing_task.html" with task=task show_summary=forloop.first do_link=1 %}
+      </div>
+    </article>
   {% endfor %}
 {% endblock %}

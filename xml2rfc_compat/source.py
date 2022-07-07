@@ -8,6 +8,8 @@ import glob
 import os
 from typing import List, Union, Callable, Tuple
 
+import yaml
+
 from django.db import transaction
 
 from sources import indexable
@@ -22,9 +24,13 @@ def index_xml2rfc_source(
     on_error: Callable[[str, str], None],
 ) -> Tuple[int, int]:
     """
-    Indexes data from an xml2rfc web server mirror repository.
+    Indexes data from an xml2rfc web server mirror repository:
+    each XML file along with the identically named YAML sidecar metadata file
+    (if exists).
 
     Uses :class:`.models.Xml2rfcItem` to store indexed data.
+
+    .. seealso:: :term:`xml2rfc archive source`
     """
 
     on_progress = on_progress or (lambda total, indexed: None)
@@ -49,6 +55,9 @@ def index_xml2rfc_source(
     indexed_paths = set()
 
     with transaction.atomic():
+        # Unconditionally drop all first
+        Xml2rfcItem.objects.all().delete()
+
         for idx, xml_fpath in enumerate(source_xml_files):
             on_progress(total, idx)
 
@@ -63,17 +72,28 @@ def index_xml2rfc_source(
                         on_error(xml_fpath, "NUL character in XML string")
                         continue
 
+            # Parsing sidecar metadata file
+            yaml_fpath = f"{xml_fpath.removesuffix('.xml')}.yaml"
+            if os.path.exists(yaml_fpath):
+                with open(yaml_fpath, 'r', encoding='utf-8') as yaml_fh:
+                    sidecar_metadata = yaml.load(
+                        yaml_fh.read(),
+                        Loader=yaml.SafeLoader)
+            else:
+                sidecar_metadata = dict()
+
             _pparts = xml_fpath.split(os.sep)
             dirname, fname = _pparts[-2], _pparts[-1]
             relative_fpath = f'{dirname}{os.sep}{fname}'
             Xml2rfcItem.objects.update_or_create(
                 subpath=relative_fpath,
-                xml_repr=xml_data)
+                defaults=dict(
+                    xml_repr=xml_data,
+                    sidecar_meta=sidecar_metadata,
+                ),
+            )
 
             indexed_paths.add(relative_fpath)
-
-        # Delete all preexisting files not found in source anymore
-        Xml2rfcItem.objects.exclude(subpath__in=indexed_paths).delete()
 
     return total, len(indexed_paths)
 

@@ -2,7 +2,7 @@ from typing import Dict
 from unittest import TestCase
 
 from bib_models import DocID
-from main.query_utils import get_docid_struct_for_search, get_primary_docid
+from main.query_utils import get_docid_struct_for_search
 
 
 class QueryTestCase(TestCase):
@@ -27,26 +27,3 @@ class QueryTestCase(TestCase):
         self.assertEqual(struct["id"], id_value)
         self.assertEqual(struct["type"], type_value)
         self.assertIsNone(struct.get("primary", None))
-
-    def test_get_primary_docid(self):
-        primary_id_value = "primary_id_value"
-        raw_ids = [
-            {"id": primary_id_value, "type": "type", "primary": True},
-            {"id": "id2", "type": "type2"},
-            {"id": "id3", "type": "type3", "scope": "scope"}
-        ]
-        primary_id = get_primary_docid(raw_ids)
-        self.assertIsInstance(primary_id, DocID)
-        self.assertEqual(primary_id.id, primary_id_value)
-
-    def test_fail_get_primary_docid_if_no_primary_id(self):
-        """
-        get_primary_docid should return None if no entry has primary == True
-        """
-        primary_id_value = "primary_id_value"
-        raw_ids = [
-            {"id": primary_id_value, "type": "type", "primary": False},
-            {"id": "id2", "type": "type2"},
-            {"id": "id3", "type": "type3", "scope": "scope"}
-        ]
-        self.assertIsNone(get_primary_docid(raw_ids))

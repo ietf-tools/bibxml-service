@@ -88,7 +88,8 @@ def get_by_docid(request):
     Response has extra header ``X-Xml2rfc-Anchor``
     containing xml2rfc-compatible effective anchor string
     (either given in GET query
-    or obtained via :func:`relaton.serializers.bibxml.get_suitable_anchor()`).
+    or obtained via
+    :func:`relaton.serializers.bibxml.anchor.get_suitable_anchor()`).
     """
 
     doctype, docid = request.GET.get('doctype', None), request.GET.get('docid')
@@ -109,18 +110,18 @@ def get_by_docid(request):
     resp: HttpResponse
     outcome: str
 
+    check_external = (
+        request.GET.get('check_external_sources', None) or 'last_resort')
+
     try:
         try:
-            composite_bibitem = build_citation_for_docid(
+            bibitem: BibliographicItem = build_citation_for_docid(
                 docid.strip(),
                 doctype.strip() if doctype else None,
                 strict=True)
 
-            # This will be the latest sourced item.
-            bibitem = list(composite_bibitem.sources.values())[0].bibitem
-
         except RefNotFoundError:
-            if doctype is not None:
+            if doctype is not None and check_external == 'last_resort':
                 # As a fallback, try external sources.
                 sources = [
                     ext_s

@@ -21,19 +21,25 @@ URL patterns
 .. automodule:: xml2rfc_compat.urls
    :members:
 
-Management views
-================
+xml2rfc API views
+=================
 
 .. automodule:: xml2rfc_compat.views
    :members:
    :show-inheritance:
 
-Fetcher functions
-=================
+Management views
+================
 
-.. automodule:: xml2rfc_compat.fetchers
+.. automodule:: xml2rfc_compat.management_views
    :members:
-   :undoc-members:
+   :show-inheritance:
+
+Adapters for xml2rfc paths
+==========================
+
+.. automodule:: xml2rfc_compat.adapters
+   :members:
 
 Serializing per RFC 7991
 ========================
@@ -47,9 +53,17 @@ Indexable source
 .. automodule:: xml2rfc_compat.source
    :members:
 
-Data models
-===========
+Data models (ORM)
+=================
 
 .. automodule:: xml2rfc_compat.models
    :show-inheritance:
    :members:
+
+Data models (dataclasses)
+=========================
+
+.. automodule:: xml2rfc_compat.types
+   :show-inheritance:
+   :members:
+   :exclude-members: __init__

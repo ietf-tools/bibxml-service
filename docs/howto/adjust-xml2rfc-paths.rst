@@ -10,26 +10,22 @@ from up-to-date sources.
 - If it’s a general case
   and the :term:`xml2rfc anchor`
   is enough to deduce Relaton bibliographic item lookup,
-  edit the fetcher function:
+  edit the adapter subclass (in particular, the ``resolve()`` method):
   adjust the query e.g. by adding an OR condition.
 
-  Use root URL config to locate which fetcher function is responsible
-  for the subdirectory in question.
+  .. seealso:: :mod:`bibxml.xml2rfc_adapters`
 
 - Otherwise, you can create a manual mapping
-  using the xml2rfc path resolution management GUI.
+  by updating sidecar metadata YAML file within :term:`xml2rfc mirror source`
+  repository (and reindexing the source in BibXML service).
 
-  Locate an item using service’s general-purpose search functionality,
-  and copy the first citeable identifier
-  from bibliographic item details page.
+  1. Locate an item using service’s general-purpose search functionality,
+     and copy the first citeable identifier
+     from bibliographic item details page.
 
-  Use that identifier when creating a mapping.
+  2. Use that identifier when creating a YAML file with contents like this::
 
-  .. note::
-  
-     Manual maps will be lost if the database is completely wiped.
-     Use management GUI to export or import mappings to/from a JSON file
-     to protect against that scenario.
+         primary_docid: "<copied string>"
 
 .. seealso::
 

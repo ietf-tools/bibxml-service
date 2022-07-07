@@ -117,6 +117,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'main.app.Config',
     'management.app.Config',
+    'sources.app.Config',
     'xml2rfc_compat.app.Config',
     'compressor',
     'debug_toolbar',
@@ -332,8 +333,20 @@ DATATRACKER_CLIENT_SECRET = environ.get("DATATRACKER_CLIENT_SECRET", '').strip()
 
 DATATRACKER_REDIRECT_URI = environ.get(
     "DATATRACKER_REDIRECT_URI",
-    f"https://{HOSTNAME or '(hostname at runtime)'}/datatracker-auth/callback/")
-"""Redirect URI configured on Datatracker side."""
+    # TODO: Might want to hard-code hostname as well
+    f"https://{HOSTNAME or '(hostname at runtime)'}/"
+    "datatracker-auth/callback/")
+"""Redirect URI configured on Datatracker side.
+
+.. note::
+
+   This value is supposed to be manually kept in sync
+   with the one configured on IETF/Datatracker auth side.
+   It is used to sanity-check Datatracker auth configuration
+   by comparing it against the corresponding reversed Django URL pattern,
+   if they differ then Datatracker OIDC is assumed to be misconfigured
+   since Datatracker’s redirect would not be handled by this service.
+"""
 
 
 # Custom
@@ -402,7 +415,7 @@ Settings following below define how the service obtains Git repository
 URL and branch corresponding to those datasets at indexing stage.
 """
 
-DEFAULT_DATASET_REPO_URL_TEMPLATE = "https://github.com/ietf-ribose/relaton-data-{dataset_id}"
+DEFAULT_DATASET_REPO_URL_TEMPLATE = "https://github.com/ietf-tools/relaton-data-{dataset_id}"
 """Used to obtain default Git repository URL for a Relaton source,
 if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
 
@@ -422,7 +435,7 @@ if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
 DATASET_SOURCE_OVERRIDES = {
     'ieee': {
         'relaton_data': {
-            'repo_url': 'https://github.com/ietf-ribose/relaton-data-ieee',
+            'repo_url': 'https://github.com/ietf-tools/relaton-data-ieee',
         },
     },
 }
@@ -450,6 +463,7 @@ XML2RFC_COMPAT_DIR_ALIASES = {
     'bibxml7': ['bibxml-doi'],
     'bibxml8': ['bibxml-iana'],
     'bibxml9': ['bibxml-rfcsubseries'],
+    'bibxml-nist': [],
 }
 """Maps dirname to a list of aliases to reflect
 IETF xml2rfc web server behavior.

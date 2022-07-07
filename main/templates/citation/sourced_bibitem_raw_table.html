@@ -1,0 +1,53 @@
+{# Outputs a generic grid of bibitem properties. #}
+{# Expects bibitem (a BibliographicItem instance), sourced_item (SourcedBibliographicItem instance) #}
+
+{% load pydantic %}
+
+<table class="
+  border-collapse text-sm leading-tight overflow-hidden
+  sm:bg-dark-200
+  sm:[@supports(-webkit-backdrop-filter:none)]:bg-transparent
+  sm:[@supports(backdrop-filter:none)]:bg-transparent
+  sm:backdrop-blur-lg
+  sm:w-full
+  dark:text-dark-400
+">
+  {# Browsers insert a tbody anyway, so we might as well have it here to not forget #}
+  <tbody class="">
+    {% for field in bibitem|flatten_and_annotate:sourced_item.validation_errors %}
+      {% with field.pydantic_loc|with_parents|get_validation_errors:sourced_item.validation_errors as field_errors %}
+        {% if field.value or field.validation_errors %} {# Omit null/None fields, unless they have errors #}
+          <tr
+            class="sticky top-0 z-20 flex flex-col sm:table-row {% if field.validation_errors %}bg-rose-500/20 cursor-help{% endif %}"
+            title="{{ field.validation_errors|join:", " }}"
+            id="field-{{ field.pydantic_loc|first }}"
+          >
+            <th class="
+              border
+              border-dark-300 dark:border-dark-900
+
+              bg-dark-300/70
+              dark:bg-dark-700/70
+              sm:bg-transparent
+
+              py-1 px-2 sm:px-4 text-left align-top tracking-tight font-normal
+              overflow-hidden
+              sm:w-[50%]
+              sm:truncate sm:text-ellipsis
+            ">
+              {{ field.pydantic_loc|pretty_print_loc }}
+            </th>
+            <td class="
+              border
+              border-dark-300 dark:border-dark-900
+              py-1 px-2 sm:px-4 align-top overflow-hidden
+              sm:w-[50%]
+            ">
+              <span>{{ field.value|default:"N/A" }}</span>
+            </td>
+          </tr>
+        {% endif %}
+      {% endwith %}
+    {% endfor %}
+  </tbody>
+</table>

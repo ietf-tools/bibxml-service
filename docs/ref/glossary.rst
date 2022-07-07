@@ -14,8 +14,13 @@ Glossary
        - More than one source can provide data for the bibliographic items
          with the same :term:`document identifier`.
        - One source can provide bibliographic items of more than one document type.
-       
+
        Can either be an :term:`indexable source` or an :term:`external source`.
+
+   BibXML format
+       XML using schema defined
+       by `RFC 7991 <https://datatracker.ietf.org/doc/html/rfc7991>`_
+       or newer `Xml2rfc vocabulary <https://xml2rfc.tools.ietf.org/xml2rfc-doc.html>`_.
 
    indexable source
        An external data source periodically compiled by external tools
@@ -81,22 +86,65 @@ Glossary
           - :doc:`/topics/xml2rfc-compat` for overview
           - :data:`xml2rfc_compat.models.dir_subpath_regex` for the regular expression
 
+   xml2rfc archive source
+   xml2rfc mirror source
+      An :term:`indexable source` (living in a Git repository)
+      that contains two kinds of data:
+
+      - Original XML files as served by xml2rfc tools web server.
+
+        These files are supposed to be periodically overwritten using rsync
+        from rsync mirror.
+
+      - :term:`Optional “sidecar” YAML files <xml2rfc sidecar metadata file>`.
+
+      .. seealso:: :mod:`xml2rfc_compat.source`
+
+   xml2rfc sidecar metadata file
+      A YAML file named after an XML file existing in :term:`xml2rfc archive source`,
+      describing e.g. which bibliographic item it maps to.
+
+      Among other things, it can describe which :term:`document identifier`
+      the relevant XML file maps to, in order for the service to prefer an up-to-date
+      document if it exists
+      among available indexed :term:`bibliographic data sources <bibliographic data source>`.
+
+      These YAML files can be edited using external tooling or by hand,
+      and are not overwritten when xml2rfc archive source is automatically updated.
+
+      .. seealso::
+
+         - :attr:`xml2rfc_compat.models.Xml2rfcItem.sidecar_meta`
+         - :class:`xml2rfc_compat.types.Xml2rfcPathMetadata`
+
+
+   anchor
    xml2rfc anchor
-      Part of the filename in an :term:`xml2rfc-style path`
-      without “reference” or “_reference” prefix and file extension.
+      Used to mean two different strings, which may be the same
+      but are conceptually different:
 
-      It also appears as the “anchor” attribute on the ``<reference>``
-      element in returned XML.
+      - Part of the filename in an :term:`xml2rfc-style path`,
+        without “reference” or “_reference” prefix and file extension.
+      - The value of the “anchor” attribute on the ``<reference>``
+        element in BibXML.
 
-   xml2rfc fetcher function
-   xml2rfc fetcher
-      A function registered and associated with a top-level xml2rfc subpath
-      via :func:`xml2rfc_compat.urls.register_fetcher`.
+   xml2rfc adapter
+      A set of functions registered and associated with a top-level xml2rfc subpath
+      via :func:`xml2rfc_compat.adapters.register_adapter`.
 
-      Fetcher function is passed the ``anchor`` argument as a string,
-      for which it must return
-      a :class:`~relaton.models.bibdata.BibliographicItem` instance,
-      and is expected to raise either :class:`main.exceptions.RefNotFoundError`
-      or :class:`pydantic.ValidationError`.
+      Generally should be a :class:`xml2rfc_compat.adapters.Xml2rfcAdapter` subclass.
+
+      Consists of resolve and reverse functions.
+
+      Resolve function is invoked when handling a request to an xml2rfc path.
+      It’s passed the ``anchor`` argument as a string,
+      for which it must return a representation of the corresponding
+      bibliographic item in :term:`BibXML format`.
+
+      Reverse function is invoked when displaying a bibliographic item to the user,
+      to obtain an xml2rfc path through which the same item can be obtained.
+      It’s passed a :class:`relaton.models.bibdata.BibliographicItem` instance,
+      and should return the :term:`anchor` part of xml2rfc-style path filename,
+      or ``None`` if it’s not applicable to given item.
 
       .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`

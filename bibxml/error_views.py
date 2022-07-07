@@ -1,6 +1,6 @@
 """Error handlers for Django project’s root URL configuration."""
 
-from typing import Union
+from typing import Union, Optional
 from django.shortcuts import render
 
 
@@ -8,14 +8,14 @@ def server_error(request, *args, **kwargs):
     """Handler for HTTP 500 errors."""
 
     exc = kwargs.get('exception', None)
-    return _render_error(request, exc, "Server error (500)")
+    return _render_error(request, "Server error (500)", 500, exc)
 
 
 def not_authorized(request, *args, **kwargs):
     """Handler for HTTP 403 errors."""
 
     exc = kwargs.get('exception', None)
-    return _render_error(request, exc, "Not authorized (403)")
+    return _render_error(request, "Not authorized (403)", 403, exc)
 
 
 def not_found(request, *args, **kwargs):
@@ -23,7 +23,7 @@ def not_found(request, *args, **kwargs):
 
     exc = kwargs.get('exception', None)
 
-    exc_repr: Union[None, str] = None
+    exc_repr: Optional[str] = None
 
     if exc:
         resolver_404_path = _get_resolver_404_path(exc)
@@ -34,7 +34,7 @@ def not_found(request, *args, **kwargs):
         else:
             exc_repr = str(exc)
 
-    return _render_error(request, exc_repr, "Not found (404)")
+    return _render_error(request, "Not found (404)", 404, exc_repr)
 
 
 _get_resolver_404_path = (
@@ -48,13 +48,17 @@ otherwise ``None``."""
 
 
 def _render_error(
-        request,
-        exc: Union[Exception, None, str],
-        title: str):
+    request,
+    title: str,
+    status_code: int,
+    exc: Union[Exception, None, str],
+):
     """Generic error view.
-    Renders the error.html template with given title and error description.
 
-    If error description is an instance of Exception, casts it to string."""
+    Renders the ``error.html`` template with given title and error description.
+
+    If error description is an instance of :class:`Exception`,
+    casts it to string."""
 
     exc_repr = (
         exc
@@ -64,5 +68,6 @@ def _render_error(
         request,
         'error.html',
         dict(
-          error_description=exc_repr,
-          error_title=title))
+            error_description=exc_repr,
+            error_title=title),
+        status=status_code)

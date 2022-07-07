@@ -12,19 +12,22 @@ under ``/data/`` directory under repository root
 
 .. seealso:: :rfp:req:`3`
 """
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, List, Dict, Any, cast
 import glob
 from os import path
 import datetime
 
 import yaml
 from celery.utils.log import get_task_logger
-from relaton.models import dates
+from relaton.models import dates, BibliographicItem
+from pydantic import ValidationError
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import transaction
 
+from bib_models.util import normalize_relaxed
 from common.util import as_list
+from common.pydantic import ValidationErrorDict, pretty_print_loc
 from sources import indexable
 
 from .types import IndexedSourceMeta, IndexedObject
@@ -85,7 +88,7 @@ get_github_web_data_root = (
 )
 get_github_web_issues = (
     lambda repo_home:
-    f'{repo_home}/issues'
+    f'{repo_home}/issues/new'
 )
 
 
@@ -224,6 +227,28 @@ def index_dataset(ds_id, relaton_path, refs=None,
                         to_dates(as_list(ref_data.get('date', [])))
                         or [datetime.datetime.now().date()]
                     )
+
+                    if on_error:
+                        try:
+                            BibliographicItem(**ref_data)
+                        except ValidationError as validation_error:
+                            err_desc = '\n'.join([
+                                f"{d['type']} at "
+                                f"{pretty_print_loc(d['loc'])}: {d['msg']}"
+                                for d in cast(
+                                    List[ValidationErrorDict],
+                                    validation_error.errors()
+                                )
+                            ])
+                            try:
+                                normalize_relaxed(ref_data)
+                                BibliographicItem(**ref_data)
+                            except Exception:
+                                on_error(ref, err_desc)
+                            else:
+                                on_error(
+                                    ref,
+                                    'resolved (normalized):\n%s' % err_desc)
 
                     RefData.objects.update_or_create(
                         ref=ref,

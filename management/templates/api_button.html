@@ -1,12 +1,16 @@
 <span
-    class="{% if small %}f7 pa1 ph2 {% else %}f5 pa2 ph3 {% endif %} dib ba b--light-gray"
-    data-api-endpoint="{{ endpoint }}"
-    data-api-method="{{ method }}"
-    data-api-action-label="{{ label }}"
-    data-api-spec-op-id="{{ openapi_op_id }}"
-    data-api-readable-spec-path="{% url "openapi_readable_spec" "openapi_spec_main" %}#operation/{{ openapi_op_id }}">
+  class="
+    px-4 py-2
+    {{ htmlclass }}
+  "
+  data-api-endpoint="{{ endpoint }}"
+  data-api-method="{{ method }}"
+  data-api-action-label="{{ label }}"
+  data-api-spec-op-id="{{ openapi_op_id }}"
+  data-api-readable-spec-path="{% url "openapi_readable_spec" "openapi_spec_main" %}#operation/{{ openapi_op_id }}"
+>
   {{ label }}:
-  <code class="f7 ph2 gray">{{ method }} {{ endpoint }}</code>
+  <code>{{ method }} {{ endpoint }}</code>
   {% if openapi_op_id and openapi_spec_root %}
     <a href="{% url "openapi_spec_main" %}" class="link">(spec)</a>
   {% endif %}

@@ -1,72 +1,80 @@
-<article class="p-4">
-  <div class="flex flex-col md:flex-row mb-2 md:items-center md:space-x-2">
-    <span class="text-xs font-mono px-4 py-2">
+<div class="flex flex-col md:flex-row mb-2 md:items-center md:space-x-4 md:px-4">
+  <span class="text-xs font-mono py-2 px-4">
+    {% if do_link %}
+      <a class="link" href="{% url "manage_indexing_task" task.task_id %}?{% if task.dataset_id %}dataset_id={{ task.dataset_id }}{% endif %}">
+        {{ task.task_id }}
+      </a>
+    {% else %}
       {{ task.task_id }}
-    </span>
-    {% if task.status != "PENDING" %}
-      <span class="text-xs px-4 py-2
-          {% if task.status == "SUCCESS" %}bg-emerald-800 text-white
-          {% elif task.status == "PROGRESS" %}bg-amber-800 text-white
-          {% elif task.status == "FAILURE" %}bg-rose-800 text-white
-          {% else %}bg-gray-300/20
-          {% endif %}">
-        {{ task.status }}
-      </span>
     {% endif %}
-    {% if task.progress %}
-      <progress
-        class="custom-progress grow"
-        value="{{ task.progress.current }}"
-        max="{{ task.progress.total }}"
-        title="{{ task.progress.current }} of {{ task.progress.total }}">
-      </progress>
-    {% endif %}
-  </div>
-
-  <div class="px-4 mb-2">
-    {% if task.error %}
-      <p class="text-sm">{{ task.error.type }}</p>
-      <p class="text-xs">{{ task.error.message }}</p>
-    {% endif %}
-    {% if task.action %}
-      <p class="mb-2 text-xs">
-        {{ task.action }}
-        <br />
-        {% if task.progress %}
-          at&nbsp;{{ task.progress.current }} of&nbsp;{{ task.progress.total }}
-        {% endif %}
-      </p>
-    {% endif %}
-    {% if task.progress %}
-      {% url "api_stop_task" task.task_id as stop_task_url %}
-      {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" %}
-    {% endif %}
-    {% if task.outcome_summary %}
-      <p class="text-sm mt-2">{{ task.outcome_summary }}</p>
-    {% endif %}
-  </div>
-
+  </span>
   {% if task.status != "PENDING" %}
-    <p class="px-4 text-sm">
-      Requested for <strong class="ttu">{{ task.dataset_id }}</strong>:
-      {% if task.requested_refs %}
-        <ul class="py-3">
-          {% for ref in task.requested_refs %}
-            <li class="">{{ ref }}</li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        entire dataset
-      {% endif %}
-    </p>
+    <span class="text-xs px-4 py-2
+        {% if task.status == "SUCCESS" %}bg-emerald-800 text-white
+        {% elif task.status == "PROGRESS" %}bg-amber-800 text-white
+        {% elif task.status == "FAILURE" %}bg-rose-800 text-white
+        {% else %}bg-gray-300/20
+        {% endif %}">
+      {{ task.status }}
+    </span>
+  {% endif %}
+  {% if task.progress %}
+    <progress
+      class="custom-progress grow"
+      value="{{ task.progress.current }}"
+      max="{{ task.progress.total }}"
+      title="{{ task.progress.current }} of {{ task.progress.total }}">
+    </progress>
+    {% url "api_stop_task" task.task_id as stop_task_url %}
+    {% include "api_button.html" with endpoint=stop_task_url method="POST" label="Revoke task" small=True openapi_op_id="stopTask" openapi_spec_root="/api/v1/" htmlclass="text-xs uppercase" %}
+  {% endif %}
+</div>
 
-    <p class="px-4 text-sm">
-      Completed at:
-      {% if task.completed_at %}
-        {{ task.completed_at }}
-      {% else %}
-        —
+<div class="px-4 mb-1">
+  {% if task.error %}
+    <p class="text-sm">{{ task.error.type }}</p>
+    <p class="text-xs">{{ task.error.message }}</p>
+  {% endif %}
+  {% if task.progress %}
+    <p class="mb-2 text-xs overflow-x-auto">
+      {{ task.action }}
+      <br />
+      {% if task.progress %}
+        at&nbsp;{{ task.progress.current }} of&nbsp;{{ task.progress.total }}
       {% endif %}
     </p>
   {% endif %}
-</article>
+</div>
+
+{% if task.status != "PENDING" %}
+  <p class="px-4 text-sm">
+    {% if task.dataset_id %}
+      Requested for
+      <a href="{% url "manage_indexable_source" task.dataset_id %}" class="font-bold tracking-tight">
+        {{ task.dataset_id }}</a>:
+    {% endif %}
+    {% if task.requested_refs %}
+      <ul class="py-3">
+        {% for ref in task.requested_refs %}
+          <li class="">{{ ref }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      entire dataset
+    {% endif %}
+  </p>
+
+  <p class="px-4 text-sm">
+    Completed at:
+    {% if task.completed_at %}
+      {{ task.completed_at }}
+    {% else %}
+      —
+    {% endif %}
+  </p>
+  {% if show_summary and task.outcome_summary %}
+    <pre class="text-xs px-4 mt-2 overflow-x-auto">{{ task.outcome_summary }}</pre>
+  {% endif %}
+{% else %}
+  <p class="text-sm px-4">No reliable task information.
+{% endif %}

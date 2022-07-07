@@ -153,7 +153,7 @@ Linting types properly requires mypy to be able to access imported modules.
 However, this does not require running Docker at all times.
 If on macOS or Linux, instead you can:
 
-1. Create and active a Python 3.9 virtual environment using ``virtualenv``.
+1. Create and active a Python 3.10 virtual environment using ``virtualenv``.
 2. Install requirements with ``pip install -r requirements.txt``.
    (Don’t forget to repeat this step if requirements change later.)
 3. Make sure your IDE resolves to Python within the virtualenv.
@@ -169,6 +169,23 @@ If on macOS or Linux, instead you can:
 
 It’s also a good idea to run flake8. Where project conventions
 differ from flake8 style, use project conventions.
+
+
+Debugging
+---------
+
+The code can be debugged using an interactive tool such as ``ipdb``.
+The environment is already setup to accept stdin interactions.
+
+If you are running Docker using the command line, all you have to do is
+install ``ipdb`` in your container::
+
+    docker-compose exec web pip install ipdb
+
+See the documentation [1]_ for more information.
+
+.. [1]  https://pypi.org/project/ipdb/
+
 
 Automated testing
 -----------------

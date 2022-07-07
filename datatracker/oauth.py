@@ -212,8 +212,8 @@ def initiate(request):
     """A Django view that redirects the user to Datatracker
     for login and approval.
 
-    If :data:`~datatracker.oauth.CLIENT_ID`
-    or :data:`~datatracker.oauth.CLIENT_SECRET` are missing,
+    If :data:`~bibxml.settings.DATATRACKER_CLIENT_ID`
+    or :data:`~bibxml.settings.DATATRACKER_CLIENT_SECRET` are missing,
     or if obtained redirect URI does not match configuration,
     queues an error-level message and redirects the user back
     to where they came from or default post-OAuth redirect URL.

@@ -1,0 +1,14 @@
+{% if datatracker_oauth_enabled %}
+  {% if datatracker_user %}
+    <span class="truncate">
+      <a class="font-semibold" href="{% url "datatracker_oauth_logout" %}">Log&nbsp;out</a>
+      ({{ datatracker_user.name|default:"name N/A" }})
+    </span>
+  {% else %}
+    <a
+      href="{% url "datatracker_oauth_initiate" %}"
+    >
+      Log in via Datatracker
+    </a>
+  {% endif %}
+{% endif %}

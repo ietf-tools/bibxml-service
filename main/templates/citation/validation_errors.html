@@ -1,0 +1,5 @@
+{% spaceless %}{# Whitespace/indentation is important here, this may be displayed in a tooltip. #}
+{% load pydantic %}
+{% for err in validation_errors %}{% if in_page_links %}<a href="#field-{{ err.loc|first }}" class="link">{{ err.loc|pretty_print_loc }}</a>{% else %}{{ err.loc|pretty_print_loc }}{% endif %}: {{ err.msg }}{% if not forloop.last %}, {% endif %}
+{% endfor %}
+{% endspaceless %}

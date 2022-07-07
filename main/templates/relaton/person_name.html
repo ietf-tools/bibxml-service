@@ -1,4 +1,5 @@
-{% load relaton %}
+{% load common %}
+
 {% with val.surname.content as surname and val.completename.content as fullname and val.forename as given_names and val.initial|as_list as initials %}
   {% if fullname %}
     {{ fullname }}

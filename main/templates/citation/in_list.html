@@ -1,6 +1,6 @@
 {# Expects context: bibliographic item as data, forloop, optional ref, dataset_id #}
 
-{% load relaton %}
+{% load relaton common %}
 
 <article class="{% include "_list_item_classes.html" %} bibitem-in-list">
   <div class="{% include "_list_item_inner_classes.html" %}">
@@ -39,8 +39,20 @@
       {% include "relaton/doc_ids.html" with ids=data.docid|as_list query=query tabindex="0" %}
     </div>
 
-    {% if data.headline %}
-      <div class="px-4 text-xs leading-tight">… {{ data.headline|safe }} …</div>
-    {% endif %}
+    <div class="px-4 text-xs leading-tight">
+      {% if data.headline %}
+        … {{ data.headline|safe }} …
+      {% else %}
+        <div class="hidden sm:block">
+          &nbsp;
+          {% comment %}
+            This serves a purpose: remove this, and you’ll see
+            how on very large screens AND without headlines,
+            inner item will not be large enough, causing unexpected spacing
+            and in case of short lists weird shadow offset on the last item.
+          {% endcomment %}
+        </div>
+      {% endif %}
+    </div>
   </div>
 </article>

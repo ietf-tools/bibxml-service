@@ -1,0 +1,25 @@
+{% extends "management/datasets.html" %}
+
+{% block title %}
+  {{ block.super }}
+  —
+  indexing task {{ task.task_id }}
+{% endblock %}
+
+{% block content %}
+  {% if source %}
+    {% include "source_header.html" %}
+  {% endif %}
+
+  <div class="
+    md:overflow-visible
+    md:row-[span_6_/_span_6]
+    md:overflow-y-auto
+    bg-dark-200
+    dark:bg-dark-800
+    py-4
+  ">
+    {% include "indexing_task.html" with task=task show_summary=1 %}
+  </div>
+{% endblock %}
+

@@ -13,9 +13,8 @@ import re
 import json
 
 import requests
-from pydantic import ValidationError
 
-from bib_models import DocID, BibliographicItem
+from bib_models import construct_bibitem
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
 from main.exceptions import RefNotFoundError
 from main import external_sources
@@ -57,7 +56,10 @@ def remove_version(id: str) -> Tuple[str, str]:
 
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
-def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographicItem:
+def get_internet_draft(
+    docid: str,
+    strict: bool = True,
+) -> ExternalBibliographicItem:
     """Retrieves an Internet Draft from Datatracker in Relaton format.
 
     Makes necessary requests to Datatracker API
@@ -84,11 +86,11 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
         abstract=[{
             'content': data['abstract'],  # .replace('\n', ' '),
         }] if 'abstract' in data else None,
-        edition={
-            'content': data['rev'],
-        },
         link=[{
             'content': f'{BASE_DOMAIN}%s' % data['resource_uri'],
+        }],
+        version=[{
+            'draft': data['rev'],
         }],
         docid=[{
             'type': 'IETF',
@@ -138,8 +140,15 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
                         authors = json.loads(latest_submission_data['authors'])
                     except json.JSONDecodeError:
                         try:
-                            authors = ast.literal_eval(latest_submission_data['authors'])
-                        except:
+                            # IMPORTANT: Using literal_eval means we assume
+                            # Datatracker’s responses are always trustworthy.
+                            # The reason we’re using it is because Datatracker
+                            # appears to return something like Python’s repr()
+                            # of a list sometimes here
+                            # (i.e., not JSON-decodable)
+                            authors = ast.literal_eval(
+                                latest_submission_data['authors'])
+                        except (ValueError, SyntaxError):
                             authors = []
                 else:
                     authors = []
@@ -147,22 +156,18 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
                     bibitem_data['contributor'] += [
                         {
                             'role': ['author'],
-                            'person': {'name': {'completename':
-                                {'content': a['name']}
-                            }},
+                            'person': {
+                                'name': {
+                                    'completename': {
+                                        'content': a['name']
+                                    },
+                                },
+                            },
                         }
                         for a in authors
                     ]
 
-    errors: List[str] = []
-    if strict:
-        bibitem = BibliographicItem(**bibitem_data)
-    else:
-        try:
-            bibitem = BibliographicItem(**bibitem_data)
-        except ValidationError as err:
-            errors.append(str(err))
-            bibitem = BibliographicItem.construct(**bibitem_data)
+    bibitem, errors = construct_bibitem(bibitem_data, strict)
 
     return ExternalBibliographicItem(
         source=ExternalSourceMeta(
@@ -171,5 +176,5 @@ def get_internet_draft(docid: str, strict: bool = True) -> ExternalBibliographic
         ),
         bibitem=bibitem,
         validation_errors=errors,
-        requests=[],
+        requests=[],  # TODO: Provide requests incurred later
     )

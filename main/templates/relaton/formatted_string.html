@@ -1,5 +1,5 @@
 {% if val.format == "text/html" %}
-  {{ val.content|default:"—"|safe }}
+  {{ val.content|default:"N/A"|safe }}
 {% else %}
-  {{ val.content|default:"—" }}
+  {{ val.content|default:"N/A" }}
 {% endif %}

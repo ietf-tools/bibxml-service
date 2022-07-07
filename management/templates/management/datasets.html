@@ -6,10 +6,6 @@
   Indexable sources
 {% endblock %}
 
-{% block content_grid_classes %}
-  md:grid-cols-2
-{% endblock %}
-
 {% block content %}
   {{ block.super }}
 
@@ -31,7 +27,13 @@
           {% endif %}
         <br />
         <span class="text-xs break-all">
-          {{ dataset.status }}
+          {% if dataset.task_id %}
+            <a class="link" href="{% url "manage_indexing_task" dataset.task_id %}?dataset_id={{ dataset.name }}">
+              {{ dataset.status }}
+            </a>
+          {% else %}
+            {{ dataset.status }}
+          {% endif %}
         </span>
       </div>
     </article>

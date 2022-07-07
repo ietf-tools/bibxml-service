@@ -11,7 +11,7 @@ RFP requirement compliance
        and Javascript/HTML/CSS for the interactive web page,
        built on modern infrastructure components and designed for maintainability.
 
-   - Server side is written in Python 3.9 with type annotations.
+   - Server side is written in Python 3.10 with type annotations.
 
    - Client-side, JavaScript is purposefully maintained entirely
      optional for core functionality.
@@ -71,7 +71,7 @@ RFP requirement compliance
    The service does not currently expose data using rsync,
    but source data used by the service is available
    via repositories named after ``relaton-data-*`` pattern
-   within https://github.com/ietf-ribose/.
+   within https://github.com/ietf-tools/.
 
    .. seealso:: :mod:`main.sources` for Relaton source implementation
 
@@ -112,7 +112,7 @@ RFP requirement compliance
 
    xml2rfc-style paths are supported. Requested path is used
    to construct a query against Relaton bibliographic item JSON,
-   and obtained item is returned serialized in XML.
+   and obtained item is returned serialized in :term:`BibXML format`.
 
    A manual map to a document identifier, if present,
    overrides automatic resolution.
@@ -160,7 +160,8 @@ RFP requirement compliance
        Development must use a public github repository under the IETF Tools Organisation
 
    The service and associated data source and infrastructure repositories
-   are hosted under https://github.com/ietf-ribose/.
+   are hosted under https://github.com/ietf-ribose/
+   (being migrated under https://github.com/ietf-tools/).
 
 .. rfp:req::
    :id: 9
@@ -175,7 +176,7 @@ RFP requirement compliance
 
        Early on in the development a build process must be added such that commits to the repository
        will build an image and run tests in a container based on that image,
-       and when tests pass, will deploy a container on a staging site. 
+       and when tests pass, will deploy a container on a staging site.
        The image will be made available on a hub (such as hub.docker.com).
        We expect the same image to be useful for both production and development use.
        We anticipate a CD system that will allow us to deploy to potentially distributed

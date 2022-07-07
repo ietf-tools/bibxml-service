@@ -1,0 +1,48 @@
+{# Accepts sourced_item, indexed (true if item is not external), htmlclass, show_error_icon, show_internal_links. #}
+<span
+  class="
+    flex flex-row flex-wrap overflow-hidden
+    {% if sourced_item.validation_errors|length > 0 %}pointer-help{% endif %}
+    {{ htmlclass }}
+  "
+  {# Note: indentation is significant. #}
+  title="{% if sourced_item.validation_errors|length > 0 %}Source data did not validate.
+{% include "citation/validation_errors.html" with validation_errors=sourced_item.validation_errors %}
+Note: this may be caused either by malformed source data, or by this service’s data handling.{% endif %}"
+>
+  {% if sourced_item.validation_errors|length > 0 or sourced_item.indexed_object %}
+    {% if show_error_icon and sourced_item.validation_errors|length > 0 %}
+      {% include "_error_icon.html" with title="Source did not validate" htmlclass="h-5 w-5 mr-1 inline text-rose-600" %}
+    {% endif %}
+    {% if sourced_item.indexed_object %}
+      {% if show_internal_links %}
+        <a
+          class="truncate link"
+          href="{% url "browse_indexed_ref" sourced_item.source.id|cut:"relaton-data-" sourced_item.indexed_object.name %}"
+        >
+          {{ sourced_item.indexed_object.name }}
+        </a>
+      {% else %}
+        <span class="truncate">
+          {{ sourced_item.indexed_object.name }}
+        </span>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+  &ensp;
+  <span class="truncate">
+    {% if indexed %}
+      indexed from
+    {% else %}
+      requested via
+    {% endif %}
+    {% if show_internal_links and indexed %}
+      <a
+        class="link"
+        href="{% url "browse_dataset" sourced_item.source.id|cut:"relaton-data-" %}"
+      >{{ sourced_item.source.id }}</a>
+    {% else %}
+      <span>{{ sourced_item.source.id }}</span>
+    {% endif %}
+  </span>
+</span>

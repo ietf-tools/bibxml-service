@@ -7,9 +7,8 @@ from django.views.decorators.http import require_POST, require_safe
 from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
 from management import auth
-from xml2rfc_compat import views as xml2rfc_views
-# TODO: Register xml2rfc fetchers in app config
-from xml2rfc_compat import fetchers  # Imported for registration side-effect
+from xml2rfc_compat import management_views as xml2rfc_views
+from . import xml2rfc_adapters  # Imported for registration side-effect
 from xml2rfc_compat.urls import get_urls as get_xml2rfc_urls
 from datatracker import auth as dt_auth
 from datatracker import oauth as dt_oauth
@@ -126,24 +125,20 @@ urlpatterns = [
             ])),
         ])),
 
+        path('tasks/', include([
+            path('<task_id>/', include([
+                path('', require_safe(auth.basic(never_cache(
+                    mgmt_views.indexing_task
+                ))), name='manage_indexing_task'),
+            ])),
+        ])),
+
         path('xml2rfc-compat/', include([
             path('', require_safe(auth.basic(never_cache(
                 xml2rfc_views.DirectoryOverview.as_view(
                     template_name='management/xml2rfc.html',
                 )
             ))), name='manage_xml2rfc'),
-            path('import-map/', require_POST(auth.basic(
-                xml2rfc_views.import_manual_map,
-            )), name='manage_xml2rfc_import_manual_map'),
-            path('export-map/', require_safe(auth.basic(
-                xml2rfc_views.export_manual_map,
-            )), name='manage_xml2rfc_export_manual_map'),
-            path('edit-manual-map/<path:subpath>/', require_POST(auth.basic(
-                xml2rfc_views.edit_manual_map,
-            )), name='manage_xml2rfc_directory_map_path'),
-            path('delete-manual-map/<path:subpath>/', require_POST(auth.basic(
-                xml2rfc_views.delete_manual_map,
-            )), name='manage_xml2rfc_directory_unmap_path'),
             path('<path:subpath>/', require_safe(auth.basic(never_cache(
                 xml2rfc_views.ExploreDirectory.as_view(
                     template_name='management/xml2rfc_directory.html',
@@ -196,7 +191,7 @@ urlpatterns = [
         ])),
 
         path('indexed-sources/', include([
-            path('<dataset_id>/', include([
+            path('relaton-data-<dataset_id>/', include([
                 path('', never_cache(require_safe(
                     public_views.IndexedDatasetCitationListView.as_view()
                 )), name='browse_dataset'),

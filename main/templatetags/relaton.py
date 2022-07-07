@@ -6,24 +6,10 @@ import json
 from django.urls import reverse
 from django import template
 
-from common.util import as_list as base_as_list
-
-
-citation_search_base = reverse('search_citations')
-get_by_docid_base = reverse('get_citation_by_docid')
+from common.util import as_list
 
 
 register = template.Library()
-
-
-@register.filter
-def as_list(value):
-    """Returns the value as a list (see :func:`common.util.as_list`),
-    omitting any ``None`` values."""
-
-    result: Any = base_as_list(value)
-
-    return [val for val in result if val is not None and val != '']
 
 
 @register.filter
@@ -65,6 +51,7 @@ def bibitem_link(value: Any):
                 id, type = None, None
 
     if id:
+        get_by_docid_base = reverse('get_citation_by_docid')
         id_query = (
             f'{get_by_docid_base}'
             f'?docid={quote_plus(id)}')
@@ -75,7 +62,6 @@ def bibitem_link(value: Any):
             return id_query
     else:
         return None
-
 
 
 @register.filter
@@ -118,6 +104,7 @@ def substruct_search_link(value: Any, query: str):
     else:
         serializable = value
 
+    citation_search_base = reverse('search_citations')
     substruct_json = json.dumps(select_keys(serializable, key_checker))
     query_json = subfield % substruct_json
     return (

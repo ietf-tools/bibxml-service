@@ -1,18 +1,18 @@
 """View functions for management GUI."""
 
-from typing import List, Union, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 from django.shortcuts import render
 from django.conf import settings
 from django.http.request import split_domain_port
-
-from main.models import RefData
+from django.http import HttpResponseNotFound
+from django.utils.timesince import timesince
 
 from sources.task_status import get_dataset_task_history
 from sources.task_status import describe_indexing_task
 from sources.task_status import list_running_tasks
-from sources.task_status import IndexingTaskDescription, TaskProgress
+from sources.task_status import get_latest_outcome, TaskProgress
 from sources import indexable
 
 
@@ -42,6 +42,7 @@ class IndexableSourceStatus:
     name: str
     status: str
     item_count: str
+    task_id: Optional[str]
     task_progress: Optional[TaskProgress]
 
 
@@ -50,26 +51,31 @@ def datasets(request):
 
     sources: List[IndexableSourceStatus] = []
     for source_id, source in indexable.registry.items():
-        task: Union[IndexingTaskDescription, None]
-        try:
-            task = get_dataset_task_history(source_id, limit=1)[0]
-        except IndexError:
-            task = None
+        task = get_latest_outcome(source_id)
 
         status: str
         if task is None:
-            status = "no task history"
+            status = "status unknown"
         elif task['progress']:
             status = f"in progress ({task['action'] or 'N/A'})"
         elif task['completed_at']:
-            status = f"last indexed {task['completed_at']}"
+            try:
+                ago = timesince(task['completed_at'], depth=1)
+            except Exception:
+                ago = ''
+            status = (
+                f"last indexed {ago} ago "
+                f"({task['completed_at'].strftime('%Y-%m-%dT%H:%M:%SZ')})")
         else:
-            status = "task status expired"
+            status = "status unknown"
         # TODO: Annotate/aggregate indexed item counts in management GUI?
         sources.append(IndexableSourceStatus(
             name=source_id,
             status=status,
-            task_progress=task['progress'] if task and 'progress' in task else None,
+            task_id=task['task_id'] if task else None,
+            task_progress=task['progress']
+            if task and 'progress' in task
+            else None,
             item_count=str(source.count_indexed()),
         ))
 
@@ -80,10 +86,35 @@ def datasets(request):
 
 
 def dataset(request, dataset_id: str):
-    """Indexable source indexing history & running tasks."""
+    """:term:`indexable source` indexing history & running tasks."""
+
+    try:
+        source = indexable.registry[dataset_id]
+    except KeyError:
+        return HttpResponseNotFound(f"Source {dataset_id} not found")
 
     return render(request, 'management/dataset.html', dict(
         **shared_context,
         dataset_id=dataset_id,
+        source=source,
         history=get_dataset_task_history(dataset_id),
+    ))
+
+
+def indexing_task(request, task_id: str):
+    """Indexing task run for an indexable source."""
+
+    dataset_id = request.GET.get('dataset_id', None)
+    if dataset_id:
+        try:
+            source = indexable.registry[dataset_id]
+        except KeyError:
+            source = None
+    else:
+        source = None
+
+    return render(request, 'management/task.html', dict(
+        **shared_context,
+        source=source,
+        task=describe_indexing_task(task_id),
     ))

@@ -14,7 +14,14 @@
    :members:
 
 
-``merger``: Merging bibliographic items representing the same document
+``util``: Utilities for instantiating bibliographic items
+=========================================================
+
+.. automodule:: bib_models.util
+   :members:
+
+
+``merger``: Merging bibliographic items representing the same resource
 ======================================================================
 
 .. automodule:: bib_models.merger

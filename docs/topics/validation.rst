@@ -25,13 +25,14 @@ To make such situations less problematic,
 some functions responsible for constructing bibliographic item instances
 support a ``strict`` boolean keyword argument.
 
-By default it is ``True``, and item that fails validation
+By default it is ``True``, and any item that fails validation
 will make the function raise a :class:`pydantic.ValidationError`.
+The caller should never receive a malformed item.
 
 If explicitly set to ``False``, the item will be constructed anyway,
-but it may contain unexpected data structures. For example, it may
-have dictionaries instead of objects, and values that are invalid
-left as is.
+but it may contain unexpected data types. For example, it may
+have dictionaries instead of objects, or timestamps as strings
+instead of appropriate datetime objects.
 
 .. note::
 
@@ -41,9 +42,11 @@ left as is.
 .. seealso::
 
    Some functions that use ``strict``:
-   
+
    - :func:`main.query.build_citation_for_docid`
-   - :func:`main.query.get_indexed_item`
-   - :func:`main.query_utils.merge_refs`
-   - :func:`datatracker.internet_drafts.get_internet_draft`
-   - :func:`doi.get_doi_ref`
+   - :func:`bib_models.util.construct_bibitem`, with callers:
+
+     - :func:`main.query.get_indexed_item`
+     - :func:`main.query_utils.compose_bibitem`
+     - :func:`datatracker.internet_drafts.get_internet_draft`
+     - :func:`doi.get_doi_ref`

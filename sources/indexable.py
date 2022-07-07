@@ -8,7 +8,7 @@ and don’t necessarily need to contain bibliographic data.
 import functools
 import hashlib
 from dataclasses import dataclass
-from typing import Callable, Union, List, Tuple, Dict, TypedDict
+from typing import Callable, Optional, List, Tuple, Dict, TypedDict
 from os import path, makedirs
 
 from celery.utils.log import get_task_logger
@@ -46,9 +46,9 @@ class IndexableSource:
 
     index: Callable[
         [
-            Union[List[str], None],
-            Union[Callable[[str, int, int], None], None],
-            Union[Callable[[str, str], None], None],
+            Optional[List[str]],
+            Optional[Callable[[str, int, int], None]],
+            Optional[Callable[[str, str], None]],
         ],
         Tuple[int, int],
     ]
@@ -75,6 +75,12 @@ class IndexableSource:
     """A function that wipes all indexed data for this source.
     Takes no arguments and returns nothing."""
 
+    list_repository_urls: Callable[[], List[str]]
+    """Returns a list of repository URLs backing this source."""
+
+    id: str
+    """Source identifier."""
+
 
 registry: Dict[str, IndexableSource] = {}
 """
@@ -91,7 +97,7 @@ class IndexableSourceToRegister(TypedDict, total=True):
     indexer: Callable[
         [
             List[str],
-            Union[List[str], None],
+            Optional[List[str]],
             Callable[[int, int], None],
             Callable[[str, str], None],
         ],
@@ -166,9 +172,9 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
 
         @functools.wraps(index_info['indexer'])
         def handle_index(
-            refs: Union[List[str], None],
-            on_progress: Union[Callable[[str, int, int], None], None],
-            on_item_error: Union[Callable[[str, str], None], None],
+            refs: Optional[List[str]],
+            on_progress: Optional[Callable[[str, int, int], None]],
+            on_item_error: Optional[Callable[[str, str], None]],
         ) -> Tuple[int, int]:
             work_dir_paths: List[str] = []
             repo_heads: List[str] = []
@@ -233,9 +239,11 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
                 return 0, 0
 
         indexable_source = IndexableSource(
+            id=source_id,
             index=handle_index,
             reset_index=index_info['reset_index'],
             count_indexed=index_info['count_indexed'],
+            list_repository_urls=lambda: [r[0] for r in repos],
         )
 
         registry[source_id] = indexable_source
