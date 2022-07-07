@@ -21,14 +21,15 @@ There are two possible approaches to this:
 
   This method is easier to set up.
 
-  .. note:: Set this value to a high enough number of seconds.
-            This helps avoid overwhelming management GUI
-            with no-op task outcomes.
-
   .. seealso:: :data:`bibxml.settings.AUTO_REINDEX_INTERVAL`
 
 How frequently to reindex?
 --------------------------
+
+In short, it’s recommended to confirm how frequently the sources usually change,
+and pick a value somewhat higher than that—regardless of whether
+you implement scheduled API endpoint calls
+or use the ``AUTO_REINDEX_INTERVAL`` setting.
 
 Generally, you can reindex sources as often as you want.
 If no changes were detected in source’s underlying Git repo
@@ -39,11 +40,6 @@ However, it’s currently recommended to not reindex too often,
 as that will overwhelm task outcome listings in management GUI
 (making it harder to track down issues) and cause unnecessary requests
 to Git server APIs.
-
-It’s recommended to confirm how frequently the sources usually change,
-and pick a value somewhat higher than that—regardless of whether
-you implement scheduled API endpoint calls
-or use the ``AUTO_REINDEX_INTERVAL`` setting.
 
 .. note:: Regardless of the method you choose, make sure to monitor
           task execution as part of overall
