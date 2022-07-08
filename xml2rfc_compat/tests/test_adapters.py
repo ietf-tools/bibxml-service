@@ -3,7 +3,7 @@ from django.test import TestCase
 from bib_models import BibliographicItem
 from bibxml.settings import XML2RFC_PATH_PREFIX
 from bibxml.xml2rfc_adapters import RfcAdapter, MiscAdapter, InternetDraftsAdapter, W3cAdapter, ThreeGPPPAdapter, \
-    IeeeAdapter, IanaAdapter, RfcSubseriesAdapter
+    IeeeAdapter, IanaAdapter, RfcSubseriesAdapter, NistAdapter
 from main.exceptions import RefNotFoundError
 
 
@@ -18,14 +18,14 @@ class XML2RFCAdaptersTestCase(TestCase):
         corresponding fetcher function.
         """
         self.rfcs_ref = "RFC.4037"
-        self.misc_ref = "FIPS.180.1993"  # fix
+        self.misc_ref = "FIPS.180.1993"
         self.internet_drafts_ref = "I-D.ietf-hip-rfc5201-bis"
-        self.w3c_ref = "W3C.REC-owl2-syntax-20121211"  # fix
-        self.threegpp_ref = "SDO-3GPP.TS 25.321:Rel-8/8.3.0"  # fix
+        self.w3c_ref = "W3C.REC-owl2-syntax"  # fix
+        self.threegpp_ref = "SDO-3GPP.25.321:Rel-8/8.3.0"
         self.ieee_ref = "R.IEEE.P2740/D-6.5.2020-08"
         self.iana_ref = "IANA.xml-security-uris/security-uris"
         self.rfcsubseries_ref = "STD.29.xml"
-        self.nist_ref = "NBS.CRPL-F-A.90"  # fix
+        self.nist_ref = "NBS.CRPL-F-A.90"
         self.doi_ref = "10.1093/benz/9780199773787.article.b00004912"
 
         self.dirname = XML2RFC_PATH_PREFIX
@@ -50,12 +50,10 @@ class XML2RFCAdaptersTestCase(TestCase):
             adapter.resolve()
 
     def test_misc(self):
-        # TODO fix
-        # adapter = MiscAdapter(self.dirname, "bibxml2", self.misc_ref)
-        # bibitem = adapter.resolve()
-        # self._assert_is_instance_of_bibliographicitem(bibitem)
-        # self._assert_refs_equal(bibitem, self.misc_ref)
-        pass
+        adapter = MiscAdapter(self.dirname, "bibxml2", self.misc_ref)
+        bibitem = adapter.resolve()
+        self._assert_is_instance_of_bibliographicitem(bibitem)
+        self._assert_refs_equal(bibitem, self.misc_ref)
 
     def test_misc_not_found(self):
         adapter = MiscAdapter(self.dirname, "bibxml2", "NONEXISTENT.8023.19888")
@@ -93,7 +91,6 @@ class XML2RFCAdaptersTestCase(TestCase):
         # bibitem = adapter.resolve()
         # self._assert_is_instance_of_bibliographicitem(bibitem)
         # self._assert_refs_equal(bibitem, self.w3c_ref)
-        pass
 
     def test_w3c_not_found(self):
         adapter = W3cAdapter(self.dirname, "bibxml4", self.w3c_ref)
@@ -101,11 +98,9 @@ class XML2RFCAdaptersTestCase(TestCase):
             adapter.resolve()
 
     def test_threegpp(self):
-        # TODO fix
-        # adapter = ThreeGPPPAdapter(self.dirname, "bibxml5", self.threegpp_ref)
-        # bibitem = adapter.resolve()
-        # self._assert_refs_equal(bibitem, self.threegpp_ref)
-        pass
+        adapter = ThreeGPPPAdapter(self.dirname, "bibxml5", self.threegpp_ref)
+        bibitem = adapter.resolve()
+        self._assert_refs_equal(bibitem, self.threegpp_ref)
 
     def test_threegpp_not_found(self):
         adapter = ThreeGPPPAdapter(self.dirname, "bibxml5", self.threegpp_ref+"AA")
@@ -151,17 +146,12 @@ class XML2RFCAdaptersTestCase(TestCase):
             adapter.resolve()
 
     def test_nist(self):
-        # TODO fix
-        # adapter = RfcSubseriesAdapter(self.dirname, "bibxml-nist", self.nist_ref)
-        # bibitem = adapter.resolve()
-        # self._assert_is_instance_of_bibliographicitem(bibitem)
-        # self._assert_refs_equal(bibitem, self.nist_ref)
-        pass
+        adapter = NistAdapter(self.dirname, "bibxml-nist", self.nist_ref)
+        bibitem = adapter.resolve()
+        self._assert_is_instance_of_bibliographicitem(bibitem)
+        self._assert_refs_equal(bibitem, self.nist_ref)
 
     def test_nist_not_found(self):
-        # TODO fix
-        # adapter = RfcSubseriesAdapter(self.dirname, "bibxml-nist", self.nist_ref)
-        # with self.assertRaises(RefNotFoundError):
-        #     adapter.resolve()
-        pass
-
+        adapter = NistAdapter(self.dirname, "bibxml-nist", self.nist_ref+"A")
+        with self.assertRaises(RefNotFoundError):
+            adapter.resolve()
