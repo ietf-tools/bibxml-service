@@ -27,8 +27,7 @@ log = logging.getLogger(__name__)
 @register_adapter('bibxml')
 class RfcAdapter(Xml2rfcAdapter):
     """
-    Resolves RFC paths.
-    Straightforward case.
+    Adapts RFC paths. Straightforward case of string replacement.
     """
     exact_docid_match = True
 
@@ -62,6 +61,7 @@ class MiscAdapter(Xml2rfcAdapter):
     """
     Resolves misc paths. ID is fuzzy matched.
     """
+
     IGNORE_DOCTYPES = set([
         'IANA',
         'W3C',
@@ -74,8 +74,8 @@ class MiscAdapter(Xml2rfcAdapter):
     """These doctypes will not be reversed.
     It’s expected that they will be reversed by other, more specific adapters.
 
-    (So that, e.g., for a W3C doc, user won’t get a bibxml-misc path
-    but a bibxml4 path.)
+    (So that, e.g., for a W3C doc, user won’t see a bibxml-misc path
+    in addition to bibxml4 path.)
     """
 
     @classmethod
@@ -101,6 +101,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 
     .. seealso:: :issue:`157`
     """
+
     anchor_is_valid: bool
     bare_anchor: str
     unversioned_anchor: str
@@ -305,8 +306,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 @register_adapter('bibxml4')
 class W3cAdapter(Xml2rfcAdapter):
     """
-    Resolves W3C paths. Currently, there could be false positives
-    as dates appended to the end of xml2rfc filename are ignored.
+    Resolves W3C paths.
     """
     @classmethod
     def reverse(self, item: BibliographicItem) -> List[ReversedRef]:
@@ -382,27 +382,31 @@ class IeeeAdapter(Xml2rfcAdapter):
     which are considered reliably formatted but are not compatible
     with preexisting paths.
 
-    :term:`docid.id` -> :term:`xml2rfc anchor` conversion logic:
+    - :term:`docid.id` -> :term:`xml2rfc anchor` conversion logic:
 
-    - Split the path into prefix and the rest of the anchor.
+      1. Split the path into prefix and the rest of the anchor.
 
-    - In prefix, slashes are replaced with underscores, e.g.:
+      2. In prefix, slashes are replaced with underscores, e.g.:
 
-      - IEEE documents start with ``R.IEEE.``,
-      - mixed-published documents start with e.g. ``R.ANSI_IEEE.``.
+         - IEEE documents start with ``R.IEEE.``,
+         - mixed-published documents start with e.g. ``R.ANSI_IEEE.``.
 
-    - In rest of the anchor, whitespace are replaced with
-      underscores. (Slashes are left as is.)
+      3. The rest of the anchor is URL quoted
+         (everything is percent-encoded except ASCII letters, numbers,
+         basic punctuation like dash and forward slash).
 
-    - Prefix and rest are recombined, separated by period;
-      and everything is prefixed with ``R.``.
+      4. Prefix and rest are recombined, separated by period;
+         and everything is prefixed with ``R.``.
 
-    The anchor is converted back to docid using the same logic in reverse.
+    - xml2rfc anchor resolution logic:
 
-    For anchors that don’t start with ``R.``,
-    adapter doesn’t resolve the xml2rfc path, letting the view fall back
-    to archive XML data.
+      - For anchors that don’t start with ``R.``,
+        adapter doesn’t resolve the xml2rfc path, letting the view fall back
+        to archive XML data.
+
+      - For anchors that start with ``R.``, as above in reverse.
     """
+
     exact_docid_match = True
 
     @classmethod
@@ -437,8 +441,8 @@ class IanaAdapter(Xml2rfcAdapter):
     """
     Resolves IANA paths.
 
-    Note that these are not well-tested, since bibxml-iana
-    snapshot is not available.
+    The forward slash that separates registry ID part from subregistry ID part
+    in subregistry identifiers is replaced by underscore in xml2rfc paths.
     """
     exact_docid_match = True
 
@@ -509,6 +513,8 @@ class RfcSubseriesAdapter(Xml2rfcAdapter):
 class NistAdapter(Xml2rfcAdapter):
     """
     Resolves NIST paths.
+
+    This is not very reliable, fallbacks may occur.
     """
 
     @classmethod
