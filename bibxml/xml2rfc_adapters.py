@@ -107,6 +107,14 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
     unversioned_anchor: str
     requested_version: Optional[str]
 
+    def format_anchor(self):
+        """
+        Returns a string like ``I-D.foo-bar``,
+        if full ID is e.g. ``draft-foo-bar-00``.
+        This is in line with preexisting xml2rfc tools behavior.
+        """
+        return f"I-D.{self.unversioned_anchor}"
+
     @classmethod
     def get_bare_i_d_docid(self, item: BibliographicItem) -> Optional[str]:
         if ((primary_docid := get_primary_docid(item.docid))
