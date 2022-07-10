@@ -279,6 +279,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 # Note this (should be transient until sources are reindexed,
                 # if not then there’s a problem)
                 # and return Datatracker’s version
+                self.log(f"returning Datatracker version {dt_version}")
                 log.warn(
                     "Returning Datatracker result for xml2rfc bibxml3 path. "
                     "If unversioned I-D was requested, "
