@@ -169,7 +169,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         else:
             query = (
                 '(@.type == "Internet-Draft") && '
-                r'(@.id like_regex "%s[\d+]")'
+                r'(@.id like_regex "%s[[:digit:]]{2}")'
                 % re.escape(f'draft-{unversioned}-')
             )
             self.log(f"using query {query}")
