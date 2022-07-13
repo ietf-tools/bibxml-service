@@ -3,19 +3,17 @@
 from typing import List, Dict, Any
 
 from crossref.restful import Works, Etiquette
-
 from django.conf import settings
+from relaton.models import Date
+from relaton.models.bibitemlocality import Locality, LocalityStack
 
-from common.util import as_list
-
-from bib_models import construct_bibitem, DocID
-from bib_models import Title, Contributor, Organization
-from bib_models import Person, PersonAffiliation, PersonName
 from bib_models import GenericStringValue, Link
-
-from main.types import ExternalBibliographicItem, ExternalSourceMeta
+from bib_models import Person, PersonAffiliation, PersonName
+from bib_models import Title, Contributor, Organization
+from bib_models import construct_bibitem, DocID
+from common.util import as_list
 from main.exceptions import RefNotFoundError
-
+from main.types import ExternalBibliographicItem, ExternalSourceMeta
 
 etiquette = Etiquette(
     settings.SERVICE_NAME,
@@ -26,6 +24,10 @@ etiquette = Etiquette(
 """Etiquette info to be used when making Crossref API requests."""
 
 works = Works(etiquette=etiquette)
+
+ACCEPTED_DATE_TYPES = ["published", "accessed", "created", "implemented", "obsoleted",
+                       "confirmed", "updated", "issued", "transmitted", "copied", "unchanged",
+                       "circulated", "adapted", "vote-started", "vote-ended", "announced"]
 
 
 def get_bibitem(docid: DocID, strict: bool = True) \
@@ -92,6 +94,37 @@ def get_bibitem(docid: DocID, strict: bool = True) \
           if tid in resp),
     ]
 
+    # LocalityStack
+    ct = resp.get('container-title')
+    if ct:
+        volume = resp.get('volume', None)
+        issue = resp.get('journal-issue', {}).get("issue")
+        page = resp.get('page', None)
+        localities = [{"type": "container-title", "value": ct[0]}]
+        if volume:
+            localities.append({"type": "volume", "value": volume})
+        if issue:
+            localities.append({"type": "issue", "value": issue})
+        if volume:
+            localities.append({"type": "page", "value": page})
+
+        extent: LocalityStack = LocalityStack(locality=[
+            Locality(type=locality.get("type"), reference_from=locality.get("value"))
+            for locality in localities
+        ])
+
+    dates = []
+    for date_type in ACCEPTED_DATE_TYPES:
+        if resp.get(date_type):
+            date_parts = resp.get(date_type).get("date-parts")
+            for _elm in date_parts:
+                if isinstance(_elm[0], int):
+                    date = "%04d" % _elm[0]
+
+                    for _i in _elm[1:]:
+                        date += "-%02d" % _i
+                    dates.append(Date(type=date_type, value=date))
+
     data = dict(
         # The following are not captured:
         # source
@@ -117,6 +150,8 @@ def get_bibitem(docid: DocID, strict: bool = True) \
             'format': 'application/x-jats+xml',  # See GitHub issue 210
         }] if 'abstract' in resp else [],
         contributor=contributors,
+        extent=extent,
+        date=dates
     )
 
     bibitem, errors = construct_bibitem(data, strict)
