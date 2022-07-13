@@ -112,6 +112,20 @@ input, button, select, textarea {
     }
   }
 
+  /**
+   * A button with an optional icon.
+   * Intended to be shown on bg-dark-200/dark:bg-dark-800 parent.
+   */
+  .button-v2 {
+    @apply flex flex-row items-center overflow-hidden;
+    > .label {
+      @apply bg-dark-300 dark:bg-dark-900 whitespace-nowrap flex-1 py-1 px-2;
+    }
+    > .icon {
+      /** Can contain Heroicon SVG. Use text-sm with Solid style. */
+      @apply bg-dark-300 dark:bg-dark-900 py-1 px-1 shrink-0 ml-px;
+    }
+  }
   .input-on-blue {
     @apply text-inherit bg-dark-800/20 placeholder:tracking-tight placeholder:text-inherit;
   }

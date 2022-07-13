@@ -209,6 +209,14 @@ class CitationSearchResultListView(BaseCitationSearchView):
     query_in_path = True
     metric_counter = metrics.api_search_hits
 
+    supported_query_formats = (
+        'docid_regex',
+        'json_struct',
+        'json_path',
+        'json_repr',
+        'websearch',
+    )
+
     def render_to_response(self, context):
         result_count = len(self.object_list)
         meta: Dict[str, Any] = dict(total_records=result_count)

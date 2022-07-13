@@ -2,7 +2,7 @@ hypercorn>=0.13.2,<0.14
 Django>=4.0,<5.0
 django-cors-headers>=3.11.0,<4.0
 django_debug_toolbar
-django_compressor>=3.0,<4.0
+django_compressor==3.1
 prometheus_client>=0.13.1,<0.14
 deepmerge>=1.0,<2.0
 dnspython>=2.2.0,<2.3
@@ -23,4 +23,4 @@ pydantic>=1.9.1,<1.10
 crossrefapi>=1.5,<2
 simplejson
 sentry-sdk
-relaton==0.2.6
+relaton==0.2.8

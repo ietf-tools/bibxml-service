@@ -1,6 +1,5 @@
-from typing import List, Dict, Callable
+from typing import List, Optional
 from pathlib import Path
-import re
 from os import environ, path
 import socket
 
@@ -244,12 +243,16 @@ COMPRESS_PRECOMPILERS = (
    # ('text/jsx', 'cat {infile} | babel --config-file %s > {outfile}' % BABEL_CONFIG),
    (
        'text/javascript',
-       '%s {infile} --config-file %s --source-maps --out-file {outfile}'
+       '%s {infile} --config-file %s --source-maps'
        % (BABEL_EXECUTABLE, BABEL_CONFIG),
    ),
    (
        'text/css',
-       '%s {infile} -o {outfile}'
+       # NOTE: We set DEBUG=0, because otherwise on some Node/NPM versions
+       # the global DEBUG may cause PostCSS/Tailwind to output Tailwind JIT
+       # debug stats to stdout, disabling the first actual TW CSS rule
+       # by making it syntactically invalid due to immediately preceding stats.
+       'DEBUG=0 %s {infile}'
        % (POSTCSS_EXECUTABLE, ),
    ),
 )
@@ -370,6 +373,38 @@ a more precise query."""
 DATASET_TMP_ROOT = environ.get('DATASET_TMP_ROOT', '/data/datasets')
 """Where to keep fetched source data and data generated during indexing.
 Should be a directory. No trailing slash."""
+
+AUTO_REINDEX_INTERVAL: Optional[int] = int(
+    environ.get(
+        'AUTO_REINDEX_INTERVAL',
+        '',
+    ).strip() or '0'
+) or None
+"""
+If the following are all true:
+
+- The task was invoked via API without ``refs`` parameter
+  (i.e., for the entire source)
+- The task either succeeded or failed with an ``Exception`` or subclass
+  (i.e., not ``SystemExit``)
+- This setting is set to an integer larger than zero
+
+Then :term:`indexable source` indexing task
+will queue itself again, for the same source,
+using ``AUTO_REINDEX_INTERVAL``
+seconds as countdown upon completion.
+
+.. seealso:: :doc:`/howto/auto-reindex-sources`
+
+.. note:: For any source to automatically reindex using this setting,
+          that source has to be manually indexed (e.g., via management GUI)
+          at least once after ``celery`` service startup.
+
+.. important::
+
+   This is not a failproof way to implement perpetual source reindexing.
+   Even if you use this setting, make sure to monitor task status.
+"""
 
 
 # API access

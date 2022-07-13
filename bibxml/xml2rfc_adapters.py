@@ -3,6 +3,7 @@ Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
 
 from typing import Optional, List, cast, Sequence
+import urllib
 import logging
 import re
 
@@ -26,8 +27,7 @@ log = logging.getLogger(__name__)
 @register_adapter('bibxml')
 class RfcAdapter(Xml2rfcAdapter):
     """
-    Resolves RFC paths.
-    Straightforward case.
+    Adapts RFC paths. Straightforward case of string replacement.
     """
     exact_docid_match = True
 
@@ -61,6 +61,7 @@ class MiscAdapter(Xml2rfcAdapter):
     """
     Resolves misc paths. ID is fuzzy matched.
     """
+
     IGNORE_DOCTYPES = set([
         'IANA',
         'W3C',
@@ -73,8 +74,8 @@ class MiscAdapter(Xml2rfcAdapter):
     """These doctypes will not be reversed.
     It’s expected that they will be reversed by other, more specific adapters.
 
-    (So that, e.g., for a W3C doc, user won’t get a bibxml-misc path
-    but a bibxml4 path.)
+    (So that, e.g., for a W3C doc, user won’t see a bibxml-misc path
+    in addition to bibxml4 path.)
     """
 
     @classmethod
@@ -100,10 +101,19 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 
     .. seealso:: :issue:`157`
     """
+
     anchor_is_valid: bool
     bare_anchor: str
     unversioned_anchor: str
     requested_version: Optional[str]
+
+    def format_anchor(self):
+        """
+        Returns a string like ``I-D.foo-bar``,
+        if full ID is e.g. ``draft-foo-bar-00``.
+        This is in line with preexisting xml2rfc tools behavior.
+        """
+        return f"I-D.{self.unversioned_anchor}"
 
     @classmethod
     def get_bare_i_d_docid(self, item: BibliographicItem) -> Optional[str]:
@@ -167,8 +177,8 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         else:
             query = (
                 '(@.type == "Internet-Draft") && '
-                r'(@.id like_regex "%s[\d+]")'
-                % re.escape(f'draft-{unversioned}-'),
+                r'(@.id like_regex "%s[[:digit:]]{2}")'
+                % re.escape(f'draft-{unversioned}-')
             )
             self.log(f"using query {query}")
             return [sorted(
@@ -277,6 +287,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 # Note this (should be transient until sources are reindexed,
                 # if not then there’s a problem)
                 # and return Datatracker’s version
+                self.log(f"returning Datatracker version {dt_version}")
                 log.warn(
                     "Returning Datatracker result for xml2rfc bibxml3 path. "
                     "If unversioned I-D was requested, "
@@ -304,8 +315,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 @register_adapter('bibxml4')
 class W3cAdapter(Xml2rfcAdapter):
     """
-    Resolves W3C paths. Currently, there could be false positives
-    as dates appended to the end of xml2rfc filename are ignored.
+    Resolves W3C paths.
     """
     @classmethod
     def reverse(self, item: BibliographicItem) -> List[ReversedRef]:
@@ -314,12 +324,24 @@ class W3cAdapter(Xml2rfcAdapter):
             return [(f"W3C.{docid.id.removeprefix('W3C ')}", None)]
         return []
 
-    def resolve_docid(self) -> Optional[DocID]:
-        with_proper_prefix = self.anchor.replace('W3C.', 'W3C ')
-        # We throw away trailing date, because available sources
+    # def get_docid_query(self) -> Optional[str]:
+
+    def resolve_docid(self) -> DocID:
+        unprefixed = self.anchor.removeprefix('W3C.')
+        # We can try combinations w/o trailing date and/or leading doctype
+        # for a fuzzy match:
+        # untyped = (
+        #     unprefixed.
+        #     removeprefix('NOTE-').
+        #     removeprefix('SPSR-').
+        #     removeprefix('REC-').
+        #     removeprefix('CR-').
+        #     removeprefix('PR-').
+        #     removeprefix('WD-'))
         # appear to not have the old versions in bibxml-w3c.
-        without_trailing_date = re.sub(r'\-[\d]{8}$', '', with_proper_prefix)
-        return DocID(type="W3C", id=without_trailing_date)
+        # undated_untyped = re.sub(r'\-[\d]{8}$', '', untyped)
+        # undated = re.sub(r'\-[\d]{8}$', '', unprefixed)
+        return DocID(type="W3C", id=f'W3C {unprefixed}')
 
 
 @register_adapter('bibxml5')
@@ -369,22 +391,44 @@ class IeeeAdapter(Xml2rfcAdapter):
     which are considered reliably formatted but are not compatible
     with preexisting paths.
 
-    For other paths, returns nothing, leaving caller to fall back.
+    - :term:`docid.id` -> :term:`xml2rfc anchor` conversion logic:
+
+      1. Split the path into prefix and the rest of the anchor.
+
+      2. In prefix, slashes are replaced with underscores, e.g.:
+
+         - IEEE documents start with ``R.IEEE.``,
+         - mixed-published documents start with e.g. ``R.ANSI_IEEE.``.
+
+      3. The rest of the anchor is URL quoted
+         (everything is percent-encoded except ASCII letters, numbers,
+         basic punctuation like dash and forward slash).
+
+      4. Prefix and rest are recombined, separated by period;
+         and everything is prefixed with ``R.``.
+
+    - xml2rfc anchor resolution logic:
+
+      - For anchors that don’t start with ``R.``,
+        adapter doesn’t resolve the xml2rfc path, letting the view fall back
+        to archive XML data.
+
+      - For anchors that start with ``R.``, as above in reverse.
     """
+
     exact_docid_match = True
 
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IEEE'):
-            return [(
-                f"R.IEEE.{docid.id.removeprefix('IEEE ').replace(' ', '_')}",
-                None,
-            )]
+            prefix, rest = docid.id.split(' ', 1)
+            anchor = f"R.{prefix.replace('/', '_')}.{urllib.parse.quote(rest)}"
+            return [(anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        is_legacy = not self.anchor.startswith('R.IEEE.')
+        is_legacy = not self.anchor.startswith('R.')
         if is_legacy:
             # We give up on automatically resolving legacy bibxml6/IEEE paths.
             # This is intended to trigger fallback behavior
@@ -393,8 +437,12 @@ class IeeeAdapter(Xml2rfcAdapter):
         else:
             # However, we support automatically generated IEEE paths
             # that we can be sure to resolve
-            docid = self.anchor.removeprefix('R.IEEE.').replace('_', ' ')
-            return DocID(type="IEEE", id=f'IEEE {docid}')
+            unprefixed = self.anchor.removeprefix('R.')
+            id_prefix, rest = unprefixed.split('.', 1)
+            return DocID(
+                type="IEEE",
+                id=f"{id_prefix.replace('_', '/')} {urllib.parse.unquote(rest)}",
+            )
 
 
 @register_adapter('bibxml8')
@@ -402,21 +450,25 @@ class IanaAdapter(Xml2rfcAdapter):
     """
     Resolves IANA paths.
 
-    Note that these are not well-tested, since bibxml-iana
-    snapshot is not available.
+    The forward slash that separates registry ID part from subregistry ID part
+    in subregistry identifiers is replaced by underscore in xml2rfc paths.
     """
+    exact_docid_match = True
+
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == 'IANA'):
-            return [(
-                f"IANA.{docid.id.removeprefix('IANA ').replace(' ', '_')}",
-                None,
-            )]
+            xml2rfc_anchor = 'IANA.' + (
+                docid.id.
+                removeprefix('IANA ').
+                replace('/', '_')
+            )
+            return [(xml2rfc_anchor, None)]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        id = self.anchor.replace('IANA.', 'IANA ').replace('_', ' ')
+        id = self.anchor.replace('IANA.', 'IANA ').replace('_', '/')
         return DocID(type="IANA", id=id)
 
 
@@ -470,6 +522,8 @@ class RfcSubseriesAdapter(Xml2rfcAdapter):
 class NistAdapter(Xml2rfcAdapter):
     """
     Resolves NIST paths.
+
+    This is not very reliable, fallbacks may occur.
     """
 
     @classmethod

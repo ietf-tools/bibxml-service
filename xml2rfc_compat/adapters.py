@@ -5,6 +5,7 @@ via :func:`xml2rfc_compat.urls.get_urls()`.
 """
 
 from typing import Dict, List, Tuple, Optional, TypeAlias, Type, Sequence
+import logging
 import re
 
 from django.urls import reverse, NoReverseMatch
@@ -12,11 +13,17 @@ from django.urls import reverse, NoReverseMatch
 from relaton.models.bibdata import BibliographicItem, DocID
 
 from bib_models.util import get_primary_docid
+from common.util import get_fuzzy_match_regex
 
 from main.models import RefData
 from main.query_utils import compose_bibitem
 from main.query import hydrate_relations, search_refs_relaton_field
 from main.exceptions import RefNotFoundError
+
+from .models import Xml2rfcItem
+
+
+log = logging.getLogger(__name__)
 
 
 ReversedRef: TypeAlias = Tuple[str, Optional[str]]
@@ -85,6 +92,22 @@ class Xml2rfcAdapter:
         """
         return None
 
+    def mangle_anchor(self, anchor: str) -> str:
+        """
+        Performs final anchor mangling,
+        regardless of how the nachor was obtained.
+
+        By default, does minimal substitutions to attempt to comply
+        with ``xs:ID`` schema.
+        """
+        return re.sub(
+            r'^\d',
+            r'_\g<0>',
+            anchor.
+            replace(' ', '.').
+            replace(':', '.')
+        )
+
     @classmethod
     def reverse(
         cls,
@@ -122,25 +145,27 @@ class Xml2rfcAdapter:
 
     def get_docid_query(self) -> Optional[str]:
         if (docid := self.resolve_docid()):
-            self.log(f"using docid {docid.type} {docid.id}")
-            q = '@.type == "%s" && @.primary == true' % docid.type
-            if self.exact_docid_match:
-                q = '%s && @.id == "%s"' % (q, docid.id)
+            if isinstance(docid, list):
+                queries: List[str] = []
+                for d in docid:
+                    self.log(f"using docid {d.type} {d.id}")
+                    queries.append(get_docid_query(
+                        d,
+                        exact=self.exact_docid_match))
+                query = ' || '.join([f'({q})' for q in queries])
             else:
-                q = '%s && @.id like_regex "(?i)^%s$"' % (
-                    q,
-                    '[^a-zA-Z0-9]'.join([
-                        '%s' % re.escape(part)
-                        for part in re.split(r'[^a-zA-Z0-9]', docid.id)
-                    ])
-                )
-            return q
+                self.log(f"using docid {docid.type} {docid.id}")
+                query = get_docid_query(
+                    docid,
+                    exact=self.exact_docid_match)
+
+            return query
         else:
             return None
 
-    def resolve_docid(self) -> Optional[DocID]:
+    def resolve_docid(self) -> List[DocID] | Optional[DocID]:
         doctype, docid = self.anchor.split('.', 1)
-        return DocID(type=doctype, id=docid)
+        return DocID(type=doctype, id=f'{doctype} {docid}')
 
     def build_bibitem(self, refs: Sequence[RefData]) -> BibliographicItem:
         if len(refs) > 0:
@@ -171,6 +196,42 @@ def register_adapter(dirname: str):
     return _register_xml2rfc_adapter
 
 
+def get_docid_query(docid: DocID, exact=False) -> str:
+    q = '@.type == "%s" && @.primary == true' % docid.type
+    if exact:
+        return '%s && @.id == "%s"' % (q, docid.id)
+    else:
+        return '%s && @.id like_regex "(?i)^%s$"' % (
+            q,
+            get_fuzzy_match_regex(docid.id),
+        )
+
+
+def make_xml2rfc_url(
+    dirname: str,
+    subpath: str,
+    desc: Optional[str] = None,
+    request=None,
+) -> Optional[Tuple[str, str, Optional[str]]]:
+    try:
+        # Use Django’s ``reverse()`` to ensure all
+        # returned xml2rfc paths actually resolve
+        url = reverse(
+            f'xml2rfc_{dirname}',
+            args=[subpath],
+        )
+        return (
+            subpath,
+            request.build_absolute_uri(url)
+            if request else url,
+            desc,
+        )
+    except NoReverseMatch:
+        # XXX: Log reversion failure
+        log.exception("Failed to reverse xml2rfc path")
+        return None
+
+
 def list_xml2rfc_urls(
     item: BibliographicItem,
     request=None,
@@ -187,24 +248,35 @@ def list_xml2rfc_urls(
     """
     urls: List[Tuple[str, str, Optional[str]]] = []
 
-    for dirname, adapter_cls in adapters.items():
-        if (refs := adapter_cls.reverse(item)):
-            for anchor, desc in refs:
-                try:
-                    subpath = f'{dirname}/reference.{anchor}.xml'
-                    url = reverse(
-                        f'xml2rfc_{dirname}',
-                        args=[subpath],
-                    )
-                    urls.append((
-                        subpath,
-                        request.build_absolute_uri(url)
-                        if request else url,
+    # Use reverse mapping, if any
+    if ((
+        docid := get_primary_docid(item.docid)
+    ) and (
+        xml2rfc_item := Xml2rfcItem.objects.
+        filter(sidecar_meta__primary_docid=docid.id).
+        first()
+    ) and (
+        url := make_xml2rfc_url(
+            xml2rfc_item.format_dirname(),
+            xml2rfc_item.subpath,
+            None,
+            request)
+    )):
+        urls.append(url)
+
+    # Try adapters’ automatic reversion
+    if not urls:
+        for dirname, adapter_cls in adapters.items():
+            if reversed_anchors := adapter_cls.reverse(item):
+                urls.extend([
+                    url
+                    for anchor, desc in reversed_anchors
+                    if (url := make_xml2rfc_url(
+                        dirname,
+                        f'{dirname}/reference.{anchor}.xml',
                         desc,
+                        request,
                     ))
-                except NoReverseMatch as err:
-                    print(err)
-                    raise
-                    pass
+                ])
 
     return urls

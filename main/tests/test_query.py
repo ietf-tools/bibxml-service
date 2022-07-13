@@ -128,9 +128,8 @@ class QueryTestCase(TestCase):
         The function build_citation_for_docid should :raise RefNotFoundError:
         if a combination of non-existing id and reference is passed as parameter.
         """
-        id, doctype = "NONEXISTENTID", "NONEXISTENTTYPE"
         with self.assertRaises(RefNotFoundError):
-            build_citation_for_docid(id, doctype)
+            build_citation_for_docid("nonexistentid", "nonexistenttype")
 
     def test_build_citation_for_docid_strict_is_false(self):
         """
@@ -168,7 +167,7 @@ class QueryTestCase(TestCase):
         """
         refs = search_refs_relaton_field(
             {
-                "docid[*]": '@.id == "%s"' % re.escape("NONEXISTENTID"),
+                "docid[*]": '@.id == "%s"' % "NONEXISTENTID",
             },
             exact=True,
         )
