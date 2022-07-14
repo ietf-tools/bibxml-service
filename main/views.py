@@ -166,20 +166,10 @@ def browse_citation_by_docid(request):
 
     else:
         citation_dict = unpack_dataclasses(citation.dict())
-        try:
-            xml2rfc_urls = xml2rfc_adapters.list_xml2rfc_urls(
-                citation,
-                request,
-            )
-        except Exception:
-            log.exception(
-                "Failed to reverse xml2rfc URLs for item with docid %s",
-                docid)
-            xml2rfc_urls = []
         metrics.gui_bibitem_hits.labels(docid, 'success').inc()
         return render(request, 'browse/citation_details.html', dict(
             data=citation_dict,
-            xml2rfc_urls=xml2rfc_urls,
+            xml2rfc_urls=_get_xml2rfc_urls_safe(citation, request),
             **shared_context,
         ))
 
@@ -254,8 +244,8 @@ def browse_external_reference(request, dataset_id):
         if source := external_sources.registry.get(dataset_id, None):
             try:
                 # external_item = source.get_item(ref.strip())
-                _data = source.get_item(ref.strip()).dict()
-                data = unpack_dataclasses(_data)
+                item = source.get_item(ref.strip())
+                data = unpack_dataclasses(item.dict())
             except RuntimeError as exc:
                 log.exception(
                     "Failed to retrieve or unpack "
@@ -278,6 +268,7 @@ def browse_external_reference(request, dataset_id):
                     dataset_id=dataset_id,
                     ref=ref,
                     data=composed,
+                    xml2rfc_urls=_get_xml2rfc_urls_safe(item.bibitem, request),
                     **shared_context,
                 ))
         else:
@@ -358,3 +349,16 @@ class IndexedDatasetCitationListView(ListView):
             except ValidationError:
                 pass
         return ctx
+
+
+def _get_xml2rfc_urls_safe(item: BibliographicItem, request):
+    try:
+        return xml2rfc_adapters.list_xml2rfc_urls(
+            item,
+            request,
+        )
+    except Exception:
+        log.exception(
+            "Failed to reverse xml2rfc URLs for item %s",
+            item.docid)
+        return []
