@@ -1,4 +1,4 @@
-{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, key_sr_only, inline, comma_sep #}
+{# Expects key, val, tmpl, idx, wide, break_row, htmlclass, item_htmlclass, key_sr_only, inline, comma_sep #}
 
 <div class="
   {{ htmlclass }}
@@ -21,6 +21,7 @@
           class="
             {% if inline and comma_sep %}flex after:inline after:content-[',_'] last:after:content-none{% endif %}
             {% if inline == "nowrap" %}whitespace-nowrap{% endif %}
+            {{ item_htmlclass|default:"" }}
           "
         >
           {% if tmpl %}

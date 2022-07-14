@@ -30,7 +30,7 @@
 
   <dl>
     {% if bibitem.abstract %}
-      {% include "deflist/entry_list.html" with key="abstract" key_sr_only=1 items=bibitem.abstract|default:"N/A"|as_list tmpl="relaton/formatted_string.html" wide="1" htmlclass="font-light relative before:block before:absolute before:leading-none before:top-[-.25em] before:left-[-.15em] before:text-white dark:before:text-black before:-z-10 before:text-[6rem] before:font-serif before:content-['“']" multiline=1 %}
+      {% include "deflist/entry_list.html" with key="abstract" key_sr_only=1 items=bibitem.abstract|default:"N/A"|as_list tmpl="relaton/formatted_string.html" wide="1" item_htmlclass="running-text" htmlclass="font-light relative before:block before:absolute before:leading-none before:top-[-.25em] before:left-[-.15em] before:text-white dark:before:text-black before:-z-10 before:text-[6rem] before:font-serif before:content-['“']" multiline=1 %}
     {% else %}
       Abstract is not available.
     {% endif %}
