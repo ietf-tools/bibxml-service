@@ -257,13 +257,13 @@ def browse_external_reference(request, dataset_id):
                     "Couldn’t retrieve citation: {}".format(
                         str(exc)))
             else:
-                composed = {
-                    **data['bibitem'],
-                    'primary_docid': ref.strip(),
-                    'sources': {
+                composed = dict(
+                    primary_docid=ref.strip(),
+                    sources={
                         dataset_id: data,
                     },
-                }
+                    **data['bibitem'],
+                )
                 return render(request, 'browse/citation_details.html', dict(
                     dataset_id=dataset_id,
                     ref=ref,
