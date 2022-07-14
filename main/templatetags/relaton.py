@@ -1,4 +1,4 @@
-from typing import Any, Set, Tuple, Callable, List, Optional
+from typing import Dict, Any, Set, Tuple, Callable, List, Optional
 from urllib.parse import quote_plus
 import dataclasses
 import json
@@ -6,10 +6,28 @@ import json
 from django.urls import reverse
 from django import template
 
+from relaton.models.strings import GenericStringValue
+from relaton.serializers.bibxml.abstracts import get_paragraphs
+
 from common.util import as_list
 
 
 register = template.Library()
+
+
+@register.filter
+def to_html(value: Dict[str, str]):
+    """Converts a dictionary representation of Relaton’s
+    :class:`~relaton.models.strings.GenericStringValue`
+    to HTML with paragraph markup.
+    """
+    if isinstance(value, dict) and 'content' in value and 'format' in value:
+        try:
+            gsv = GenericStringValue(**value)
+        except Exception:
+            return value['content']
+        else:
+            return '<p>%s' % '<p>'.join(get_paragraphs(gsv))
 
 
 @register.filter

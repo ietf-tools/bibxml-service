@@ -1,5 +1,11 @@
-{% if val.format == "text/html" %}
-  {{ val.content|default:"N/A"|safe }}
+{% load relaton %}
+
+{% if val.content %}
+  {% if val.format == "text/html" %}
+    {{ val.content|safe }}
+  {% else %}
+    {{ val|to_html|safe }}
+  {% endif %}
 {% else %}
-  {{ val.content|default:"N/A" }}
+  N/A
 {% endif %}
