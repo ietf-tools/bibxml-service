@@ -4,15 +4,12 @@ Registers an external source.
 """
 
 import logging
-from typing import Union, Dict, Any
 
 import requests
 import requests_cache
 from simplejson import JSONDecodeError
-from pydantic import ValidationError
 
 from bib_models import DocID
-from main.exceptions import RefNotFoundError
 from main.types import ExternalBibliographicItem
 from main import external_sources
 
