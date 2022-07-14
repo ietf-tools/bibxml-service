@@ -1,6 +1,6 @@
 """Responsible for Crossref interaction."""
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 from crossref.restful import Works, Etiquette
 from django.conf import settings
@@ -95,33 +95,34 @@ def get_bibitem(docid: DocID, strict: bool = True) \
     ]
 
     # LocalityStack
-    ct = resp.get('container-title')
-    if ct:
-        volume = resp.get('volume', None)
-        issue = resp.get('journal-issue', {}).get("issue")
-        page = resp.get('page', None)
-        localities = [{"type": "container-title", "value": ct[0]}]
-        if volume:
-            localities.append({"type": "volume", "value": volume})
-        if issue:
-            localities.append({"type": "issue", "value": issue})
-        if volume:
-            localities.append({"type": "page", "value": page})
+    container_title = resp.get('container-title')
+    extent: Optional[LocalityStack]
+    if container_title:
+        localities: List[Locality] = [
+            Locality(
+                type='container-title',
+                reference_from=container_title[0],
+            ),
+        ]
+        if volume := resp.get('volume', None):
+            localities.append(Locality(type='volume', reference_from=volume))
+        if issue := resp.get('journal-issue', {}).get('issue', None):
+            localities.append(Locality(type='issue', reference_from=issue))
+        if page := resp.get('page', None):
+            localities.append(Locality(type='page', reference_from=page))
 
-        extent: LocalityStack = LocalityStack(locality=[
-            Locality(type=locality.get("type"), reference_from=locality.get("value"))
-            for locality in localities
-        ])
+        extent = LocalityStack(locality=localities)
+    else:
+        extent = None
 
     dates = []
     for date_type in ACCEPTED_DATE_TYPES:
         if resp.get(date_type):
-            date_parts = resp.get(date_type).get("date-parts")
-            for _elm in date_parts:
-                if isinstance(_elm[0], int):
-                    date = "%04d" % _elm[0]
-
-                    for _i in _elm[1:]:
+            date_parts = resp.get(date_type).get('date-parts')
+            for _part in date_parts:
+                if isinstance(_part[0], int):
+                    date = "%04d" % _part[0]
+                    for _i in _part[1:]:
                         date += "-%02d" % _i
                     dates.append(Date(type=date_type, value=date))
 
