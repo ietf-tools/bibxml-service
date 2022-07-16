@@ -59,14 +59,32 @@ specifying URL and/or branch name explicitly).
 
 .. seealso:: :mod:`main.sources` for Relaton source registration & indexing logic
 
-Other data sources
-------------------
+.. _sourcing-xml2rfc-archive:
 
-Currently, there’s only one: :term:`xml2rfc mirror source`.
-It provides xml2rfc compatibility related data—preexisting xml2rfc paths
-with original XML contents, and how they map to Relaton document identifiers.
+xml2rfc archive source
+----------------------
 
-.. seealso:: :mod:`xml2rfc_compat.source` for registration & indexing logic
+Also called “:term:`xml2rfc mirror source`”,
+this source provides xml2rfc compatibility related data—preexisting xml2rfc paths
+with original XML contents and how they map to Relaton document identifiers.
+
+It’s not categorized as a bibliographic data source:
+unlike with Relaton sources, this service deosn’t parse the original XML files
+to extract bibliographic data for search.
+
+The only way those XML files are used
+is to return valid data for a preexisting xml2rfc path
+that failed to resolve to an authoritative source.
+In that scenario, XML string is returned verbatim
+(except the anchor attribute may be substituted, if overridden via GET query).
+
+Additionally, :term:`sidecar YAML <xml2rfc sidecar metadata file>` files
+can be used to map some xml2rfc paths to Relaton document identifiers
+for faster and more reliable path resolution.
+
+See :ref:`xml2rfc-path-resolution-algorithm` for more on xml2rfc path resolution.
+
+.. seealso:: :mod:`xml2rfc_compat.source` for this source’s registration & indexing logic
 
 .. _sourcing-external-sources:
 

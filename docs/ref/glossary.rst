@@ -71,12 +71,17 @@ Glossary
       An :term:`indexable source` (living in a Git repository)
       that contains two kinds of data:
 
+      (Not really a mirror, since its contents are not supposed
+      to receive any updates.)
+
       - Original XML files as served by xml2rfc tools web server.
 
         These files are supposed to be periodically overwritten using rsync
         from rsync mirror.
 
       - :term:`Optional “sidecar” YAML files <xml2rfc sidecar metadata file>`.
+
+      Read more in :ref:`sourcing-xml2rfc-archive`.
 
       .. seealso:: :mod:`xml2rfc_compat.source`
 
