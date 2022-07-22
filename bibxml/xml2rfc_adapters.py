@@ -470,8 +470,10 @@ class IanaAdapter(Xml2rfcAdapter):
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
-        id = self.anchor.replace('IANA.', 'IANA ').replace('_', '/')
-        return DocID(type="IANA", id=id)
+        if self.anchor.startswith('IANA.'):
+            id = self.anchor.replace('IANA.', 'IANA ', 1).replace('_', '/')
+            return DocID(type="IANA", id=id)
+        return None
 
 
 @register_adapter('bibxml9')
