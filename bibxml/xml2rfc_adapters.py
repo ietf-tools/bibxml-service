@@ -51,9 +51,12 @@ class RfcAdapter(Xml2rfcAdapter):
 
     def resolve_docid(self) -> Optional[DocID]:
         parts = self.anchor.split('.')
-        raw_num = parts[1]
-        rfc_num = int(raw_num)
-        return DocID(type="IETF", id=f"RFC {rfc_num}")
+        if parts[0] == 'RFC' and len(parts[1]) == 4:
+            raw_num = parts[1]
+            rfc_num = int(raw_num)
+            return DocID(type="IETF", id=f"RFC {rfc_num}")
+        else:
+            return None
 
 
 @register_adapter('bibxml2')
