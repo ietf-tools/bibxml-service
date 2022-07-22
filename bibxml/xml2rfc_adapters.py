@@ -543,27 +543,29 @@ class NistAdapter(Xml2rfcAdapter):
         return None
 
     def fetch_refs(self) -> Sequence[RefData]:
-        docid = (
-            self.anchor.
-            removeprefix('NIST.').
-            replace('_', ' ').replace('.', ' '))
+        if self.anchor.startswith('NIST.'):
+            docid = (
+                self.anchor.
+                removeprefix('NIST.').
+                replace('_', ' ').replace('.', ' '))
 
-        # Split prefix from the rest
-        _, rest = docid.split(' ', 1)
+            # Split prefix from the rest
+            _, rest = docid.split(' ', 1)
 
-        query = (
-            '@.type == "NIST" && ('
-                # Handles e.g. NIST.LCIRC.xxxx,
-                # which should be NIST.NBS.LCIRC
-                '@.id like_regex "(?i)(NBS|NIST) %s" ||'
-                # Handles normal cases like NIST.NBS.xxxx
-                '@.id like_regex "(?i)%s"'
-            ')' % (re.escape(rest), re.escape(docid))
-        )
-        self.log(f"using query {query}")
-        return search_refs_relaton_field({
-            'docid[*]': query,
-        }, limit=10, exact=True)
+            query = (
+                '@.type == "NIST" && ('
+                    # Handles e.g. NIST.LCIRC.xxxx,
+                    # which should be NIST.NBS.LCIRC
+                    '@.id like_regex "(?i)(NBS|NIST) %s" ||'
+                    # Handles normal cases like NIST.NBS.xxxx
+                    '@.id like_regex "(?i)%s"'
+                ')' % (re.escape(rest), re.escape(docid))
+            )
+            self.log(f"using query {query}")
+            return search_refs_relaton_field({
+                'docid[*]': query,
+            }, limit=10, exact=True)
+        return []
 
 
 @register_adapter('bibxml7')
