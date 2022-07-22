@@ -384,7 +384,6 @@ class ThreeGPPPAdapter(Xml2rfcAdapter):
         return search_refs_relaton_field({
             'docid[*]': query,
         }, limit=10, exact=True)
-        return []
 
 
 @register_adapter('bibxml6')
