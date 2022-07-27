@@ -589,7 +589,6 @@ class DoiAdapter(Xml2rfcAdapter):
 
     def format_anchor(self) -> Optional[str]:
         formatted_anchor = self.anchor.replace(".", "_", 1).replace("/", "_")
-        # formatted_anchor = formatted_anchor
         return f"{formatted_anchor.upper()}"
 
 
