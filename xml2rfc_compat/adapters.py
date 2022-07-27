@@ -95,7 +95,7 @@ class Xml2rfcAdapter:
     def mangle_anchor(self, anchor: str) -> str:
         """
         Performs final anchor mangling,
-        regardless of how the nachor was obtained.
+        regardless of how the anchor was obtained.
 
         By default, does minimal substitutions to attempt to comply
         with ``xs:ID`` schema.
