@@ -40,6 +40,13 @@ def resolve_mapping(subpath: str) -> Tuple[
     """Returns a 3-tuple of mapping configuration, resolved item,
     and error as a string, any can be None.
     Does not raise exceptions.
+
+    .. important::
+
+       If a mapping for ``reference.foo.bar.xml``
+       should apply for ``_reference.foo.bar.xml``,
+       then ``subpath`` should be normalized
+       stripping the possible underscore in ``_reference``.
     """
     mapped_docid: Optional[str]
     resolved_item: Optional[BibliographicItem]
@@ -94,8 +101,14 @@ def resolve_automatically(
     Optional[BibliographicItem],
     Optional[str],
 ]:
-    """Returns a 3-tuple of resolver function name, resolved item,
+    """
+    This function does really nothing except invoking
+    given adapter instance’s ``resolve()``
+    method with proper error handling and logging.
+
+    Returns a 3-tuple of resolver function name, resolved item,
     and error as a string, any can be None.
+
     Does not raise exceptions.
     """
     item: Optional[BibliographicItem] = None
@@ -149,11 +162,10 @@ def handle_xml2rfc_path(
 
     This function handles filename
     cleanup, obtaining a :class:`relaton.models.bibdata.BibliographicItem`
-    instance, serializing it into an XML string with proper anchor tag supplied,
+    instance, serializing it into an XML string with proper anchor tag,
     incrementing relevant metrics.
 
-    The view function behaves as following
-    (see also :ref:`xml2rfc-path-resolution-algorithm`):
+    Some aspects of this view’s behavior:
 
     - Inspects ``X-Requested-With`` request header, and does not increment
       access metric if it’s the internal ``xml2rfcResolver`` tool.
@@ -190,7 +202,9 @@ def handle_xml2rfc_path(
              will override ``anchor`` attribute in XML.
 
       - In case of failure (and no fallback available),
-        ``application/json`` response with error description.
+        ``application/json`` response with error description
+
+    .. seealso:: :ref:`xml2rfc-path-resolution-algorithm`
     """
     resp: HttpResponse
 
@@ -334,6 +348,11 @@ def obtain_fallback_xml(
     """Obtains XML fallback for given subpath, if possible.
 
     Does not raise exceptions.
+
+    .. note:: You may want to normalize ``subpath``
+              to remove the possible underscore in ``_reference``.
+              This would mean fallback response for ``_reference.foo.bar.xml``
+              can use XML from ``reference.foo.bar.xml``, if it exists.
     """
 
     requested_dirname = subpath.split('/')[-2]
