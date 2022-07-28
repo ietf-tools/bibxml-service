@@ -20,7 +20,7 @@ from main.query_utils import compose_bibitem
 from main.query import hydrate_relations, search_refs_relaton_field
 from main.exceptions import RefNotFoundError
 
-from .models import Xml2rfcItem
+from .models import Xml2rfcItem, construct_normalized_xml2rfc_subpath
 
 
 log = logging.getLogger(__name__)
@@ -279,7 +279,7 @@ def list_xml2rfc_urls(
                     for anchor, desc in reversed_anchors
                     if (url := make_xml2rfc_url(
                         dirname,
-                        f'{dirname}/reference.{anchor}.xml',
+                        construct_normalized_xml2rfc_subpath(dirname, anchor),
                         desc,
                         request,
                     ))
