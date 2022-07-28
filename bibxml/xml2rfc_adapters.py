@@ -357,15 +357,20 @@ class ThreeGPPPAdapter(Xml2rfcAdapter):
     """
 
     @classmethod
-    def reverse(self, item: BibliographicItem) -> List[ReversedRef]:
+    def resolve_num(cls, item: BibliographicItem) -> Optional[str]:
         if ((docid := get_primary_docid(item.docid))
                 and docid.type == '3GPP'):
-            num = (
+            return (
                 docid.id.split(':')[0].
                 removeprefix('3GPP ').
                 removeprefix('TS ').
                 removeprefix('TR ').
                 replace(' ', '.'))
+        return None
+
+    @classmethod
+    def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
+        if (num := cls.resolve_num(item)):
             return [
                 (f"3GPP.{num}", None),
                 (f"SDO-3GPP.{num}", None),
@@ -385,6 +390,13 @@ class ThreeGPPPAdapter(Xml2rfcAdapter):
             'docid[*]': query,
             'date[*]': '@.type == "published"',
         }, limit=1, exact=True)
+
+    def format_anchor(self) -> str:
+        if (self.resolved_item is not None
+                and (num := self.resolve_num(self.resolved_item))):
+            return f'SDO-3GPP.{num}'
+        else:
+            raise RuntimeError("Cannot format anchor: item not resolved")
 
 
 @register_adapter('bibxml6')
