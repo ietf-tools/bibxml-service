@@ -50,9 +50,10 @@ xml2rfc-style path resolution algorithm
    is attempted to be retrieved from authoritative sources
    and its XML serialization is returned.
 
-3. If the above fails, the normalized path is passed to registered adapters,
-   which parses the anchor, performs necessary DB queries and is expected
-   to return a ``BibliographicItem``.
+3. If the above fails, registered adapter is used
+   to attempt to obtain a bibliographic item
+   from authoritative sources
+   based on dirname and anchor in requested path.
 
 4. If no bibliographic item can be located, attempt to obtain
    fallback XML for given path from :term:`xml2rfc archive source`

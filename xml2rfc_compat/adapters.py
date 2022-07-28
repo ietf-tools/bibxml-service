@@ -43,8 +43,8 @@ class Xml2rfcAdapter:
     """Directory name :data:`xml2rfc_compat.models.dir_subpath_regex`."""
 
     subpath: str
-    """The entire subpath in :data:`xml2rfc_compat.models.dir_subpath_regex`,
-    with possible underscore in ``_reference`` stripped."""
+    """The entire :term:`xml2rfc subpath`
+    matched by :data:`xml2rfc_compat.models.dir_subpath_regex`."""
 
     anchor: str
     """The anchor part of :data:`xml2rfc_compat.models.dir_subpath_regex`."""
