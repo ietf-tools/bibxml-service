@@ -25,7 +25,7 @@ class XML2RFCAdaptersTestCase(TestCase):
         self.ieee_ref = "R.IEEE.P2740/D-6.5.2020-08"
         self.iana_ref = "IANA.xml-security-uris/security-uris"
         self.rfcsubseries_ref = "STD.29.xml"
-        self.nist_ref = "NBS.CRPL-F-A.90"
+        self.nist_ref = "NIST.IR_4802"
         self.doi_ref = "10.1093/benz/9780199773787.article.b00004912"
 
         self.dirname = XML2RFC_PATH_PREFIX
