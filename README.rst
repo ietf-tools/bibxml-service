@@ -2,6 +2,9 @@
 BibXML Service
 ==============
 
+.. image:: https://codecov.io/gh/ietf-ribose/bibxml-service/branch/main/graph/badge.svg?token=P963U4A2LL 
+ :target: https://codecov.io/gh/ietf-ribose/bibxml-service
+
 For an overview, see https://github.com/ietf-ribose/bibxml-project.
 
 This project uses Docker, Django and PostgreSQL.
