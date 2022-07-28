@@ -383,7 +383,7 @@ class ThreeGPPPAdapter(Xml2rfcAdapter):
         self.log(f"using query {query}")
         return search_refs_relaton_field({
             'docid[*]': query,
-            'date': '@.type == "published"',
+            'date[*]': '@.type == "published"',
         }, limit=1, exact=True)
 
 
