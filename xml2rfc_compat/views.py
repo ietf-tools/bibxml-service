@@ -232,7 +232,7 @@ def handle_xml2rfc_path(
 
     subpath_normalized = construct_normalized_xml2rfc_subpath(dirname, anchor)
 
-    adapter = adapter_cls(subpath_normalized, normalized_dirname, anchor)
+    adapter = adapter_cls(xml2rfc_subpath, normalized_dirname, anchor)
 
     methods = ["manual", "auto", "fallback"]
     method_results: Dict[str, ResolutionOutcome] = {}
