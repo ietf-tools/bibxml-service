@@ -587,6 +587,10 @@ class DoiAdapter(Xml2rfcAdapter):
         else:
             return result.bibitem
 
+    def format_anchor(self) -> Optional[str]:
+        formatted_anchor = self.anchor.replace(".", "_", 1).replace("/", "_")
+        return f"{formatted_anchor.upper()}"
+
 
 def _sort_by_id_draft_number(item: RefData):
     """For sorting Internet Drafts."""
