@@ -60,6 +60,9 @@ Glossary
        A path that used to be handled by xml2rfc tools web server.
        (Normally points to an XML file.)
 
+       Usually means the part of the URL *excluding*
+       domain name and leading :data:`bibxml.settings.XML2RFC_PATH_PREFIX`.
+
        .. seealso::
 
           - :rfp:req:`5` for background
@@ -103,6 +106,14 @@ Glossary
          - :class:`xml2rfc_compat.types.Xml2rfcPathMetadata`
 
 
+   xml2rfc dirname
+      For an :term:`xml2rfc-style path` like ``/public/rfc/bibxml3/reference.foo.bar.xml``,
+      this is the “bibxml3” part.
+
+      Some dirnames have aliases: e.g., ``bibxml4`` is equivalent to ``bibxml-w3c``.
+
+      .. seealso:: :mod:`xml2rfc_compat.aliases`, :data:`bibxml.settings.XML2RFC_COMPAT_DIR_ALIASES`
+
    anchor
    xml2rfc anchor
       Used to mean two different strings, which may be the same
@@ -114,7 +125,7 @@ Glossary
         element in BibXML.
 
    xml2rfc adapter
-      A set of functions registered and associated with a top-level xml2rfc subpath
+      A set of functions registered and associated with :term:`xml2rfc dirname`
       via :func:`xml2rfc_compat.adapters.register_adapter`.
 
       Generally should be a :class:`xml2rfc_compat.adapters.Xml2rfcAdapter` subclass.
