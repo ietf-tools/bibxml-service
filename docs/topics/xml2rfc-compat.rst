@@ -40,30 +40,38 @@ Output format support is implemented via :mod:`~xml2rfc_compat.serializer`.
 xml2rfc-style path resolution algorithm
 =======================================
 
-Root URL configuration includes xml2rfc-style paths via
-:func:`xml2rfc_compat.urls.get_urls()`.
-Each path is handled the following way:
+1. Requested path is normalized: for example,
+   this removes the underscore preceding ``reference``
+   in ``public/rfc/bibxml/_reference.foo.bar.xml``, adjusting it
+   to ``public/rfc/bibxml/reference.foo.bar.xml``.
 
-1. A manual mapping is looked up for requested path.
+2. A docid mapping is looked up for the normalized path.
    If found, bibliographic item with mapped docid
-   is attempted to be retrieved and returned as XML.
+   is attempted to be retrieved from authoritative sources
+   and its XML serialization is returned.
 
-2. If the above fails, the path is passed to registered adapters,
+3. If the above fails, the normalized path is passed to registered adapters,
    which parses the anchor, performs necessary DB queries and is expected
    to return a ``BibliographicItem``.
 
-3. If no bibliographic item can be located, URL handler falls back
-   to pre-indexed xml2rfc web server data.
+4. If no bibliographic item can be located, attempt to obtain
+   fallback XML for given path from :term:`xml2rfc archive source`
+   as last resort, and return that.
 
 .. note::
 
-   Only a path for which an :term:`xml2rfc adapter` is registered will be handled.
+   GET query parameter ``anchor``,
+   if given, replaces top-level reference anchor in XML
+   (even fallback XML).
 
-.. note::
+.. note:: If no :term:`xml2rfc adapter` is registered for given path,
+          this process does not take place.
 
-   Anchor in GET query, if given, will replace top-level reference anchor in XML.
+.. seealso::
 
-.. seealso:: :func:`xml2rfc_compat.views.handle_xml2rfc_path()`
+   Root URL configuration includes xml2rfc-style paths via
+   :func:`xml2rfc_compat.urls.get_urls()`, and xml2rfc path handling
+   is done by :func:`xml2rfc_compat.views.handle_xml2rfc_path`.
 
 Mapping
 -------
