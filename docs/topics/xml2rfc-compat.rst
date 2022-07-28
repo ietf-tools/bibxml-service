@@ -83,7 +83,7 @@ instance.
 
 The management GUI may provide a utility for exploring manual mappings.
 
-.. seealso:: :func:`xml2rfc_compat.views.resolve_manual_map()`
+.. seealso:: :func:`xml2rfc_compat.views.resolve_mapping()`
 
 Adapter
 -----------------
