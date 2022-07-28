@@ -12,7 +12,7 @@ from prometheus import metrics
 from main.exceptions import RefNotFoundError
 from main.query import build_citation_for_docid
 
-from .models import Xml2rfcItem
+from .models import Xml2rfcItem, construct_normalized_xml2rfc_subpath
 from .adapters import Xml2rfcAdapter, adapters
 # from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
 from .serializer import to_xml_string
@@ -165,7 +165,14 @@ def handle_xml2rfc_path(
     instance, serializing it into an XML string with proper anchor tag,
     incrementing relevant metrics.
 
-    Some aspects of this view’s behavior:
+    Notable aspects of this view’s behavior:
+
+    - When resolving a mapped Relaton resource or fallback XML,
+      normalized xml2rfc subpath is used
+      (for example, it never has an underscore before the ``reference.`` part).
+
+      However, full xml2rfc subpath is used when logging
+      or when incrementing access metrics.
 
     - Inspects ``X-Requested-With`` request header, and does not increment
       access metric if it’s the internal ``xml2rfcResolver`` tool.
@@ -223,12 +230,14 @@ def handle_xml2rfc_path(
     # Below code attempts to catch anything
     # and return fallback XML in any problematic scenario.
 
-    adapter = adapter_cls(xml2rfc_subpath, normalized_dirname, anchor)
+    subpath_normalized = construct_normalized_xml2rfc_subpath(dirname, anchor)
+
+    adapter = adapter_cls(subpath_normalized, normalized_dirname, anchor)
 
     methods = ["manual", "auto", "fallback"]
     method_results: Dict[str, ResolutionOutcome] = {}
 
-    mapped_docid, item, error = resolve_mapping(xml2rfc_subpath)
+    mapped_docid, item, error = resolve_mapping(subpath_normalized)
     if mapped_docid:
         method_results['manual'] = dict(
             config=mapped_docid,
@@ -269,7 +278,7 @@ def handle_xml2rfc_path(
 
     if not xml_repr:
         xml_repr = obtain_fallback_xml(
-            xml2rfc_subpath,
+            subpath_normalized,
             anchor=requested_anchor)
         method_results['fallback'] = dict(
             config='',
