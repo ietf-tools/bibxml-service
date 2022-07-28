@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 __all__ = (
     'handle_xml2rfc_path',
-    'resolve_manual_map',
+    'resolve_mapping',
     'resolve_automatically',
     'obtain_fallback_xml',
     'ResolutionOutcome',
@@ -32,7 +32,7 @@ __all__ = (
 )
 
 
-def resolve_manual_map(subpath: str) -> Tuple[
+def resolve_mapping(subpath: str) -> Tuple[
     Optional[str],
     Optional[BibliographicItem],
     Optional[str],
@@ -214,7 +214,7 @@ def handle_xml2rfc_path(
     methods = ["manual", "auto", "fallback"]
     method_results: Dict[str, ResolutionOutcome] = {}
 
-    mapped_docid, item, error = resolve_manual_map(xml2rfc_subpath)
+    mapped_docid, item, error = resolve_mapping(xml2rfc_subpath)
     if mapped_docid:
         method_results['manual'] = dict(
             config=mapped_docid,

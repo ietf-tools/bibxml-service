@@ -26,7 +26,7 @@ from .aliases import get_aliases
 from .models import Xml2rfcItem
 from .models import get_mapped_xml2rfc_items, get_xml2rfc_items_for_dir
 from .adapters import adapters
-from .views import resolve_manual_map, resolve_automatically
+from .views import resolve_mapping, resolve_automatically
 
 
 log = logging.getLogger(__name__)
@@ -154,7 +154,7 @@ class ExploreDirectory(TemplateView):
         automatic_map_item: Union[BibliographicItem, None]
 
         if selected_item:
-            manual_map, manual_map_item, _ = resolve_manual_map(
+            manual_map, manual_map_item, _ = resolve_mapping(
                 selected_item.subpath)
 
             if adapter_cls := adapters.get(dirname, None):
