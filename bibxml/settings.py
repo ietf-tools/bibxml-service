@@ -502,6 +502,9 @@ XML2RFC_COMPAT_DIR_ALIASES = {
 }
 """Maps dirname to a list of aliases to reflect
 IETF xml2rfc web server behavior.
+
+The key should be the name of a directory exactly as it appears
+in :term:`xml2rfc archive source`; the value should be a list of aliases.
 """
 
 XML2RFC_PATH_PREFIX = 'public/rfc/'
