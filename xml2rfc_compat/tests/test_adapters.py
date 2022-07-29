@@ -20,7 +20,7 @@ class XML2RFCAdaptersTestCase(TestCase):
         self.rfcs_ref = "RFC.4037"
         self.misc_ref = "FIPS.180.1993"
         self.internet_drafts_ref = "I-D.ietf-hip-rfc5201-bis"
-        self.w3c_ref = "REC-owl2-syntax"  # fix
+        self.w3c_ref = "rec-powder-grouping-20090901"
         self.threegpp_ref = "SDO-3GPP.25.321:Rel-8/8.3.0"
         self.ieee_ref = "R.IEEE.P2740/D-6.5.2020-08"
         self.iana_ref = "IANA.xml-security-uris/security-uris"
@@ -49,7 +49,6 @@ class XML2RFCAdaptersTestCase(TestCase):
         with self.assertRaises(RefNotFoundError):
             adapter.resolve()
 
-    # TODO fix this
     def test_misc(self):
         adapter = MiscAdapter(self.dirname, "bibxml2", self.misc_ref)
         bibitem = adapter.resolve()
@@ -79,24 +78,13 @@ class XML2RFCAdaptersTestCase(TestCase):
             adapter.resolve()
 
     def test_w3c(self):
-        pass
-        #     """
-        #     This test fails with some old data representation. Relatons data should conform
-        #     to the official schema https://github.com/relaton/relaton-models/blob/main/grammars/biblio.rnc
-        #     pydantic.error_wrappers.ValidationError: 1 validation error for BibliographicItem
-        #     relation -> 0 -> bibitem -> formattedref
-        #     instance of GenericStringValue, tuple or dict expected (type=type_error.dataclass; class_name=GenericStringValue)
-        #     """
-        #     # TODO fix item not found
-        #     # "W3C.REC-owl2-syntax-20121211"
-        # adapter = W3cAdapter(self.dirname, "bibxml4", self.w3c_ref)
-        # bibitem = adapter.resolve()
-        # # bibitem = fetchers.w3c(ref=self.w3c_ref)
-        # self._assert_is_instance_of_bibliographicitem(bibitem)
-        # self._assert_refs_equal(bibitem, self.w3c_ref)
+        adapter = W3cAdapter(self.dirname, "bibxml4", self.w3c_ref)
+        bibitem = adapter.resolve()
+        self._assert_is_instance_of_bibliographicitem(bibitem)
+        self._assert_refs_equal(bibitem, self.w3c_ref)
 
     def test_w3c_not_found(self):
-        adapter = W3cAdapter(self.dirname, "bibxml4", self.w3c_ref)
+        adapter = W3cAdapter(self.dirname, "bibxml4", self.w3c_ref+"AA")
         with self.assertRaises(RefNotFoundError):
             adapter.resolve()
 
