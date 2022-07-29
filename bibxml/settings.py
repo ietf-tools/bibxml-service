@@ -510,15 +510,3 @@ This prefix is subtracted from further resolution.
 
 Must have trailing slash, but no leading slash.
 """
-
-
-# Other
-# -----
-
-AUTHORITATIVE_DATASETS = [
-    'rfcs',
-    'ids',
-    'rfcsubseries',
-]
-"""A list of authoritative datasets.
-"""

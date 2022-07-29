@@ -21,5 +21,4 @@ def sources(request):
     return dict(
         indexable_sources=indexable_sources.keys(),
         relaton_datasets=settings.RELATON_DATASETS,
-        authoritative_datasets=settings.AUTHORITATIVE_DATASETS,
     )
