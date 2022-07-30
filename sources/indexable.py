@@ -254,7 +254,7 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
 
         registry[source_id] = indexable_source
 
-        if AUTO_REINDEX_INTERVAL is not None:
+        if AUTO_REINDEX_INTERVAL:
             # Set up beat schedule
             celery_app.conf.beat_schedule[f'index-{source_id}'] = {
                 'task': 'sources.tasks.fetch_and_index_task',
