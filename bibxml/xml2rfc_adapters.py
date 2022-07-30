@@ -307,15 +307,18 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                     self.requested_version,
                     indexed_version,
                     dt_version)
-                return dt_bibitem
+                self.resolved_item = dt_bibitem
 
-        if indexed_bibitem and any([
-            not self.requested_version,
-            indexed_version == self.requested_version,
-        ]):
-            return indexed_bibitem
-        else:
-            raise RefNotFoundError()
+        if not self.resolved_item:
+            if indexed_bibitem and any([
+                not self.requested_version,
+                indexed_version == self.requested_version,
+            ]):
+                self.resolved_item = indexed_bibitem
+            else:
+                raise RefNotFoundError()
+
+        return self.resolved_item
 
 
 @register_adapter('bibxml4')
