@@ -92,8 +92,13 @@ def push_task(dataset_id, task_id):
     """Adds given ``task_id`` to the top of the list for given dataset,
     and sets a key with task metadata (currently, requested refs).
 
-    :param task_id: Celery task ID."""
+    Removes any instances of ``task_id`` recorded for this dataset beforehand,
+    so can be run multiple times.
 
+    :param task_id: Celery task ID.
+    """
+
+    cache.lrem(dataset_id, 0, task_id)
     cache.lpush(dataset_id, task_id)
 
 
