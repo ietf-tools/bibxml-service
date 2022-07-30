@@ -348,7 +348,7 @@ class W3cAdapter(Xml2rfcAdapter):
 
 
 @register_adapter('bibxml5')
-class ThreeGPPPAdapter(Xml2rfcAdapter):
+class ThreeGPPAdapter(Xml2rfcAdapter):
     """
     This scheme is very simple, and looks like ``[SDO-]3GPP.NN.MMM``.
     They in fact resolve to 3GPP TR or TS, followed by ``NN.MMM:Rel-...``,

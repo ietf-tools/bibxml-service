@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from bib_models import BibliographicItem
 from bibxml.settings import XML2RFC_PATH_PREFIX
-from bibxml.xml2rfc_adapters import RfcAdapter, MiscAdapter, InternetDraftsAdapter, W3cAdapter, ThreeGPPPAdapter, \
+from bibxml.xml2rfc_adapters import RfcAdapter, MiscAdapter, InternetDraftsAdapter, W3cAdapter, ThreeGPPAdapter, \
     IeeeAdapter, IanaAdapter, RfcSubseriesAdapter, NistAdapter
 from main.exceptions import RefNotFoundError
 
@@ -89,12 +89,12 @@ class XML2RFCAdaptersTestCase(TestCase):
             adapter.resolve()
 
     def test_threegpp(self):
-        adapter = ThreeGPPPAdapter(self.dirname, "bibxml5", self.threegpp_ref)
+        adapter = ThreeGPPAdapter(self.dirname, "bibxml5", self.threegpp_ref)
         bibitem = adapter.resolve()
         self._assert_refs_equal(bibitem, self.threegpp_ref)
 
     def test_threegpp_not_found(self):
-        adapter = ThreeGPPPAdapter(self.dirname, "bibxml5", self.threegpp_ref+"AA")
+        adapter = ThreeGPPAdapter(self.dirname, "bibxml5", self.threegpp_ref+"AA")
         with self.assertRaises(RefNotFoundError):
             adapter.resolve()
 
