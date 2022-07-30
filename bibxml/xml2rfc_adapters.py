@@ -520,6 +520,17 @@ class RfcSubseriesAdapter(Xml2rfcAdapter):
     ])
     """Exhaustive set of all RFC subseries ID prefixes."""
 
+    def format_anchor(self) -> Optional[str]:
+        parts = self.anchor.split('.')
+        if len(parts) == 2:
+            try:
+                num = int(parts[1])
+            except (ValueError, TypeError):
+                return None
+            else:
+                return f'{parts[0]}{num}'
+        return None
+
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
