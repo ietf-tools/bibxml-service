@@ -1,12 +1,10 @@
 """
 Celery task for working with indexable sources.
 """
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 import traceback
 from textwrap import indent
 from celery.utils.log import get_task_logger
-
-from django.conf import settings
 
 from .celery import app
 
