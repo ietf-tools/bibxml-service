@@ -122,7 +122,7 @@ services:
       - |
         export SNAPSHOT=$$(git describe --abbrev=0) &&
         ./wait-for-migrations.sh &&
-        celery -A sources.celery:app worker -l info -c 1
+        celery -A sources.celery:app worker -B -l info -c 1
     environment:
       PRIMARY_HOSTNAME: ${HOST:?err}
       INTERNAL_HOSTNAMES: "celery"

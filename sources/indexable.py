@@ -16,7 +16,7 @@ from django.conf import settings
 
 from common.git import ensure_latest
 
-from . import cache
+from . import cache, celery_app
 
 
 __all__ = (
@@ -33,6 +33,12 @@ log = get_task_logger(__name__)
 """Celery task logger.
 Log events are expected only when ran in Celery context.
 """
+
+
+AUTO_REINDEX_INTERVAL: Optional[int] = getattr(
+    settings,
+    'AUTO_REINDEX_INTERVAL',
+    None)
 
 
 @dataclass
@@ -247,6 +253,14 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
         )
 
         registry[source_id] = indexable_source
+
+        if AUTO_REINDEX_INTERVAL is not None:
+            # Set up beat schedule
+            celery_app.conf.beat_schedule[f'index-{source_id}'] = {
+                'task': 'sources.tasks.fetch_and_index_task',
+                'schedule': AUTO_REINDEX_INTERVAL,
+                'args': (source_id, ),
+            }
 
     return wrapper
 
