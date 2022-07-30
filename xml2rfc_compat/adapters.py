@@ -283,18 +283,17 @@ def list_xml2rfc_urls(
         urls.append(url)
 
     # Try adapters’ automatic reversion
-    if not urls:
-        for dirname, adapter_cls in adapters.items():
-            if reversed_anchors := adapter_cls.reverse(item):
-                urls.extend([
-                    url
-                    for anchor, desc in reversed_anchors
-                    if (url := make_xml2rfc_url(
-                        dirname,
-                        construct_normalized_xml2rfc_subpath(dirname, anchor),
-                        desc,
-                        request,
-                    ))
-                ])
+    for dirname, adapter_cls in adapters.items():
+        if reversed_anchors := adapter_cls.reverse(item):
+            urls.extend([
+                url
+                for anchor, desc in reversed_anchors
+                if (url := make_xml2rfc_url(
+                    dirname,
+                    construct_normalized_xml2rfc_subpath(dirname, anchor),
+                    desc,
+                    request,
+                ))
+            ])
 
     return urls
