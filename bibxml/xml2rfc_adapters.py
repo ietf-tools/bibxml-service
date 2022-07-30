@@ -441,7 +441,11 @@ class IeeeAdapter(Xml2rfcAdapter):
                 and docid.type == 'IEEE'):
             prefix, rest = docid.id.split(' ', 1)
             anchor = f"R.{prefix.replace('/', '_')}.{urllib.parse.quote(rest)}"
-            return [(anchor, None)]
+            return [(
+                anchor,
+                "The R-prefixed xml2rfc path uses filenames "
+                "derived from authoritative IEEE identifiers "
+                "in a reversible manner.")]
         return []
 
     def resolve_docid(self) -> Optional[DocID]:
