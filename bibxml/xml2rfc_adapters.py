@@ -81,6 +81,9 @@ class MiscAdapter(Xml2rfcAdapter):
     in addition to bibxml4 path.)
     """
 
+    def format_anchor(self):
+        return self.anchor
+
     @classmethod
     def reverse(cls, item: BibliographicItem) -> List[ReversedRef]:
         if ((docid := get_primary_docid(item.docid))
