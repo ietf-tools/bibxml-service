@@ -81,7 +81,7 @@ class Xml2rfcAdapter:
         Resolves to bibliographic item.
         """
         refs = self.fetch_refs()
-        if (num_refs := len(refs)):
+        if num_refs := len(refs):
             self.log(f"{num_refs} found")
             return self.build_bibitem(refs)
         else:
