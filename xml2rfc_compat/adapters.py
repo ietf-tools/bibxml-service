@@ -136,6 +136,18 @@ class Xml2rfcAdapter:
             return [(f'{docid.type}.{docid.id}', None)]
         return []
 
+    def format_log(self) -> str:
+        config_str = self.__class__.__name__
+        try:
+            config_str = '%s: %s' % (
+                config_str,
+                ' -> '.join([i.replace(',', ' ') for i in self._log])
+            )
+        except Exception:
+            return '<unable to format log>'
+        else:
+            return config_str
+
     # Somewhat private/subclass-only
 
     def log(self, msg: str):
