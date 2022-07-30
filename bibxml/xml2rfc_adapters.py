@@ -211,7 +211,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 
         # Look up by primary identifier
         try:
-            indexed_bibitem = self.build_bibitem(self.fetch_refs())
+            indexed_bibitem = self.build_bibitem_from_refs(self.fetch_refs())
         except Exception:
             log.exception(
                 "Failed to obtain or validate indexed bibliographic item "
