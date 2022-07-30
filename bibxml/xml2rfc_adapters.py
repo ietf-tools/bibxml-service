@@ -392,9 +392,11 @@ class ThreeGPPPAdapter(Xml2rfcAdapter):
         }, limit=1, exact=True)
 
     def format_anchor(self) -> str:
-        if (self.resolved_item is not None
-                and (num := self.resolve_num(self.resolved_item))):
-            return f'SDO-3GPP.{num}'
+        if self.resolved_item is not None:
+            if num := self.resolve_num(self.resolved_item):
+                return f'SDO-3GPP.{num}'
+            else:
+                raise RuntimeError("Cannot format anchor: failed to resolve num")
         else:
             raise RuntimeError("Cannot format anchor: item not resolved")
 
