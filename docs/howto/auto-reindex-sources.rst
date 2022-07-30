@@ -27,20 +27,31 @@ There are two possible approaches to this:
 How frequently to reindex?
 --------------------------
 
-In short, it’s recommended to confirm how frequently the sources usually change,
-and pick a value somewhat higher than that—regardless of whether
-you implement scheduled API endpoint calls
-or use the ``AUTO_REINDEX_INTERVAL`` setting.
+In short: it’s recommended to check how frequently the sources change
+and how long it takes to index the largest source,
+and pick a value higher than the maximum between those two.
 
-Generally, you can reindex sources as often as you want.
-If no changes were detected in source’s underlying Git repo
-(the HEAD commit is the same), then indexing task will not do the work
-of actually reading every file.
+Long answer: you may want to ensure that reindex interval
+is larger than the time it takes for a source to be reindexed
+(which could be multiple minutes for sources with many documents,
+such as Internet Drafts)—otherwise, task queue may grow indefinitely.
 
-However, it’s currently recommended to not reindex too often,
-as that will overwhelm task outcome listings in management GUI
+Furthermore, it’s currently recommended to not reindex too often,
+as it’d overwhelm task outcome listings in management GUI
 (making it harder to track down issues) and cause unnecessary requests
 to Git server APIs.
+
+Other than that, it’s OK to reindex sources as often as you want.
+
+.. note::
+
+   If no changes were detected in source’s underlying Git repo
+   (the HEAD commit is the same), then indexing task will skip reindexing.
+
+   This ensures the service does not reindex unnecessarily,
+   but it also means that if you change indexing implementation
+   you’d need to ensure each source
+   has at least one commit since then for changes to have effect.
 
 .. note:: Regardless of the method you choose, make sure to monitor
           task execution as part of overall
