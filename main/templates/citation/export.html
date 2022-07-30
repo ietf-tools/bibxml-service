@@ -6,13 +6,14 @@
   {% for subpath, url, desc in xml2rfc_urls %}
     <span
       class="button-v2 flex-1"
-      title="{{ desc|default:"" }}"
       data-xml2rfc-subpath="{{ subpath }}"
       data-abbreviate-as="{{ subpath }}"
       data-full-url="{{ url }}"
       data-copy-button-class="icon"
     >
-      <input title="{{ desc|default:"" }}" class="text-sm label md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
+      <input title="{% spaceless %}{{ url }}{% if subpath %}
+
+{{ desc|default:"" }}{% endif %}{% endspaceless %}" class="text-sm label md:overflow-x-auto overflow-hidden md:truncate" readonly type="text" value="{{ url }}" />
       <a href="{{ url }}" class="link icon" title="Open">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
