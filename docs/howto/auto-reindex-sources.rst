@@ -19,7 +19,8 @@ There are two possible approaches to this:
 - Set ``AUTO_REINDEX_INTERVAL`` to a positive integer
   in production environment.
 
-  This method is easier to set up.
+  This method uses ``celerybeat`` scheduler. It’s easier to set up,
+  but puts more importance on monitoring the status of task worker.
 
   .. seealso:: :data:`bibxml.settings.AUTO_REINDEX_INTERVAL`
 

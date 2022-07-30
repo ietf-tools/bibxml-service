@@ -158,7 +158,7 @@ Indexing
 ``AUTO_REINDEX_INTERVAL``
     accepted by Django and Compose, pass-through
 
-    How many seconds to wait before reindexing.
+    How many seconds to wait before reindexing a source.
     Must be larger than zero for reindexing to be enabled.
 
     See :data:`bibxml.settings.AUTO_REINDEX_INTERVAL` for more.

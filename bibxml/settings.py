@@ -381,29 +381,11 @@ AUTO_REINDEX_INTERVAL: Optional[int] = int(
     ).strip() or '0'
 ) or None
 """
-If the following are all true:
-
-- The task was invoked via API without ``refs`` parameter
-  (i.e., for the entire source)
-- The task either succeeded or failed with an ``Exception`` or subclass
-  (i.e., not ``SystemExit``)
-- This setting is set to an integer larger than zero
-
-Then :term:`indexable source` indexing task
-will queue itself again, for the same source,
-using ``AUTO_REINDEX_INTERVAL``
-seconds as countdown upon completion.
+The :term:`indexable source` reindex task
+will be periodically ran this amount of seconds
+using Celery beat scheduler.
 
 .. seealso:: :doc:`/howto/auto-reindex-sources`
-
-.. note:: For any source to automatically reindex using this setting,
-          that source has to be manually indexed (e.g., via management GUI)
-          at least once after ``celery`` service startup.
-
-.. important::
-
-   This is not a failproof way to implement perpetual source reindexing.
-   Even if you use this setting, make sure to monitor task status.
 """
 
 
