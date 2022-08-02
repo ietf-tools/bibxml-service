@@ -100,11 +100,10 @@ is stored.
 """
 
 
-def context_processor(request):
-    """Adds context variables:
-
-    - ``datatracker_oauth_enabled`` (boolean)
-    - ``datatracker_user``, currently authenticated user info
+def is_datatracker_oauth_enabled() -> bool:
+    """
+    Returns ``True`` if the service is configured with Datatracker
+    OAuth2/OIDC client credentials.
     """
     try:
         _get_redirect_uri()
@@ -112,12 +111,22 @@ def context_processor(request):
         ok = False
     else:
         ok = True if (CLIENT_ID and CLIENT_SECRET) else False
+    return ok
+
+
+def context_processor(request):
+    """Adds context variables:
+
+    - ``datatracker_oauth_enabled`` (boolean)
+    - ``datatracker_user``, currently authenticated user info
+    """
+    enabled = is_datatracker_oauth_enabled()
 
     ctx = dict(
-        datatracker_oauth_enabled=ok,
+        datatracker_oauth_enabled=enabled,
     )
 
-    if ok and OAUTH_USER_INFO_KEY in request.session:
+    if enabled and OAUTH_USER_INFO_KEY in request.session:
         ctx['datatracker_user'] = request.session[OAUTH_USER_INFO_KEY]
 
     return ctx
@@ -133,7 +142,7 @@ def get_client(request):
     clears OAuth data from session.
     """
 
-    if OAUTH_TOKEN_KEY in request.session:
+    if is_datatracker_oauth_enabled() and OAUTH_TOKEN_KEY in request.session:
         session = OAuth2Session(
             CLIENT_ID,
             scope=OAUTH_SCOPES,
@@ -226,7 +235,7 @@ def initiate(request):
     # Otherwise, will be stored in session to internally redirect the user
     # after OAuth callback.
 
-    if not CLIENT_ID or not CLIENT_SECRET:
+    if not is_datatracker_oauth_enabled():
         log.warning(
             "Datatracker OAuth2: client ID/secret not configured, "
             "redirecting to home")
@@ -277,7 +286,7 @@ def handle_callback(request):
         OAUTH_INITIATED_FROM_URL_KEY,
         get_default_post_oauth_redirect_url())
 
-    if not CLIENT_ID or not CLIENT_SECRET:
+    if not is_datatracker_oauth_enabled():
         log.warning(
             "Datatracker OAuth2 callback: client ID/secret not configured, "
             "redirecting to home")
