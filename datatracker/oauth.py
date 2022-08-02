@@ -288,8 +288,8 @@ def handle_callback(request):
 
     if not is_datatracker_oauth_enabled():
         log.warning(
-            "Datatracker OAuth2 callback: client ID/secret not configured, "
-            "redirecting to home")
+            "Datatracker OAuth2 callback: Datatracker OAuth2 misconfigured, "
+            "redirecting the user to home")
         messages.error(
             request,
             "Couldn’t authenticate with Datatracker: "
