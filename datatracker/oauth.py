@@ -159,7 +159,6 @@ def get_client(request):
             auto_refresh_kwargs=dict(
                 client_id=CLIENT_ID,
                 client_secret=CLIENT_SECRET,
-                scope=OAUTH_SCOPES,
             ),
             token_updater=token_updater,
         )
