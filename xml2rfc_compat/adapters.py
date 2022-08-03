@@ -9,6 +9,7 @@ import logging
 import re
 
 from django.urls import reverse, NoReverseMatch
+from django.conf import settings
 
 from relaton.models.bibdata import BibliographicItem, DocID
 
@@ -282,9 +283,18 @@ def make_xml2rfc_url(
             f'xml2rfc_{dirname}',
             args=[subpath],
         )
+        port = request.get_port()
+        if port != '443':
+            port = f':{port}'
+        else:
+            port = ''
+        if request.is_secure():
+            proto = 'https'
+        else:
+            proto = 'http'
         return (
             subpath,
-            request.build_absolute_uri(url)
+            f"{proto}://{settings.HOSTNAME}{port}/{url.removeprefix('/')}"
             if request else url,
             desc,
         )
