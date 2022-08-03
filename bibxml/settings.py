@@ -170,13 +170,11 @@ WSGI_APPLICATION = 'bibxml.wsgi.application'
 
 CSRF_USE_SESSIONS = True
 
+CSRF_TRUSTED_ORIGINS = [f'https://{HOSTNAME}']
 if DEBUG:
-    CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
-    SESSION_COOKIE_DOMAIN = 'localhost'
-else:
-    CSRF_TRUSTED_ORIGINS = [f'https://{HOSTNAME}']
-    SESSION_COOKIE_DOMAIN = HOSTNAME
+    CSRF_TRUSTED_ORIGINS.append(f'http://{HOSTNAME}')
 
+SESSION_COOKIE_DOMAIN = HOSTNAME
 
 # Database
 
