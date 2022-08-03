@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Dict, Set, Optional, cast
 from pathlib import Path
 from os import environ, path
 import socket
@@ -40,7 +40,9 @@ SOURCE_REPOSITORY_URL = environ.get("SOURCE_REPO_URL", None)
 SERVICE_NAME = environ.get("SERVICE_NAME")
 """Service title (short phrase)."""
 
-HOSTNAME = environ.get("PRIMARY_HOSTNAME")
+# Always a string, since missing environment variable
+# will cause preceding checks to fail.
+HOSTNAME: str = cast(str, environ.get("PRIMARY_HOSTNAME"))
 """Primary hostname the service is publicly deployed under."""
 
 
