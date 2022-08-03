@@ -283,18 +283,12 @@ def make_xml2rfc_url(
             f'xml2rfc_{dirname}',
             args=[subpath],
         )
-        port = request.get_port()
-        if port != '443':
-            port = f':{port}'
-        else:
-            port = ''
-        if request.is_secure():
-            proto = 'https'
-        else:
-            proto = 'http'
+
+        _port = request.get_port()
+        port = f':{_port}' if _port not in ['443', '80'] else ''
         return (
             subpath,
-            f"{proto}://{settings.HOSTNAME}{port}/{url.removeprefix('/')}"
+            f"//{settings.HOSTNAME}{port}/{url.removeprefix('/')}"
             if request else url,
             desc,
         )
