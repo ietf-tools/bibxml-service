@@ -284,8 +284,8 @@ def make_xml2rfc_url(
             args=[subpath],
         )
 
-        _port = request.get_port()
-        port = f':{_port}' if _port not in ['443', '80'] else ''
+        _p = request.get_port()
+        port = f':{_p}' if settings.DEBUG and _p not in ['443', '80'] else ''
         return (
             subpath,
             f"//{settings.HOSTNAME}{port}/{url.removeprefix('/')}"
