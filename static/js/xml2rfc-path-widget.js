@@ -36,7 +36,7 @@
   /** Initialize with copy button. */
   function initCopyWidget(el) {
     const subpath = el.dataset.xml2rfcSubpath;
-    const fullURL = el.dataset.fullUrl;
+    const fullURL = withProtocol(el.dataset.fullUrl);
     const input = el.querySelector('input');
 
     let destroyAbbreviator = abbreviateUntilHover(el, input);
@@ -149,6 +149,18 @@
       el.removeEventListener('mouseleave', handleAbbreviate);
       el.removeChild(short);
       handleExpand();
+    }
+  }
+
+  /**
+   * If given URL is protocol-relative, prepend current protocol;
+   * otherwise return as is.
+   */
+  function withProtocol(url) {
+    if (url.indexOf('//') === 0) {
+      return `${location.protocol}${url}`;
+    } else {
+      return url;
     }
   }
 })();
