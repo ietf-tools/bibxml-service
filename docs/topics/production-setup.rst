@@ -60,6 +60,11 @@ AWS CloudFront/ELB, CloudFlare.
      every resource request that matters metrics-wise
      hit the web application itself.
 
+.. note::
+
+   Django’s ``request.is_secure()`` convenience function may return
+   a false negative if you terminate TLS outside of the service.
+
 
 Monitoring errors
 =================
