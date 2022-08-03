@@ -28,8 +28,27 @@ as a sibling of ``docker-compose.yml``.
              make sure ``DEBUG`` is **not** set in production.
 
 
-HTTPS setup
-===========
+Networking
+==========
+
+While the service itself makes use of the :data:`bibxml.settings.HOSTNAME` setting
+(controllable via environment, if you use the provided Compose file),
+Django may still rely on ``HTTP_HOST`` or ``SERVER_NAME`` HTTP request headers.
+(It can also be made to accept ``HTTP_X_FORWARDED_FOR``, if configured.)
+
+- Make sure front-end proxies you run before Django
+  supply headers as appropriate.
+
+- Make sure you aren’t too loose with ``ALLOWED_HOSTS``
+  (which, if you use the provided Compose file,
+  is influenced by ``INTERNAL_HOSTNAMES``,
+  ``RESPOND_TO_DETECTED_INTERNAL_HOSTNAME``,
+  and ``RESPOND_TO_DETECTED_INTERNAL_IPS`` environment variables).
+  Only allow hostnames that are actually needed.
+
+
+HTTPS
+=====
 
 The service relies on being accessed via HTTPS URLs.
 
