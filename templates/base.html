@@ -26,10 +26,6 @@
       <link type="text/css" rel="stylesheet" href="{% static "css/main.css" %}" />
     {% endcompress %}
 
-    {% compress js %}
-      <script type="text/javascript" src="{% static "js/matomo.js" %}"></script>
-    {% endcompress %}
-
     {% block extra_head %}{% endblock %}
   </head>
 
@@ -119,6 +115,10 @@
       {% endblock %}
 
     </div>
+
+    {% compress js %}
+      <script type="text/javascript" src="{% static "js/matomo.js" %}"></script>
+    {% endcompress %}
 
     {% block extra_scripts %}{% endblock %}
 
