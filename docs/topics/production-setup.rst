@@ -51,8 +51,8 @@ HTTPS
 =====
 
 The service relies on being accessed via HTTPS URLs,
-HTTP URLs are only acceptable in local development
-and may cause issues otherwise.
+Plain HTTP URLs are only acceptable in local development
+and without the ``DEBUG`` flag may cause unexpected behaviour.
 
 It is expected to be run from behind a load balancer (reverse proxy, CDN)
 that terminates SSL and talks to BibXML in plain HTTP.
