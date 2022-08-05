@@ -100,7 +100,7 @@ def index_xml2rfc_source(
 
 indexable.register_git_source(
     'xml2rfc',
-    [('https://github.com/ietf-ribose/bibxml-data-archive', 'main')],
+    [('https://github.com/ietf-tools/bibxml-data-archive', 'main')],
 )({
     'indexer': index_xml2rfc_source,
     'count_indexed': Xml2rfcItem.objects.count,
