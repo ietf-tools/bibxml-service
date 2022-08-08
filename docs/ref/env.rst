@@ -211,6 +211,18 @@ Security
     Each will have the same effect and access privileges
     as ``API_SECRET``.
 
+``REQUIRE_DATATRACKER_AUTH``
+    accepted by Django and Compose, pass-through
+
+    Controls public-side authentication requirement.
+
+    If set to ``1``, the setting is set to ``True``.
+
+    .. seealso::
+
+       - :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH`
+       - :doc:`/topics/auth`
+
 ``DEBUG``
     accepted by Django and Compose, pass-through
 

@@ -125,7 +125,7 @@
     {% endwith %}
   </header>
 
-  {% if datatracker_oauth_enabled %}
+  {% if datatracker_oauth_enabled or not datatracker_auth_required %}
     <div class="
       md:col-span-2 mb-4 md:mb-0
       z-20

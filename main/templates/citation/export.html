@@ -2,7 +2,7 @@
 {# Uses Heroicons #}
 
 
-{% if datatracker_user %}
+{% if datatracker_user or not datatracker_auth_required %}
   {% for subpath, url, desc in xml2rfc_urls %}
     <span
       class="button-v2 flex-1"

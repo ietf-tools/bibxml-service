@@ -123,6 +123,10 @@ def context_processor(request):
     enabled = is_datatracker_oauth_enabled()
 
     ctx = dict(
+        datatracker_auth_required=getattr(
+            settings,
+            'REQUIRE_DATATRACKER_AUTH',
+            False),
         datatracker_oauth_enabled=enabled,
     )
 
