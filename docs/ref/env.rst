@@ -226,7 +226,7 @@ Security
 ``DEBUG``
     accepted by Django and Compose, pass-through
 
-    If set to 1, Django’s built-in ``runserver`` is used
+    If set to ``1``, Django’s built-in ``runserver`` is used
     to serve the GUI, and error pages are verbose.
 
     It will also try to auto-detect IPs and hostnames and add them
