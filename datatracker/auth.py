@@ -20,11 +20,12 @@ def api(viewfunc):
     """Header-based auth decorator for Django views.
     Use for API endpoints that require Datatracker authentication.
 
-    Token is expected to be given under ``X-Datatracker-Token`` HTTP header.
+    - Expects token under ``X-Datatracker-Token`` HTTP header.
 
-    If token is not provided,
-    but current session contains a valid Datatracker token,
-    it counts as well.
+    - If token is not provided,
+      but current session contains a valid Datatracker token,
+      it counts as well.
+
     :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH`
     makes this decorator no-op.
     """
