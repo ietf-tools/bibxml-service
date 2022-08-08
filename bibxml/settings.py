@@ -351,6 +351,20 @@ DATATRACKER_REDIRECT_URI = environ.get(
    since Datatracker’s redirect would not be handled by this service.
 """
 
+REQUIRE_DATATRACKER_AUTH = int(
+    environ.get("REQUIRE_DATATRACKER_AUTH", default=0)
+) == 1
+"""
+If ``True``:
+
+- Public API requires either Datatracker developer’s token HTTP header,
+  or valid Datatracker OAuth2 access token in UA session
+- Bibitem export links are not shown in GUI unless the user is logged in
+  via Datatracker
+
+.. seealso:: :doc:`/topics/auth`
+"""
+
 
 # Custom
 

@@ -6,6 +6,7 @@ import functools
 from simplejson import JSONDecodeError
 
 from django.http.response import HttpResponseForbidden
+from django.conf import settings
 
 from .request import post
 from .oauth import get_client
@@ -24,7 +25,12 @@ def api(viewfunc):
     If token is not provided,
     but current session contains a valid Datatracker token,
     it counts as well.
+    :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH`
+    makes this decorator no-op.
     """
+    if not getattr(settings, 'REQUIRE_DATATRACKER_AUTH', False):
+        return viewfunc
+
     @functools.wraps(viewfunc)
     def wrapper(request, *args, **kwargs):
         provided_secret = request.headers.get('x-datatracker-token', None)

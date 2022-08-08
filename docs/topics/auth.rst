@@ -5,34 +5,35 @@ Authentication
 .. contents::
    :local:
 
-BibXML service uses multiple authentication mechanisms.
+BibXML service uses multiple authentication mechanisms in different areas:
 
-- Public service API requires authentication.
-
-- Public GUI in general does not require authentication,
-  but certain GUI features that require on API (such as bibliographic
-  item export currently) may be omitted without authentication.
-
-- Internal (management) GUI and POST API endpoints
-  require authentication.
-
-- Internal GET API endpoints do not require authentication.
+- Valid Datatracker developer’s token passed via ``X-Datatracker-Token`` HTTP header
+- Datatracker OIDC/OAuth2 integration (valid access token in session)
+- Basic HTTP auth
+- An valid BibXML service API token passed via ``X-IETF-Token`` HTTP header
 
 .. note::
-  
+
    The project is not set up to use Django’s contrib user authentication.
-   At this time, it’s unclear what the roadmap is and what authentication
-   mechanism should look like in the end.
-
-.. important::
-
-   **Do not** expose management view functions without the ``auth.basic()`` decorator.
-   Management templates are passed API secret
-   and include it to enable the user to trigger certain API endpoints
-   (such as source reindexing) via client-side JS.
+   It may be worth introducing it later if warranted.
 
 Public-side auth
 ================
+
+By default, public service does *not* require any authentication.
+However, this can be changed by setting :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH` to ``True``
+(via runtime environment variable or by editing :mod:`bibxml.settings` source).
+
+Below describes the behavior if :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH` is ``True``:
+
+- Backward-compatible xml2rfc-style path API never requires authentication.
+
+- All other public service API require authentication.
+
+- Public GUI in general does not require authentication,
+  but GUI features that rely on API (such as bibliographic
+  item export links) are omitted if the user is not logged in via Datatracker
+  (i.e., there’s no valid access token in user agent session).
 
 HTTP header token
 -----------------
@@ -65,11 +66,25 @@ after which access token is stored encrypted in user’s session.
 Internal auth
 =============
 
+- Internal (management) GUI and POST API endpoints
+  require authentication.
+
+- Internal GET API endpoints do not require authentication.
+
 Internal authentication uses tokens provisioned at build or deploy time
 via the ``API_SECRET`` and ``EXTRA_API_SECRETS`` environment variables,
 and are used in ways described below.
 
-Note: the service does not track activity per token API secret token.
+.. note:: This service does not track activity per token API secret token.
+
+.. important::
+
+   All management view functions **must** be wrapped
+   in :func:`management.auth.basic()` decorator.
+
+   Management templates are passed API secret
+   and include it to enable the user to trigger certain API endpoints
+   (such as source reindexing) via client-side JS.
 
 .. seealso:: :mod:`management.auth`, :data:`bibxml.settings.API_SECRETS`
 
