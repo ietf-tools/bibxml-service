@@ -233,6 +233,8 @@ Security
     to ``INTERNAL_IP`` for Django debug toolbar to work
     in Docker environment.
 
+    It will also assume plain-text HTTP in some scenarios.
+
     .. important:: Don’t set in production.
 
 
