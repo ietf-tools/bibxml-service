@@ -1,22 +1,18 @@
-from typing import Tuple, Optional, TypedDict, Dict, Callable
-import re
 import logging
-
-from pydantic import ValidationError
+import re
+from typing import Tuple, Optional, TypedDict, Dict, Callable
 
 from django.http import HttpResponse, HttpResponseNotFound, JsonResponse
+from pydantic import ValidationError
 
 from bib_models import BibliographicItem
-from prometheus import metrics
-
 from main.exceptions import RefNotFoundError
-
-from .models import Xml2rfcItem, construct_normalized_xml2rfc_subpath
+from prometheus import metrics
 from .adapters import Xml2rfcAdapter, adapters
+from .aliases import unalias
+from .models import Xml2rfcItem, construct_normalized_xml2rfc_subpath
 # from .resolvers import AnchorFormatterFunc, anchor_formatter_registry
 from .serializer import to_xml_string
-from .aliases import unalias
-
 
 log = logging.getLogger(__name__)
 
@@ -269,6 +265,9 @@ def handle_xml2rfc_path(
             lambda anchor: adapter.mangle_anchor(anchor),
         )
 
+        if adapter_cls.__name__ == "InternetDraftsAdapter":
+            xml_repr = _replace_target_with_format(xml_repr)
+
         if item:
             metric_label = 'success'
         else:
@@ -394,3 +393,26 @@ def _replace_anchor(xml_repr: str, anchor: str | Callable[[str], str]) -> str:
         r'anchor="%s"' % new_anchor,
         xml_repr,
         count=1)
+
+
+target_regex = re.compile(r'target=\"([^\"]*)\"')
+"""Regular expression used for mangling target in an XML string."""
+
+def _replace_target_with_format(xml_repr: str):
+    """
+    InternetDrafts entries require the reference target
+    attribute to be removed and placed within the <format>
+    tag instead.
+    Format:
+    <reference anchor="...">
+      <front>...</front>
+      <format type="TXT" target="https://www.ietf.org/archive/id/draft-ietf-bfd-mpls-mib-07.txt"/>
+    </reference>
+    """
+    target = target_regex.search(xml_repr)[0]
+    xml_repr = xml_repr.replace(target, "")
+    len_front = len("</front>")
+    front_index = xml_repr.index("</front>")
+    format_tag = f'<format type="TXT" {target}/>'
+    updated_xml = xml_repr[:front_index+len_front] + '\n' + format_tag + xml_repr[front_index+len_front:]
+    return updated_xml
