@@ -14,7 +14,7 @@ BibXML service relies on indexable
 :term:`bibliographic data sources <bibliographic data source>`
 configured (registered).
 From those sources, BibXML service obtains bibliographic data
-in Relaton format and indexes it for search purposes.
+in the Relaton YAML format and indexes it for search purposes.
 Indexing can be triggered either via management GUI or via API.
 
 Those sources themselves are Git repositories,
@@ -22,12 +22,12 @@ the contents of which are in some cases static snapshots
 but typically are generated periodically using respective
 Github Actions workflows, which retrieve and parse bibliographic data
 from authoritative sources and output it formatted consistently
-per Relaton data model.
+per the Relaton data model.
 
 .. seealso::
 
    * For a full list of Relaton datasets and how they are generated:
-     https://github.com/ietf-ribose/bibxml-service/wiki/Relaton-sources.
+     https://github.com/ietf-tools/bibxml-service/wiki/Data-sources
 
    * For where Relaton sources are registered, :mod:`main.sources`
 
