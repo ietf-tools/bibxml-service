@@ -127,6 +127,12 @@ def normalize_relaxed(data: Dict[str, Any]):
                 'content': edition
             }
 
+    if keywords := data.get('keyword', []):
+        data['keyword'] = [
+            normalize_keyword(item)
+            for item in keywords
+        ]
+
     for contributor in data.get('contributor', []):
         person_or_org = contributor.get(
             'person',
@@ -149,6 +155,15 @@ def normalize_relaxed(data: Dict[str, Any]):
                 pass
 
     return data
+
+
+def normalize_keyword(raw: str | Dict[str, Any]) -> str:
+    if isinstance(raw, str):
+        return raw
+    elif isinstance(raw, dict) and (content := raw.get('content', None)):
+        return content
+    else:
+        return str(raw)
 
 
 def normalize_version(raw: str) -> Dict[str, Any]:
