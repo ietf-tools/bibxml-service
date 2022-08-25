@@ -33,7 +33,7 @@ def to_xml_string(item: BibliographicItem, **kwargs) -> bytes:
     return etree.tostring(
         canonicalized_tree,
         encoding='utf-8',
-        xml_declaration=True,
+        xml_declaration=False,
         doctype=None,
         pretty_print=True,
     )
