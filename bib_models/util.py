@@ -253,4 +253,11 @@ def normalize_contact(raw: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             address=raw,
         )
 
+    if 'phone' in raw and isinstance(raw['phone'], str):
+        return dict(
+            phone=dict(
+                content=raw['phone'],
+            ),
+        )
+
     return raw
