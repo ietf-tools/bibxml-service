@@ -100,8 +100,8 @@ if environ.get("SENTRY_DSN", None):
         integrations=[
             DjangoIntegration(),
             LoggingIntegration(
-                level=logging.INFO,
-                event_level=logging.WARNING,
+                level=logging.ERROR,
+                event_level=logging.ERROR,
             ),
         ],
         server_name=HOSTNAME,
