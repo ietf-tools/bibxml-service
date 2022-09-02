@@ -32,6 +32,16 @@ paths:
       schema:
         example: reference.W3C.NOTE-XML-FRAG-REQ-19981123
         type: string
+    - name: anchor
+      in: query
+      description: |
+        Replace the `anchor` in *top-level* `<reference>` or `<referencegroup>`
+        to specified string.
+
+        NOTE: Does not affect any of the nested `<reference>` elements.
+      required: true
+      schema:
+        type: string
 
     get:
       summary: Get bibliographic item by xml2rfc tools path
