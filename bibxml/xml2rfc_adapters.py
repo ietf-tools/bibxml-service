@@ -335,6 +335,9 @@ class W3cAdapter(Xml2rfcAdapter):
 
     # def get_docid_query(self) -> Optional[str]:
 
+    def format_anchor(self):
+        return self.anchor
+
     def resolve_docid(self) -> DocID:
         unprefixed = self.anchor.removeprefix('W3C.')
         # We can try combinations w/o trailing date and/or leading doctype
