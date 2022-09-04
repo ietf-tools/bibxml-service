@@ -127,28 +127,82 @@ def normalize_relaxed(data: Dict[str, Any]):
                 'content': edition
             }
 
+    if keywords := data.get('keyword', []):
+        data['keyword'] = [
+            normalize_maybe_formatted_str(item)
+            for item in keywords
+        ]
+
     for contributor in data.get('contributor', []):
-        person_or_org = contributor.get(
-            'person',
-            contributor.get(
-                'organization',
-                {}))
-        contacts = as_list(person_or_org.get('contact', []))
-        if contacts:
-            try:
-                person_or_org['contact'] = [
-                    normalized
-                    for normalized in [
-                        normalize_contact(item)
-                        for item in contacts
-                        if isinstance(item, dict)
+        if ((person := contributor.get('person', None))
+                or (org := contributor.get('organization', None))):
+
+            # Adapt contacts:
+            person_or_org = person or org
+            contacts = as_list(person_or_org.get('contact', []))
+            if contacts:
+                try:
+                    person_or_org['contact'] = [
+                        normalized
+                        for normalized in [
+                            normalize_contact(item)
+                            for item in contacts
+                            if isinstance(item, dict)
+                        ]
+                        if normalized is not None
                     ]
-                    if normalized is not None
-                ]
-            except Exception:
-                pass
+                except Exception:
+                    pass
+
+            if person:
+                # Adapt new name format:
+                if given_name := person.get('name', {}).get('given', {}):
+                    # Forenames that are not initials
+                    if actual_forenames := [
+                                _name_content
+                                for n in given_name.get('forename')
+                                if (_name_content := n.get('content', None))
+                            ]:
+                        person['name']['forename'] = ' '.join(actual_forenames)
+                    # Only initials
+                    if initials := given_name.get('formatted_initials'):
+                        person['name']['initial'] = [initials]
+                    # Delete the “given”, not yet supported by relaton-py
+                    del person['name']['given']
+
+                # Adapt new affiliated organization format:
+                if affiliations := as_list(person.get('affiliation', [])):
+                    for affiliation in affiliations:
+                        if affiliated_org := affiliation.get('organization', {}):
+                            affiliation['organization'] = \
+                                normalize_org(affiliated_org)
+                    person['affiliation'] = affiliations
+
+            # Adapt new organization name format:
+            elif org:
+                contributor['organization'] = normalize_org(org)
 
     return data
+
+
+def normalize_org(raw: Dict[str, Any]) -> Dict[str, Any]:
+    if org_name := raw.get('name', None):
+        if isinstance(org_name, list):
+            raw['name'] = [normalize_maybe_formatted_str(n) for n in org_name]
+        else:
+            raw['name'] = [normalize_maybe_formatted_str(org_name)]
+    if abbr := raw.get('abbreviation', None):
+        raw['abbreviation'] = normalize_maybe_formatted_str(abbr)
+    return raw
+
+
+def normalize_maybe_formatted_str(raw: str | Dict[str, Any]) -> str:
+    if isinstance(raw, str):
+        return raw
+    elif isinstance(raw, dict) and (content := raw.get('content', None)):
+        return content
+    else:
+        return str(raw)
 
 
 def normalize_version(raw: str) -> Dict[str, Any]:
@@ -197,6 +251,13 @@ def normalize_contact(raw: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if 'city' in raw or 'country' in raw:
         return dict(
             address=raw,
+        )
+
+    if 'phone' in raw and isinstance(raw['phone'], str):
+        return dict(
+            phone=dict(
+                content=raw['phone'],
+            ),
         )
 
     return raw
