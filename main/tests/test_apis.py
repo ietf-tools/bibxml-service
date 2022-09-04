@@ -114,16 +114,3 @@ class RefDataApiTests(TestCase):
         results_count = len(response.json().get("data"))
 
         self.assertEqual(results_count, 0)
-
-    def test_get_doi_ref(self):
-        # Ref link: https://doi.org/10.1093/benz/9780199773787.article.b00004912
-        ref = "10.1093/benz/9780199773787.article.b00004912"
-        url = reverse("api_get_doi_ref", args=[quote_plus(ref)])
-        response = self.client.get(url, **self.api_headers)
-        self.assertEqual(response.status_code, 200)
-
-    def test_not_found_by_doi_ref(self):
-        url = f'{reverse("api_get_doi_ref", kwargs={"ref": "NONEXISTENT_REF_404"})}'
-        response = self.client.get(url, **self.api_headers)
-        self.assertEqual(response.status_code, 404)
-        self.assertTrue(len(response.json()["error"]) > 0)
