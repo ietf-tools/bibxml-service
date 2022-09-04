@@ -191,8 +191,6 @@ def normalize_org(raw: Dict[str, Any]) -> Dict[str, Any]:
             raw['name'] = [normalize_maybe_formatted_str(n) for n in org_name]
         else:
             raw['name'] = [normalize_maybe_formatted_str(org_name)]
-    if abbr := raw.get('abbreviation', None):
-        raw['abbreviation'] = normalize_maybe_formatted_str(abbr)
     return raw
 
 
