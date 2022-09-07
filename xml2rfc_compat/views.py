@@ -231,8 +231,8 @@ def handle_xml2rfc_path(
 
     try:
         # format_anchor() should be called after attempts to resolve the item
-        if adapter_anchor := adapter.format_anchor():
-            requested_anchor = adapter_anchor
+        if not requested_anchor and (_anch := adapter.format_anchor()):
+            requested_anchor = _anch
     except Exception:
         log.exception(
             "xml2rfc path (%s): "
