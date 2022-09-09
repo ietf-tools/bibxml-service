@@ -154,34 +154,6 @@ def normalize_relaxed(data: Dict[str, Any]):
                 except Exception:
                     pass
 
-            if person:
-                # Adapt new name format:
-                if given_name := person.get('name', {}).get('given', {}):
-                    # Forenames that are not initials
-                    if actual_forenames := [
-                                _name_content
-                                for n in given_name.get('forename')
-                                if (_name_content := n.get('content', None))
-                            ]:
-                        person['name']['forename'] = ' '.join(actual_forenames)
-                    # Only initials
-                    if initials := given_name.get('formatted_initials'):
-                        person['name']['initial'] = [initials]
-                    # Delete the “given”, not yet supported by relaton-py
-                    del person['name']['given']
-
-                # Adapt new affiliated organization format:
-                if affiliations := as_list(person.get('affiliation', [])):
-                    for affiliation in affiliations:
-                        if affiliated_org := affiliation.get('organization', {}):
-                            affiliation['organization'] = \
-                                normalize_org(affiliated_org)
-                    person['affiliation'] = affiliations
-
-            # Adapt new organization name format:
-            elif org:
-                contributor['organization'] = normalize_org(org)
-
     return data
 
 
