@@ -59,11 +59,11 @@ exclude_patterns: List[str] = []
 
 extlinks = {
     'issue': (
-        'https://github.com/ietf-ribose/bibxml-service/issues/%s',
+        'https://github.com/ietf-tools/bibxml-service/issues/%s',
         'bibxml-service GitHub issue #%s',
     ),
     'github': (
-        'https://github.com/ietf-ribose/bibxml-service/blob/main/%s',
+        'https://github.com/ietf-tools/bibxml-service/blob/main/%s',
         '%s (on GitHub)',
     ),
 }
