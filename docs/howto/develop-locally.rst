@@ -92,6 +92,11 @@ Running the service
 
 To simply serve the BibXML service, run ``docker compose up``.
 
+.. note:: If you get an *error* regarding missing ``SNAPSHOT`` variable,
+          check that your local Git repository has the tags fetched.
+          This variable is populated from latest Git tag and is used
+          to display service version in certain places.
+
 Web front-end should be available under ``localhost:8000``.
 API spec should be available under ``localhost:8000/api/v1``.
 
