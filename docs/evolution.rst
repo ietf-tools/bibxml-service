@@ -55,4 +55,25 @@ including xml2rfc adapter registry and function implementations, URLs,
 :term:`xml2rfc archive source` implementation, possibly more.
 
 
+Implementation
+==============
 
+Improvements that don’t radically changing how the service is organized.
+
+Dockerfile
+----------
+
+- Use a newer Python 3.11 image.
+
+  Should be possible when ``lxml`` has a wheel for 3.11,
+  without it building from source significantly complicates Dockerfile
+  and increases image size.
+
+
+- Make images slimmer.
+
+  It should be possible to improve performance by employing certain tactics
+  that would result in smaller images that don’t include unused dependencies
+  (e.g., Node for Celery, Git for web)
+
+  See also :issue:`97`.
