@@ -8,6 +8,13 @@ How to develop locally
 Setting up
 ==========
 
+Clone the repository. Ensure you have the tags fetched
+(if you have cloned a fork, they may not be fetched by default;
+``git fetch --all`` should address that).
+
+Requirements
+------------
+
 You will need Docker and Docker Compose.
 Configuration entry point lives in ``docker-compose.yml``
 at the root of the repository.
