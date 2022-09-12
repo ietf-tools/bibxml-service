@@ -9,24 +9,50 @@ Evolution
 Architecture
 ============
 
-New API
--------
+Consolidating authentication
+----------------------------
 
-Existing integrations can be switched from xml2rfc-style paths to new API.
-Using the new API endpoints (e.g., search)
-service consumers should be able to achieve their goals with less logic,
-and they can obtain the same XML.
+Instead of (admittedly, simple and probably sufficient) Basic HTTP auth,
+management GUI could use Datatracker OAuth2.
 
-After that, large part of :mod:`xml2rfc_compat` can be deprecated:
-xml2rfc adapter registry and function implementations, URLs, xml2rfc mirror source.
-
-Authentication
---------------
-
-Instead of Basic HTTP auth, management GUI could potentially
-use Datatracker OAuth2. (Datatracker API would need to provide
+Datatracker API would need to provide
 an endpoint to check whether given user has access to BibXML management.
 After that, :func:`management.auth.basic` could be renamed appropriately
 and use :func:`datatracker.oauth.get_client()` to make a request to that
-endpoint. However, ideally Datatracker OAuth2 automatic token refresh should
-be implemented first.)
+endpoint.
+
+Concerns
+~~~~~~~~
+
+- Due to requirement uncertainty, Datatracker OAuth2 authentication
+  for visitors can be turned on or off,
+  and at the moment of writing is off.
+  If it is not needed anymore, it might not be worth it to keep it
+  only for management GUI, and instead maintain Basic HTTP
+  and remove OAuth2 altogether.
+
+- If OAuth2 is deemed useful but the optionality remains,
+  the OAuth2 on/off switch
+  :data:`bibxml.settings.REQUIRE_DATATRACKER_AUTH`
+  may need to be renamed to clarify that it applies only to visitor GUI.
+
+  - If warranted, it might be worth replacing that simple switch
+    with a more complex setting
+    dictating which authentication mechanisms are used for what
+    or even a full access control implementation.
+
+Obsoleting the :term:`xml2rfc-style path` API
+---------------------------------------------
+
+Existing integrations can be switched
+from using :term:`xml2rfc-style paths <xml2rfc-style path>` to new API.
+With new API providing endpoints without prior equivalents (e.g., search),
+service consumers should be able to achieve their goals with less logic
+while obtaining the same XML in the end.
+
+After switching integrations, large parts of :mod:`xml2rfc_compat` can be deprecated
+including xml2rfc adapter registry and function implementations, URLs,
+:term:`xml2rfc archive source` implementation, possibly more.
+
+
+
