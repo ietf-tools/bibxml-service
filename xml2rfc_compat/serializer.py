@@ -1,5 +1,6 @@
 """
-Registers to_xml_string in this project’s serializer registry.
+This module registers :func:`~.to_xml_string`
+in this project’s serializer registry (:mod:`bib_models.serializers`).
 """
 from lxml import etree
 from relaton.serializers.bibxml import serialize as _original_serialize
@@ -13,6 +14,9 @@ __all__ = (
 
 @serializers.register('bibxml', 'application/xml')
 def to_xml_string(item: BibliographicItem, **kwargs) -> bytes:
+    """
+    A wrapper around :func:`relaton.serializers.bibxml.serialize`.
+    """
     # get a tree
     canonicalized_tree = etree.fromstring(
         # obtained from a canonicalized string representation
