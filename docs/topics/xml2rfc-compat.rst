@@ -45,7 +45,7 @@ xml2rfc-style path resolution algorithm
    in ``public/rfc/bibxml/_reference.foo.bar.xml``, adjusting it
    to ``public/rfc/bibxml/reference.foo.bar.xml``.
 
-2. A docid mapping is looked up for the normalized path.
+2. A :term:`docid` mapping is looked up for the normalized path.
    If found, bibliographic item with mapped docid
    is attempted to be retrieved from authoritative sources
    and its XML serialization is returned.
