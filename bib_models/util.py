@@ -157,7 +157,8 @@ def normalize_relaxed(data: Dict[str, Any]):
             if person:
                 if forenames := person['name']['given']['forename']:
                     for i in range(len(forenames)):
-                        person['name']['given']['forename'][i]['content'] = person['name']['given']['forename'][i]['initial']
+                        person['name']['given']['forename'][i]['content'] = \
+                            person['name']['given']['forename'][i]['initial']
 
                 # Adapt new affiliated organization format:
                 if affiliations := as_list(person.get('affiliation', [])):
