@@ -160,18 +160,6 @@ def normalize_relaxed(data: Dict[str, Any]):
                         person['name']['given']['forename'][i]['content'] = \
                             person['name']['given']['forename'][i]['initial']
 
-                # Adapt new affiliated organization format:
-                if affiliations := as_list(person.get('affiliation', [])):
-                    for affiliation in affiliations:
-                        if affiliated_org := affiliation.get('organization', {}):
-                            affiliation['organization'] = \
-                                normalize_org(affiliated_org)
-                    person['affiliation'] = affiliations
-
-            # Adapt new organization name format:
-            elif org:
-                contributor['organization'] = normalize_org(org)
-
     return data
 
 
