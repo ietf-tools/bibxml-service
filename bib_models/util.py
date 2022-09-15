@@ -163,15 +163,6 @@ def normalize_relaxed(data: Dict[str, Any]):
     return data
 
 
-def normalize_org(raw: Dict[str, Any]) -> Dict[str, Any]:
-    if org_name := raw.get('name', None):
-        if isinstance(org_name, list):
-            raw['name'] = [normalize_maybe_formatted_str(n) for n in org_name]
-        else:
-            raw['name'] = [normalize_maybe_formatted_str(org_name)]
-    return raw
-
-
 def normalize_maybe_formatted_str(raw: str | Dict[str, Any]) -> str:
     if isinstance(raw, str):
         return raw
