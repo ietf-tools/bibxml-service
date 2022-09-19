@@ -1,12 +1,18 @@
-version: "3.9"
+version: "3.3"
 
 services:
   # Single instance only.
   redis:
+    restart: unless-stopped
     image: redis
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
 
   # Single instance only.
   db:
+    restart: unless-stopped
     build:
       context: ops
       dockerfile: db.Dockerfile
@@ -19,6 +25,13 @@ services:
       POSTGRES_DB: ${DB_NAME:?missing DB name}
       POSTGRES_USER: ${DB_NAME:?err}
       POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
+    user: "${UID}:${GID}"
+    volumes:
+      - ./bibdb:/var/lib/postgresql/data
 
   # Must be run once, pre deploy.
   # Built image is reused by "web" and "celery".
@@ -42,7 +55,7 @@ services:
         python manage.py migrate &&
         python manage.py check --deploy
     environment:
-      PRIMARY_HOSTNAME: ${HOST:?err}
+      PRIMARY_HOSTNAME: ${HOST_NAME?err}
       DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
       DJANGO_SECRET: "${DJANGO_SECRET:?err}"
@@ -64,8 +77,9 @@ services:
 
   # Can be run in multiple instances.
   web:
+    restart: unless-stopped
     image: local/web-precheck:latest
-    hostname: ${HOST:?err}
+    hostname: ${HOST_NAME?err}
     command:
       - /bin/sh
       - -c
@@ -81,7 +95,7 @@ services:
     ports:
       - "${PORT:?missing port to expose web service under}:8000"
     environment:
-      PRIMARY_HOSTNAME: ${HOST:?missing main hostname (e.g., localhost for development)}
+      PRIMARY_HOSTNAME: ${HOST_NAME?missing main hostname (e.g., localhost for development)}
       INTERNAL_HOSTNAMES: "web"
       DEBUG: ${DEBUG:-0}
       SOURCE_REPO_URL: ${SOURCE_REPO_URL:?missing source repository URL}
@@ -111,11 +125,16 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
       REDIS_PORT: 6379
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
     depends_on:
       - web-precheck
 
   # Single instance only.
   celery:
+    restart: unless-stopped
     image: local/web-precheck:latest
     command:
       - /bin/sh
@@ -125,7 +144,7 @@ services:
         ./wait-for-migrations.sh &&
         celery -A sources.celery:app worker -B -l info -c 1
     environment:
-      PRIMARY_HOSTNAME: ${HOST:?err}
+      PRIMARY_HOSTNAME: ${HOST_NAME?err}
       INTERNAL_HOSTNAMES: "celery"
       DATASET_TMP_ROOT: "/data/datasets"
       DEBUG: ${DEBUG:-0}
@@ -146,6 +165,10 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
       AUTO_REINDEX_INTERVAL: ${AUTO_REINDEX_INTERVAL}
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
     depends_on:
       - web-precheck
       - redis
@@ -153,6 +176,7 @@ services:
       - "9080:9080"
 
   celery-exporter:
+    restart: unless-stopped
     image: danihodovic/celery-exporter
     command: "--broker-url=redis://redis:6379"
     depends_on:
