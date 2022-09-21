@@ -208,3 +208,27 @@ Marking new release
 -------------------
 
 See :doc:`/howto/mark-releases`.
+
+
+Working on Python dependencies
+------------------------------
+
+If you are working on, for example, ``relaton-py``
+and want to test it in context of this service,
+you may want to be able to make changes to it on your host system
+but also have those changes reflected in container at runtime
+without publishing the package.
+
+One way to achieve that is by:
+
+1. Placing ``relaton-py`` repository root as a sibling of this service’s
+   repository root.
+2. Mounting package root (where top-level ``__init__.py`` resides)
+   directly into the container by adding the following entry
+   to ``web.volumes`` in project’s Compose file
+   (for development only without committing, of course)::
+
+       - ../relaton-py/relaton:/usr/local/lib/python3.10/site-packages/relaton:ro
+
+.. note:: Make sure the parent directory is set up to be available to containers
+          in Docker Desktop resource sharing preferences.
