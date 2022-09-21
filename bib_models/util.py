@@ -157,8 +157,9 @@ def normalize_relaxed(data: Dict[str, Any]):
             if person:
                 if forenames := person['name']['given']['forename']:
                     for i in range(len(forenames)):
-                        person['name']['given']['forename'][i]['content'] = \
-                            person['name']['given']['forename'][i]['initial']
+                        if initial:= person['name']['given']['forename'][i].get('initial') \
+                                     and not person['name']['given']['forename'][i].get('content'):
+                            person['name']['given']['forename'][i]['content'] = initial
 
     return data
 
