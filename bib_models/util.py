@@ -155,45 +155,13 @@ def normalize_relaxed(data: Dict[str, Any]):
                     pass
 
             if person:
-                # Adapt new name format:
-                if given_name := person.get('name', {}).get('given', {}):
-                    # Forenames that are not initials
-                    if actual_forenames := [
-                                _name_content
-                                for n in given_name.get('forename')
-                                if (_name_content := n.get('content', None))
-                            ]:
-                        person['name']['forename'] = ' '.join(actual_forenames)
-                    # Only initials
-                    if initials := given_name.get('formatted_initials'):
-                        person['name']['initial'] = [initials]
-                    # Delete the “given”, not yet supported by relaton-py
-                    del person['name']['given']
-
-                # Adapt new affiliated organization format:
-                if affiliations := as_list(person.get('affiliation', [])):
-                    for affiliation in affiliations:
-                        if affiliated_org := affiliation.get('organization', {}):
-                            affiliation['organization'] = \
-                                normalize_org(affiliated_org)
-                    person['affiliation'] = affiliations
-
-            # Adapt new organization name format:
-            elif org:
-                contributor['organization'] = normalize_org(org)
+                if forenames := person['name']['given']['forename']:
+                    for i in range(len(forenames)):
+                        if initial:= person['name']['given']['forename'][i].get('initial') \
+                                     and not person['name']['given']['forename'][i].get('content'):
+                            person['name']['given']['forename'][i]['content'] = initial
 
     return data
-
-
-def normalize_org(raw: Dict[str, Any]) -> Dict[str, Any]:
-    if org_name := raw.get('name', None):
-        if isinstance(org_name, list):
-            raw['name'] = [normalize_maybe_formatted_str(n) for n in org_name]
-        else:
-            raw['name'] = [normalize_maybe_formatted_str(org_name)]
-    if abbr := raw.get('abbreviation', None):
-        raw['abbreviation'] = normalize_maybe_formatted_str(abbr)
-    return raw
 
 
 def normalize_maybe_formatted_str(raw: str | Dict[str, Any]) -> str:

@@ -8,7 +8,7 @@ from relaton.models import Date
 from relaton.models.bibitemlocality import Locality, LocalityStack
 
 from bib_models import GenericStringValue, Link
-from bib_models import Person, PersonAffiliation, PersonName
+from bib_models import Person, PersonAffiliation, FullName, GivenName
 from bib_models import Title, Contributor, Organization
 from bib_models import construct_bibitem, DocID
 from common.util import as_list
@@ -189,16 +189,16 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
                     abbreviation=None,
                 ),
             ) for aff in crossref_author['affiliation']],
-            name=PersonName(
+            name=FullName(
                 surname=GenericStringValue(
                     content=crossref_author['family'],
                 ) if 'family' in crossref_author else None,
                 completename=GenericStringValue(
                     content=crossref_author['name'],
                 ) if 'name' in crossref_author else None,
-                forename=[GenericStringValue(
+                given=GivenName(forename=[GenericStringValue(
                     content=crossref_author['given'],
-                )] if 'given' in crossref_author else [],
+                )] if 'given' in crossref_author else [])
             ),
         ),
     )
