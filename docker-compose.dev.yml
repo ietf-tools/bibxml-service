@@ -5,6 +5,18 @@
 
 services:
   web:
+    command:
+      # This command overrides the one from the “main” Compose file
+      # in order to run the extra `npm install` required
+      # after the mounted `code` directory overwrites `node_modules`
+      # created during Dockerfile build process.
+      - /bin/sh
+      - -c
+      - |
+        export SNAPSHOT=$$(git describe --abbrev=0) &&
+        npm install &&
+        ./wait-for-migrations.sh &&
+        python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
   celery:
