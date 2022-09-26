@@ -12,7 +12,7 @@ from relaton.models.bibdata import BibliographicItem, DocID
 log = logging.getLogger(__name__)
 
 
-def construct_bibitem(data: Dict[str, Any], strict=True) -> Tuple[
+def construct_bibitem(data: Dict[str, Any], strict: bool = True) -> Tuple[
     BibliographicItem,
     Optional[List[ValidationErrorDict]],
 ]:
@@ -98,7 +98,7 @@ def get_primary_docid(raw_ids: List[DocID]) -> Optional[DocID]:
         return None
 
 
-def normalize_relaxed(data: Dict[str, Any]):
+def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Normalizes possibly relaxed/abbreviated deserialized structure,
     where possible, to minimize validation errors.
