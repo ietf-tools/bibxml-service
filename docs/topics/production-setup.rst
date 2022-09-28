@@ -2,6 +2,9 @@
 Production setup
 ================
 
+.. contents::
+   :local:
+
 .. seealso:: :rfp:req:`6`
 
 .. seealso::
@@ -170,3 +173,62 @@ I.e., there should be at most 1 instance of each container
              within the Celery container, either.
              Indexing tasks, as currently implemented,
              are not intended to be run in parallel.
+
+
+Security
+========
+
+Being purely a query service operating on open bibliographic data,
+generally speaking there is not much to be gained from an attack.
+
+.. note:: This does not excuse service operators from ensuring
+          a potential successful attacker can’t gain control
+          of the infrastructure beyond the service itself.
+          (Use proper least-privilege access control practices
+          with tools such as IAM in case of AWS.)
+
+That said, feasible attack vectors include:
+
+- Control over authoritative sources of bibliographic data,
+  and tools used to build those sources.
+- User input for searching bibliographic data.
+
+Authoritative sources of bibliographic data
+-------------------------------------------
+
+Git repositories under the ``ietf-tools`` Github organization serve as sources of truth,
+periodically compiled (through the use of Github Actions)
+from third-party authoritative bibliographic data sources
+using Ruby gems with ``relaton-cli`` gem as entry point.
+
+**Data stored in those repositories is considered trusted.**
+Hence, a malicious party being able to modify GHA workflows in those repositories
+or taking control over Ruby gems invoked by those workflows would be able to
+alter bibliographic data available in the service, as well as exploit vulnerabilities
+in YAML deserializers used during bibliographic data indexing.
+
+.. seealso:: :doc:`/topics/architecture`, :doc:`/topics/sourcing`
+
+User input
+----------
+
+The service accepts user input for the purposes of querying bibliographic data.
+User input is sanitized and interpolated following Django’s recommendations [0]_
+before being passed to PostgreSQL database server.
+
+The most complex logic for query construction is defined in
+:func:`main.query.search_refs_relaton_field`. See function documentation
+on where it is caller’s responsibility to rule out unsanitized user input being passed
+to PostgreSQL server.
+
+.. note::
+
+   The PostgreSQL database itself wouldn’t offer much,
+   serving more or less as a cache of non-sensitive bibliographic data
+   obtained from open Git repositories serving as authoritative sources.
+   In other words, wiping the database would not cause data loss.
+   
+   However, a successful attack against the server could result
+   in privilege escalation.
+
+.. [0] https://docs.djangoproject.com/en/4.1/topics/db/sql/#passing-parameters-into-raw
