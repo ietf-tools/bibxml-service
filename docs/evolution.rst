@@ -41,6 +41,21 @@ Concerns
     dictating which authentication mechanisms are used for what
     or even a full access control implementation.
 
+
+Requiring authentication to mitigate certain attacks
+----------------------------------------------------
+
+There is a tradeoff between search flexibility and performance.
+
+High flexibility from being able to supply low-level JSON queries
+means the service shifts part of the responsibility for not
+abusing the system onto users, who can overload the database
+with certain queries.
+
+This could be mitigated by requiring authentication
+for certain kinds of queries.
+
+
 Obsoleting the :term:`xml2rfc-style path` API
 ---------------------------------------------
 
