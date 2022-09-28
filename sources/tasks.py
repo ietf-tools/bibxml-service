@@ -1,7 +1,7 @@
 """
 Celery task for working with indexable sources.
 """
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 import traceback
 from textwrap import indent
 from celery.utils.log import get_task_logger
@@ -16,12 +16,17 @@ from .models import SourceIndexationOutcome
 logger = get_task_logger(__name__)
 
 
-def fetch_and_index_task(task, dataset_id: str, refs=None):
+def fetch_and_index_task(
+    task,
+    dataset_id: str,
+    refs: Optional[List[str]] = None,
+    force=False,
+):
     """(Re)indexes indexable source with given ID.
 
-    :param str dataset_id: source ID used during registration.
-    :param refs: a list of items to index,
-                 if not provided the entire dataset is indexed
+    :param str dataset_id: registered indexable source ID.
+    :param refs: see :attr:`sources.indexable.IndexableSource.index`
+    :param force: see :attr:`sources.indexable.IndexableSource.index`
 
     :rtype: sources.task_status.IndexingTaskCeleryMeta
     """
@@ -79,7 +84,12 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
             pass
 
     try:
-        found, indexed = indexable_source.index(refs, update_status, on_error)
+        found, indexed = indexable_source.index(
+            refs,
+            update_status,
+            on_error,
+            force,
+        )
 
     except SystemExit:
         logger.exception(

@@ -31,6 +31,15 @@ that reads the data and populates the database.
 
 Currently, any indexable source must be a Git repository.
 
+After each successful indexing of a given dataset,
+the task caches Git HEAD commit hash in Redis. Indexing is skipped if
+current HEAD hash is the same as the one cached previously
+to not waste resources unnecessarily.
+This can be overridden by passing a ``force`` GET query parameter,
+which is done in management GUI (i.e., triggering reindexing from GUI
+will always trigger a full indexing run even if there were no commits
+in the repository).
+
 .. seealso:: :mod:`sources.indexable` for indexable source registry implementation
 
 .. seealso:: :doc:`/howto/auto-reindex-sources`
