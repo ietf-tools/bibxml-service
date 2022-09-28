@@ -245,10 +245,14 @@ def index_dataset(ds_id, relaton_path, refs=None,
                                 BibliographicItem(**ref_data)
                             except Exception:
                                 on_error(ref, err_desc)
+                                on_error(
+                                    ref,
+                                    'Errors not resolved:\n%s' % err_desc)
                             else:
                                 on_error(
                                     ref,
-                                    'resolved (normalized):\n%s' % err_desc)
+                                    'Errors resolved (normalized):\n%s'
+                                    % err_desc)
 
                     RefData.objects.update_or_create(
                         ref=ref,
