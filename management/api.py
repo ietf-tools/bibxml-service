@@ -10,7 +10,7 @@ from sources.task_status import get_dataset_task_history, push_task
 from sources import indexable
 
 
-def run_indexer(request, dataset_name):
+def run_indexer(request, dataset_name: str):
     """Starts indexing for given dataset."""
 
     force = request.GET.get('force', False)
