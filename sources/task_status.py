@@ -88,7 +88,7 @@ def get_task_ids(dataset_id, limit=10) -> List[str]:
     return cache.lrange(dataset_id, 0, limit)
 
 
-def push_task(dataset_id, task_id):
+def push_task(dataset_id, task_id) -> None:
     """Adds given ``task_id`` to the top of the list for given dataset,
     and sets a key with task metadata (currently, requested refs).
 
