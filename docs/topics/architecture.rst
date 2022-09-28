@@ -24,6 +24,10 @@ Github Actions workflows, which retrieve and parse bibliographic data
 from authoritative sources and output it formatted consistently
 per the Relaton data model.
 
+The PostgreSQL database that is part of the service does not contain
+critical data, losing all data would only require reindexing
+the above bibliographic data sources.
+
 .. seealso::
 
    * For a full list of Relaton datasets and how they are generated:
