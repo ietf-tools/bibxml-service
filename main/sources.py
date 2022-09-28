@@ -53,10 +53,10 @@ DATASET_SOURCE_OVERRIDES = getattr(
     'DATASET_SOURCE_OVERRIDES',
     {})
 
-DEFAULT_DATASET_REPO_URL_TEMPLATE = getattr(
+DEFAULT_DATASET_REPO_URL_TEMPLATE = cast(str, getattr(
     settings,
     'DEFAULT_DATASET_REPO_URL_TEMPLATE',
-    None)
+    None))
 
 DEFAULT_DATASET_REPO_BRANCH = getattr(
     settings,
