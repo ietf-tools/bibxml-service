@@ -18,7 +18,7 @@
 
   // If we support permissions
   if (navigator.permissions) {
-    navigator.permissions.query({name: "clipboard-write"}).then(result => {
+    navigator.permissions.query({name: "clipboard-write"}).then((result => {
       // And we get them
       if (result.state == "granted" || result.state == "prompt") {
         // Initialize widget with copy button
@@ -27,7 +27,11 @@
         // Otherwise, initialize widget with select-all button
         els.forEach(initSelectWidget);
       }
-    });
+    }), (err => {
+      console.error("Failed clipboard permissions check", err);
+      // Otherwise, initialize widget with select-all button
+      els.forEach(initSelectWidget);
+    }));
   } else {
     // Otherwise, initialize widget with select-all button
     els.forEach(initCopyWidget);
