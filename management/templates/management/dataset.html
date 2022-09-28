@@ -12,7 +12,7 @@
   {% url "api_reset_index" dataset_id as reset_url %}
 
   <div class="w-full md:flex md:items-center md:justify-center text-center gap-x-2">
-    {% include "api_button.html" with label="Queue reindex task" endpoint=reindex_url method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" htmlclass="" %}
+    {% include "api_button.html" with label="Queue reindex task" endpoint=reindex_url get_query='{"force": true}' method="POST" openapi_op_id="indexDataset" openapi_spec_root="/api/v1/" htmlclass="" %}
     {% include "api_button.html" with label="Reset index" endpoint=reset_url method="POST" openapi_op_id="resetDatasetIndex" openapi_spec_root="/api/v1/" htmlclass="" %}
   </div>
 

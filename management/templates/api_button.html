@@ -4,6 +4,9 @@
     {{ htmlclass }}
   "
   data-api-endpoint="{{ endpoint }}"
+  {% if get_query %}
+    data-api-get-query='{{ get_query|safe }}'
+  {% endif %}
   data-api-method="{{ method }}"
   data-api-action-label="{{ label }}"
   data-api-spec-op-id="{{ openapi_op_id }}"

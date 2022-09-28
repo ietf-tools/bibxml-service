@@ -55,20 +55,24 @@ class IndexableSource:
             Optional[List[str]],
             Optional[Callable[[str, int, int], None]],
             Optional[Callable[[str, str], None]],
+            Optional[bool],
         ],
         Tuple[int, int],
     ]
     """
-    The indexer function. Takes 3 positional arguments,
+    The indexer function. Takes 4 positional arguments,
     any of which can be None:
 
-    1) a list of source-specific references to index
+    1) ``refs``, a list of source-specific references to index
        (absence means “index all”)
     2) an on-progress handler
        (which should be called with an action as a string
        and 2 ints, total and indexed).
     3) an on-error handler, called with 2 strings
        (problematic item and error description).
+    4) ``force``, a flag that will ensure the indexer runs even
+       if cached HEAD commit hash from previous indexation
+       has not changed.
 
     Returns 2-tuple of integers
     (number of found items, number of indexed items).
@@ -179,8 +183,9 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
         @functools.wraps(index_info['indexer'])
         def handle_index(
             refs: Optional[List[str]],
-            on_progress: Optional[Callable[[str, int, int], None]],
-            on_item_error: Optional[Callable[[str, str], None]],
+            on_progress: Optional[Callable[[str, int, int], None]] = None,
+            on_item_error: Optional[Callable[[str, str], None]] = None,
+            force=False,
         ) -> Tuple[int, int]:
             work_dir_paths: List[str] = []
             repo_heads: List[str] = []
@@ -215,7 +220,7 @@ def register_git_source(source_id: str, repos: List[Tuple[str, str]]):
 
             heads_serialized = ', '.join(repo_heads)
 
-            if cache.get(latest_indexed_heads_key) != heads_serialized:
+            if force or cache.get(latest_indexed_heads_key) != heads_serialized:
                 log.info(
                     "Repositories changed for %s, starting index",
                     source_id)
