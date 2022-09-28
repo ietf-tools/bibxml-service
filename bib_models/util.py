@@ -134,8 +134,9 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
         ]
 
     for contributor in data.get('contributor', []):
-        if ((person := contributor.get('person', None))
-                or (org := contributor.get('organization', None))):
+        person = contributor.get('person', None)
+        org = contributor.get('organization', None)
+        if person or org:
 
             # Adapt contacts:
             person_or_org = person or org
