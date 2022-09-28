@@ -114,6 +114,11 @@ for better development experience you can run the command this way instead::
 
 This will mount source code directory and enable hot reload on changes.
 
+.. note:: ``celery`` container will not be reloaded.
+          If iterating on logic that runs as part of an async task
+          (including, e.g., ``handle_index()`` in :mod:`sources.indexable`),
+          you’ll have to Ctrl+C stop and restart Compose.
+
 If you want to run the service together with monitoring helper services,
 run this::
 
