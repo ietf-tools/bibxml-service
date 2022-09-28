@@ -129,7 +129,7 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
 
     if keywords := data.get('keyword', []):
         data['keyword'] = [
-            normalize_maybe_formatted_str(item)
+            to_plain_string(item)
             for item in keywords
         ]
 
@@ -164,11 +164,15 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def normalize_maybe_formatted_str(raw: str | Dict[str, Any]) -> str:
+def to_plain_string(raw: str | Dict[str, Any]) -> str:
+    """
+    Given either a formatted string dict or a plain string,
+    returns a plain string (formatted string’s ``content`` key).
+    """
     if isinstance(raw, str):
         return raw
     elif isinstance(raw, dict) and (content := raw.get('content', None)):
-        return content
+        return str(content)
     else:
         return str(raw)
 
