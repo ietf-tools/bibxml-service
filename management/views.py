@@ -91,7 +91,8 @@ def dataset(request, dataset_id: str):
     try:
         source = indexable.registry[dataset_id]
     except KeyError:
-        return HttpResponseNotFound(f"Source {dataset_id} not found")
+        return HttpResponseNotFound(
+            f"Source {dataset_id} not found".encode('utf-8'))
 
     return render(request, 'management/dataset.html', dict(
         **shared_context,
