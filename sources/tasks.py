@@ -36,7 +36,7 @@ def fetch_and_index_task(task, dataset_id: str, refs=None):
 
     push_task(dataset_id, task.request.id)
 
-    task_desc: IndexingTaskCeleryMeta = dict(
+    task_desc = IndexingTaskCeleryMeta(
         action='starting indexing {}'.format(dataset_id),
         progress={'total': 0, 'current': 0},
         dataset_id=dataset_id,
