@@ -156,11 +156,12 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                     pass
 
             if person:
-                if forenames := person['name']['given']['forename']:
-                    for i in range(len(forenames)):
-                        if initial:= person['name']['given']['forename'][i].get('initial') \
-                                     and not person['name']['given']['forename'][i].get('content'):
-                            person['name']['given']['forename'][i]['content'] = initial
+                if ((gname := person.get('name', {}).get('given', None))
+                        and (fnames := as_list(gname.get('forename', [])))):
+                    gname['forename'] = [
+                        ensure_formatted_string_content(fname)
+                        for fname in fnames
+                    ]
 
     return data
 
@@ -176,6 +177,19 @@ def to_plain_string(raw: str | Dict[str, Any]) -> str:
         return str(content)
     else:
         return str(raw)
+
+
+def ensure_formatted_string_content(fname: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Make sure given formatted string has non-empty ``content``.
+
+    This is relevant for, e.g., forenames, which per Relaton spec have optional
+    ``content``.
+    """
+    if not fname.get('content', None):
+        return dict(content='', **fname)
+    else:
+        return fname
 
 
 def normalize_version(raw: str) -> Dict[str, Any]:
