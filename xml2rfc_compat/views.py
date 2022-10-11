@@ -38,7 +38,7 @@ def resolve_mapping(
     Optional[BibliographicItem],
     Optional[str],
 ]:
-    """Returns a 3-tuple of mapping configuration, resolved item,
+    """Returns a 2-tuple of resolved item,
     and error as a string, any can be None.
     Does not raise exceptions.
 
