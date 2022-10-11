@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, TypedDict, Dict, Callable
+from typing import Tuple, Optional, TypedDict, Dict, Callable, Union
 import re
 import logging
 
@@ -128,7 +128,10 @@ def handle_xml2rfc_path(
     xml2rfc_subpath: str,
     dirname: str,
     anchor: str,
-) -> JsonResponse:
+) -> Union[
+    HttpResponse,
+    JsonResponse
+]:
     """View function that resolves an xml2rfc path.
 
     Requires an :term:`xml2rfc adapter` to be registered for given
