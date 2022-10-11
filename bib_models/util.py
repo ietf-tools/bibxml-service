@@ -1,4 +1,4 @@
-from typing import cast, Optional, List, Tuple, Dict, Any
+from typing import cast, Optional, List, Tuple, Dict, Any, Union
 import logging
 
 from pydantic import ValidationError
@@ -166,7 +166,7 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def to_plain_string(raw: str | Dict[str, Any]) -> str:
+def to_plain_string(raw: Union[str, Dict[str, Any]]) -> str:
     """
     Given either a formatted string dict or a plain string,
     returns a plain string (formatted string’s ``content`` key).
