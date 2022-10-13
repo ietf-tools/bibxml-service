@@ -18,6 +18,9 @@ services:
         ./wait-for-migrations.sh &&
         python manage.py runserver 0.0.0.0:8000
     volumes:
+      # If working on relaton-py, it could be mounted as follows
+      # (given Docker can mount parent directory)
+      # - ../relaton-py/relaton:/usr/local/lib/python3.10/site-packages/relaton:ro
       - .:/code
   celery:
     volumes:
