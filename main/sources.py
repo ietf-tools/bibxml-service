@@ -244,7 +244,6 @@ def index_dataset(ds_id, relaton_path, refs=None,
                                 normalize_relaxed(ref_data)
                                 BibliographicItem(**ref_data)
                             except Exception:
-                                on_error(ref, err_desc)
                                 on_error(
                                     ref,
                                     'Errors not resolved:\n%s' % err_desc)
