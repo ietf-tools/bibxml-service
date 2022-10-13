@@ -38,5 +38,14 @@
         </span>
       </div>
     </article>
+  {% empty %}
+    <div class="p-4 grid place-content-center">
+      <p>
+        No xml2rfc paths available.
+        Most likely,
+        the <a class="link" href="{% url "manage_indexable_source" "xml2rfc" %}"><code>xml2rfc</code> source</a>
+        has not been indexed yet.
+      </p>
+    </div>
   {% endfor %}
 {% endblock %}
