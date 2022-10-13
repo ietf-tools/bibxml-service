@@ -24,4 +24,7 @@ services:
       - .:/code
   celery:
     volumes:
+      # If working on relaton-py, it could be mounted as follows
+      # (given Docker can mount parent directory)
+      # - ../relaton-py/relaton:/usr/local/lib/python3.10/site-packages/relaton:ro
       - .:/code
