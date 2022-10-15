@@ -39,7 +39,7 @@ class RefData(models.Model):
     """
 
     body = models.JSONField()
-    """Contains canonical Relaton representation
+    """Canonical Relaton representation
     of :term:`bibliographic item`.
     Can be used to construct
     a :class:`relaton.models.bibdata.BibliographicItem` instance.
