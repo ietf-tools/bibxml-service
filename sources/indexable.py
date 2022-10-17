@@ -48,6 +48,11 @@ class IndexableSource:
 
     An instance of this class will be automatically created
     when you use the :func:`register_git_source` decorator.
+
+    Subsequently, when the project operates on an registered source
+    (e.g., when indexing is requested), this is the spec.
+
+    .. seealso:: :class:`~.IndexableSourceToRegister`
     """
 
     index: Callable[
@@ -102,7 +107,10 @@ that handles data retrieval and indexing.
 
 
 class IndexableSourceToRegister(TypedDict, total=True):
-    """A dictionary expected by indexable source registration."""
+    """A dictionary expected by indexable source registration.
+
+    When you *register* a pluggable indexable source, this is the spec.
+    """
 
     indexer: Callable[
         [
