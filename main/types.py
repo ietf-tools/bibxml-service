@@ -140,7 +140,10 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     “the latest document to the oldest”.
     """
 
-    # TODO: mypy complains about the following overrides. Ignore?
+    # TODO: mypy complains about the following overrides.
+    # The model assumes only one doctype/docnumber,
+    # but an item combined from multiple sources may have more than one
+    # of either.
 
     doctype: Union[str, List[str], None] = None
     """Parent defines ``doctype`` as an optional string,
