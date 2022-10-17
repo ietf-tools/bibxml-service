@@ -2,6 +2,10 @@ from django.db import models
 
 
 class SourceIndexationOutcome(models.Model):
+    """
+    Serves for capturing indexing outcomes for management GUI and API.
+    """
+
     source_id = models.CharField(max_length=250, db_index=True)
     """Identifier of the :term:`indexable source`."""
 
