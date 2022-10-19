@@ -193,6 +193,17 @@ def normalize_role(raw: str | Dict[str, Any]) -> Dict[str, Any]:
     else:
         # Must be an invalid role
         return {'description': str(raw)}
+
+
+def to_formatted_string(raw: str | Dict[str, Any]) -> Dict[str, Any]:
+    if isinstance(raw, str):
+        return dict(content=raw)
+    elif isinstance(raw, dict) and isinstance(raw.get('content', None), str):
+        return raw
+    else:
+        return dict(content=str(raw))
+
+
 def ensure_formatted_string_content(fname: Dict[str, Any]) -> Dict[str, Any]:
     """
     Make sure given formatted string has non-empty ``content``.
