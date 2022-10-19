@@ -17,7 +17,7 @@ services:
     image: local/test:latest
     build:
       context: .
-      dockerfile: test2.Dockerfile
+      dockerfile: test.Dockerfile
       args:
         SNAPSHOT: ${SNAPSHOT:?err}
     depends_on:
