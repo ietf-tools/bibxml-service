@@ -30,9 +30,9 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
 RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 
 # Install Playwright (required for tests only)
-RUN ["pip", "install", "playwright"]
-RUN ["python", "-m", "playwright", "install"]
-RUN ["playwright", "install-deps"]
+#RUN ["pip", "install", "playwright"]
+#RUN ["python", "-m", "playwright", "install"]
+#RUN ["playwright", "install-deps"]
 
 # Install Coverage (required for tests only)
 RUN ["pip", "install", "coverage"]
