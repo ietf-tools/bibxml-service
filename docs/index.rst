@@ -46,6 +46,11 @@ Code layout
 .. parsed-literal::
 
    ├── README.rst
+   ├── RELATON_VERSION.txt
+   │   Version (including major and minor) of Relaton’s Ruby toolchain
+   │   that produces bibliographic data YAML compatible with this service.
+   │   (Patch versions can be assumed to not introduce breaking schema changes.)
+   │   This file can be consumed by bibliographic data YAML generators.
    │
    │
    │   Client-side code:
