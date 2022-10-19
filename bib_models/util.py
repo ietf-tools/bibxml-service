@@ -163,6 +163,9 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                         for fname in fnames
                     ]
 
+        if roles := as_list(contributor.get('role', None) or []):
+            contributor['role'] = [normalize_role(r) for r in roles]
+
     return data
 
 
@@ -179,6 +182,17 @@ def to_plain_string(raw: str | Dict[str, Any]) -> str:
         return str(raw)
 
 
+def normalize_role(raw: str | Dict[str, Any]) -> Dict[str, Any]:
+    """Takes a role that is possibly a string and returns a dict
+    that complies with :class:`relaton.bibdata.Role` definition.
+    """
+    if isinstance(raw, str):
+        return {'type': raw}
+    elif isinstance(raw, dict) and ('type' in raw or 'description' in raw):
+        return raw
+    else:
+        # Must be an invalid role
+        return {'description': str(raw)}
 def ensure_formatted_string_content(fname: Dict[str, Any]) -> Dict[str, Any]:
     """
     Make sure given formatted string has non-empty ``content``.
