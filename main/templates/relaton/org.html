@@ -1,0 +1,10 @@
+{% load common %}
+{# Expects `val` to be an Organization instance #}
+
+{% with org_name=val.name|as_list|first %}
+  {% if val.abbreviation.content %}
+    {{ val.abbreviation.content }}
+  {% elif org_name.content %}
+    {{ org_name.content }}
+  {% endif %}
+{% endwith %}

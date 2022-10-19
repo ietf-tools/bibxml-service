@@ -20,9 +20,9 @@
   {% endif %}
 
   {% if val.organization.abbreviation or val.organization.name %}
-    {% with org_name=val.organization.name|as_list|first link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
+    {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
       <a class="link" href="{{ link }}" title="Organization’s name or abbreviation">
-        {{ val.organization.abbreviation|default:org_name|default:"N/A" }}
+        {% include "relaton/org.html" with val=val.organization %}
       </a>
     {% endwith %}
   {% elif val.person.name %}
