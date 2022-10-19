@@ -7,9 +7,6 @@ RUN ["python", "-m", "pip", "install", "--upgrade", "pip"]
 # Could probably be removed for non-slim Python image
 RUN apt-get update && apt-get install -yq curl libpq-dev build-essential git
 
-# To build lxml from source, need at least this (but maybe better stick to wheels):
-# RUN apt-get install -yq libxml2-dev zlib1g-dev libxslt-dev
-
 # Copy and install requirements separately to let Docker cache layers
 COPY requirements.txt /code/requirements.txt
 
@@ -36,9 +33,6 @@ ENV API_SECRET=test
 
 # Copy the rest of the codebase
 COPY . /code
-
-#RUN ["python", "manage.py", "collectstatic", "--noinput"]
-#RUN ["python", "manage.py", "compress"]
 
 ENV WAIT_VERSION 2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
