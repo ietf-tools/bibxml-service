@@ -3,7 +3,20 @@
 {% if val.organization.abbreviation or val.organization.name or val.person.name %}
 
   {% if val.role %}
-    <span title="Participant role(s)" class="opacity-50">{{ val.role|as_list|join:", " }}</span>
+    <span title="Participant role(s)" class="opacity-50">
+      {% for role in val.role|as_list %}
+        {# NB: roles should be sorted by type for ifchanged to make sense #}
+        {% ifchanged role.type %}
+          {# We just ignore roles without type for now #}
+          {% if role.type %}
+            <span title="{{ role.description|default:"" }}" class="
+              {# Separate roles with a comma #}
+              after:inline after:content-[',_'] last:after:content-none
+            ">{{ role.type }}</span>
+          {% endif %}
+        {% endifchanged %}
+      {% endfor %}
+    </span>
   {% endif %}
 
   {% if val.organization.abbreviation or val.organization.name %}
