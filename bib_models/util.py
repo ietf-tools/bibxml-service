@@ -166,6 +166,16 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
         if roles := as_list(contributor.get('role', None) or []):
             contributor['role'] = [normalize_role(r) for r in roles]
 
+    if relations := data.get('relation', []):
+        data['relation'] = [
+            {
+                "bibitem": normalize_relaxed(bibitem),
+                **r,
+            }
+            for r in relations
+            if (bibitem := r.get('bibitem'))
+        ]
+
     return data
 
 
