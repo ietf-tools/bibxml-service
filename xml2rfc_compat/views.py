@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, TypedDict, Dict, Callable
+from typing import Tuple, Optional, TypedDict, Dict, Callable, Union
 import re
 import logging
 
@@ -38,7 +38,7 @@ def resolve_mapping(
     Optional[BibliographicItem],
     Optional[str],
 ]:
-    """Returns a 3-tuple of mapping configuration, resolved item,
+    """Returns a 2-tuple of resolved item,
     and error as a string, any can be None.
     Does not raise exceptions.
 
@@ -90,7 +90,7 @@ def resolve_automatically(
     given adapter instance’s ``resolve()``
     method with proper error handling and logging.
 
-    Returns a 3-tuple of resolver function name, resolved item,
+    Returns a 2-tuple of resolved item,
     and error as a string, any can be None.
 
     Does not raise exceptions.
@@ -128,7 +128,10 @@ def handle_xml2rfc_path(
     xml2rfc_subpath: str,
     dirname: str,
     anchor: str,
-):
+) -> Union[
+    HttpResponse,
+    JsonResponse
+]:
     """View function that resolves an xml2rfc path.
 
     Requires an :term:`xml2rfc adapter` to be registered for given
