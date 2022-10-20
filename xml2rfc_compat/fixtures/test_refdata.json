@@ -1347,17 +1347,13 @@
                                     "person": {
                                         "name": {
                                             "given": {
-                                                "forename": {
-                                                    "initial": [
-                                                        {
-                                                            "content": "J.",
-                                                            "language": [
-                                                                "en"
-                                                            ]
-                                                        }
+                                                "forename": [{
+                                                    "language": [
+                                                        "en"
                                                     ],
+                                                    "initial":  "J.",
                                                     "content": "John"
-                                                }
+                                                }]
                                             },
                                             "surname": {
                                                 "content": "Postel",
@@ -1380,14 +1376,15 @@
                                     ],
                                     "person": {
                                         "name": {
-                                            "initial": [
-                                                {
-                                                    "content": "J.",
+                                            "given": {
+                                                "forename": [{
                                                     "language": [
                                                         "en"
-                                                    ]
-                                                }
-                                            ],
+                                                    ],
+                                                    "initial":  "J.",
+                                                    "content": "John"
+                                                }]
+                                            },
                                             "surname": {
                                                 "content": "Reynolds",
                                                 "language": [
