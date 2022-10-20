@@ -1,4 +1,4 @@
-from typing import cast, Optional, List, Tuple, Dict, Any, Union
+from typing import cast, Optional, List, Tuple, Dict, Any
 import logging
 
 from pydantic import ValidationError
