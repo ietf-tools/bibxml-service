@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker compose -f docker-compose.test.yml --build
+        run: docker compose -f docker-compose.test.yml build
       - name: Run tests
         env:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
