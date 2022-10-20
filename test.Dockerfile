@@ -41,4 +41,4 @@ RUN chmod +x /wait
 RUN curl -Os https://uploader.codecov.io/latest/linux/codecov
 RUN chmod +x codecov
 
-CMD python -m coverage run manage.py test 2> /code/test-artifacts/stderr.log > /code/test-artifacts/stdout.log && ./codecov -t ${CODECOV_TOKEN}
+CMD python -m coverage run manage.py test && ./codecov -t ${CODECOV_TOKEN}
