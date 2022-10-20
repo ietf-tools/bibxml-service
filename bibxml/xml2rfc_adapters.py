@@ -552,6 +552,8 @@ class RfcSubseriesAdapter(Xml2rfcAdapter):
 
         if len(parts) >= 2:
             series, num_raw, *_ = self.anchor.split('.')
+            if series not in self.SUBSERIES_STEMS:
+                raise ValueError("Invalid rfcsubseries ID")
             try:
                 num = int(num_raw)
             except ValueError:
