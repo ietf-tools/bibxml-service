@@ -27,10 +27,12 @@ jobs:
       SNAPSHOT: "test"
     steps:
       - uses: actions/checkout@v3
-      - name: Build the Docker image and run the tests
+      - name: Build the Docker image
+        run: docker compose -f docker-compose.test.yml build
+      - name: Run tests
         env:
           CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
-        run: docker compose -f docker-compose.test.yml up --exit-code-from test --build
+        run: docker compose -f docker-compose.test.yml up --exit-code-from test
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v1
