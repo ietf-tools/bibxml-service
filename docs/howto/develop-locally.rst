@@ -157,7 +157,9 @@ Documenting
 -----------
 
 Whenever you work on something, or ideally before you start doing that,
-update documentation to reflect your changes.
+update documentation to reflect your changes. For example, if you are renaming
+a unit or a variable, make sure to ``grep`` or ``git grep`` to find any references
+to it in the documentation and update them accordingly.
 
 Pay attention to any new warnings during documentation generation, some warnings
 are unavoidable but a new warning may indicate a broken cross-reference.
