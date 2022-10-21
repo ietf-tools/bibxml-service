@@ -77,7 +77,7 @@ Web server
 ----------
 
 ``PRIMARY_HOSTNAME``
-    **required by Django** and (as ``HOST``) by Compose
+    **required by Django** and (as ``HOST_NAME``) by Compose
 
     Hostname used for Web GUI.
     HTTP requests with mismatching Host header will result in an error.

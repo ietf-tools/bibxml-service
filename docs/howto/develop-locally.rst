@@ -58,7 +58,7 @@ Building base image
       DB_NAME=bibxml
       DB_SECRET=qwert
       DJANGO_SECRET=FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF
-      HOST=localhost
+      HOST_NAME=localhost
       API_SECRET=test
       SERVICE_NAME=IETF BibXML service
       CONTACT_EMAIL=<ops contact email>

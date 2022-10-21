@@ -31,7 +31,7 @@ on AWS infrastructure using the bundled Compose configuration.
    .. code-block:: text
 
       DEBUG=0
-      HOST=your.chosen.domain.name.com
+      HOST_NAME=your.chosen.domain.name.com
       PORT=12345
       DB_NAME=bibxml
       DB_SECRET=random string
