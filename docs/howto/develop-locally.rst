@@ -151,8 +151,15 @@ Docker Compose will automatically reload the code for you.
 
 In addition, make sure to build documentation,
 make sure any new units are documented and all cross-references
-(including the previously existing ones) resolve. Pay attention
-to any new warnings during documentation generation, some warnings
+(including the previously existing ones) resolve.
+
+Documenting
+-----------
+
+Whenever you work on something, or ideally before you start doing that,
+update documentation to reflect your changes.
+
+Pay attention to any new warnings during documentation generation, some warnings
 are unavoidable but a new warning may indicate a broken cross-reference.
 
 Linting
