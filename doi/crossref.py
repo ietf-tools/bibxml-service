@@ -7,10 +7,13 @@ from django.conf import settings
 from relaton.models import Date
 from relaton.models.bibitemlocality import Locality, LocalityStack
 
-from bib_models import GenericStringValue, Link
-from bib_models import Person, PersonAffiliation, FullName, GivenName
-from bib_models import Title, Contributor, Organization
-from bib_models import construct_bibitem, DocID
+from relaton.models.strings import GenericStringValue, Title
+from relaton.models.links import Link
+from relaton.models.people import Person, PersonAffiliation
+from relaton.models.people import FullName, GivenName, Forename
+from relaton.models.bibdata import Contributor, Role, DocID
+from relaton.models.orgs import Organization
+from bib_models import construct_bibitem
 from common.util import as_list
 from main.exceptions import RefNotFoundError
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
@@ -76,11 +79,11 @@ def get_bibitem(docid: DocID, strict: bool = True) \
         *(to_contributor('chair', chair)
           for chair in resp.get('chair', [])),
     ]
-    if 'publisher' in resp:
+    if publisher := resp.get('publisher', '').strip():
         contributors.append(Contributor(
-            role=['publisher'],
+            role=[Role(type='publisher')],
             organization=Organization(
-                name=resp.get('publisher'),
+                name=GenericStringValue(content=publisher),
             ),
         ))
 
@@ -178,7 +181,7 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
     :rtype: relaton.models.bibdata.Contributor
     """
     return Contributor(
-        role=[role],
+        role=[Role(type=role)],
         person=Person(
             affiliation=[PersonAffiliation(
                 organization=Organization(
@@ -196,7 +199,7 @@ def to_contributor(role: str, crossref_author: Dict[str, Any]) \
                 completename=GenericStringValue(
                     content=crossref_author['name'],
                 ) if 'name' in crossref_author else None,
-                given=GivenName(forename=[GenericStringValue(
+                given=GivenName(forename=[Forename(
                     content=crossref_author['given'],
                 )] if 'given' in crossref_author else [])
             ),
