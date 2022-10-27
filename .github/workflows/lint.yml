@@ -12,11 +12,10 @@ jobs:
   mypy:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Python
-        uses: actions/setup-python@v1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.7.4
-          architecture: x64
+          python-version: "3.10"
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install mypy
