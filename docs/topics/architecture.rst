@@ -10,6 +10,35 @@ Dependency overview
        A diagram describing dependencies between
        services and data sources, under and outside of IETF control.
 
+Basic entities
+==============
+
+The two most important entities operated upon by the service are:
+
+1. Indexed :term:`reference`.
+
+   Contains partial (e.g., without fully resolved relations)
+   or full representation of a bibliographic item.
+
+   Uniquely identified by source and own ID within the source.
+
+2. :term:`Bibliographic item`.
+
+   A “hydrated” bibliographic item displayed by the service,
+   constructed from (possibly multiple) indexed references.
+
+   These are fuzzily identified by a :term:`primary resource identifier`.
+
+   .. note::
+
+      Currently bibliographic items are constructed from idnexed references
+      on the fly, but as a further optimization measure the service may
+      start constructing bibliographic items and storing them in the database
+      for faster access.
+
+Data sources
+============
+
 BibXML service relies on indexable
 :term:`bibliographic data sources <bibliographic data source>`
 configured (registered).
@@ -23,10 +52,6 @@ but typically are generated periodically using respective
 Github Actions workflows, which retrieve and parse bibliographic data
 from authoritative sources and output it formatted consistently
 per the Relaton data model.
-
-The PostgreSQL database that is part of the service does not contain
-critical data, losing all data would only require reindexing
-the above bibliographic data sources.
 
 .. seealso::
 
@@ -45,3 +70,10 @@ Indexing can be triggered the same way as for bibliographic data sources.
 
    * For where the xml2rfc archive source is registered,
      :mod:`xml2rfc_compat.source`
+
+The role of the database
+========================
+
+The PostgreSQL database that is part of the service does not contain
+critical data, losing all data would only require reindexing
+the above bibliographic data sources.
