@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  test-redis:
+    image: redis
+
+  test-db:
+    build:
+      context: ops
+      dockerfile: db.Dockerfile
+      args:
+        POSTGRES_DB: test
+        POSTGRES_USER: test
+        POSTGRES_PASSWORD: test
+
+  test:
+    image: local/test:latest
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+      args:
+        SNAPSHOT: ${SNAPSHOT:?err}
+    depends_on:
+      - test-db
+      - test-redis
+    command: sh -c "/wait && python -m coverage run manage.py test && ./codecov -t ${CODECOV_TOKEN}"
+    environment:
+      - WAIT_HOSTS=test-db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - WAIT_BEFORE_HOSTS=15
+    # If working on relaton-py, it could be mounted as follows
+    # volumes:
+    #   - ../relaton-py/relaton:/usr/local/lib/python3.10/site-packages/relaton:ro
