@@ -31,17 +31,12 @@ at the main branch.
 Locally
 -------
 
-Tests can be run locally without the need of having
-a Codecov configuration. We can do so using the
-following command:
+Tests can be run locally without the need of having a Codecov
+configuration. To do so, override docker-compose.test.yml
+with docker-compose.test-local.yml.
 
 ::
 
-    docker-compose exec web python manage.py test
+    docker compose -f docker-compose.test.yml -f docker-compose.test-local.yml up --build --exit-code-from test
 
 
-.. note::
-
-   In order to be able to execute this command,
-   the whole environment needs to be up and running
-   (.. seealso:: :doc:`/howto/develop-locally`).
