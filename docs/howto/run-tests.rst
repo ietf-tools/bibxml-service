@@ -2,8 +2,8 @@
 How to run tests
 ================
 
-Production/CI
--------------
+CI
+--
 
 ::
 
