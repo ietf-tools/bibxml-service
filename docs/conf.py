@@ -13,7 +13,7 @@
 
 import os
 import sys
-from typing import List
+from typing import List, Any
 import django
 sys.path.insert(0, '/code')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bibxml.settings')
@@ -71,7 +71,7 @@ extlinks = {
 html_css_files = [
     'custom-haiku.css',
 ]
-html_js_files = [
+html_js_files: List[Any] = [
 ]
 
 autodoc_member_order = 'bysource'

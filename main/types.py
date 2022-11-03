@@ -145,12 +145,12 @@ class CompositeSourcedBibliographicItem(BibliographicItem):
     # but an item combined from multiple sources may have more than one
     # of either.
 
-    doctype: Union[str, List[str], None] = None
+    doctype: Union[str, List[str], None] = None  # type: ignore
     """Parent defines ``doctype`` as an optional string,
     but during merging we may end up with multiple.
     """
 
-    docnumber: Union[str, List[str], None] = None
+    docnumber: Union[str, List[str], None] = None  # type: ignore
     """Parent defines ``docnumber`` as an optional string,
     but during merging we may end up with multiple.
     """

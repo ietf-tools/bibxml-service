@@ -425,7 +425,7 @@ def get_provider() -> ProviderInfo:
         return ProviderInfo(**data)
 
 
-DEFAULT_PROVIDER = ProviderInfo(**{
+DEFAULT_PROVIDER = ProviderInfo(**{  # type: ignore
     "issuer": "https://auth.ietf.org/api/openid",
     "authorization_endpoint": "https://auth.ietf.org/api/openid/authorize",
     "token_endpoint": "https://auth.ietf.org/api/openid/token",

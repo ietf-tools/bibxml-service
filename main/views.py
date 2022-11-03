@@ -220,7 +220,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
     template_name = 'browse/search_citations.html'
-    metric_counter = metrics.gui_search_hits
+    metric_counter = metrics.gui_search_hits  # type: ignore
 
     def get_context_data(self, **kwargs):
         return dict(
@@ -244,7 +244,7 @@ def browse_external_reference(request, dataset_id):
         if source := external_sources.registry.get(dataset_id, None):
             try:
                 # external_item = source.get_item(ref.strip())
-                item = source.get_item(ref.strip())
+                item = source.get_item(ref.strip())  # type: ignore
                 data = unpack_dataclasses(item.dict())
             except RuntimeError as exc:
                 log.exception(

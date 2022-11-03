@@ -7,7 +7,7 @@ import socket
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(environ.get("DEBUG", default=0)) == 1
+DEBUG = int(environ.get("DEBUG", default=0)) == 1  # type: ignore
 
 LOGGING = {
     'version': 1,
@@ -352,7 +352,7 @@ DATATRACKER_REDIRECT_URI = environ.get(
 """
 
 REQUIRE_DATATRACKER_AUTH = int(
-    environ.get("REQUIRE_DATATRACKER_AUTH", default=0)
+    environ.get("REQUIRE_DATATRACKER_AUTH", default=0)  # type: ignore
 ) == 1
 """
 If ``True``:

@@ -37,8 +37,9 @@ class QueryTestCase(TestCase):
             DocID(id="id3", type="type3", scope="scope", primary=False)
         ]
         primary_id = get_primary_docid(raw_ids)
+        self.assertIsNotNone(primary_id)
         self.assertIsInstance(primary_id, DocID)
-        self.assertEqual(primary_id.id, primary_id_value)
+        self.assertEqual(primary_id.id, primary_id_value)  # type: ignore
 
     def test_fail_get_primary_docid_if_no_primary_id(self):
         """

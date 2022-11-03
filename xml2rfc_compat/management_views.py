@@ -150,11 +150,11 @@ class ExploreDirectory(TemplateView):
     def get_context_data(self, **kwargs):
         dirname, selected_item = self.get_selection(**kwargs)
 
-        manual_map_item: Union[BibliographicItem, None]
-        automatic_map_item: Union[BibliographicItem, None]
+        manual_map_item: Union[BibliographicItem, str, None]
+        automatic_map_item: Union[BibliographicItem, str, None]
 
         if selected_item:
-            manual_map, manual_map_item, _ = resolve_mapping(
+            manual_map, manual_map_item = resolve_mapping(
                 selected_item.subpath)
 
             if adapter_cls := adapters.get(dirname, None):
@@ -163,7 +163,7 @@ class ExploreDirectory(TemplateView):
                     dirname,
                     selected_item.format_anchor(),
                 )
-                _, automatic_map_item, _ = resolve_automatically(
+                _, automatic_map_item = resolve_automatically(
                     selected_item.subpath,
                     selected_item.format_anchor(),
                     adapter)
