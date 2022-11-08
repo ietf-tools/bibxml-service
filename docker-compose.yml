@@ -5,10 +5,6 @@ services:
   redis:
     restart: unless-stopped
     image: redis
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "${SYSLOG}"
 
   # Single instance only.
   db:
@@ -25,10 +21,6 @@ services:
       POSTGRES_DB: ${DB_NAME:?missing DB name}
       POSTGRES_USER: ${DB_NAME:?err}
       POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "${SYSLOG}"
     user: "${UID}:${GID}"
     volumes:
       - ./bibdb:/var/lib/postgresql/data
@@ -125,10 +117,6 @@ services:
       CELERY_RESULT_BACKEND: "redis://redis:6379"
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "${SYSLOG}"
     depends_on:
       - web-precheck
 
@@ -165,10 +153,6 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       PYTHONUNBUFFERED: 1
       AUTO_REINDEX_INTERVAL: ${AUTO_REINDEX_INTERVAL}
-    logging:
-      driver: "syslog"
-      options:
-        syslog-address: "${SYSLOG}"
     depends_on:
       - web-precheck
       - redis
