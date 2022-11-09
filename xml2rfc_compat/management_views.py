@@ -150,8 +150,8 @@ class ExploreDirectory(TemplateView):
     def get_context_data(self, **kwargs):
         dirname, selected_item = self.get_selection(**kwargs)
 
-        manual_map_item: Union[BibliographicItem, str, None]
-        automatic_map_item: Union[BibliographicItem, str, None]
+        manual_map_item: Union[BibliographicItem | None, str | None]
+        automatic_map_item: Union[BibliographicItem | None, str | None]
 
         if selected_item:
 
