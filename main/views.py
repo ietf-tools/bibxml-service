@@ -220,7 +220,7 @@ class CitationSearchResultListView(MultipleObjectTemplateResponseMixin,
                                    BaseCitationSearchView):
 
     template_name = 'browse/search_citations.html'
-    metric_counter = metrics.gui_search_hits  # type: ignore
+    metric_counter = metrics.gui_search_hits
 
     def get_context_data(self, **kwargs):
         return dict(
