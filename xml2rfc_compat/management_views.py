@@ -154,8 +154,6 @@ class ExploreDirectory(TemplateView):
         automatic_map_item: Union[BibliographicItem, str, None]
 
         if selected_item:
-            manual_map, manual_map_item = resolve_mapping(
-                selected_item.subpath)
 
             if adapter_cls := adapters.get(dirname, None):
                 adapter = adapter_cls(
@@ -167,6 +165,8 @@ class ExploreDirectory(TemplateView):
                     selected_item.subpath,
                     selected_item.format_anchor(),
                     adapter)
+                manual_map, manual_map_item = resolve_mapping(
+                    selected_item.subpath, adapter)
             else:
                 automatic_map_item = None
         else:

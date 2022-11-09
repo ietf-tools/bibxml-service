@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  redis:
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
+
+  db:
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
+
+  web:
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
+
+  celery:
+    logging:
+      driver: "syslog"
+      options:
+        syslog-address: "${SYSLOG}"
