@@ -31,7 +31,7 @@ The two most important entities operated upon by the service are:
 
    .. note::
 
-      Currently bibliographic items are constructed from idnexed references
+      Currently bibliographic items are constructed from indexed references
       on the fly, but as a further optimization measure the service may
       start constructing bibliographic items and storing them in the database
       for faster access.
