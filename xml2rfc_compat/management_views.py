@@ -161,16 +161,16 @@ class ExploreDirectory(TemplateView):
                     dirname,
                     selected_item.format_anchor(),
                 )
-                _, automatic_map_item = resolve_automatically(
+                automatic_map_item, _ = resolve_automatically(
                     selected_item.subpath,
                     selected_item.format_anchor(),
                     adapter)
-                manual_map, manual_map_item = resolve_mapping(
+                manual_map_item, _ = resolve_mapping(
                     selected_item.subpath, adapter)
             else:
+                manual_map_item = None
                 automatic_map_item = None
         else:
-            manual_map = None
             manual_map_item = None
             automatic_map_item = None
 
@@ -178,7 +178,6 @@ class ExploreDirectory(TemplateView):
             selected_item=selected_item,
             selected_item_map=dict(
                 manual=dict(
-                    config=manual_map,
                     item=manual_map_item,
                 ),
                 automatic_item=automatic_map_item,
