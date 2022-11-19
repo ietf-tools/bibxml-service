@@ -26,6 +26,10 @@ jobs:
       DEBUG: 1
       SNAPSHOT: "test"
     steps:
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
       - uses: actions/checkout@v3
       - name: Build the Docker image
         run: docker compose -f docker-compose.test.yml build
