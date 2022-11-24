@@ -34,9 +34,10 @@ Glossary
 
    reference
    ref
-       Name of an entry in an :term:`indexed source`
-       (e.g., a filename in a Git repository).
-       Unique per source.
+       An entry in an :term:`indexed source`,
+       or the name of such an entry (e.g., filename in a Git repository).
+
+       The name is unique per source.
 
        In case of Relaton sources, reference data
        is indexed as :class:`main.models.RefData` instances.
