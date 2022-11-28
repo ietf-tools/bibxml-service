@@ -23,6 +23,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash -
 RUN apt-get update
 RUN apt-get install -yq nodejs
 
+RUN apt-get clean && rm -rf /var/lib/apt/lists/
+
 # Install requirements for building docs
 RUN pip install sphinx
 
