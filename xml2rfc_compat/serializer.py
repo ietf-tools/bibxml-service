@@ -74,7 +74,7 @@ def serialize(item: BibliographicItem, anchor: str = None) -> _Element:
 @serializers.register('bibxml', 'application/xml')
 def to_xml_string(item: BibliographicItem, **kwargs) -> bytes:
     """
-    A wrapper around :func:`relaton.serializers.bibxml.serialize`.
+    A wrapper around :func:`xml2rfc_compat.serializer.serialize`.
     """
     # get a tree
     canonicalized_tree = etree.fromstring(
