@@ -244,7 +244,7 @@ def browse_external_reference(request, dataset_id):
         if source := external_sources.registry.get(dataset_id, None):
             try:
                 # external_item = source.get_item(ref.strip())
-                item = source.get_item(ref.strip())
+                item = source.get_item(ref.strip(), None)
                 data = unpack_dataclasses(item.dict())
             except RuntimeError as exc:
                 log.exception(

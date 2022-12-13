@@ -33,7 +33,7 @@ def index_xml2rfc_source(
     .. seealso:: :term:`xml2rfc archive source`
     """
 
-    on_progress = on_progress or (lambda total, indexed: None)
+    on_progress = on_progress or (lambda total, indexed: None)  # type: ignore[truthy-function]
 
     if len(work_dirs) > 1:
         raise RuntimeError("Received too many working directories")

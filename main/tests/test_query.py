@@ -1,6 +1,6 @@
 import json
 import re
-from typing import List, Any
+from typing import List, Any, Optional
 from unittest import TestCase
 
 from django.core.management import call_command
@@ -79,7 +79,7 @@ class QueryTestCase(TestCase):
         Test that search_refs_relaton_struct returns an empty list of
         results when called with an empty list of objs.
         """
-        objs: List[None] = []
+        objs: List[Any] = []
         refs = search_refs_relaton_struct(*objs)
         self.assertIsInstance(refs, QuerySet[RefData])
         self.assertEqual(refs.count(), 0)
