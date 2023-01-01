@@ -156,12 +156,14 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                     pass
 
             if person:
-                if ((gname := person.get('name', {}).get('given', None))
-                        and (fnames := as_list(gname.get('forename', [])))):
-                    gname['forename'] = [
-                        ensure_formatted_string_content(fname)
-                        for fname in fnames
-                    ]
+                if gname := person.get('name', {}).get('given', None):
+                    if fnames := as_list(gname.get('forename', [])):
+                        gname['forename'] = [
+                            ensure_formatted_string_content(fname)
+                            for fname in fnames
+                        ]
+                    if fi := gname.get('formatted_initials', None):
+                        gname['formatted_initial'] = ensure_formatted_string_content(fi)
 
         if roles := as_list(contributor.get('role', None) or []):
             contributor['role'] = [normalize_role(r) for r in roles]
