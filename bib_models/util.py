@@ -8,7 +8,6 @@ from common.pydantic import ValidationErrorDict
 
 from relaton.models.bibdata import BibliographicItem, DocID
 
-
 log = logging.getLogger(__name__)
 
 
@@ -163,7 +162,8 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                             for fname in fnames
                         ]
                     if fi := gname.get('formatted_initials', None):
-                        gname['formatted_initial'] = ensure_formatted_string_content(fi)
+                        gname['formatted_initials'] = \
+                            ensure_formatted_string_content(fi)
 
         if roles := as_list(contributor.get('role', None) or []):
             contributor['role'] = [normalize_role(r) for r in roles]
