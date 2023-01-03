@@ -2,13 +2,14 @@
 This module registers :func:`~.to_xml_string`
 in this project’s serializer registry (:mod:`bib_models.serializers`).
 """
-from typing import List
+from typing import Optional, List
 
 from lxml.etree import _Element
 from lxml import objectify, etree
 from relaton.models import Relation
 from relaton.serializers.bibxml.anchor import get_suitable_anchor
-from relaton.serializers.bibxml.reference import create_referencegroup, create_reference
+from relaton.serializers.bibxml.reference import create_referencegroup
+from relaton.serializers.bibxml.reference import create_reference
 from relaton.serializers.bibxml.target import get_suitable_target
 from relaton.util import as_list
 
@@ -20,7 +21,10 @@ __all__ = (
 )
 
 
-def serialize(item: BibliographicItem, anchor: str = None) -> _Element:
+def serialize(
+    item: BibliographicItem,
+    anchor: Optional[str] = None,
+) -> _Element:
     """Converts a BibliographicItem to XML,
     trying to follow RFC 7991.
 
