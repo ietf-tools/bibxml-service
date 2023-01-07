@@ -24,7 +24,10 @@ __all__ = (
 )
 
 
-def serialize(item: BibliographicItem, anchor: Optional[str]) -> _Element:
+def serialize(
+        item: BibliographicItem,
+        anchor: Optional[str] = None
+) -> _Element:
     """Converts a BibliographicItem to XML,
     trying to follow RFC 7991.
 
