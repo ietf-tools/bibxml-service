@@ -31,7 +31,7 @@ def is_rfc_publisher(contrib):
     """Returns ``True`` if contributor belongs
     to ``RFC Publisher`` organization"""
     if org := contrib.organization:
-        if org.name.content == "RFC Publisher":
+        if any(name.content == "RFC Publisher" for name in as_list(org.name)):
             return True
     return False
 
