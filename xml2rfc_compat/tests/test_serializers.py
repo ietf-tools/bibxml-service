@@ -14,20 +14,16 @@ from relaton.models import (
     GenericStringValue,
 )
 from relaton.models.bibitemlocality import LocalityStack, Locality
-from ..serializers import (
-    create_reference,
-    get_suitable_anchor,
-    get_suitable_target,
-    serialize,
-)
+from ..serializers import serialize
 from ..serializers.abstracts import (
     create_abstract,
     get_paragraphs,
     get_paragraphs_html,
     get_paragraphs_jats,
 )
+from ..serializers.anchor import get_suitable_anchor
 from ..serializers.authors import create_author, is_rfc_publisher, filter_contributors
-from ..serializers.reference import build_refcontent_string
+from ..serializers.reference import build_refcontent_string, create_reference
 from ..serializers.series import (
     extract_doi_series,
     extract_rfc_series,
@@ -36,6 +32,7 @@ from ..serializers.series import (
     extract_3gpp_tr_series,
     extract_ieee_series,
 )
+from ..serializers.target import get_suitable_target
 
 
 class SerializerTestCase(TestCase):
