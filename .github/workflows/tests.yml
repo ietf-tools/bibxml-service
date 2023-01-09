@@ -26,7 +26,15 @@ jobs:
       DEBUG: 1
       SNAPSHOT: "test"
     steps:
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
       - uses: actions/checkout@v3
+      - name: Install mypy
+        run: pip install mypy && pip install -r requirements.txt
+      - name: Run mypy
+        run: mypy --ignore-missing-imports --install-types --non-interactive .
       - name: Build the Docker image
         run: docker compose -f docker-compose.test.yml build
       - name: Run tests

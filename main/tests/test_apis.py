@@ -65,10 +65,12 @@ class RefDataApiTests(TestCase):
         self.assertTrue(len(response.json()["error"]) > 0)
 
     def test_success_search_ref(self):
+        docid = self.ref_body.get("docid") or [{"id": "ref_01"}]
+
         struct_query = json.dumps(
             {
                 "docid": [
-                    {"id": self.ref_body.get("docid")[0].get("id"), "type": "standard"}
+                    {"id": docid[0].get("id"), "type": "standard"}
                 ],
             }
         )

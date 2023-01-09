@@ -131,7 +131,7 @@ def get_by_docid(request):
                 for ext_s in sources:
                     external_bibitem: Optional[ExternalBibliographicItem]
                     try:
-                        external_bibitem = ext_s.get_item(docid)
+                        external_bibitem = ext_s.get_item(docid, None)
                     except (RefNotFoundError, RuntimeError):
                         external_bibitem = None
                     else:
@@ -278,7 +278,7 @@ def get_ref(request, dataset_name: str, ref: str):
         bibitem: BibliographicItem
         if dataset_name in external_sources.registry:
             source = external_sources.registry[dataset_name]
-            bibitem = source.get_item(ref.strip()).bibitem
+            bibitem = source.get_item(ref.strip(), None).bibitem
         else:
             indexed_item = get_indexed_item(
                 dataset_name,

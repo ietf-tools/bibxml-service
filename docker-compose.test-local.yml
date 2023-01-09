@@ -1,0 +1,6 @@
+version: "3.9"
+
+services:
+
+  test:
+    command: sh -c "/wait && python manage.py test"

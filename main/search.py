@@ -11,6 +11,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import Http404
 from django.contrib import messages
+from prometheus_client import Counter
 
 from common.util import get_fuzzy_match_regex
 
@@ -127,7 +128,7 @@ class BaseCitationSearchView(BaseListView):
     """How long to cache search results for. Results are cached as a list
     is constructed from query and query format. Default is one hour."""
 
-    metric_counter = None
+    metric_counter: Union[Counter, None] = None
     """A Prometheus Counter instance accepting two labels,
     ``query_format`` and ``got_results``.
     """

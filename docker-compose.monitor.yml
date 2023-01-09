@@ -1,6 +1,6 @@
 # Meant to be used in conjunction (after) the main docker-compose.yml:
 #
-# docker compose -f docker-compose.yml -f docker-compose.monitor.yml up
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.monitor.yml up
 
 services:
   flower:

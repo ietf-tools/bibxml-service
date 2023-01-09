@@ -43,6 +43,7 @@ class RefData(models.Model):
     of :term:`bibliographic item`.
     Can be used to construct
     a :class:`relaton.models.bibdata.BibliographicItem` instance.
+    May be normalized.
     """
 
     latest_date = models.DateField()
