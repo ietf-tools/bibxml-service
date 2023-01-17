@@ -2,7 +2,7 @@
 <span class="">
   {% for owner in val.owner %}
     {% with owner.name|first as owner_name %}
-      {% if owner.url %}<a class="link" href="{{ owner.url }}">{{ owner_name }}</a>{% else %}{{ owner_name }}{% endif %}{% if not forloop.last %}, {% endif %}
+      {% if owner.url %}<a class="link" href="{{ owner.url }}">{{ owner_name.content }}</a>{% else %}{{ owner_name }}{% endif %}{% if not forloop.last %}, {% endif %}
     {% endwith %}
   {% endfor %}
 </span>
