@@ -111,7 +111,7 @@ class BaseCitationSearchView(BaseListView):
 
     query_format_allow_fallback: Union[bool, None] = None
     """If True, and given query is unsuccessful, will try the next format.
-    Can be overridden with ``allow_format_callback`` GET parameter."""
+    Can be overridden with ``allow_format_fallback`` GET parameter."""
 
     query = None
     """Deserialized query, parsed from request."""
