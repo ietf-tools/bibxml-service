@@ -20,7 +20,7 @@
   {% endif %}
 
   {% if val.organization.abbreviation or val.organization.name %}
-    {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name' %}
+    {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=organization.abbreviation,organization.name[*].content' %}
       <a class="link" href="{{ link }}" title="Organization’s name or abbreviation">
         {% include "relaton/org.html" with val=val.organization %}
       </a>
