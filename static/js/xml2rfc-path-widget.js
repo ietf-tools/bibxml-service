@@ -17,6 +17,8 @@
   `;
 
   // If we support permissions
+  // NOTE: per https://bugzilla.mozilla.org/show_bug.cgi?id=1560373#c8,
+  // the `clipboard-write` permission may be deprecated.
   if (navigator.permissions) {
     navigator.permissions.query({name: "clipboard-write"}).then((result => {
       // And we get them
