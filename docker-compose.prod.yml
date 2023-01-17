@@ -12,6 +12,8 @@ services:
       driver: "syslog"
       options:
         syslog-address: "${SYSLOG}"
+    volumes:
+      - ./bibdb:/var/lib/postgresql/data
 
   web:
     logging:
