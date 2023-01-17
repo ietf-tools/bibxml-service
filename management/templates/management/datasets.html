@@ -29,12 +29,15 @@
         <span class="text-xs break-all">
           {% if dataset.task_id %}
             <a class="link" href="{% url "manage_indexing_task" dataset.task_id %}?dataset_id={{ dataset.name }}">
-              {{ dataset.status }}
-            </a>
+              {{ dataset.status }}</a>
           {% else %}
             {{ dataset.status }}
           {% endif %}
         </span>
+
+        {# Workaround for insufficient height causing weird shadow. #}
+        <br /><br />
+
       </div>
     </article>
   {% endfor %}
