@@ -7,9 +7,12 @@
 {% block header_extras %}
   <div class="
     {% include "_side_block_classes.html" %}
-    leading-tight flex flex-col bg-slate-600 text-slate-100 p-4
+    leading-tight flex flex-col p-4
+    bg-dark-700
+    text-dark-100
+    dark:text-inherit
   ">
-    <h2>Items indexed from source <span class="font-bold">{{ dataset_id }}</span></h2>
+    <h2>Indexed&nbsp;references from&nbsp;source <span class="font-bold">{{ dataset_id }}</span></h2>
   </div>
 
   <nav class="

@@ -117,7 +117,7 @@ input, button, select, textarea {
    * Intended to be shown on bg-dark-200/dark:bg-dark-800 parent.
    */
   .button-v2 {
-    @apply flex flex-row items-center overflow-hidden;
+    @apply flex flex-row items-stretch overflow-hidden;
     > .label {
       @apply bg-dark-300 dark:bg-dark-900 whitespace-nowrap flex-1 py-1 px-2;
     }
