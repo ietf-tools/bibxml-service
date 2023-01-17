@@ -22,8 +22,6 @@ services:
       POSTGRES_USER: ${DB_NAME:?err}
       POSTGRES_PASSWORD: "${DB_SECRET:?missing DB secret (long random string)}"
     user: "${UID}:${GID}"
-    volumes:
-      - ./bibdb:/var/lib/postgresql/data
 
   # Must be run once, pre deploy.
   # Built image is reused by "web" and "celery".
