@@ -161,7 +161,7 @@ def build_refcontent_string(extent: LocalityStack | Locality) -> str:
     return ", ".join(parts)
 
 
-def filter_docids(docids: List[DocID]) -> List:
+def filter_docids(docids: List[DocID]) -> List[Optional[DocID]]:
     """
     docids whose scope == "trademark" should be ignored
     when rendering BibXML output.
