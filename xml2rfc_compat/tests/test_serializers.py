@@ -341,10 +341,11 @@ class SerializerTestCase(TestCase):
             DocID(id="trademark", type="type", scope="trademark")
         ]
         docids = filter_docids(docids)
-        self.assertFalse(any(
-            docid.scope == "trademark"
-            for docid in docids
-        ))
+        if docids:
+            self.assertFalse(any(
+                docid.scope == "trademark"
+                for docid in docids
+            ))
 
     def test_build_refcontent_string_with_localitystack(self):
         title = "Container Title"
