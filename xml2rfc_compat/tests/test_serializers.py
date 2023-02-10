@@ -23,7 +23,7 @@ from ..serializers.abstracts import (
 )
 from ..serializers.anchor import get_suitable_anchor
 from ..serializers.authors import create_author, is_rfc_publisher, filter_contributors
-from ..serializers.reference import build_refcontent_string, create_reference
+from ..serializers.reference import build_refcontent_string, create_reference, filter_docids
 from ..serializers.series import (
     extract_doi_series,
     extract_rfc_series,
@@ -334,6 +334,17 @@ class SerializerTestCase(TestCase):
         reference = create_reference(new_bibitem)
         target = reference.xpath("//reference/format/@target")[0]
         self.assertEqual(target, data["link"]["content"])
+
+    def test_docids_with_scope_trademark_should_be_ignored(self):
+        docids = [
+            DocID(id="I-D.ietf-bfd-mpls-mib", type="IETF", scope="anchor"),
+            DocID(id="trademark", type="type", scope="trademark")
+        ]
+        docids = filter_docids(docids)
+        self.assertFalse(any(
+            docid.scope == "trademark"
+            for docid in docids
+        ))
 
     def test_build_refcontent_string_with_localitystack(self):
         title = "Container Title"

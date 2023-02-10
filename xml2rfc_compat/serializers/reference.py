@@ -3,7 +3,8 @@ from typing import List, Tuple, Optional, Union, cast
 
 from lxml import objectify
 from lxml.etree import _Element
-from relaton.models import BibliographicItem, Contributor, parse_relaxed_date, GenericStringValue, Series, Title, Date
+from relaton.models import BibliographicItem, Contributor, parse_relaxed_date, GenericStringValue, Series, Title, Date, \
+    DocID
 from relaton.models.bibitemlocality import LocalityStack, Locality
 
 from common.util import as_list
@@ -89,7 +90,7 @@ def create_reference(item: BibliographicItem) -> _Element:
 
     ref = E.reference(front)
 
-    if (item.extent and (refcontent := build_refcontent_string(item.extent))):
+    if item.extent and (refcontent := build_refcontent_string(item.extent)):
         ref.append(E.refcontent(refcontent))
 
     # Series
@@ -100,7 +101,7 @@ def create_reference(item: BibliographicItem) -> _Element:
         for s in actual_series
         if s.number and s.title
     ])
-    for docid in (item.docid or []):
+    for docid in filter_docids(item.docid):
         series.extend([
             func(docid)
             for func in DOCID_SERIES_EXTRACTORS
@@ -158,3 +159,11 @@ def build_refcontent_string(extent: LocalityStack | Locality) -> str:
         parts.append(extent.reference_from)
 
     return ", ".join(parts)
+
+
+def filter_docids(docids: List[DocID]) -> List:
+    """
+    docids whose scope == "trademark" should be ignored
+    when rendering BibXML output.
+    """
+    return [docid for docid in docids if docid.scope != "trademark"]
