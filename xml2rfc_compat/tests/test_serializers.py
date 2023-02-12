@@ -23,7 +23,7 @@ from ..serializers.abstracts import (
 )
 from ..serializers.anchor import get_suitable_anchor
 from ..serializers.authors import create_author, is_rfc_publisher, filter_contributors
-from ..serializers.reference import build_refcontent_string, create_reference
+from ..serializers.reference import build_refcontent_string, create_reference, filter_docids
 from ..serializers.series import (
     extract_doi_series,
     extract_rfc_series,
