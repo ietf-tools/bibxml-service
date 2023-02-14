@@ -113,6 +113,14 @@ def create_reference(item: BibliographicItem) -> _Element:
                 value=series_info[1],
             ))
 
+    # Target, may be overwritten by callers
+    try:
+        target = get_suitable_target(as_list(item.link or []))
+    except ValueError:
+        pass
+    else:
+        ref.set('target', target)
+
     # Anchor, may be overwritten by callers
     try:
         anchor = get_suitable_anchor(item)
