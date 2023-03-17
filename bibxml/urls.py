@@ -3,6 +3,7 @@ from django.views.decorators.cache import never_cache
 from django.conf import settings
 from django.urls import path, include
 from django.views.decorators.http import require_POST, require_safe
+from django.views.generic.base import TemplateView
 
 from main import api as public_api, views as public_views
 from management import api as mgmt_api, views as mgmt_views
@@ -146,6 +147,11 @@ urlpatterns = [
             ))), name='manage_xml2rfc_directory'),
         ])),
     ])),
+
+    # robots.txt
+    path('robots.txt',TemplateView.as_view(
+        template_name='robots.txt',
+        content_type='text/plain')),
 
     # Main GUI
     path('', include([
