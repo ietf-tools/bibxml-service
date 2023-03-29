@@ -40,6 +40,7 @@ def construct_bibitem(data: Dict[str, Any], strict: bool = True) -> Tuple[
         Unless ``strict`` is set to ``False``.
     """
     errors: Optional[List[ValidationErrorDict]] = None
+
     try:
         normalize_relaxed(data)
     except Exception:
