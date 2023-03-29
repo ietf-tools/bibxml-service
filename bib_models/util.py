@@ -40,7 +40,6 @@ def construct_bibitem(data: Dict[str, Any], strict: bool = True) -> Tuple[
         Unless ``strict`` is set to ``False``.
     """
     errors: Optional[List[ValidationErrorDict]] = None
-
     try:
         normalize_relaxed(data)
     except Exception:
@@ -126,12 +125,6 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                 'content': edition
             }
 
-    if keywords := data.get('keyword', []):
-        data['keyword'] = [
-            to_plain_string(item)
-            for item in keywords
-        ]
-
     for contributor in data.get('contributor', []):
         person = contributor.get('person', None)
         org = contributor.get('organization', None)
@@ -153,17 +146,6 @@ def normalize_relaxed(data: Dict[str, Any]) -> Dict[str, Any]:
                     ]
                 except Exception:
                     pass
-
-            if person:
-                if gname := person.get('name', {}).get('given', None):
-                    if fnames := as_list(gname.get('forename', [])):
-                        gname['forename'] = [
-                            ensure_formatted_string_content(fname)
-                            for fname in fnames
-                        ]
-                    if fi := gname.get('formatted_initials', None):
-                        gname['formatted_initials'] = \
-                            ensure_formatted_string_content(fi)
 
         if roles := as_list(contributor.get('role', None) or []):
             contributor['role'] = [normalize_role(r) for r in roles]
