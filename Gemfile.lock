@@ -272,7 +272,7 @@ GEM
       relaton-omg (~> 1.14.0)
       relaton-un (~> 1.14.0)
       relaton-w3c (~> 1.14.1)
-    relaton-3gpp (1.14.3)
+    relaton-3gpp (1.14.6)
       mdb (~> 0.5.0)
       net-ftp (~> 0.1.0)
       relaton-bib (~> 1.14.0)
@@ -316,7 +316,7 @@ GEM
       cnccs (~> 0.1.1)
       gb-agencies (~> 0.0.1)
       relaton-iso-bib (~> 1.14.0)
-    relaton-iana (1.14.1)
+    relaton-iana (1.14.3)
       faraday (~> 1.0)
       relaton-bib (~> 1.14.0)
       ruby-jing
