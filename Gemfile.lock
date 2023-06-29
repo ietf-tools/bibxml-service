@@ -277,6 +277,7 @@ GEM
       net-ftp (~> 0.1.0)
       relaton-bib (~> 1.14.0)
       rubyzip (~> 2.3.0)
+      index (~> 0.2.0)
     relaton-bib (1.14.5)
       addressable
       bibtex-ruby
