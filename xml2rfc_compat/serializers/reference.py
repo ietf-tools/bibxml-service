@@ -106,20 +106,16 @@ def create_reference(item: BibliographicItem) -> _Element:
             func(docid)
             for func in DOCID_SERIES_EXTRACTORS
         ])
+
+    doi = False
     for series_info in list(dict.fromkeys(series)):
         if series_info is not None:
             ref.append(E.seriesInfo(
                 name=series_info[0],
                 value=series_info[1],
             ))
-
-    # Target, may be overwritten by callers
-    try:
-        target = get_suitable_target(as_list(item.link or []))
-    except ValueError:
-        pass
-    else:
-        ref.set('target', target)
+            if series_info[0] == "DOI":
+                doi = True
 
     # Anchor, may be overwritten by callers
     try:
@@ -128,6 +124,17 @@ def create_reference(item: BibliographicItem) -> _Element:
         pass
     else:
         ref.set('anchor', anchor)
+
+        # Target, may be overwritten by callers
+        try:
+            target = get_suitable_target(as_list(item.link or []))
+        except ValueError:
+            pass
+        else:
+            if doi:
+                # https://github.com/ietf-tools/bibxml-service/issues/332
+                target = target.replace("http", "https").replace("dx.doi.org", "doi.org")
+            ref.set('target', target)
 
     return ref
 
