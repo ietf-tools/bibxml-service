@@ -2,14 +2,17 @@
 Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
 
-from typing import Optional, List, cast, Sequence
+from typing import Optional, List, cast, Sequence, Iterable
 import urllib
 import logging
 import re
+from urllib.parse import urlparse
 
+from relaton.models import Link
 from relaton.models.bibdata import BibliographicItem, DocID, VersionInfo
 
 from bib_models.util import get_primary_docid
+from common.util import as_list
 from doi.crossref import get_bibitem as get_doi_bibitem
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
@@ -626,6 +629,12 @@ class DoiAdapter(Xml2rfcAdapter):
         if not result:
             raise RefNotFoundError()
         else:
+            # https://github.com/ietf-tools/bibxml-service/issues/332
+            link = as_list(result.bibitem.link or [])
+            for index, _ in enumerate(link):
+                parsed_link = urlparse(result.bibitem.link[index].content)  # type: ignore
+                if parsed_link.netloc == "dx.doi.org":
+                    result.bibitem.link[index].content = parsed_link._replace(scheme="https")._replace(netloc="doi.org").geturl()  # type: ignore
             return result.bibitem
 
     def format_anchor(self) -> Optional[str]:
