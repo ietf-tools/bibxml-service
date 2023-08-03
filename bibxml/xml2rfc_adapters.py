@@ -630,11 +630,11 @@ class DoiAdapter(Xml2rfcAdapter):
             raise RefNotFoundError()
         else:
             # https://github.com/ietf-tools/bibxml-service/issues/332
-            link = as_list(result.bibitem.link or [])
+            link = as_list(result.bibitem.link)
             for index, _ in enumerate(link):
-                parsed_link = urlparse(typing.cast(typing.List[Link],result.bibitem.link[index]).content)
+                parsed_link = urlparse(link[index].content)
                 if parsed_link.netloc == "dx.doi.org":
-                    typing.cast(typing.List[Link], result.bibitem.link[index]).content = \
+                    link[index].content = \
                         parsed_link._replace(scheme="https")._replace(netloc="doi.org").geturl()
             return result.bibitem
 
