@@ -1,7 +1,7 @@
 """
 Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
-
+import typing
 from typing import Optional, List, cast, Sequence, Iterable
 import urllib
 import logging
@@ -632,9 +632,9 @@ class DoiAdapter(Xml2rfcAdapter):
             # https://github.com/ietf-tools/bibxml-service/issues/332
             link = as_list(result.bibitem.link or [])
             for index, _ in enumerate(link):
-                parsed_link = urlparse(result.bibitem.link[index].content)
+                parsed_link = urlparse(typing.cast(typing.List[Link],result.bibitem.link[index]).content)
                 if parsed_link.netloc == "dx.doi.org":
-                    result.bibitem.link[index].content = \
+                    typing.cast(typing.List[Link], result.bibitem.link[index]).content = \
                         parsed_link._replace(scheme="https")._replace(netloc="doi.org").geturl()
             return result.bibitem
 
