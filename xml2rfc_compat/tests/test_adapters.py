@@ -156,3 +156,8 @@ class XML2RFCAdaptersTestCase(TestCase):
             if content := link.__getattribute__("content"):
                 url_parse = urlparse(content)
                 self.assertNotEqual("http://dx.doi.org", f"{url_parse.scheme}://{url_parse.netloc}")
+        self.assertTrue(any(
+            link
+            for link in as_list(bibitem.link or [])
+            if f"{urlparse(link.content).scheme}://{urlparse(link.content).netloc}" == "https://doi.org"
+        ))
