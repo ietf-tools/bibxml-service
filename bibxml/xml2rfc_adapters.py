@@ -1,28 +1,24 @@
 """
 Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
-import typing
-from typing import Optional, List, cast, Sequence, Iterable
-import urllib
 import logging
 import re
+import urllib
+from typing import Optional, List, cast, Sequence
 from urllib.parse import urlparse
 
-from relaton.models import Link
 from relaton.models.bibdata import BibliographicItem, DocID, VersionInfo
 
 from bib_models.util import get_primary_docid
 from common.util import as_list
-from doi.crossref import get_bibitem as get_doi_bibitem
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
+from doi.crossref import get_bibitem as get_doi_bibitem
+from main.exceptions import RefNotFoundError
 from main.models import RefData
 from main.query import search_refs_relaton_field
-from main.exceptions import RefNotFoundError
-
-from xml2rfc_compat.adapters import register_adapter
 from xml2rfc_compat.adapters import ReversedRef, Xml2rfcAdapter
-
+from xml2rfc_compat.adapters import register_adapter
 
 log = logging.getLogger(__name__)
 
