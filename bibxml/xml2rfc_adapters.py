@@ -50,8 +50,7 @@ class RfcAdapter(Xml2rfcAdapter):
 
     def resolve_docid(self) -> Optional[DocID]:
         parts = self.anchor.split('.')
-        parts[1] = parts[1].zfill(4)  # https://github.com/ietf-tools/bibxml-service/issues/367
-        if parts[0] == 'RFC' and len(parts[1]) == 4:
+        if parts[0] == 'RFC':
             raw_num = parts[1]
             rfc_num = int(raw_num)
             return DocID(type="IETF", id=f"RFC {rfc_num}")
