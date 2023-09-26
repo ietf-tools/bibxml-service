@@ -59,9 +59,9 @@ def get_bibitem(docid: DocID, strict: bool = True) \
         resp = works.doi(docid.id)
         if not resp:
             raise RefNotFoundError("There was a problem retrieving DOI data. "
-                                   "This can be caused by Crossref (the service"
-                                   " we retrieve DOI data from) being unavailable"
-                                   " at the moment. Try again later!")
+                                   "This can be caused by an invalid id or by "
+                                   "Crossref (the service we retrieve DOI data "
+                                   "from) being unavailable at the moment. Try again later!")
         cache.set(f'DOI_{docid.id}', resp, DEFAULT_CACHE_SECONDS)
 
     docids: List[DocID] = [
