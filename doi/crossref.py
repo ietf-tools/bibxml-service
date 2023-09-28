@@ -1,19 +1,20 @@
 """Responsible for Crossref interaction."""
-
 from typing import List, Dict, Any, Optional
 
 from crossref.restful import Works, Etiquette
 from django.conf import settings
+from django.core.cache import cache
 from relaton.models import Date
-from relaton.models.bibitemlocality import Locality, LocalityStack
-
-from relaton.models.strings import GenericStringValue, Title
-from relaton.models.links import Link
-from relaton.models.people import Person, PersonAffiliation
-from relaton.models.people import FullName, GivenName, Forename
 from relaton.models.bibdata import Contributor, Role, DocID
+from relaton.models.bibitemlocality import Locality, LocalityStack
+from relaton.models.links import Link
 from relaton.models.orgs import Organization
+from relaton.models.people import FullName, GivenName, Forename
+from relaton.models.people import Person, PersonAffiliation
+from relaton.models.strings import GenericStringValue, Title
+
 from bib_models import construct_bibitem
+from bibxml.settings import DEFAULT_CACHE_SECONDS
 from common.util import as_list
 from main.exceptions import RefNotFoundError
 from main.types import ExternalBibliographicItem, ExternalSourceMeta
@@ -53,10 +54,15 @@ def get_bibitem(docid: DocID, strict: bool = True) \
             "DOI source requires DOI docid.type",
             repr(docid))
 
-    resp = works.doi(docid.id)
-
+    resp = cache.get(f'DOI_{docid.id}')
     if not resp:
-        raise RefNotFoundError()
+        resp = works.doi(docid.id)
+        if not resp:
+            raise RefNotFoundError("There was a problem retrieving DOI data. "
+                                   "This can be caused by an invalid id or by "
+                                   "Crossref (the service we retrieve DOI data "
+                                   "from) being unavailable at the moment. Try again later!")
+        cache.set(f'DOI_{docid.id}', resp, DEFAULT_CACHE_SECONDS)
 
     docids: List[DocID] = [
         DocID(type='DOI', id=resp['DOI']),
