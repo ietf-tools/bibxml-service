@@ -4,7 +4,7 @@ from typing import Tuple
 from os import access, path, R_OK, W_OK, X_OK
 from pathlib import Path
 from shutil import rmtree
-from git import Repo  # type: ignore[attr-defined]
+from git import Repo
 from celery.utils.log import get_task_logger
 from django.core.exceptions import SuspiciousOperation
 from django.conf import settings
