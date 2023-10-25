@@ -43,7 +43,7 @@ class RefDataApiTests(TestCase):
         )
         import datatracker.auth
 
-        datatracker.auth.token_is_valid = lambda key: True
+        datatracker.auth.token_is_valid = lambda key: True  # type: ignore[assignment]
 
         self.api_headers = {
             "HTTP_X_DATATRACKER_TOKEN": "test",
