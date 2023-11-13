@@ -80,6 +80,7 @@ def get_internet_draft(
         raise RefNotFoundError()
 
     data = resp.json()
+    data['resource_uri'] = data.get('resource_uri').replace('api/v1/doc/document/', 'doc/html/')
 
     bibitem_data: Dict[str, Any] = dict(
         type='draft',
