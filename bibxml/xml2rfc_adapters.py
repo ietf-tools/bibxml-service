@@ -241,7 +241,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             )[0]]
 
     def resolve(self) -> BibliographicItem:
-        """Returns either latest indexed version,
+        """Returns eithegr latest indexed version,
         or latest version at Datatracker if it’s newer.
 
         .. note:: Datatracker may provide less data than indexed sources.
