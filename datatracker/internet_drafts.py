@@ -45,14 +45,30 @@ def remove_version(id: str) -> Tuple[str, str]:
     and optionally version (or None).
     """
 
-    match = version_re.match(id)
+    resp = get(f'/api/v1/doc/document/{id}/')
+    if resp.status_code == 404:
 
-    if not match or not match.group('versionless'):
-        raise ValueError("Invalid Datatracker ID: %s" % id)
+        resp = get(f'/api/v1/doc/document/draft-{id}/')
+        if resp.status_code == 200:
+            return f'draft-{id}', ''
+        else:
+            match = version_re.match(id)
 
-    versionless = match.group('versionless')
+            if not match or not match.group('versionless'):
+                raise ValueError("Invalid Datatracker ID: %s" % id)
 
-    return versionless, match.group('version')
+            versionless = match.group('versionless')
+
+            return versionless, match.group('version')
+    else:
+        match = version_re.match(id)
+
+        if not match or not match.group('versionless'):
+            raise ValueError("Invalid Datatracker ID: %s" % id)
+
+        versionless = match.group('versionless')
+
+        return versionless, match.group('version')
 
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
@@ -72,8 +88,10 @@ def get_internet_draft(
 
     # We cannot request a particular I-D version from Datatracker,
     # so we ignore the second tuple element (version)
-    versionless, _ = remove_version(docid)
 
+    # resp = get(f'/api/v1/doc/document/{docid}/')
+    # if resp.status_code == 404:
+    versionless, _ = remove_version(docid)
     resp = get(f'/api/v1/doc/document/{versionless}/')
 
     if resp.status_code == 404:

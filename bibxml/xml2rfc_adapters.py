@@ -13,6 +13,7 @@ from bib_models.util import get_primary_docid
 from common.util import as_list
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
+from datatracker.request import get
 from doi.crossref import get_bibitem as get_doi_bibitem
 from main.exceptions import RefNotFoundError
 from main.models import RefData
@@ -118,12 +119,29 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if full ID is e.g. ``draft-foo-bar-00``.
         This is in line with preexisting xml2rfc tools behavior.
         """
+        if self.id_draft_name_exists_in_datatracker(self.anchor.removeprefix("I-D.")):
+            return self.anchor
+        # if not self.id_draft_name_exists_in_datatracker(self.unversioned_anchor) and \
+        #         self.id_draft_name_exists_in_datatracker(f'draft-{self.unversioned_anchor}-{self.requested_version}'):
+        #     return f"I-D.draft-{self.unversioned_anchor}-{self.requested_version}"
         return f"I-D.{self.unversioned_anchor}"
+
+    def id_draft_name_exists_in_datatracker(self, docid: str) -> bool:
+        # import ipdb; ipdb.set_trace()
+
+        resp = get(f'/api/v1/doc/document/{docid}/')
+
+        if resp.status_code == 404:
+            return False
+
+        return True
 
     @classmethod
     def get_bare_i_d_docid(self, item: BibliographicItem) -> Optional[str]:
         if ((primary_docid := get_primary_docid(item.docid))
                 and primary_docid.type == 'Internet-Draft'):
+            # if self.id_draft_name_exists_in_datatracker(self, primary_docid.id):
+            #     return remove_version(primary_docid.id)[0]
             return remove_version(primary_docid.id.removeprefix("draft-"))[0]
         return None
 
@@ -165,11 +183,12 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 ref.startswith('I-D.draft-') and version,
                 # or unversioned without the additional draft- prefix:
                 not ref.startswith('I-D.draft-') and not version,
-            ]),
+            ]) or self.id_draft_name_exists_in_datatracker(f'{ref.removeprefix("I-D.")}'),
         ])
 
     def fetch_refs(self) -> Sequence[RefData]:
         unversioned = self.unversioned_anchor
+        # import ipdb; ipdb.set_trace()
         if version := self.requested_version:
             query = (
                 '(@.type == "Internet-Draft") && '
@@ -183,7 +202,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             query = (
                 '(@.type == "Internet-Draft") && '
                 r'(@.id like_regex "%s[[:digit:]]{2}$")'
-                % re.escape(f'draft-{unversioned}-')
+                % re.escape(f'draft-{unversioned.replace("draft-", "")}-')
             )
             self.log(f"using query {query}")
             return [sorted(
