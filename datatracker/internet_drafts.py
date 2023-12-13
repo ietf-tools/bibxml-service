@@ -45,30 +45,14 @@ def remove_version(id: str) -> Tuple[str, str]:
     and optionally version (or None).
     """
 
-    resp = get(f'/api/v1/doc/document/{id}/')
-    if resp.status_code == 404:
+    match = version_re.match(id)
 
-        resp = get(f'/api/v1/doc/document/draft-{id}/')
-        if resp.status_code == 200:
-            return f'draft-{id}', ''
-        else:
-            match = version_re.match(id)
+    if not match or not match.group('versionless'):
+        raise ValueError("Invalid Datatracker ID: %s" % id)
 
-            if not match or not match.group('versionless'):
-                raise ValueError("Invalid Datatracker ID: %s" % id)
+    versionless = match.group('versionless')
 
-            versionless = match.group('versionless')
-
-            return versionless, match.group('version')
-    else:
-        match = version_re.match(id)
-
-        if not match or not match.group('versionless'):
-            raise ValueError("Invalid Datatracker ID: %s" % id)
-
-        versionless = match.group('versionless')
-
-        return versionless, match.group('version')
+    return versionless, match.group('version')
 
 
 @external_sources.register_for_types('datatracker', {'Internet-Draft': True})
@@ -85,14 +69,29 @@ def get_internet_draft(
     :param bool strict: see :ref:`strict-validation`
     :rtype: main.types.ExternalBibliographicItem
     """
-
-    # We cannot request a particular I-D version from Datatracker,
-    # so we ignore the second tuple element (version)
-
-    # resp = get(f'/api/v1/doc/document/{docid}/')
-    # if resp.status_code == 404:
-    versionless, _ = remove_version(docid)
-    resp = get(f'/api/v1/doc/document/{versionless}/')
+    if not docid.startswith('draft-'):
+        # We cannot request a particular I-D version from Datatracker,
+        # so we ignore the second tuple element (version)
+        versionless, _ = remove_version(docid)
+        resp = get(f'/api/v1/doc/document/{versionless}/')
+    else:
+        # Requested path is in the form `draft-foo-bar-something`.
+        # `something` can be anything (11, 11-11, 1, 010, 1-11-111,..).
+        # Assert if `draft` and `something` are part of the document name
+        resp = get(f'/api/v1/doc/document/{docid}/')
+        if resp.status_code == 404:
+            # Assert if `draft-` is part of the document name
+            # without the ending `-something`
+            # TODO do we need this? This path should not be supported (unversioned + version)
+            versionless, _ = remove_version(docid)
+            resp = get(f'/api/v1/doc/document/{versionless}/')
+            if resp == 404:
+                # Requested document is a draft, strip the version
+                versionless, _ = remove_version(docid.removeprefix('draft-'))
+                resp = get(f'/api/v1/doc/document/{versionless}/')
+        else:
+            versionless, _ = remove_version(docid)
+            resp = get(f'/api/v1/doc/document/{versionless}/')
 
     if resp.status_code == 404:
         raise RefNotFoundError()

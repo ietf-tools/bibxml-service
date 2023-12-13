@@ -119,16 +119,15 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if full ID is e.g. ``draft-foo-bar-00``.
         This is in line with preexisting xml2rfc tools behavior.
         """
-        if self.id_draft_name_exists_in_datatracker(self.anchor.removeprefix("I-D.")):
-            return self.anchor
-        # if not self.id_draft_name_exists_in_datatracker(self.unversioned_anchor) and \
-        #         self.id_draft_name_exists_in_datatracker(f'draft-{self.unversioned_anchor}-{self.requested_version}'):
-        #     return f"I-D.draft-{self.unversioned_anchor}-{self.requested_version}"
+
+        if self.id_draft_name_exists_in_datatracker(self.bare_anchor):
+            return f"I-D.draft-{self.anchor.removeprefix('I-D.').removeprefix('draft-')}"
         return f"I-D.{self.unversioned_anchor}"
 
     def id_draft_name_exists_in_datatracker(self, docid: str) -> bool:
-        # import ipdb; ipdb.set_trace()
-
+        """
+        Assert if a document with given docid exists in Datatracker.
+        """
         resp = get(f'/api/v1/doc/document/{docid}/')
 
         if resp.status_code == 404:
@@ -168,8 +167,27 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 
         ref = self.anchor
 
-        self.bare_anchor = ref.removeprefix('I-D.').removeprefix('draft-')
-        unversioned, version = remove_version(self.bare_anchor)
+        draft_is_part_of_document_name = False
+        if ref.startswith('I-D.draft-'):
+            document_name = ref.removeprefix('I-D.')
+            if self.id_draft_name_exists_in_datatracker(document_name):
+                # The `draft` appendix is part of the document name
+                self.bare_anchor = document_name
+                unversioned, version = document_name, ''
+                draft_is_part_of_document_name = True
+            else:
+                # Requested path represents a draft with a version
+                self.bare_anchor = ref.removeprefix('I-D.').removeprefix('draft-')
+                unversioned, version = remove_version(self.bare_anchor)
+        else:
+            # Requested path represents an unversioned document
+            self.bare_anchor = ref.removeprefix('I-D.')
+            if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
+                # Check whether the ending is part of the name...
+                unversioned, version = self.bare_anchor, ''
+            else:
+                # ...or if it represents a version (in this case the request is invalid)
+                unversioned, version = remove_version(self.bare_anchor)
 
         self.unversioned_anchor = unversioned
         self.requested_version = version
@@ -183,12 +201,11 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 ref.startswith('I-D.draft-') and version,
                 # or unversioned without the additional draft- prefix:
                 not ref.startswith('I-D.draft-') and not version,
-            ]) or self.id_draft_name_exists_in_datatracker(f'{ref.removeprefix("I-D.")}'),
+            ]) or draft_is_part_of_document_name,
         ])
 
     def fetch_refs(self) -> Sequence[RefData]:
         unversioned = self.unversioned_anchor
-        # import ipdb; ipdb.set_trace()
         if version := self.requested_version:
             query = (
                 '(@.type == "Internet-Draft") && '
@@ -202,7 +219,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             query = (
                 '(@.type == "Internet-Draft") && '
                 r'(@.id like_regex "%s[[:digit:]]{2}$")'
-                % re.escape(f'draft-{unversioned.replace("draft-", "")}-')
+                % re.escape(f'draft-{unversioned.removeprefix("draft-")}-')
             )
             self.log(f"using query {query}")
             return [sorted(
@@ -253,7 +270,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         # Check Datatracker’s latest version (slow)
         try:
             dt_bibitem = get_internet_draft(
-                f'draft-{self.bare_anchor}',
+                f'draft-{self.bare_anchor.removeprefix("draft-")}',
                 strict=indexed_bibitem is None,
             ).bibitem
 
