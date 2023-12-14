@@ -4,6 +4,7 @@ Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 import logging
 import re
 import urllib
+from functools import lru_cache
 from typing import Optional, List, cast, Sequence
 from urllib.parse import urlparse
 
@@ -119,11 +120,12 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if full ID is e.g. ``draft-foo-bar-00``.
         This is in line with preexisting xml2rfc tools behavior.
         """
-
+        # import ipdb; ipdb.set_trace()
         if self.id_draft_name_exists_in_datatracker(self.bare_anchor):
             return f"I-D.draft-{self.anchor.removeprefix('I-D.').removeprefix('draft-')}"
         return f"I-D.{self.unversioned_anchor}"
 
+    @lru_cache(maxsize=None)
     def id_draft_name_exists_in_datatracker(self, docid: str) -> bool:
         """
         Assert if a document with given docid exists in Datatracker.
@@ -170,6 +172,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         draft_is_part_of_document_name = False
         if ref.startswith('I-D.draft-'):
             document_name = ref.removeprefix('I-D.')
+
             if self.id_draft_name_exists_in_datatracker(document_name):
                 # The `draft` appendix is part of the document name
                 self.bare_anchor = document_name
@@ -177,16 +180,15 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 draft_is_part_of_document_name = True
             else:
                 # Requested path represents a draft with a version
-                self.bare_anchor = ref.removeprefix('I-D.').removeprefix('draft-')
+                self.bare_anchor = ref.removeprefix('I-D.')
                 unversioned, version = remove_version(self.bare_anchor)
         else:
-            # Requested path represents an unversioned document
+            # Requested path is for an unversioned document
             self.bare_anchor = ref.removeprefix('I-D.')
             if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
-                # Check whether the ending is part of the name...
+                self.bare_anchor = f'draft-{self.bare_anchor}'
                 unversioned, version = self.bare_anchor, ''
             else:
-                # ...or if it represents a version (in this case the request is invalid)
                 unversioned, version = remove_version(self.bare_anchor)
 
         self.unversioned_anchor = unversioned
