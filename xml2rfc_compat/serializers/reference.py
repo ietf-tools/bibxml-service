@@ -98,7 +98,7 @@ def create_reference(item: BibliographicItem) -> _Element:
     actual_series: List[Series] = as_list(item.series or [])
     series.extend([
         (
-            cast(List[Title], as_list(s.title or []))[0].content,
+            as_list(s.title or [])[0].content,
             s.number
         )
         for s in actual_series
