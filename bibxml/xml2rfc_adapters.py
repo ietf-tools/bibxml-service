@@ -1,25 +1,24 @@
 """
 Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 """
-
-from typing import Optional, List, cast, Sequence
-import urllib
 import logging
 import re
+import urllib
+from typing import Optional, List, cast, Sequence
+from urllib.parse import urlparse
 
 from relaton.models.bibdata import BibliographicItem, DocID, VersionInfo
 
 from bib_models.util import get_primary_docid
-from doi.crossref import get_bibitem as get_doi_bibitem
+from common.util import as_list
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
+from doi.crossref import get_bibitem as get_doi_bibitem
+from main.exceptions import RefNotFoundError
 from main.models import RefData
 from main.query import search_refs_relaton_field
-from main.exceptions import RefNotFoundError
-
-from xml2rfc_compat.adapters import register_adapter
 from xml2rfc_compat.adapters import ReversedRef, Xml2rfcAdapter
-
+from xml2rfc_compat.adapters import register_adapter
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +50,7 @@ class RfcAdapter(Xml2rfcAdapter):
 
     def resolve_docid(self) -> Optional[DocID]:
         parts = self.anchor.split('.')
-        if parts[0] == 'RFC' and len(parts[1]) == 4:
+        if parts[0] == 'RFC':
             raw_num = parts[1]
             rfc_num = int(raw_num)
             return DocID(type="IETF", id=f"RFC {rfc_num}")
@@ -626,6 +625,13 @@ class DoiAdapter(Xml2rfcAdapter):
         if not result:
             raise RefNotFoundError()
         else:
+            # https://github.com/ietf-tools/bibxml-service/issues/332
+            link = as_list(result.bibitem.link or [])
+            for index, _ in enumerate(link):
+                parsed_link = urlparse(link[index].content)
+                if parsed_link.netloc == "dx.doi.org":
+                    link[index].content = \
+                        parsed_link._replace(scheme="https")._replace(netloc="doi.org").geturl()
             return result.bibitem
 
     def format_anchor(self) -> Optional[str]:
