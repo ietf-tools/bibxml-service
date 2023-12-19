@@ -152,6 +152,7 @@ def create_author(contributor: Contributor) -> _Element:
                 forenames = ' '.join(
                     f.content
                     for f in as_list(name.given.forename or [])
+                    if f.content is not None
                 )
             else:
                 forenames = None
