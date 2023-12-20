@@ -26,7 +26,7 @@
       </a>
     {% endwith %}
   {% elif val.person.name %}
-    {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=person.name.completename.content,person.name.surname.content,person.name.forename[*].content' %}
+    {% with link=val|substruct_search_link:'{"contributor": [%s]};as_list=yes;only=person.name.completename.content,person.name.surname.content,person.name.given.forename[*].content' %}
       <a class="link" href="{{ link }}" title="Individual’s name">
         {% include "relaton/person_name.html" with val=val.person.name %}
       </a>
