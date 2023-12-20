@@ -32,7 +32,7 @@ jobs:
           python-version: "3.10"
       - uses: actions/checkout@v3
       - name: Install mypy
-        run: pip install mypy && pip install -r requirements.txt
+        run: pip install "mypy==1.4.1" && pip install -r requirements.txt
       - name: Run mypy
         run: mkdir .mypy_cache && mypy --ignore-missing-imports --install-types --non-interactive .
       - name: Build the Docker image

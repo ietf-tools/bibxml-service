@@ -705,14 +705,14 @@
                         ],
                         "person": {
                             "name": {
-                                "initial": [
-                                    {
+                                "given": {
+                                    "formatted_initials": {
                                         "content": "R.",
                                         "language": [
                                             "en"
                                         ]
                                     }
-                                ],
+                                },
                                 "surname": {
                                     "content": "Moskowitz",
                                     "language": [
@@ -734,14 +734,14 @@
                         ],
                         "person": {
                             "name": {
-                                "initial": [
-                                    {
+                                "given": {
+                                    "formatted_initials": {
                                         "content": "T.",
                                         "language": [
                                             "en"
                                         ]
                                     }
-                                ],
+                                },
                                 "surname": {
                                     "content": "Heer",
                                     "language": [
@@ -763,14 +763,14 @@
                         ],
                         "person": {
                             "name": {
-                                "initial": [
-                                    {
+                                "given": {
+                                    "formatted_initials": {
                                         "content": "P.",
                                         "language": [
                                             "en"
                                         ]
                                     }
-                                ],
+                                },
                                 "surname": {
                                     "content": "Jokela",
                                     "language": [
@@ -792,14 +792,14 @@
                         ],
                         "person": {
                             "name": {
-                                "initial": [
-                                    {
-                                        "content": "T.",
-                                        "language": [
-                                            "en"
-                                        ]
+                                "given": {
+                                    "formatted_initials": {
+                                            "content": "T.",
+                                            "language": [
+                                                "en"
+                                            ]
                                     }
-                                ],
+                                },
                                 "surname": {
                                     "content": "Henderson",
                                     "language": [
@@ -874,27 +874,16 @@
                     "Latn"
                 ],
                 "keyword": [
-                    "IEEE Standards",
-                    "Hazards",
-                    "Safety",
-                    "Power cables",
-                    "Electronics equipment",
-                    "Oil drilling",
-                    "cables",
-                    "cable installation",
-                    "cable retention",
-                    "cable selection",
-                    "cable systems",
-                    "Class I Division 1",
-                    "Class I Zone 1",
-                    "Class I Division 2",
-                    "Class I Zone 2",
-                    "classified locations",
-                    "flexible applications",
-                    "hazardous locations",
-                    "IEEE 2740",
-                    "oil and gas land drilling rig",
-                    "portability"
+                    {"content": "IEEE Standards"},
+                    {"content": "Hazards"},
+                    {"content": "Safety"},
+                    {"content": "Power cables"},
+                    {"content": "Electronics equipment"},
+                    {"content": "Oil drilling"},
+                    {"content": "cables"},
+                    {"content": "cable installation"},
+                    {"content": "cable retention"},
+                    {"content": "cable selection"}
                 ],
                 "revdate": "2020-08-12",
                 "abstract": [

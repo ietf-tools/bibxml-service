@@ -28,4 +28,4 @@ pydantic>=1.10,<2.0
 crossrefapi>=1.5,<2
 simplejson
 sentry-sdk
-relaton==0.2.25
+relaton==0.2.32
