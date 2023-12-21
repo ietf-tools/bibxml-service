@@ -170,25 +170,29 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         ref = self.anchor
 
         draft_is_part_of_document_name = False
-        if ref.startswith('I-D.draft-'):
+        if not ref.startswith('I-D.draft-'):
+            # Requested path is for an unversioned document
+            self.bare_anchor = ref.removeprefix('I-D.')
+
+            unversioned, version = remove_version(self.bare_anchor)
+            # if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
+            #     self.bare_anchor = f'draft-{self.bare_anchor}'
+            #     unversioned, version = self.bare_anchor, ''
+            # else:
+            #     unversioned, version = remove_version(self.bare_anchor)
+        else:
             document_name = ref.removeprefix('I-D.')
 
             if self.id_draft_name_exists_in_datatracker(document_name):
-                # The `draft` appendix is part of the document name
+                # The string as a whole is the document name (catches cases
+                # where e.g. we have an ending -nn, e.g. draft-foo-bar-11 and 11
+                # is part of the name, and not a version)
                 self.bare_anchor = document_name
                 unversioned, version = document_name, ''
                 draft_is_part_of_document_name = True
             else:
                 # Requested path represents a draft with a version
                 self.bare_anchor = ref.removeprefix('I-D.')
-                unversioned, version = remove_version(self.bare_anchor)
-        else:
-            # Requested path is for an unversioned document
-            self.bare_anchor = ref.removeprefix('I-D.')
-            if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
-                self.bare_anchor = f'draft-{self.bare_anchor}'
-                unversioned, version = self.bare_anchor, ''
-            else:
                 unversioned, version = remove_version(self.bare_anchor)
 
         self.unversioned_anchor = unversioned
