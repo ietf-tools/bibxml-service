@@ -457,10 +457,11 @@ def build_citation_for_docid(
         for ref in refs
         for id in as_list(ref.body.get('docid', []))
     ])
-    if primary_docid:
-        refs = query_suppressing_user_input_error(
-            lambda: search_refs_docids(primary_docid)
-        ) or []
+    if not primary_docid:
+        primary_docid = ""
+    refs = query_suppressing_user_input_error(
+        lambda: search_refs_docids(primary_docid)
+    ) or []
 
     composite_item, valid = compose_bibitem(
         refs,
