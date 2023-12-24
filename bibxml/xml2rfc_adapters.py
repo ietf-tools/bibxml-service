@@ -120,7 +120,6 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if full ID is e.g. ``draft-foo-bar-00``.
         This is in line with preexisting xml2rfc tools behavior.
         """
-        # import ipdb; ipdb.set_trace()
         if self.id_draft_name_exists_in_datatracker(self.bare_anchor):
             return f"I-D.draft-{self.anchor.removeprefix('I-D.').removeprefix('draft-')}"
         return f"I-D.{self.unversioned_anchor}"
@@ -141,9 +140,14 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
     def get_bare_i_d_docid(self, item: BibliographicItem) -> Optional[str]:
         if ((primary_docid := get_primary_docid(item.docid))
                 and primary_docid.type == 'Internet-Draft'):
-            # if self.id_draft_name_exists_in_datatracker(self, primary_docid.id):
-            #     return remove_version(primary_docid.id)[0]
-            return remove_version(primary_docid.id.removeprefix("draft-"))[0]
+            bare_id = remove_version(primary_docid.id)[0]
+            if self.id_draft_name_exists_in_datatracker(self, bare_id):
+                return bare_id
+            elif self.id_draft_name_exists_in_datatracker(self, primary_docid.id):
+                return primary_docid.id
+            else:
+                return remove_version(primary_docid.id.removeprefix("draft-"))[0]
+
         return None
 
     @classmethod
@@ -152,7 +156,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             if (version := item.version):
                 # Return versioned path for I-D version
                 return [(
-                    f'I-D.draft-{bare_id}-{version[0].draft}',
+                    f'I-D.draft-{bare_id.removeprefix("draft-")}-{version[0].draft}',
                     None,
                 )]
             else:
