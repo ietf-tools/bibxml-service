@@ -459,7 +459,7 @@ def build_citation_for_docid(
     ])
     if primary_docid:
         refs = query_suppressing_user_input_error(
-            lambda: search_refs_docids(primary_docid)
+            lambda: search_refs_docids(primary_docid)  # type: ignore[arg-type]
         ) or []
 
     composite_item, valid = compose_bibitem(
