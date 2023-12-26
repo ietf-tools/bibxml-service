@@ -178,12 +178,12 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             # Requested path is for an unversioned document
             self.bare_anchor = ref.removeprefix('I-D.')
 
-            unversioned, version = remove_version(self.bare_anchor)
-            # if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
-            #     self.bare_anchor = f'draft-{self.bare_anchor}'
-            #     unversioned, version = self.bare_anchor, ''
-            # else:
-            #     unversioned, version = remove_version(self.bare_anchor)
+            if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
+                # Requested path could be in the form foo-bar-nn and -nn
+                # is part of the document name, and not a version
+                unversioned, version = self.bare_anchor, ''
+            else:
+                unversioned, version = remove_version(self.bare_anchor)
         else:
             document_name = ref.removeprefix('I-D.')
 
