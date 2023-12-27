@@ -109,6 +109,10 @@ class SerializerTestCase(TestCase):
         self.bibitem_referencegroup_data: Dict[str, Any] = {
             "id": "ref_02",
             "docid": [{"id": "ref_02", "type": "test_dataset_02"}],
+            "link": {
+                "content": "https://www.rfc-editor.org/info/std94",
+                "type": "src"
+            },
             "relation": [
                 {
                     "type": "includes",
@@ -137,6 +141,41 @@ class SerializerTestCase(TestCase):
                         "type": "standard",
                         "docid": [{"id": "RFC1918", "type": "RFC"}],
                         "docnumber": "RFC1918",
+                        "date": [{"type": "published", "value": "1998-02-11"}],
+                        "extent": {"locality": [
+                            {"type": "container-title", "reference_from": "Container Title"},
+                            {"type": "volume", "reference_from": "1"},
+                            {"type": "issue", "reference_from": "2"},
+                            {"type": "page", "reference_from": "3"}
+                        ]}
+                    },
+                },{
+                    "type": "includes",
+                    "bibitem": {
+                        "id": "test_id2",
+                        "title": [
+                            {
+                                "content": "title2",
+                                "language": "en",
+                                "script": "Latn",
+                                "format": "text / plain",
+                            }
+                        ],
+                        "contributor": [
+                            contributor_organization_data,
+                            self.contributor_person_data,
+                        ],
+                        "link": [
+                            {
+                                "content": "https://raw.githubusercontent.com/relaton/relaton-data-ietf/master/data"
+                                "/reference2.RFC"
+                                ".19182.xml",
+                                "type": "xml",
+                            }
+                        ],
+                        "type": "standard",
+                        "docid": [{"id": "RFC19182", "type": "RFC"}],
+                        "docnumber": "RFC19182",
                         "date": [{"type": "published", "value": "1998-02-11"}],
                         "extent": {"locality": [
                             {"type": "container-title", "reference_from": "Container Title"},
@@ -174,6 +213,18 @@ class SerializerTestCase(TestCase):
 
         xmlschema.assertValid(xml_reference)
         xmlschema.assertValid(xml_referencegroup)
+
+    def test_target_referencegroup(self):
+        """
+        Target should be set as attribute of <referencegroup>.
+        """
+        xml_referencegroup = serialize(self.bibitem_referencegroup)
+        target = xml_referencegroup.keys()[1]
+        self.assertEqual(target, "target")
+        self.assertEqual(
+            xml_referencegroup.get(target),
+            self.bibitem_referencegroup_data["link"]["content"]
+        )
 
     def test_build_refcontent_string(self):
         """
