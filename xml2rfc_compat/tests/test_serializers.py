@@ -149,41 +149,6 @@ class SerializerTestCase(TestCase):
                             {"type": "page", "reference_from": "3"}
                         ]}
                     },
-                },{
-                    "type": "includes",
-                    "bibitem": {
-                        "id": "test_id2",
-                        "title": [
-                            {
-                                "content": "title2",
-                                "language": "en",
-                                "script": "Latn",
-                                "format": "text / plain",
-                            }
-                        ],
-                        "contributor": [
-                            contributor_organization_data,
-                            self.contributor_person_data,
-                        ],
-                        "link": [
-                            {
-                                "content": "https://raw.githubusercontent.com/relaton/relaton-data-ietf/master/data"
-                                "/reference2.RFC"
-                                ".19182.xml",
-                                "type": "xml",
-                            }
-                        ],
-                        "type": "standard",
-                        "docid": [{"id": "RFC19182", "type": "RFC"}],
-                        "docnumber": "RFC19182",
-                        "date": [{"type": "published", "value": "1998-02-11"}],
-                        "extent": {"locality": [
-                            {"type": "container-title", "reference_from": "Container Title"},
-                            {"type": "volume", "reference_from": "1"},
-                            {"type": "issue", "reference_from": "2"},
-                            {"type": "page", "reference_from": "3"}
-                        ]}
-                    },
                 }
             ],
         }
