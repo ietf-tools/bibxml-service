@@ -141,9 +141,9 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if ((primary_docid := get_primary_docid(item.docid))
                 and primary_docid.type == 'Internet-Draft'):
             bare_id = remove_version(primary_docid.id)[0]
-            if self.id_draft_name_exists_in_datatracker(self, bare_id):
+            if self.id_draft_name_exists_in_datatracker(self, bare_id):  # type: ignore[arg-type]
                 return bare_id
-            elif self.id_draft_name_exists_in_datatracker(self, primary_docid.id):
+            elif self.id_draft_name_exists_in_datatracker(self, primary_docid.id):  # type: ignore[arg-type]
                 return primary_docid.id
             else:
                 return remove_version(primary_docid.id.removeprefix("draft-"))[0]
