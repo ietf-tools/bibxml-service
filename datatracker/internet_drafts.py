@@ -83,7 +83,7 @@ def get_internet_draft(
             # TODO do we need this? This path should not be supported (unversioned + version)
             versionless, _ = remove_version(docid)
             resp = get(f'/api/v1/doc/document/{versionless}/')
-            if resp == 404:
+            if resp.status_code == 404:
                 # Requested document is a draft, strip the version
                 versionless, _ = remove_version(docid.removeprefix('draft-'))
                 resp = get(f'/api/v1/doc/document/{versionless}/')
