@@ -219,7 +219,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if version := self.requested_version:
             query = (
                 '(@.type == "Internet-Draft") && '
-                f'(@.id == "draft-{unversioned}-{version}")'
+                f'(@.id == "draft-{unversioned.removeprefix("draft-")}-{version}")'
             )
             self.log(f"using query {query}")
             return list(search_refs_relaton_field({
