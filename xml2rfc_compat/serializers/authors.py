@@ -133,7 +133,7 @@ def create_author(contributor: Contributor) -> _Element:
             initials = [
                 # We don’t expect trailing full stops in initials
                 # Workaround for bad source data, in effect
-                i.content.strip()
+                i.content.strip() if i.content else ""
                 for i in cast(
                     List[GenericStringValue],
                     as_list(name.given.formatted_initials or []),
