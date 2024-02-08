@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: "ghcr.io/ietf-tools/bibxml-service"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  #tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
@@ -41,7 +41,8 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8000
+  targetPort: 80
 
 ingress:
   enabled: false
@@ -105,3 +106,65 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  - name: PRIMARY_HOSTNAME
+    value: "bib.ietf.org"
+  - name: INTERNAL_HOSTNAMES
+    value: "locahost, 127.0.0.1"
+  - name: DEBUG
+    value: "0"
+  - name: SOURCE_REPO_URL
+    value: "https://github.com/ietf-tools/"
+  - name: DJANGO_SECRET
+    value: "SomeLongRandomString"
+  - name: API_SECRET
+    value: "ItsASecret"
+  - name: EXTRA_API_SECRETS
+    value: "ItsASecret"
+  - name: DB_HOST
+    value: "HOSTNAMEHERE"
+  - name: DB_PORT
+    value: "5432"
+  - name: DB_USER
+    value: "bibxml"
+  - name: DB_NAME
+    value: "bibxml"
+  - name: DB_SECRET
+    value: "bibxml"
+  - name: SERVICE_NAME
+    value: "IETF BibXML Service"
+  - name: CONTACT_EMAIL
+    value: "tools-help@ietf.org"
+  - name: SERVER_EMAIL
+    value: "support@ietf.org"
+  - name: SENTRY_DSN
+    value: ""
+  - name: MATOMO_URL
+    value: "analytics.ietf.org"
+  - name: MATOMO_SITE_ID
+    value: ""
+  - name: MATOMO_TAG_MANAGER_CONTAINER
+    value: ""
+  - name: DATATRACKER_CLIENT_ID
+    value: "0"
+  - name: DATATRACKER_CLIENT_SECRET
+    value: "0"
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: DATASET_TMP_ROOT
+    value: "/data/datasets"
+  - name: CELERY_BROKER_URL
+    value: "redis://HOSTNAMEHERE:6379"
+  - name: CELERY_RESULT_BACKEND
+    value: "redis://HOSTNAMEHERE:6379"
+  - name: REDIS_HOST
+    value: "HOSTNAMEHERE"
+  - name: REDIS_PORT
+    value: "6379"
+  - name: AUTO_REINDEX_INTERVAL
+    value: "5400"
+  - name: SNAPSHOT
+    value: "{{ .Chart.AppVersion }}"
+  - name: PORT
+    value: "8000"
