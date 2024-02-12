@@ -62,6 +62,20 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/${{ github.repository }}:${{ steps.semver.outputs.nextStrict }}, ghcr.io/${{ github.repository }}:latest
 
+      - name: Set Helm Chart Version
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          echo "Setting version ${{ steps.semver.outputs.nextStrict }}..."
+          sed -i -r -e "s|^version: .*$|version: '${{ steps.semver.outputs.nextStrict }}'|" helm/Chart.yaml
+
+      - name: Package and Push Chart
+        run: |
+          helm plugin install https://github.com/chartmuseum/helm-push.git
+          helm repo add chartmuseum https://charts.ietf.org
+          helm cm-push --version="${{ steps.semver.outputs.nextStrict }}" --username="${{ secrets.HELM_REPO_USERNAME }}" --password="${{ secrets.HELM_REPO_PASSWORD }}" helm/ chartmuseum
+          helm repo remove chartmuseum
+
       - name: Update CHANGELOG
         id: changelog
         uses: requarks/changelog-action@v1
