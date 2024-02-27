@@ -124,6 +124,15 @@ spec:
           - -c
           - |
             celery -A sources.celery:app worker -B -l info -c 1
+        - name: redis
+          image: "redis:{{ .Values.image.tag | default "5.0.4" }}"
+          command:
+            - redis-server
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

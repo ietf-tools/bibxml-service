@@ -155,11 +155,11 @@ env:
   - name: DATASET_TMP_ROOT
     value: "/data/datasets"
   - name: CELERY_BROKER_URL
-    value: "redis://HOSTNAMEHERE:6379"
+    value: "redis://localhost:6379"
   - name: CELERY_RESULT_BACKEND
-    value: "redis://HOSTNAMEHERE:6379"
+    value: "redis://localhost:6379"
   - name: REDIS_HOST
-    value: "HOSTNAMEHERE"
+    value: "localhost"
   - name: REDIS_PORT
     value: "6379"
   - name: AUTO_REINDEX_INTERVAL
