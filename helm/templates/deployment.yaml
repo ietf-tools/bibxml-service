@@ -47,7 +47,10 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote -}}
+            {{ end }}
           command:
           - /bin/sh
           - -c
@@ -56,56 +59,6 @@ spec:
             python manage.py check --deploy &&
             python manage.py clear_cache &&
             hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
-      {{- with .Values.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "helm.fullname" . }}-celery
-  labels:
-    {{- include "helm.labels" . | nindent 4 }}
-spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
-  selector:
-    matchLabels:
-      {{- include "helm.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "helm.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
-    spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "helm.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      containers:
         - name: {{ .Chart.Name }}-celery
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -118,12 +71,15 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            {{- toYaml .Values.env | nindent 12 }}
+            {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote -}}
+            {{ end }}
           command:
-          - /bin/sh
-          - -c
-          - |
-            celery -A sources.celery:app worker -B -l info -c 1
+            - /bin/sh
+            - -c
+            - |
+              celery -A sources.celery:app worker -B -l info -c 1
         - name: redis
           image: "redis:{{ .Values.image.tag | default "5.0.4" }}"
           command:

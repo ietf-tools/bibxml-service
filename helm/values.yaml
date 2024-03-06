@@ -42,7 +42,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 8000
-  targetPort: 80
+  targetPort: 8000
 
 ingress:
   enabled: false
@@ -108,63 +108,33 @@ tolerations: []
 affinity: {}
 
 env:
-  - name: PRIMARY_HOSTNAME
-    value: "bib.ietf.org"
-  - name: INTERNAL_HOSTNAMES
-    value: "locahost, 127.0.0.1"
-  - name: DEBUG
-    value: "0"
-  - name: SOURCE_REPO_URL
-    value: "https://github.com/ietf-tools/"
-  - name: DJANGO_SECRET
-    value: "SomeLongRandomString"
-  - name: API_SECRET
-    value: "ItsASecret"
-  - name: EXTRA_API_SECRETS
-    value: "ItsASecret"
-  - name: DB_HOST
-    value: "HOSTNAMEHERE"
-  - name: DB_PORT
-    value: "5432"
-  - name: DB_USER
-    value: "bibxml"
-  - name: DB_NAME
-    value: "bibxml"
-  - name: DB_SECRET
-    value: "bibxml"
-  - name: SERVICE_NAME
-    value: "IETF BibXML Service"
-  - name: CONTACT_EMAIL
-    value: "tools-help@ietf.org"
-  - name: SERVER_EMAIL
-    value: "support@ietf.org"
-  - name: SENTRY_DSN
-    value: ""
-  - name: MATOMO_URL
-    value: "analytics.ietf.org"
-  - name: MATOMO_SITE_ID
-    value: ""
-  - name: MATOMO_TAG_MANAGER_CONTAINER
-    value: ""
-  - name: DATATRACKER_CLIENT_ID
-    value: "0"
-  - name: DATATRACKER_CLIENT_SECRET
-    value: "0"
-  - name: PYTHONUNBUFFERED
-    value: "1"
-  - name: DATASET_TMP_ROOT
-    value: "/data/datasets"
-  - name: CELERY_BROKER_URL
-    value: "redis://localhost:6379"
-  - name: CELERY_RESULT_BACKEND
-    value: "redis://localhost:6379"
-  - name: REDIS_HOST
-    value: "localhost"
-  - name: REDIS_PORT
-    value: "6379"
-  - name: AUTO_REINDEX_INTERVAL
-    value: "5400"
-  - name: SNAPSHOT
-    value: "{{ .Chart.AppVersion }}"
-  - name: PORT
-    value: "8000"
+  PRIMARY_HOSTNAME: "bib.ietf.org"
+  INTERNAL_HOSTNAMES: "locahost, 127.0.0.1"
+  DEBUG: "0"
+  SOURCE_REPO_URL: "https://github.com/ietf-tools/"
+  DJANGO_SECRET: "SomeLongRandomString"
+  API_SECRET: "ItsASecret"
+  EXTRA_API_SECRETS: "ItsASecret"
+  DB_HOST: "HOSTNAMEHERE"
+  DB_PORT: "5432"
+  DB_USER: "bibxml"
+  DB_NAME: "bibxml"
+  DB_SECRET: "bibxml"
+  SERVICE_NAME: "IETF BibXML Service"
+  CONTACT_EMAIL: "tools-help@ietf.org"
+  SERVER_EMAIL: "support@ietf.org"
+  SENTRY_DSN: ""
+  MATOMO_URL: "analytics.ietf.org"
+  MATOMO_SITE_ID: ""
+  MATOMO_TAG_MANAGER_CONTAINER: ""
+  DATATRACKER_CLIENT_ID: "0"
+  DATATRACKER_CLIENT_SECRET: "0"
+  PYTHONUNBUFFERED: "1"
+  DATASET_TMP_ROOT: "/data/datasets"
+  CELERY_BROKER_URL: "redis://localhost:6379"
+  CELERY_RESULT_BACKEND: "redis://localhost:6379"
+  REDIS_HOST: "localhost"
+  REDIS_PORT: "6379"
+  AUTO_REINDEX_INTERVAL: "5400"
+  SNAPSHOT: "{{ .Chart.AppVersion }}"
+  PORT: "8000"
