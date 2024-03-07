@@ -68,6 +68,8 @@ jobs:
         run: |
           echo "Setting version ${{ steps.semver.outputs.nextStrict }}..."
           sed -i -r -e "s|^version: .*$|version: '${{ steps.semver.outputs.nextStrict }}'|" helm/Chart.yaml
+          sed -i -r -e "s|^appVersion: ".*"$|appVersion: '${{ steps.semver.outputs.nextStrict }}'|" helm/Chart.yaml
+
 
       - name: Package and Push Chart
         run: |
