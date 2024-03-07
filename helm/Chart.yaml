@@ -1,5 +1,5 @@
 apiVersion: v2
-name: bibxml
+name: bibxml-service
 description: IETF BibXML web service
 
 # A chart can be either an 'application' or a 'library' chart.
