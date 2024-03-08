@@ -51,6 +51,8 @@ spec:
             - name: {{ $key }}
               value: {{ $val | quote -}}
             {{ end }}
+            - name: SNAPSHOT
+              value: "{{ .Chart.AppVersion }}"
           command:
           - /bin/sh
           - -c
@@ -75,6 +77,8 @@ spec:
             - name: {{ $key }}
               value: {{ $val | quote -}}
             {{ end }}
+            - name: SNAPSHOT
+              value: "{{ .Chart.AppVersion }}"
           command:
             - /bin/sh
             - -c
