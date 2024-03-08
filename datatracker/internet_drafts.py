@@ -69,12 +69,28 @@ def get_internet_draft(
     :param bool strict: see :ref:`strict-validation`
     :rtype: main.types.ExternalBibliographicItem
     """
-
-    # We cannot request a particular I-D version from Datatracker,
-    # so we ignore the second tuple element (version)
-    versionless, _ = remove_version(docid)
-
-    resp = get(f'/api/v1/doc/document/{versionless}/')
+    if not docid.startswith('draft-'):
+        # We cannot request a particular I-D version from Datatracker,
+        # so we ignore the second tuple element (version)
+        versionless, _ = remove_version(docid)
+        resp = get(f'/api/v1/doc/document/{versionless}/')
+    else:
+        # Requested path is in the form `draft-foo-bar`
+        resp = get(f'/api/v1/doc/document/{docid}/')
+        if resp.status_code == 404:
+            # Assert if `draft-` is part of the document name
+            # without the ending `-something`
+            # TODO do we need this? This path should not be supported (unversioned + version)
+            versionless, _ = remove_version(docid)
+            resp = get(f'/api/v1/doc/document/{versionless}/')
+            if resp.status_code == 404:
+                # Requested document is a draft, strip the version
+                versionless, _ = remove_version(docid.removeprefix('draft-'))
+                resp = get(f'/api/v1/doc/document/{versionless}/')
+        # else:
+        #     # `draft-foo-bar` is the document name, strip the version
+        #     versionless, _ = remove_version(docid)
+        #     resp = get(f'/api/v1/doc/document/{versionless}/')
 
     if resp.status_code == 404:
         raise RefNotFoundError()
