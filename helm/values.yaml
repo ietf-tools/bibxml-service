@@ -41,7 +41,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 80
   targetPort: 8000
 
 ingress:
@@ -109,7 +109,7 @@ affinity: {}
 
 env:
   PRIMARY_HOSTNAME: "bib.ietf.org"
-  INTERNAL_HOSTNAMES: "locahost, 127.0.0.1"
+  INTERNAL_HOSTNAMES: "localhost,127.0.0.1"
   DEBUG: "0"
   SOURCE_REPO_URL: "https://github.com/ietf-tools/"
   DJANGO_SECRET: "SomeLongRandomString"
@@ -136,5 +136,4 @@ env:
   REDIS_HOST: "localhost"
   REDIS_PORT: "6379"
   AUTO_REINDEX_INTERVAL: "5400"
-  SNAPSHOT: "{{ .Chart.AppVersion }}"
   PORT: "8000"
