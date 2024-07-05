@@ -161,3 +161,17 @@ class XML2RFCAdaptersTestCase(TestCase):
             for link in as_list(bibitem.link or [])
             if f"{urlparse(link.content).scheme}://{urlparse(link.content).netloc}" == "https://doi.org"
         ))
+
+    def test_iana_should_replace_target_scheme(self):
+        adapter = IanaAdapter(self.dirname, "bibxml-iana", self.iana_ref)
+        bibitem = adapter.resolve()
+        for link in as_list(bibitem.link or []):
+            if content := link.__getattribute__("content"):
+                url_parse = urlparse(content)
+                self.assertEqual(url_parse.scheme, "https")
+        self.assertTrue(
+            all(
+                urlparse(link.content).scheme == "https"
+                for link in as_list(bibitem.link or [])
+            )
+        )

@@ -503,6 +503,23 @@ class IanaAdapter(Xml2rfcAdapter):
         return None
 
 
+    def resolve(self) -> BibliographicItem:
+        refs = self.fetch_refs()
+        if num_refs := len(refs):
+            self.log(f"{num_refs} found")
+            resolved_item = self.build_bibitem_from_refs(refs)
+            link = as_list(resolved_item.link or [])
+            for index, _ in enumerate(link):
+                parsed_link = urlparse(link[index].content)
+                if parsed_link.scheme == "http":
+                    link[index].content = \
+                        parsed_link._replace(scheme="https").geturl()
+            return resolved_item
+        else:
+            self.log("no refs found")
+            raise RefNotFoundError()
+
+
 @register_adapter('bibxml9')
 class RfcSubseriesAdapter(Xml2rfcAdapter):
     """
