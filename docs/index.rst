@@ -21,7 +21,7 @@ to BibXML service maintainers, developers and operators.
 .. seealso::
 
    - `BibXML project README <https://github.com/ietf-ribose/bibxml-project>`_
-   - `RFP <https://www7.ietf.org/media/documents/BibXML_Service_RFP.pdf>`_
+   - `RFP <https://www.ietf.org/media/documents/BibXML_Service_RFP.pdf>`_
 
 .. toctree::
    :maxdepth: 2
