@@ -13,7 +13,7 @@ This project uses Docker, Django and PostgreSQL.
 Quick start
 -----------
 
-Please refer to the `local development environment setup <https://dev.bibxml.org/static/docs/howto/develop-locally.html>`_
+Please refer to the `local development environment setup <https://bib.ietf.org/static/docs/howto/develop-locally.html>`_
 section of the documentation.
 
 You can browse documentation `in this repository <docs/index.rst>`_,
