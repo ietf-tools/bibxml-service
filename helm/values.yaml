@@ -109,7 +109,7 @@ env:
   PRIMARY_HOSTNAME: "bib.ietf.org"
   INTERNAL_HOSTNAMES: "localhost,127.0.0.1"
   DEBUG: "0"
-  SOURCE_REPO_URL: "https://github.com/ietf-tools/"
+  SOURCE_REPO_URL: "https://github.com/ietf-tools/bibxml-service"
   DJANGO_SECRET: "SomeLongRandomString"
   API_SECRET: "ItsASecret"
   EXTRA_API_SECRETS: "ItsASecret"
