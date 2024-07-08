@@ -88,7 +88,7 @@ services:
       PRIMARY_HOSTNAME: ${HOST_NAME?missing main hostname (e.g., localhost for development)}
       INTERNAL_HOSTNAMES: "web"
       DEBUG: ${DEBUG:-0}
-      SOURCE_REPO_URL: ${SOURCE_REPO_URL}
+      SOURCE_REPO_URL: ${SOURCE_REPO_URL:?missing source repository URL}
       DJANGO_SECRET: "${DJANGO_SECRET:?missing Django secret (long random string)}"
       API_SECRET: "${API_SECRET:?missing API secret}"
       EXTRA_API_SECRETS: "${EXTRA_API_SECRETS}"
