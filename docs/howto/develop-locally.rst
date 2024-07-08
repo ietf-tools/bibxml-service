@@ -58,10 +58,11 @@ Building base image
       DB_NAME=bibxml
       DB_SECRET=qwert
       DJANGO_SECRET=FDJDSLJFHUDHJCTKLLLCMNII(****#TEFF
-      HOST=localhost
+      HOST_NAME=localhost
       API_SECRET=test
       SERVICE_NAME=IETF BibXML service
       CONTACT_EMAIL=<ops contact email>
+      SOURCE_REPO_URL=https://github.com/ietf-tools/bibxml-service
       DEBUG=1
 
    .. warning:: This environment is not suitable for production use.
