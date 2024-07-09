@@ -13,6 +13,7 @@ services:
       - /bin/sh
       - -c
       - |
+        git config --global --add safe.directory /code &&
         export SNAPSHOT=$$(git describe --abbrev=0) &&
         npm install &&
         ./wait-for-migrations.sh &&
