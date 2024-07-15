@@ -276,6 +276,74 @@ class SerializerTestCase(TestCase):
             f"pp. {self.bibitem_reference_data['extent']['locality'][3]['reference_from']}"
         )
 
+    def test_build_refcontent_no_title(self):
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.title, "[title unavailable]")
+
+    def test_build_refcontent_relaxed_date_Y_m(self):
+        date: str = "1996-02"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertEqual(ref.front.date.get("month"), "February")
+        self.assertIsNone(ref.front.date.get("day"))
+
+    def test_build_refcontent_relaxed_date_B_Y(self):
+        date: str = "February 1996"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertEqual(ref.front.date.get("month"), "February")
+        self.assertIsNone(ref.front.date.get("day"))
+
+    def test_build_refcontent_relaxed_date_Y(self):
+        date: str = "1996"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertIsNone(ref.front.date.get("month"))
+        self.assertIsNone(ref.front.date.get("day"))
+
     def test_build_refcontent_string_with_date_type_different_than_published(self):
         """
         build_refcontent_string should create a <date> tag using the date with
