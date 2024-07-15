@@ -5,6 +5,7 @@ from typing import Dict, List, Any, cast
 from unittest import TestCase
 
 from lxml import etree
+from lxml.etree import _Element
 
 from relaton.models import (
     BibliographicItem,
@@ -487,6 +488,113 @@ class SerializerTestCase(TestCase):
         author_organization = create_author(Contributor(**contributor_editor))
         self.assertEqual(author_organization.tag, "author")
         self.assertNotEqual(author_organization.get("role"), "editor")
+
+    def test_create_author_affiliation(self):
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "completename": {"content": "Dr Cerf", "language": "en"},
+                },
+                "affiliation": {
+                    "organization": {
+                        "name": {
+                            "content": "Internet Engineering Task Force",
+                            "language": "en",
+                        },
+                    }
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: _Element = create_author(Contributor(**person))
+        self.assertEqual(author.organization, "Internet Engineering Task Force")
+
+    def test_create_author_affiliations(self):
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "completename": {"content": "Dr Cerf", "language": "en"},
+                },
+                "affiliation": [
+                    {
+                        "organization": {
+                            "name": {
+                                "content": "Internet Research Task Force",
+                                "language": "en",
+                            },
+                        }
+                    },
+                    {
+                        "organization": {
+                            "name": {
+                                "content": "Internet Engineering Task Force",
+                                "language": "en",
+                            },
+                        }
+                    },
+                ],
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: _Element = create_author(Contributor(**person))
+        self.assertEqual(author.organization, "Internet Research Task Force")
+
+    def test_create_author_org_address(self):
+        org: dict[str, Any] = {
+            "organization": {
+                "name": {
+                    "content": "Internet Engineering Task Force",
+                    "language": "en",
+                },
+                "contact": [
+                    {"address": {"country": "United States", "city": "Santa Cruz"}},
+                    {"address": {"country": "United States"}},
+                ],
+                "url": "www.ietf.org",
+            },
+            "role": [
+                {
+                    "type": "publisher",
+                }
+            ],
+        }
+        author: _Element = create_author(Contributor(**org))
+        self.assertTrue(hasattr(author, "address"))
+        self.assertTrue(hasattr(author.address, "postal"))
+        self.assertTrue(hasattr(author.address.postal, "country"))
+        self.assertEqual(author.address.postal.country, "United States")
+        self.assertTrue(hasattr(author.address.postal, "city"))
+        self.assertEqual(author.address.postal.city, "Santa Cruz")
+        self.assertTrue(hasattr(author.address, "uri"))
+        self.assertEqual(author.address.uri, "www.ietf.org")
+
+    def test_create_author_missing_complete_name(self):
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "prefix": {"content": "Dr", "language": "en"},
+                    "given": {
+                        "formatted_initials": {"content": "V G.", "language": "en"}
+                    },
+                    "surname": {"content": "Cerf", "language": "en"},
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: _Element = create_author(Contributor(**person))
+        self.assertEqual(author.get("fullname"), "Dr V G.Cerf")
 
     def test_is_rfc_publisher(self):
         contributor_editor: Dict[str, Any] = {
