@@ -595,6 +595,23 @@ class SerializerTestCase(TestCase):
         author: etree._Element = create_author(Contributor(**person))
         self.assertEqual(author.get("fullname"), "Dr V G.Cerf")
 
+    def test_create_author_missing_complete_and_given_names(self):
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "prefix": {"content": "Dr", "language": "en"},
+                    "surname": {"content": "Cerf", "language": "en"},
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**person))
+        self.assertEqual(author.get("fullname"), "Dr Cerf")
+
     def test_is_rfc_publisher(self):
         contributor_editor: Dict[str, Any] = {
             "organization": {
