@@ -5,7 +5,6 @@ from typing import Dict, List, Any, cast
 from unittest import TestCase
 
 from lxml import etree
-from lxml.etree import _Element
 
 from relaton.models import (
     BibliographicItem,
@@ -510,7 +509,7 @@ class SerializerTestCase(TestCase):
                 }
             ],
         }
-        author: _Element = create_author(Contributor(**person))
+        author: etree._Element = create_author(Contributor(**person))
         self.assertEqual(author.organization, "Internet Engineering Task Force")
 
     def test_create_author_affiliations(self):
@@ -544,7 +543,7 @@ class SerializerTestCase(TestCase):
                 }
             ],
         }
-        author: _Element = create_author(Contributor(**person))
+        author: etree._Element = create_author(Contributor(**person))
         self.assertEqual(author.organization, "Internet Research Task Force")
 
     def test_create_author_org_address(self):
@@ -566,7 +565,7 @@ class SerializerTestCase(TestCase):
                 }
             ],
         }
-        author: _Element = create_author(Contributor(**org))
+        author: etree._Element = create_author(Contributor(**org))
         self.assertTrue(hasattr(author, "address"))
         self.assertTrue(hasattr(author.address, "postal"))
         self.assertTrue(hasattr(author.address.postal, "country"))
@@ -593,7 +592,7 @@ class SerializerTestCase(TestCase):
                 }
             ],
         }
-        author: _Element = create_author(Contributor(**person))
+        author: etree._Element = create_author(Contributor(**person))
         self.assertEqual(author.get("fullname"), "Dr V G.Cerf")
 
     def test_is_rfc_publisher(self):
