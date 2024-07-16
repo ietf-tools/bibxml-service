@@ -653,7 +653,7 @@ class SerializerTestCase(TestCase):
                     {"address": {"country": "United States", "city": "Santa Cruz"}},
                     {"address": {"country": "United States"}},
                 ],
-                "url": "www.ietf.org",
+                "url": "https://www.ietf.org",
             },
             "role": [
                 {
@@ -669,7 +669,7 @@ class SerializerTestCase(TestCase):
         self.assertTrue(hasattr(author.address.postal, "city"))
         self.assertEqual(author.address.postal.city, "Santa Cruz")
         self.assertTrue(hasattr(author.address, "uri"))
-        self.assertEqual(author.address.uri, "www.ietf.org")
+        self.assertEqual(author.address.uri, "https://www.ietf.org")
 
     def test_create_author_missing_complete_name(self):
         """
