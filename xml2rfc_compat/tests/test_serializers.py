@@ -914,6 +914,11 @@ class SerializerTestCase(TestCase):
         docid = DocID(id=id_value, type="TYPE")
         self.assertIsNone(extract_3gpp_tr_series(docid))
 
+    def test_fail_extract_3gpp_tr_series_invalid_prefix(self):
+        id_value: str = "3GPP TR:25.321:Rel-8/8.3.0"
+        docid: DocID = DocID(id=id_value, type="3GPP")
+        self.assertIsNone(extract_3gpp_tr_series(docid))
+
     def test_extract_ieee_series(self):
         """
         extract_ieee_series should return the correct
