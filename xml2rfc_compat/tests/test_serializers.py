@@ -647,7 +647,7 @@ class SerializerTestCase(TestCase):
                 "name": {
                     "prefix": {"content": "Dr", "language": "en"},
                     "given": {
-                        "formatted_initials": {"content": "V G.", "language": "en"}
+                        "formatted_initials": {"content": "V G", "language": "en"}
                     },
                     "surname": {"content": "Cerf", "language": "en"},
                 },
@@ -659,7 +659,7 @@ class SerializerTestCase(TestCase):
             ],
         }
         author: etree._Element = create_author(Contributor(**person))
-        self.assertEqual(author.get("fullname"), "Dr V G.Cerf")
+        self.assertEqual(author.get("fullname"), "Dr V GCerf")
 
     def test_create_author_missing_complete_and_given_names(self):
         person: dict[str, Any] = {
