@@ -277,6 +277,10 @@ class SerializerTestCase(TestCase):
         )
 
     def test_build_refcontent_no_title(self):
+        """
+        create_reference should assign a default title if none is
+        provided.
+        """
         bib_item: dict[str, Any] = {
             "id": "ref_01",
             "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
@@ -285,6 +289,10 @@ class SerializerTestCase(TestCase):
         self.assertEqual(ref.front.title, "[title unavailable]")
 
     def test_build_refcontent_relaxed_date_Y_m(self):
+        """
+        create_reference should be able to process the '%Y-%m' date
+        format, without setting day.
+        """
         date: str = "1996-02"
         bib_item: dict[str, Any] = {
             "id": "ref_01",
@@ -305,6 +313,10 @@ class SerializerTestCase(TestCase):
         self.assertIsNone(ref.front.date.get("day"))
 
     def test_build_refcontent_relaxed_date_B_Y(self):
+        """
+        create_reference should be able to process the '%B %Y' date
+        format, without setting day.
+        """
         date: str = "February 1996"
         bib_item: dict[str, Any] = {
             "id": "ref_01",
@@ -325,6 +337,10 @@ class SerializerTestCase(TestCase):
         self.assertIsNone(ref.front.date.get("day"))
 
     def test_build_refcontent_relaxed_date_Y(self):
+        """
+        create_reference should be able to process the '%Y' date
+        format, without setting month and day.
+        """
         date: str = "1996"
         bib_item: dict[str, Any] = {
             "id": "ref_01",
@@ -555,6 +571,10 @@ class SerializerTestCase(TestCase):
         self.assertNotEqual(author_organization.get("role"), "editor")
 
     def test_create_author_affiliation(self):
+        """
+        create_author should retrieve the author's organization from
+        their affiliation and set it accordingly.
+        """
         person: dict[str, Any] = {
             "person": {
                 "name": {
@@ -579,6 +599,12 @@ class SerializerTestCase(TestCase):
         self.assertEqual(author.organization, "Internet Engineering Task Force")
 
     def test_create_author_affiliations(self):
+        """
+        create_author should retrieve the author's organization from
+        their affiliation and set it accordingly. Use the organization
+        from their first affiliation if there are multiple
+        affiliations provided.
+        """
         person: dict[str, Any] = {
             "person": {
                 "name": {
@@ -613,6 +639,10 @@ class SerializerTestCase(TestCase):
         self.assertEqual(author.organization, "Internet Research Task Force")
 
     def test_create_author_org_address(self):
+        """
+        create_author should retrieve the author's address from their
+        contact details and url and set them accordingly.
+        """
         org: dict[str, Any] = {
             "organization": {
                 "name": {
@@ -642,6 +672,11 @@ class SerializerTestCase(TestCase):
         self.assertEqual(author.address.uri, "www.ietf.org")
 
     def test_create_author_missing_complete_name(self):
+        """
+        create_author should generate the full name by combining the
+        prefix, initials, and surname if the complete name is not
+        provided.
+        """
         person: dict[str, Any] = {
             "person": {
                 "name": {
@@ -662,6 +697,11 @@ class SerializerTestCase(TestCase):
         self.assertEqual(author.get("fullname"), "Dr V GCerf")
 
     def test_create_author_missing_complete_and_given_names(self):
+        """
+        create_author should generate the full name by combining the
+        prefix and surname if neither the complete name nor the given
+        name is provided.
+        """
         person: dict[str, Any] = {
             "person": {
                 "name": {
@@ -707,6 +747,10 @@ class SerializerTestCase(TestCase):
         )
 
     def test_get_suitable_anchor_to_valid_xsid(self):
+        """
+        get_suitable_anchor should convert the doc ID to a valid xs:id
+        value when necessary.
+        """
         bib_item: dict[str, Any] = {
             "id": "ref_01",
             "docid": [
@@ -908,6 +952,11 @@ class SerializerTestCase(TestCase):
         self.assertIsNone(extract_3gpp_tr_series(docid))
 
     def test_fail_extract_3gpp_tr_series_invalid_prefix(self):
+        """
+        extract_3gpp_tr_series should fail unless the ID provided
+        begins with '3GPP TR '. Note: There is a trailing space
+        character.
+        """
         id_value: str = "3GPP TR:25.321:Rel-8/8.3.0"
         docid: DocID = DocID(id=id_value, type="3GPP")
         self.assertIsNone(extract_3gpp_tr_series(docid))
