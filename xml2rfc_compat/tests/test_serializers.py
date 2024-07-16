@@ -708,6 +708,16 @@ class SerializerTestCase(TestCase):
             ),
         )
 
+    def test_get_suitable_anchor_to_valid_xsid(self):
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "docid": [
+                {"id": "IEEE P2740/D-6.5 2020-08", "type": "IEEE"},
+            ],
+        }
+        anchor: str = get_suitable_anchor(BibliographicItem(**bib_item))
+        self.assertEqual(anchor, "IEEE_P2740_D_6.5_2020_08")
+
     def test_get_suitable_anchor_without_scope_with_primary(self):
         """
         get_suitable_anchor should return DocID.id if primary=True and
