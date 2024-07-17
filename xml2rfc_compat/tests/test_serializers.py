@@ -276,6 +276,90 @@ class SerializerTestCase(TestCase):
             f"pp. {self.bibitem_reference_data['extent']['locality'][3]['reference_from']}"
         )
 
+    def test_build_refcontent_no_title(self):
+        """
+        create_reference should assign a default title if none is
+        provided.
+        """
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.title, "[title unavailable]")
+
+    def test_build_refcontent_relaxed_date_Y_m(self):
+        """
+        create_reference should be able to process the '%Y-%m' date
+        format, without setting day.
+        """
+        date: str = "1996-02"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertEqual(ref.front.date.get("month"), "February")
+        self.assertIsNone(ref.front.date.get("day"))
+
+    def test_build_refcontent_relaxed_date_B_Y(self):
+        """
+        create_reference should be able to process the '%B %Y' date
+        format, without setting day.
+        """
+        date: str = "February 1996"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertEqual(ref.front.date.get("month"), "February")
+        self.assertIsNone(ref.front.date.get("day"))
+
+    def test_build_refcontent_relaxed_date_Y(self):
+        """
+        create_reference should be able to process the '%Y' date
+        format, without setting month and day.
+        """
+        date: str = "1996"
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "title": [
+                {
+                    "content": "title",
+                    "language": "en",
+                    "script": "Latn",
+                    "format": "text / plain",
+                }
+            ],
+            "docid": [{"id": "ref_01", "scope": "anchor", "type": "type"}],
+            "date": [{"type": "published", "value": date}],
+        }
+        ref: etree._Element = create_reference(BibliographicItem(**bib_item))
+        self.assertEqual(ref.front.date.get("year"), "1996")
+        self.assertIsNone(ref.front.date.get("month"))
+        self.assertIsNone(ref.front.date.get("day"))
+
     def test_build_refcontent_string_with_date_type_different_than_published(self):
         """
         build_refcontent_string should create a <date> tag using the date with
@@ -423,11 +507,10 @@ class SerializerTestCase(TestCase):
         author_organization = \
             create_author(Contributor(**contributor_organization_data))
         self.assertEqual(author_organization.tag, "author")
-        if els := author_organization.xpath("//organization"):
-            # TODO: Are we sure xpath() returns a list of strings not elements?
-            self.assertEqual(cast(List[str], els)[0], "IANA")
-        else:
-            raise AssertionError("xpath returned no organization")
+        els = author_organization.xpath("//organization")
+        self.assertIsNotNone(els, msg="xpath returned no organization")
+        # TODO: Are we sure xpath() returns a list of strings not elements?
+        self.assertEqual(cast(List[str], els)[0], "IANA")
 
     def test_create_author_non_IANA_entries(self):
         """
@@ -447,11 +530,10 @@ class SerializerTestCase(TestCase):
         author_organization = \
             create_author(Contributor(**contributor_organization_data))
         self.assertEqual(author_organization.tag, "author")
-        if els := author_organization.xpath("//organization"):
-            # TODO: Are we sure xpath() returns a list of strings not elements?
-            self.assertEqual(cast(List[str], els)[0], organization_name)
-        else:
-            raise AssertionError("xpath returned no organization")
+        els = author_organization.xpath("//organization")
+        self.assertIsNotNone(els, msg="xpath returned no organization")
+        # TODO: Are we sure xpath() returns a list of strings not elements?
+        self.assertEqual(cast(List[str], els)[0], organization_name)
 
     def test_create_author_with_editor_role(self):
         """
@@ -488,6 +570,154 @@ class SerializerTestCase(TestCase):
         self.assertEqual(author_organization.tag, "author")
         self.assertNotEqual(author_organization.get("role"), "editor")
 
+    def test_create_author_affiliation(self):
+        """
+        create_author should retrieve the author's organization from
+        their affiliation and set it accordingly.
+        """
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "completename": {"content": "Dr Cerf", "language": "en"},
+                },
+                "affiliation": {
+                    "organization": {
+                        "name": {
+                            "content": "Internet Engineering Task Force",
+                            "language": "en",
+                        },
+                    }
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**person))
+        self.assertEqual(author.organization, "Internet Engineering Task Force")
+
+    def test_create_author_affiliations(self):
+        """
+        create_author should retrieve the author's organization from
+        their affiliation and set it accordingly. Use the organization
+        from their first affiliation if there are multiple
+        affiliations provided.
+        """
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "completename": {"content": "Dr Cerf", "language": "en"},
+                },
+                "affiliation": [
+                    {
+                        "organization": {
+                            "name": {
+                                "content": "Internet Research Task Force",
+                                "language": "en",
+                            },
+                        }
+                    },
+                    {
+                        "organization": {
+                            "name": {
+                                "content": "Internet Engineering Task Force",
+                                "language": "en",
+                            },
+                        }
+                    },
+                ],
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**person))
+        self.assertEqual(author.organization, "Internet Research Task Force")
+
+    def test_create_author_org_address(self):
+        """
+        create_author should retrieve the author's address from their
+        contact details and url and set them accordingly.
+        """
+        org: dict[str, Any] = {
+            "organization": {
+                "name": {
+                    "content": "Internet Engineering Task Force",
+                    "language": "en",
+                },
+                "contact": [
+                    {"address": {"country": "United States", "city": "Santa Cruz"}},
+                    {"address": {"country": "United States"}},
+                ],
+                "url": "https://www.ietf.org",
+            },
+            "role": [
+                {
+                    "type": "publisher",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**org))
+        self.assertTrue(hasattr(author, "address"))
+        self.assertTrue(hasattr(author.address, "postal"))
+        self.assertTrue(hasattr(author.address.postal, "country"))
+        self.assertEqual(author.address.postal.country, "United States")
+        self.assertTrue(hasattr(author.address.postal, "city"))
+        self.assertEqual(author.address.postal.city, "Santa Cruz")
+        self.assertTrue(hasattr(author.address, "uri"))
+        self.assertEqual(author.address.uri, "https://www.ietf.org")
+
+    def test_create_author_missing_complete_name(self):
+        """
+        create_author should generate the full name by combining the
+        prefix, initials, and surname if the complete name is not
+        provided.
+        """
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "prefix": {"content": "Dr", "language": "en"},
+                    "given": {
+                        "formatted_initials": {"content": "V G", "language": "en"}
+                    },
+                    "surname": {"content": "Cerf", "language": "en"},
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**person))
+        self.assertEqual(author.get("fullname"), "Dr V GCerf")
+
+    def test_create_author_missing_complete_and_given_names(self):
+        """
+        create_author should generate the full name by combining the
+        prefix and surname if neither the complete name nor the given
+        name is provided.
+        """
+        person: dict[str, Any] = {
+            "person": {
+                "name": {
+                    "prefix": {"content": "Dr", "language": "en"},
+                    "surname": {"content": "Cerf", "language": "en"},
+                },
+            },
+            "role": [
+                {
+                    "type": "author",
+                }
+            ],
+        }
+        author: etree._Element = create_author(Contributor(**person))
+        self.assertEqual(author.get("fullname"), "Dr Cerf")
+
     def test_is_rfc_publisher(self):
         contributor_editor: Dict[str, Any] = {
             "organization": {
@@ -515,6 +745,20 @@ class SerializerTestCase(TestCase):
                 if docid.scope == "anchor"
             ),
         )
+
+    def test_get_suitable_anchor_to_valid_xsid(self):
+        """
+        get_suitable_anchor should convert the doc ID to a valid xs:id
+        value when necessary.
+        """
+        bib_item: dict[str, Any] = {
+            "id": "ref_01",
+            "docid": [
+                {"id": "IEEE P2740/D-6.5 2020-08", "type": "IEEE"},
+            ],
+        }
+        anchor: str = get_suitable_anchor(BibliographicItem(**bib_item))
+        self.assertEqual(anchor, "IEEE_P2740_D_6.5_2020_08")
 
     def test_get_suitable_anchor_without_scope_with_primary(self):
         """
@@ -597,12 +841,11 @@ class SerializerTestCase(TestCase):
         """
         id_value = "10.17487/RFC4036"
         docid = DocID(id=id_value, type="DOI")
-        if result := extract_doi_series(docid):
-            type, id = result
-            self.assertEqual(type, "DOI")
-            self.assertEqual(id, id_value)
-        else:
-            raise AssertionError("Failed to extract DOI series")
+        result = extract_doi_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract DOI series")
+        type, id = result  # type: ignore
+        self.assertEqual(type, "DOI")
+        self.assertEqual(id, id_value)
 
     def test_fail_extract_doi_series(self):
         """
@@ -620,12 +863,11 @@ class SerializerTestCase(TestCase):
         """
         id_value = "RFC 4036"
         docid = DocID(id=id_value, type="IETF")
-        if result := extract_rfc_series(docid):
-            series, id = result
-            self.assertEqual(series, "RFC")
-            self.assertEqual(id, id_value.split(" ")[-1])
-        else:
-            raise AssertionError("Failed to extract RFC series")
+        result = extract_rfc_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract RFC series")
+        series, id = result  # type: ignore
+        self.assertEqual(series, "RFC")
+        self.assertEqual(id, id_value.split(" ")[-1])
 
     def test_fail_extract_rfc_series(self):
         """
@@ -644,12 +886,11 @@ class SerializerTestCase(TestCase):
         id_value = "draft-ietf-hip-rfc5201-bis-13"
         type_value = "Internet-Draft"
         docid = DocID(id=id_value, type=type_value)
-        if result := extract_id_series(docid):
-            series, id = result
-            self.assertEqual(series, type_value)
-            self.assertEqual(id, id_value)
-        else:
-            raise AssertionError("Failed to extract ID series")
+        result = extract_id_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract ID series")
+        series, id = result  # type: ignore
+        self.assertEqual(series, type_value)
+        self.assertEqual(id, id_value)
 
     def test_fail_extract_id_series(self):
         """
@@ -668,12 +909,11 @@ class SerializerTestCase(TestCase):
         id_value = "W3C.REC-owl2-syntax-20121211"
         type_value = "W3C"
         docid = DocID(id=id_value, type=type_value)
-        if result := extract_w3c_series(docid):
-            series, id = result
-            self.assertEqual(series, type_value)
-            self.assertEqual(id, id_value.replace(".", " ").split("W3C ")[-1])
-        else:
-            raise AssertionError("Failed to extract W3C series")
+        result = extract_w3c_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract W3C series")
+        series, id = result  # type: ignore
+        self.assertEqual(series, type_value)
+        self.assertEqual(id, id_value.replace(".", " ").split("W3C ")[-1])
 
     def test_fail_extract_w3c_series(self):
         """
@@ -692,16 +932,15 @@ class SerializerTestCase(TestCase):
         id_value = "3GPP TR 25.321:Rel-8/8.3.0"
         type_value = "3GPP"
         docid = DocID(id=id_value, type=type_value)
-        if result := extract_3gpp_tr_series(docid):
-            series, id = result
-            self.assertEqual(series, f"{type_value} TR")
-            self.assertEqual(
-                id,
-                f"{id_value.split('3GPP TR ')[1].split(':')[0]} "
-                f"{id_value.split('/')[-1]}",
-            )
-        else:
-            raise AssertionError("Failed to extract 3GPP series")
+        result = extract_3gpp_tr_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract 3GPP series")
+        series, id = result  # type: ignore
+        self.assertEqual(series, f"{type_value} TR")
+        self.assertEqual(
+            id,
+            f"{id_value.split('3GPP TR ')[1].split(':')[0]} "
+            f"{id_value.split('/')[-1]}",
+        )
 
     def test_fail_extract_3gpp_tr_series(self):
         """
@@ -712,6 +951,16 @@ class SerializerTestCase(TestCase):
         docid = DocID(id=id_value, type="TYPE")
         self.assertIsNone(extract_3gpp_tr_series(docid))
 
+    def test_fail_extract_3gpp_tr_series_invalid_prefix(self):
+        """
+        extract_3gpp_tr_series should fail unless the ID provided
+        begins with '3GPP TR '. Note: There is a trailing space
+        character.
+        """
+        id_value: str = "3GPP TR:25.321:Rel-8/8.3.0"
+        docid: DocID = DocID(id=id_value, type="3GPP")
+        self.assertIsNone(extract_3gpp_tr_series(docid))
+
     def test_extract_ieee_series(self):
         """
         extract_ieee_series should return the correct
@@ -720,18 +969,17 @@ class SerializerTestCase(TestCase):
         id_value = "IEEE P2740/D-6.5.2020-08"
         type_value = "IEEE"
         docid = DocID(id=id_value, type=type_value)
-        if result := extract_ieee_series(docid):
-            series, id = result
-            id_value_alternative, year, *_ = (
-                docid.id.split(" ")[-1].lower().strip().split(".")
-            )
-            self.assertEqual(series, type_value)
-            self.assertTrue(id == "%s-%s" % (
-                id_value_alternative.replace("-", "."),
-                year,
-            ))
-        else:
-            raise AssertionError("Failed to extract IEEE series")
+        result = extract_ieee_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract IEEE series")
+        series, id = result  # type: ignore
+        id_value_alternative, year, *_ = (
+            docid.id.split(" ")[-1].lower().strip().split(".")
+        )
+        self.assertEqual(series, type_value)
+        self.assertTrue(id == "%s-%s" % (
+            id_value_alternative.replace("-", "."),
+            year,
+        ))
 
     def test_extract_ieee_series_with_malformed_id(self):
         """
@@ -741,13 +989,11 @@ class SerializerTestCase(TestCase):
         id_value = "IEEE P2740/D-6.5 2020-08"
         type_value = "IEEE"
         docid = DocID(id=id_value, type=type_value)
-        if result := extract_ieee_series(docid):
-            series, id = result
-            self.assertEqual(series, type_value)
-            self.assertEqual(id, id_value)
-        else:
-            raise AssertionError(
-                "Failed to extract IEEE series with malformed ID")
+        result = extract_ieee_series(docid)
+        self.assertIsNotNone(result, msg="Failed to extract IEEE series with malformed ID")
+        series, id = result  # type: ignore
+        self.assertEqual(series, type_value)
+        self.assertEqual(id, id_value)
 
     def test_fail_extract_ieee_series(self):
         """
