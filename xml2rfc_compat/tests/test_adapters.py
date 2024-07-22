@@ -175,3 +175,8 @@ class XML2RFCAdaptersTestCase(TestCase):
                 for link in as_list(bibitem.link or [])
             )
         )
+
+    def test_iana_has_no_date(self):
+        adapter = IanaAdapter(self.dirname, "bibxml-iana", self.iana_ref)
+        bibitem = adapter.resolve()
+        self.assertEqual(bibitem.date, [])
