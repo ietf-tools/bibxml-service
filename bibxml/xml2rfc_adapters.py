@@ -514,6 +514,7 @@ class IanaAdapter(Xml2rfcAdapter):
                 if parsed_link.scheme == "http":
                     link[index].content = \
                         parsed_link._replace(scheme="https").geturl()
+            resolved_item.date = []
             return resolved_item
         else:
             self.log("no refs found")
