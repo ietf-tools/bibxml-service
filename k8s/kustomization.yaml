@@ -1,0 +1,5 @@
+namespace: bib
+namePrefix: bib-
+resources:
+  - bib.yaml
+  - django-config.yaml

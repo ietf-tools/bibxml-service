@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bib-bibxml-service
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: bib-bibxml-service
+  template:
+    metadata:
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: bibxml-service-app
+          image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: datasets
+              mountPath: /data/datasets
+          envFrom:
+            - configMapRef:
+                name: django-config
+            - secretRef:
+                name: bib-secrets-env
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          command:
+          - /bin/sh
+          - -c
+          - |
+            python manage.py migrate &&
+            python manage.py check --deploy &&
+            python manage.py clear_cache &&
+            hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
+        - name: bibxml-service-celery
+          image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: datasets
+              mountPath: /data/datasets
+          envFrom:
+            - configMapRef:
+                name: django-config
+            - secretRef:
+                name: bib-secrets-env
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          command:
+            - /bin/sh
+            - -c
+            - |
+              celery -A sources.celery:app worker -B -l info -c 1
+        - name: redis
+          image: "redis:1.3.0"
+          command:
+            - redis-server
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+      volumes:
+        - name: datasets
+          emptyDir:
+            sizeLimit: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bib-bibxml-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: bib-bibxml-service
