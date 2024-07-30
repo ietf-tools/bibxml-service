@@ -10,7 +10,7 @@ data:
   DATASET_TMP_ROOT: "/data/datasets"
   DATATRACKER_CLIENT_ID: ""
   DEBUG: "0"
-  INTERNAL_HOSTNAMES: "localhost,127.0.0.1"
+  INTERNAL_HOSTNAMES: "localhost,bib.bib.svc.cluster.local,127.0.0.1"
   MATOMO_SITE_ID: ""
   MATOMO_TAG_MANAGER_CONTAINER: ""
   MATOMO_URL: "analytics.ietf.org"
