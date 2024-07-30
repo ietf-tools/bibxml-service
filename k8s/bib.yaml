@@ -39,13 +39,13 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
           command:
-          - /bin/sh
-          - -c
-          - |
-            python manage.py migrate &&
-            python manage.py check --deploy &&
-            python manage.py clear_cache &&
-            hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
+            - /bin/sh
+            - -c
+            - |
+              python manage.py migrate &&
+              python manage.py check --deploy &&
+              python manage.py clear_cache &&
+              hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
         - name: bibxml-service-celery
           image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
           imagePullPolicy: Always
