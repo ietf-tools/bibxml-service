@@ -7,7 +7,7 @@ spec:
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: bib-bibxml-service
+      app: bibxml-service
   template:
     metadata:
     spec:
@@ -96,4 +96,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: bib-bibxml-service
+    app: bibxml-service
