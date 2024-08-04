@@ -30,8 +30,6 @@ spec:
             - name: datasets
               mountPath: /data/datasets
           envFrom:
-            - configMapRef:
-                name: django-config
             - secretRef:
                 name: bib-secrets-env
           securityContext:
@@ -54,8 +52,6 @@ spec:
             - name: datasets
               mountPath: /data/datasets
           envFrom:
-            - configMapRef:
-                name: django-config
             - secretRef:
                 name: bib-secrets-env
           securityContext:
