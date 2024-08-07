@@ -79,6 +79,14 @@ spec:
             - name: redis
               containerPort: 6379
               protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 1000
+            runAsGroup: 1000
       volumes:
         - name: datasets
           emptyDir:
