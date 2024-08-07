@@ -71,7 +71,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              celery -A sources.celery:app worker -B -l info -c 1
+              celery -A sources.celery:app worker -B -l info -c 1 --pidfile=/tmp/celery_pid --schedule /tmp/celery-schedule.db
         - name: redis
           image: "redis:5.0.4"
           command:
