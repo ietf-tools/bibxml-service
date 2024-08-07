@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bibxml-service
+  name: service
   labels:
-    app: bibxml-service
+    app: service
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: bibxml-service
+      app: service
   template:
     metadata:
       labels:
-        app: bibxml-service
+        app: service
     spec:
       securityContext:
         fsGroup: 1000
         runAsNonRoot: true
       containers:
-        - name: bibxml-service-app
+        - name: app
           image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
           imagePullPolicy: Always
           ports:
@@ -45,7 +45,7 @@ spec:
               python manage.py check --deploy &&
               python manage.py clear_cache &&
               hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
-        - name: bibxml-service-celery
+        - name: celery
           image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
           imagePullPolicy: Always
           volumeMounts:
@@ -81,9 +81,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: bibxml-service
+  name: service
   labels:
-    app: bibxml-service
+    app: service
 spec:
   type: ClusterIP
   ports:
@@ -92,4 +92,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: bibxml-service
+    app: service
