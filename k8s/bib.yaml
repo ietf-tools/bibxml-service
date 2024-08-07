@@ -77,6 +77,9 @@ spec:
           command:
             - redis-server
           imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
           ports:
             - name: redis
               containerPort: 6379
@@ -93,6 +96,9 @@ spec:
         - name: datasets
           emptyDir:
             sizeLimit: 5Gi
+        - name: redis-data
+          emptyDir:
+            sizeLimit: 1Gi
         - name: tmp
           emptyDir:
             sizeLimit: 1Gi
