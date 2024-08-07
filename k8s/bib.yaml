@@ -90,8 +90,8 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
-            runAsUser: 33
-            runAsGroup: 33
+            runAsUser: 999
+            runAsGroup: 999
       volumes:
         - name: datasets
           emptyDir:
