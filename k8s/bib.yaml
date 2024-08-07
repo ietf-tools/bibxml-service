@@ -54,6 +54,8 @@ spec:
           volumeMounts:
             - name: datasets
               mountPath: /data/datasets
+            - name: tmp
+              mountPath: /tmp
           envFrom:
             - secretRef:
                 name: bib-secrets-env
@@ -91,6 +93,9 @@ spec:
         - name: datasets
           emptyDir:
             sizeLimit: 5Gi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi
 ---
 apiVersion: v1
 kind: Service
