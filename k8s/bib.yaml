@@ -71,7 +71,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              celery -A sources.celery:app worker -B -l info -c 1
+              celery -A sources.celery:app worker -B -l info -c 1 --uid 1000 --gid 1000
         - name: redis
           image: "redis:5.0.4"
           command:
