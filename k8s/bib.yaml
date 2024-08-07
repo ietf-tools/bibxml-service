@@ -41,7 +41,10 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
           command:
-            - python manage.py migrate &&
+            - /bin/sh
+            - -c
+            - |
+              python manage.py migrate &&
               python manage.py check --deploy &&
               python manage.py clear_cache &&
               hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
@@ -63,7 +66,10 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
           command:
-            - celery -A sources.celery:app worker -B -l info -c 1
+            - /bin/sh
+            - -c
+            - |
+              celery -A sources.celery:app worker -B -l info -c 1
         - name: redis
           image: "redis:5.0.4"
           command:
