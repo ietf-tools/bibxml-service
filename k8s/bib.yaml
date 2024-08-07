@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service
+  name: bibxml
   labels:
-    app: service
+    app: bibxml
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: service
+      app: bibxml
   template:
     metadata:
       labels:
-        app: service
+        app: bibxml
     spec:
       securityContext:
         fsGroup: 1000
@@ -92,4 +92,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: service
+    app: bibxml
