@@ -16,7 +16,7 @@ spec:
         app: bibxml
     spec:
       securityContext:
-        fsGroup: 1000
+        fsGroup: 33
         runAsNonRoot: true
       containers:
         - name: app
@@ -38,8 +38,8 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 33
+            runAsGroup: 33
           command:
             - /bin/sh
             - -c
@@ -65,13 +65,13 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 33
+            runAsGroup: 33
           command:
             - /bin/sh
             - -c
             - |
-              celery -A sources.celery:app worker -B -l info -c 1 --uid 1000 --gid 1000
+              celery -A sources.celery:app worker -B -l info -c 1 --uid 33 --gid 33
         - name: redis
           image: "redis:5.0.4"
           command:
@@ -87,8 +87,8 @@ spec:
               drop:
               - ALL
             readOnlyRootFilesystem: true
-            runAsUser: 1000
-            runAsGroup: 1000
+            runAsUser: 33
+            runAsGroup: 33
       volumes:
         - name: datasets
           emptyDir:
