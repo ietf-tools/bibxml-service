@@ -1,0 +1,4 @@
+namespace: bib
+namePrefix: bib-
+resources:
+  - bib.yaml

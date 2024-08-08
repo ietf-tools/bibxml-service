@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bibxml
+  labels:
+    app: bibxml
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: bibxml
+  template:
+    metadata:
+      labels:
+        app: bibxml
+    spec:
+      securityContext:
+        fsGroup: 33
+        runAsNonRoot: true
+      containers:
+        - name: app
+          image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: datasets
+              mountPath: /data/datasets
+          envFrom:
+            - secretRef:
+                name: bib-secrets-env
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 33
+            runAsGroup: 33
+          command:
+            - /bin/sh
+            - -c
+            - |
+              python manage.py migrate &&
+              python manage.py check --deploy &&
+              python manage.py clear_cache &&
+              hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
+        - name: celery
+          image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: datasets
+              mountPath: /data/datasets
+            - name: tmp
+              mountPath: /tmp
+          envFrom:
+            - secretRef:
+                name: bib-secrets-env
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 33
+            runAsGroup: 33
+          command:
+            - /bin/sh
+            - -c
+            - |
+              celery -A sources.celery:app worker -B -l info -c 1 --pidfile=/tmp/celery_pid --schedule /tmp/celery-schedule.db
+        - name: redis
+          image: "redis:5.0.4"
+          command:
+            - redis-server
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+            runAsUser: 999
+            runAsGroup: 999
+      volumes:
+        - name: datasets
+          emptyDir:
+            sizeLimit: 5Gi
+        - name: redis-data
+          emptyDir:
+            sizeLimit: 1Gi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+  labels:
+    app: service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: bibxml
