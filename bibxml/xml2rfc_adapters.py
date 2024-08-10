@@ -4,6 +4,7 @@ Defines adapters for xml2rfc paths. See :term:`xml2rfc adapter`.
 import logging
 import re
 import urllib
+from functools import lru_cache
 from typing import Optional, List, cast, Sequence
 from urllib.parse import urlparse
 
@@ -13,6 +14,7 @@ from bib_models.util import get_primary_docid
 from common.util import as_list
 from datatracker.internet_drafts import get_internet_draft
 from datatracker.internet_drafts import remove_version
+from datatracker.request import get
 from doi.crossref import get_bibitem as get_doi_bibitem
 from main.exceptions import RefNotFoundError
 from main.models import RefData
@@ -118,13 +120,34 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if full ID is e.g. ``draft-foo-bar-00``.
         This is in line with preexisting xml2rfc tools behavior.
         """
+        if self.id_draft_name_exists_in_datatracker(self.bare_anchor):
+            return f"I-D.draft-{self.anchor.removeprefix('I-D.').removeprefix('draft-')}"
         return f"I-D.{self.unversioned_anchor}"
+
+    @lru_cache(maxsize=None)
+    def id_draft_name_exists_in_datatracker(self, docid: str) -> bool:
+        """
+        Assert if a document with given docid exists in Datatracker.
+        """
+        resp = get(f'/api/v1/doc/document/{docid}/')
+
+        if resp.status_code == 404:
+            return False
+
+        return True
 
     @classmethod
     def get_bare_i_d_docid(self, item: BibliographicItem) -> Optional[str]:
         if ((primary_docid := get_primary_docid(item.docid))
                 and primary_docid.type == 'Internet-Draft'):
-            return remove_version(primary_docid.id.removeprefix("draft-"))[0]
+            bare_id = remove_version(primary_docid.id)[0]
+            if self.id_draft_name_exists_in_datatracker(self, bare_id):  # type: ignore[arg-type]
+                return bare_id
+            elif self.id_draft_name_exists_in_datatracker(self, primary_docid.id):  # type: ignore[arg-type]
+                return primary_docid.id
+            else:
+                return remove_version(primary_docid.id.removeprefix("draft-"))[0]
+
         return None
 
     @classmethod
@@ -133,7 +156,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             if (version := item.version):
                 # Return versioned path for I-D version
                 return [(
-                    f'I-D.draft-{bare_id}-{version[0].draft}',
+                    f'I-D.draft-{bare_id.removeprefix("draft-")}-{version[0].draft}',
                     None,
                 )]
             else:
@@ -150,8 +173,31 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
 
         ref = self.anchor
 
-        self.bare_anchor = ref.removeprefix('I-D.').removeprefix('draft-')
-        unversioned, version = remove_version(self.bare_anchor)
+        draft_is_part_of_document_name = False
+        if not ref.startswith('I-D.draft-'):
+            # Requested path is for an unversioned document
+            self.bare_anchor = ref.removeprefix('I-D.')
+
+            if self.id_draft_name_exists_in_datatracker(f'draft-{self.bare_anchor}'):
+                # Requested path could be in the form foo-bar-nn and -nn
+                # is part of the document name, and not a version
+                unversioned, version = self.bare_anchor, ''
+            else:
+                unversioned, version = remove_version(self.bare_anchor)
+        else:
+            document_name = ref.removeprefix('I-D.')
+
+            if self.id_draft_name_exists_in_datatracker(document_name):
+                # The string as a whole is the document name (catches cases
+                # where e.g. we have an ending -nn, e.g. draft-foo-bar-11 and 11
+                # is part of the name, and not a version)
+                self.bare_anchor = document_name
+                unversioned, version = document_name, ''
+                draft_is_part_of_document_name = True
+            else:
+                # Requested path represents a draft with a version
+                self.bare_anchor = ref.removeprefix('I-D.')
+                unversioned, version = remove_version(self.bare_anchor)
 
         self.unversioned_anchor = unversioned
         self.requested_version = version
@@ -165,7 +211,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 ref.startswith('I-D.draft-') and version,
                 # or unversioned without the additional draft- prefix:
                 not ref.startswith('I-D.draft-') and not version,
-            ]),
+            ]) or draft_is_part_of_document_name,
         ])
 
     def fetch_refs(self) -> Sequence[RefData]:
@@ -173,7 +219,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         if version := self.requested_version:
             query = (
                 '(@.type == "Internet-Draft") && '
-                f'(@.id == "draft-{unversioned}-{version}")'
+                f'(@.id == "draft-{unversioned.removeprefix("draft-")}-{version}")'
             )
             self.log(f"using query {query}")
             return list(search_refs_relaton_field({
@@ -182,8 +228,8 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         else:
             query = (
                 '(@.type == "Internet-Draft") && '
-                r'(@.id like_regex "%s[[:digit:]]{2}")'
-                % re.escape(f'draft-{unversioned}-')
+                r'(@.id like_regex "%s[[:digit:]]{2}$")'
+                % re.escape(f'draft-{unversioned.removeprefix("draft-")}-')
             )
             self.log(f"using query {query}")
             return [sorted(
@@ -234,7 +280,7 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
         # Check Datatracker’s latest version (slow)
         try:
             dt_bibitem = get_internet_draft(
-                f'draft-{self.bare_anchor}',
+                f'draft-{self.bare_anchor.removeprefix("draft-")}',
                 strict=indexed_bibitem is None,
             ).bibitem
 
