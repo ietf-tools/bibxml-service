@@ -632,7 +632,7 @@
                 "link": [
                     {
                         "type": "TXT",
-                        "content": "https://www.ietf.org/archive/id/draft-ietf-hip-rfc5201-bis-13.txt"
+                        "content": "https://www.example.org/versioned-13.txt"
                     }
                 ],
                 "type": "standard",
@@ -697,6 +697,7 @@
                 "language": [
                     "en"
                 ],
+                "version": "13",
                 "docnumber": "I-D.ietf-hip-rfc5201-bis",
                 "contributor": [
                     {
