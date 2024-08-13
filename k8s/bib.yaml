@@ -29,6 +29,10 @@ spec:
           volumeMounts:
             - name: datasets
               mountPath: /data/datasets
+          env:
+            # ensures the pod gets recreated on every deploy:
+            - name: "DEPLOY_UID"
+              value: "$DEPLOY_UID"
           envFrom:
             - secretRef:
                 name: bib-secrets-env
@@ -56,6 +60,10 @@ spec:
               mountPath: /data/datasets
             - name: tmp
               mountPath: /tmp
+          env:
+            # ensures the pod gets recreated on every deploy:
+            - name: "DEPLOY_UID"
+              value: "$DEPLOY_UID"
           envFrom:
             - secretRef:
                 name: bib-secrets-env
