@@ -5,6 +5,7 @@ from math import log as log_, floor
 from urllib.parse import unquote_plus
 import json
 
+from django.db import connection
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.http import QueryDict
@@ -24,7 +25,7 @@ from bib_models import serializers, BibliographicItem
 from xml2rfc_compat import adapters as xml2rfc_adapters
 
 from .models import RefData
-from .query import get_indexed_item, list_refs, estimate_count
+from .query import get_indexed_item, list_refs
 from .query import build_citation_for_docid
 from .search import BaseCitationSearchView
 from .search import QUERY_FORMAT_LABELS
@@ -51,12 +52,22 @@ shared_context = dict(
 """Shared context passed to GUI templates."""
 
 
+def _count_estimate(table_name: str) -> int:
+    with connection.cursor() as cursor:
+        cursor.execute(
+            'SELECT reltuples FROM pg_class WHERE relname = %s',
+            [table_name],
+        )
+        row = cursor.fetchone()
+        return int(row[0])
+
+
 def home(request):
     """Serves main landing page."""
 
     metrics.gui_home_page_hits.inc()
 
-    total_indexed_citations = estimate_count('api_ref_data')  # Use estimate
+    total_indexed_citations = _count_estimate('api_ref_data')  # Use estimate
     units = ('', 'k', 'M', 'G', 'T', 'P')
     factor = 1000.0
     magnitude = int(floor(log_(max(abs(total_indexed_citations), 1), factor)))

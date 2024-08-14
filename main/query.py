@@ -8,7 +8,6 @@ from typing import Dict, List, Union, Tuple, Any
 
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchHeadline
-from django.db import connection
 from django.db.models.functions import Cast
 from django.db.models import TextField
 from django.db.models.query import QuerySet, Q
@@ -763,18 +762,3 @@ def get_indexed_ref_by_query(
         raise RefNotFoundError(
             "Multiple references match query in given dataset",
             repr(Q))
-
-
-def estimate_count(table_name: str) -> int:
-    """Returns the estimated number of rows in a given table.
-
-    :param str table_name: table name
-    :rtype: int
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "SELECT reltuples FROM pg_class WHERE relname = %s",
-            [table_name],
-        )
-        row = cursor.fetchone()
-        return int(row[0])
