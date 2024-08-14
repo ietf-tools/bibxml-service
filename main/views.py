@@ -56,28 +56,9 @@ def home(request):
 
     metrics.gui_home_page_hits.inc()
 
-    non_empty_datasets = (
-        RefData.objects.values_list('dataset', flat=True).
-        distinct())
-
-    total_indexed_citations = RefData.objects.count()
-    units = ('', 'k', 'M', 'G', 'T', 'P')
-    factor = 1000.0
-    magnitude = int(floor(log_(max(abs(total_indexed_citations), 1), factor)))
-    total_indexed_human = '%.2f%s' % (
-        total_indexed_citations / factor**magnitude,
-        units[magnitude],
-    )
-
-    browsable_datasets = [
-        ds_id
-        for ds_id in settings.RELATON_DATASETS
-        if ds_id in non_empty_datasets]
-
     return render(request, 'browse/home.html', dict(
         **shared_context,
-        total_indexed_human=total_indexed_human,
-        browsable_datasets=browsable_datasets,
+        browsable_datasets=settings.RELATON_DATASETS,
     ))
 
 
