@@ -56,18 +56,8 @@ def home(request):
 
     metrics.gui_home_page_hits.inc()
 
-    total_indexed_citations = RefData.objects.count()
-    units = ('', 'k', 'M', 'G', 'T', 'P')
-    factor = 1000.0
-    magnitude = int(floor(log_(max(abs(total_indexed_citations), 1), factor)))
-    total_indexed_human = '%.2f%s' % (
-        total_indexed_citations / factor**magnitude,
-        units[magnitude],
-    )
-
     return render(request, 'browse/home.html', dict(
         **shared_context,
-        total_indexed_human=total_indexed_human,
         browsable_datasets=settings.RELATON_DATASETS,
     ))
 
