@@ -23,6 +23,7 @@ class XML2RFCAdaptersTestCase(TestCase):
         self.rfcs_ref = "RFC.4037"
         self.misc_ref = "FIPS.180.1993"
         self.internet_drafts_ref = "I-D.ietf-hip-rfc5201-bis"
+        self.internet_drafts_versioned_ref = "I-D.draft-ietf-hip-rfc5201-bis-13"
         self.w3c_ref = "rec-powder-grouping-20090901"
         self.threegpp_ref = "SDO-3GPP.25.321:Rel-8/8.3.0"
         self.ieee_ref = "R.IEEE.P2740/D-6.5.2020-08"
@@ -68,6 +69,24 @@ class XML2RFCAdaptersTestCase(TestCase):
         bibitem = adapter.resolve()
         self._assert_is_instance_of_bibliographicitem(bibitem)
         self._assert_refs_equal(bibitem, self.internet_drafts_ref)
+        self.assertTrue(
+            all(
+                # provides latest link from the datatracker
+                link.content.startswith("https://datatracker.ietf.org/")
+                for link in as_list(bibitem.link or [])
+            )
+        )
+
+    def test_internet_drafts_versioned(self):
+        adapter = InternetDraftsAdapter(self.dirname, "bibxml3", self.internet_drafts_versioned_ref)
+        bibitem = adapter.resolve()
+        self.assertTrue(
+            all(
+                # provides link from the fixtures
+                link.content == "https://www.example.org/versioned-13.txt"
+                for link in as_list(bibitem.link or [])
+            )
+        )
 
     def test_internet_drafts_not_found(self):
         adapter = InternetDraftsAdapter(self.dirname, "bibxml3", self.internet_drafts_ref.replace("b", ""))

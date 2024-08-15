@@ -231,82 +231,86 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 "lacks I-D version", self.anchor)
             indexed_version = None
 
-        # Check Datatracker’s latest version (slow)
-        try:
-            dt_bibitem = get_internet_draft(
-                f'draft-{self.bare_anchor}',
-                strict=indexed_bibitem is None,
-            ).bibitem
+        dt_version: Optional[str] = None
+        dt_bibitem: Optional[BibliographicItem] = None
 
-            if len(dt_bibitem.version or []) > 0:
-                dt_version = dt_bibitem.version[0].draft
-                if not isinstance(dt_version, str):
-                    raise ValueError(
-                        "Malformed I-D version (not a string): "
-                        f"{dt_version}")
-                try:
-                    parsed_version = int(dt_version)
-                except (ValueError, TypeError):
-                    raise ValueError(
-                        "Malformed I-D version (doesn’t parse to an integer): "
-                        f"{dt_version}")
-                else:
-                    if parsed_version < 0:
+        if not (self.requested_version and self.requested_version == indexed_version):
+            # Check Datatracker’s latest version (slow)
+            # when request is unversioned or requested version is not indexed
+            try:
+                dt_bibitem = get_internet_draft(
+                    f'draft-{self.bare_anchor}',
+                    strict=indexed_bibitem is None,
+                ).bibitem
+
+                if dt_bibitem and dt_bibitem.version and len(dt_bibitem.version) > 0:
+                    dt_version = dt_bibitem.version[0].draft
+                    if not isinstance(dt_version, str):
                         raise ValueError(
-                            "Malformed I-D version (not a positive integer): "
+                            "Malformed I-D version (not a string): "
                             f"{dt_version}")
-            else:
-                raise ValueError("Missing I-D version")
+                    try:
+                        parsed_version = int(dt_version)
+                    except (ValueError, TypeError):
+                        raise ValueError(
+                            "Malformed I-D version (doesn’t parse to an integer): "
+                            f"{dt_version}")
+                    else:
+                        if parsed_version < 0:
+                            raise ValueError(
+                                "Malformed I-D version (not a positive integer): "
+                                f"{dt_version}")
+                else:
+                    raise ValueError("Missing I-D version")
 
-        except Exception:
-            log.exception(
-                "Failed to fetch or validate latest draft from Datatracker "
-                "when resolving xml2rfc bibxml3 path")
-        else:
-            # Conditions for falling back to Datatracker’s response.
-            # We want to prefer indexed items in general, because they tend to
-            # provide more complete data, but in some cases we have no choice
-            # but to fall back.
-            if any([
-                # We were not requested a version
-                not self.requested_version,
-                # We were requested a version and we got that version
-                # from Datatracker
-                self.requested_version == dt_version,
-            ]) and any([
-                # We did not find indexed item matching given ID
-                # and maybe version:
-                not indexed_bibitem,
-                # We were not requested a version,
-                # and latest version on Datatracker is different
-                # (assuming newer):
-                not self.requested_version
-                and indexed_version != dt_version,
-                # We were requested a version,
-                # and somehow indexed version does not match requested version:
-                self.requested_version
-                and indexed_version != self.requested_version,
-            ]):
-                # Datatracker’s version is newer
-                # or we don’t have this draft indexed.
-                # Note this (should be transient until sources are reindexed,
-                # if not then there’s a problem)
-                # and return Datatracker’s version
-                self.log(f"returning Datatracker version {dt_version}")
-                log.warn(
-                    "Returning Datatracker result for xml2rfc bibxml3 path. "
-                    "If unversioned I-D was requested, "
-                    "then Datatracker may have a newer I-D version "
-                    "than indexed sources. "
-                    "Alternatively, indexed version could not be used "
-                    "for some reason. "
-                    "Requested version %s, "
-                    "indexed sources have version %s, "
-                    "returning Datatracker’s version %s. ",
-                    self.requested_version,
-                    indexed_version,
-                    dt_version)
-                self.resolved_item = dt_bibitem
+            except Exception:
+                log.exception(
+                    "Failed to fetch or validate latest draft from Datatracker "
+                    "when resolving xml2rfc bibxml3 path")
+        # Conditions for falling back to Datatracker’s response.
+        # We want to prefer indexed items in general, because they tend to
+        # provide more complete data, but in some cases we have no choice
+        # but to fall back.
+        if any([
+            # We were not requested a version
+            not self.requested_version,
+            # We were requested a version and we got that version
+            # from Datatracker
+            self.requested_version == dt_version,
+        ]) and any([
+            # We did not find indexed item matching given ID
+            # and maybe version:
+            not indexed_bibitem,
+            # We were not requested a version,
+            # and latest version on Datatracker is different
+            # (assuming newer):
+            not self.requested_version
+            and indexed_version != dt_version,
+            # We were requested a version,
+            # and somehow indexed version does not match requested version:
+            self.requested_version
+            and indexed_version != self.requested_version,
+        ]):
+            # Datatracker’s version is newer
+            # or we don’t have this draft indexed.
+            # Note this (should be transient until sources are reindexed,
+            # if not then there’s a problem)
+            # and return Datatracker’s version
+            self.log(f"returning Datatracker version {dt_version}")
+            log.warn(
+                "Returning Datatracker result for xml2rfc bibxml3 path. "
+                "If unversioned I-D was requested, "
+                "then Datatracker may have a newer I-D version "
+                "than indexed sources. "
+                "Alternatively, indexed version could not be used "
+                "for some reason. "
+                "Requested version %s, "
+                "indexed sources have version %s, "
+                "returning Datatracker’s version %s. ",
+                self.requested_version,
+                indexed_version,
+                dt_version)
+            self.resolved_item = dt_bibitem
 
         if not self.resolved_item:
             if indexed_bibitem and any([
