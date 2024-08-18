@@ -40,8 +40,7 @@
   <div class="{% include "_side_block_classes.html" %} md:row-span-3">
     <p class="text-xs m-4">
       {% if browsable_datasets %}
-        Bibliographic&nbsp;items
-        are indexed among&nbsp;sources:
+        Bibliographic&nbsp;item&nbsp;sources:
         {% for ds_id in browsable_datasets %}
           <a class="{% if dataset_id == ds_id %}font-bold{% endif %}" href="{% url "browse_dataset" ds_id %}"
             >{{ ds_id }}</a>{% if not forloop.last %}, {% endif %}
