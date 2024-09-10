@@ -60,6 +60,9 @@ spec:
               mountPath: /data/datasets
             - name: tmp
               mountPath: /tmp
+            - name: cfg
+              mountPath: /code/bibxml/settings.py
+              subPath: settings.py
           env:
             # ensures the pod gets recreated on every deploy:
             - name: "DEPLOY_UID"
@@ -110,6 +113,9 @@ spec:
         - name: tmp
           emptyDir:
             sizeLimit: 1Gi
+        - name: cfg
+          configMap:
+            name: files-cfgmap
 ---
 apiVersion: v1
 kind: Service

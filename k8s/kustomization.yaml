@@ -1,4 +1,8 @@
 namespace: bib
 namePrefix: bib-
+configMapGenerator:
+  - name: files-cfgmap
+    files:
+      - settings.py
 resources:
   - bib.yaml
