@@ -456,7 +456,7 @@ and must accept placeholder ``dataset_id``.
 .. seealso:: :mod:`main.sources`
 """
 
-DEFAULT_DATASET_REPO_BRANCH = 'main'
+DEFAULT_DATASET_REPO_BRANCH = 'rc'
 """Default Git repository branch name for Relaton source repository,
 if override is not specified in :data:`.DATASET_SOURCE_OVERRIDES`.
 
