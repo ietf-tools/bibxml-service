@@ -51,7 +51,7 @@ spec:
               python manage.py migrate &&
               python manage.py check --deploy &&
               python manage.py clear_cache &&
-              hypercorn -b '0.0.0.0:8000' -w 1 bibxml.asgi:application
+              hypercorn -b '0.0.0.0:8000' -w 1 --access-logfile - bibxml.asgi:application
         - name: celery
           image: "ghcr.io/ietf-tools/bibxml-service:$APP_IMAGE_TAG"
           imagePullPolicy: Always
