@@ -87,7 +87,7 @@ def get_internet_draft(
             'content': data['abstract'],  # .replace('\n', ' '),
         }] if 'abstract' in data else None,
         link=[{
-            'content': f'{BASE_DOMAIN}%s' % data['resource_uri'],
+            'content': f'{BASE_DOMAIN}/doc/html/{versionless}-%s' % data['rev'],
         }],
         version=[{
             'draft': data['rev'],
