@@ -93,7 +93,7 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - "redis-server"
-            - "--max-memory"
+            - "--maxmemory"
             - "256mb"
           ports:
             - name: redis
