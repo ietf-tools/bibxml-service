@@ -24,7 +24,7 @@ spec:
           imagePullPolicy: Always
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8000
               protocol: TCP
           volumeMounts:
             - name: datasets
@@ -36,6 +36,10 @@ spec:
           envFrom:
             - secretRef:
                 name: bib-secrets-env
+          resources:
+            limits:
+              memory: "8Gi"
+              cpu: "1000m"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -67,6 +71,10 @@ spec:
           envFrom:
             - secretRef:
                 name: bib-secrets-env
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -81,17 +89,20 @@ spec:
             - |
               celery -A sources.celery:app worker -B -l info -c 1 --pidfile=/tmp/celery_pid --schedule /tmp/celery-schedule.db
         - name: redis
-          image: "redis:5.0.4"
-          command:
-            - redis-server
+          image: "redis:7"
           imagePullPolicy: IfNotPresent
-          volumeMounts:
-            - name: redis-data
-              mountPath: /data
+          command:
+            - "redis-server"
+            - "--max-memory"
+            - "256mb"
           ports:
             - name: redis
               containerPort: 6379
               protocol: TCP
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -104,9 +115,6 @@ spec:
         - name: datasets
           emptyDir:
             sizeLimit: 5Gi
-        - name: redis-data
-          emptyDir:
-            sizeLimit: 1Gi
         - name: tmp
           emptyDir:
             sizeLimit: 1Gi
@@ -114,14 +122,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: service
+  name: bibxml
   labels:
-    app: service
+    app: bibxml
 spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: 8000
+      targetPort: http
       protocol: TCP
       name: http
   selector:
