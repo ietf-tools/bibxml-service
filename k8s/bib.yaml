@@ -4,6 +4,7 @@ metadata:
   name: bibxml
   labels:
     app: bibxml
+    appclass: heavy
 spec:
   replicas: 1
   revisionHistoryLimit: 2
@@ -14,6 +15,7 @@ spec:
     metadata:
       labels:
         app: bibxml
+        appclass: heavy
     spec:
       securityContext:
         fsGroup: 33
