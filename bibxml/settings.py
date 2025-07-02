@@ -122,6 +122,8 @@ INSTALLED_APPS = [
     'xml2rfc_compat.app.Config',
     'compressor',
     'debug_toolbar',
+    'health_check',
+    'health_check.contrib.db_heartbeat',
 ]
 
 MIDDLEWARE = [

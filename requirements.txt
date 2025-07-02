@@ -3,6 +3,7 @@ hypercorn>=0.13.2,<0.18
 Django>=4.0,<5.0
 
 django-cors-headers>=3.11.0,<4.5
+django-health-check>=3.20.0
 django_debug_toolbar
 django_compressor>4.1,<4.6
 prometheus_client>=0.13.1,<0.21

@@ -32,6 +32,7 @@ urlpatterns = [
 
     path('__debug__/', include('debug_toolbar.urls')),
     path('metrics/', auth.basic(prometheus_metrics)),
+    path('healthz/', include('health_check.urls')),
 
     path('about', never_cache(require_safe(
         views.about
