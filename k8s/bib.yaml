@@ -40,8 +40,11 @@ spec:
                 name: bib-secrets-env
           resources:
             limits:
-              memory: "8Gi"
               cpu: "1000m"
+              memory: "8Gi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -75,8 +78,11 @@ spec:
                 name: bib-secrets-env
           resources:
             limits:
-              memory: "4Gi"
               cpu: "1000m"
+              memory: "4Gi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
