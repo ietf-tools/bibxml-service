@@ -138,7 +138,6 @@ def browse_citation_by_docid(request):
         search_querydict.update({
             'query': '{}'.format(query),
             'allow_format_fallback': True,
-            'bypass_cache': True,
         })
         return redirect('{}?{}'.format(
             reverse('search_citations'),
