@@ -213,7 +213,6 @@ class CitationSearchResultListView(BaseCitationSearchView):
         'docid_regex',
         'json_struct',
         'json_path',
-        'json_repr',
         'websearch',
     )
 

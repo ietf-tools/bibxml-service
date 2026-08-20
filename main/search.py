@@ -20,7 +20,6 @@ from .models import RefData
 from .query import build_search_results
 from .query import search_refs_relaton_struct
 from .query import search_refs_relaton_field
-from .query import search_refs_json_repr_match
 from .query_utils import query_suppressing_user_input_error
 
 
@@ -97,7 +96,6 @@ class BaseCitationSearchView(BaseListView):
         'websearch',
         'json_struct',
         'json_path',
-        'json_repr',
     )
     """Allowed values of query format in request.
 
@@ -452,9 +450,6 @@ class BaseCitationSearchView(BaseListView):
         else:
             return struct
 
-    def parse_json_repr_query(self, query: str) -> str:
-        return query
-
     def parse_json_path_query(self, query: str) -> str:
         return query
 
@@ -489,11 +484,6 @@ class BaseCitationSearchView(BaseListView):
             limit=self.limit_to,
             exact=True,
         )
-
-    def handle_json_repr_query(
-            self,
-            query: str) -> QuerySet[RefData]:
-        return search_refs_json_repr_match(query, limit=self.limit_to)
 
     def handle_websearch_query(self, query: str) -> QuerySet[RefData]:
         return search_refs_relaton_field(
