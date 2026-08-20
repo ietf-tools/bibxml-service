@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KeyTransform
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchVector, SearchVectorField
 
 
 class RefData(models.Model):
@@ -84,6 +84,23 @@ class RefData(models.Model):
             GinIndex(
                 fields=['body'],
                 name='body_gin',
+            ),
+            # Deliberately a raw to_tsvector() call rather than SearchVector:
+            # SearchVector casts a JSONField to text, producing
+            # to_tsvector('english', COALESCE(body::text, '')), which is a
+            # different index. This one uses the jsonb overload,
+            # to_tsvector('english', body), which is what the whole-body
+            # websearch in main.query actually emits. It was created
+            # out-of-band in production and is declared here so that fresh
+            # deploys and the test database get the same schema.
+            GinIndex(
+                models.Func(
+                    models.Value('english'),
+                    models.F('body'),
+                    function='to_tsvector',
+                    output_field=SearchVectorField(),
+                ),
+                name='body_json_ts_gin',
             ),
             GinIndex(
                 SearchVector(
