@@ -1,6 +1,7 @@
 import datetime
 import tempfile
 from pathlib import Path
+from typing import Any, Dict
 
 import yaml
 from django.test import TestCase
@@ -12,7 +13,7 @@ from main.sources import index_dataset
 DATASET = 'test-ds'
 
 
-def _body(ref: str) -> dict:
+def _body(ref: str) -> Dict[str, Any]:
     """Minimal Relaton-shaped body. ``date`` is omitted deliberately so that
     :func:`main.sources.index_dataset` falls back to today's date and the test
     does not depend on Relaton date parsing."""
