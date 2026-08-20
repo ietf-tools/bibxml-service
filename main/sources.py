@@ -272,7 +272,7 @@ def index_dataset(ds_id, relaton_path, refs=None,
             missing_refs = requested_refs - indexed_refs
             (RefData.objects.
                 filter(dataset=ds_id).
-                exclude(ref__in=missing_refs).
+                filter(ref__in=missing_refs).
                 delete())
 
         else:
