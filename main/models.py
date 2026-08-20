@@ -1,8 +1,6 @@
 from django.db import models
-from django.db.models.functions import Cast
-from django.db.models.fields.json import KeyTransform
 from django.contrib.postgres.indexes import GinIndex
-from django.contrib.postgres.search import SearchVector, SearchVectorField
+from django.contrib.postgres.search import SearchVectorField
 
 
 class RefData(models.Model):
@@ -80,7 +78,6 @@ class RefData(models.Model):
         db_table = 'api_ref_data'
         unique_together = [['ref', 'dataset']]
         indexes = [
-            # TODO: Identify & remove unused indices
             GinIndex(
                 fields=['body'],
                 name='body_gin',
@@ -101,24 +98,6 @@ class RefData(models.Model):
                     output_field=SearchVectorField(),
                 ),
                 name='body_json_ts_gin',
-            ),
-            GinIndex(
-                SearchVector(
-                    Cast('body', models.TextField()),
-                    config='english'),
-                name='body_astext_gin',
-            ),
-            GinIndex(
-                SearchVector(
-                    KeyTransform('docid', 'body'),
-                    config='english'),
-                name='body_docid_gin',
-            ),
-            GinIndex(
-                SearchVector(
-                    'body',
-                    config='english'),
-                name='body_ts_gin',
             ),
             # TODO: Add more specific indexes for RefData.body subfields
         ]
