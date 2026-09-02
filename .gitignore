@@ -10,3 +10,6 @@ http_cache.sqlite
 .DS_Store
 .vscode
 .idea
+.claude
+*.dump
+tmp/
