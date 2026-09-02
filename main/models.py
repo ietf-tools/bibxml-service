@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 
@@ -98,6 +99,18 @@ class RefData(models.Model):
                     output_field=SearchVectorField(),
                 ),
                 name='body_json_ts_gin',
+            ),
+            # Normalised docid lookup keys, computed by the SQL function
+            # refdata_docid_keys() that migration 0011 creates. Backs the
+            # ``docid_keys=`` candidate filter in main.query, which is what
+            # keeps the xml2rfc like_regex lookups off a per-doctype scan.
+            GinIndex(
+                models.Func(
+                    models.F('body'),
+                    function='refdata_docid_keys',
+                    output_field=ArrayField(models.TextField()),
+                ),
+                name='body_docid_keys_gin',
             ),
             # TODO: Add more specific indexes for RefData.body subfields
         ]

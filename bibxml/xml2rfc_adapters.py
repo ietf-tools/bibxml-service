@@ -16,7 +16,7 @@ from datatracker.internet_drafts import remove_version
 from doi.crossref import get_bibitem as get_doi_bibitem
 from main.exceptions import RefNotFoundError
 from main.models import RefData
-from main.query import search_refs_relaton_field
+from main.query import search_refs_relaton_field, normalize_docid_key
 from xml2rfc_compat.adapters import ReversedRef, Xml2rfcAdapter
 from xml2rfc_compat.adapters import register_adapter
 
@@ -178,7 +178,9 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
             self.log(f"using query {query}")
             return list(search_refs_relaton_field({
                 'docid[*]': query,
-            }, limit=10, exact=True))
+            }, limit=10, exact=True, docid_keys=[
+                normalize_docid_key(f'draft-{unversioned}-{version}'),
+            ]))
         else:
             query = (
                 '(@.type == "Internet-Draft") && '
@@ -186,10 +188,14 @@ class InternetDraftsAdapter(Xml2rfcAdapter):
                 % re.escape(f'draft-{unversioned}-')
             )
             self.log(f"using query {query}")
+            # refdata_docid_keys() also stores every id with its trailing
+            # -NN stripped, so the unversioned name keys every version.
             return [sorted(
                 search_refs_relaton_field({
                     'docid[*]': query,
-                }, limit=50, exact=True),
+                }, limit=50, exact=True, docid_keys=[
+                    normalize_docid_key(f'draft-{unversioned}'),
+                ]),
                 key=_sort_by_id_draft_number,
                 reverse=True,
             )[0]]

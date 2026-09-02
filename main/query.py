@@ -4,7 +4,7 @@ import re
 import logging
 import json
 from typing import cast as typeCast, Optional
-from typing import Dict, List, Union, Tuple, Any
+from typing import Dict, List, Union, Tuple, Any, Sequence
 
 from django.contrib.postgres.search import SearchQuery
 from django.contrib.postgres.search import SearchHeadline
@@ -39,12 +39,33 @@ __all__ = (
     'search_refs_docids',
     'search_refs_relaton_struct',
     'search_refs_relaton_field',
+    'normalize_docid_key',
     'get_indexed_item',
     'get_indexed_ref_by_query',
 )
 
 
 log = logging.getLogger(__name__)
+
+
+def normalize_docid_key(docid: str) -> str:
+    """Reduces a document identifier to the lookup key that
+    the ``refdata_docid_keys()`` database function (migration 0011)
+    computes for every ``docid[*].id`` in an indexed body.
+
+    Every non-alphanumeric character becomes a ``-`` and the remainder is
+    lower-cased, so ``W3C soap11``, ``W3C.soap11`` and ``w3c/SOAP11``
+    all become ``w3c-soap11``. This is exactly the equivalence class that
+    :func:`common.util.get_fuzzy_match_regex` matches (one wildcard per
+    separator character), which is what lets the key be used as a superset
+    filter in front of that regex.
+
+    Non-ASCII characters are treated as separators *before* case-folding,
+    so the result does not depend on locale on either side.
+    Must stay in step with the SQL function; ``main.tests.test_docid_keys``
+    pins the two together.
+    """
+    return re.sub(r'[^a-zA-Z0-9]', '-', docid).lower()
 
 
 def list_refs(dataset_id: str) -> QuerySet[RefData]:
@@ -131,7 +152,8 @@ def search_refs_relaton_struct(
 def search_refs_relaton_field(
         *field_queries: Dict[str, str],
         exact=False,
-        limit=None) -> QuerySet[RefData]:
+        limit=None,
+        docid_keys: Optional[Sequence[str]] = None) -> QuerySet[RefData]:
     """
     Each of ``field_queries`` should be a dictionary of the following shape::
 
@@ -205,6 +227,17 @@ def search_refs_relaton_field(
 
               { '': '$.docid[*].id like_regex "(?i)rfc"' }
 
+    :param docid_keys:
+        Optional list of normalised document identifier keys
+        (see :func:`normalize_docid_key`). When given, the whole query is
+        additionally restricted to rows whose ``refdata_docid_keys(body)``
+        overlaps these keys -- a GIN-indexed candidate filter that turns a
+        ``like_regex`` scan over an entire doctype into a handful of rows.
+
+        The keys are a **hard** filter, so they must be a superset
+        of whatever ``field_queries`` can match; the field queries themselves
+        remain in place as the exact recheck.
+
     :rtype: django.db.models.query.QuerySet[RefData]
     """
     if len(field_queries) < 1:
@@ -213,7 +246,7 @@ def search_refs_relaton_field(
     limit = limit or getattr(settings, 'DEFAULT_SEARCH_RESULT_LIMIT', 100)
 
     ored_queries = []
-    interpolated_params: List[str] = []
+    interpolated_params: List[Any] = []
 
     annotate_headline: Union[None, str] = None
 
@@ -270,9 +303,17 @@ def search_refs_relaton_field(
                     ))
         ored_queries.append('(%s)' % ' AND '.join(anded_queries))
 
+    where = ' OR '.join(ored_queries)
+    if docid_keys is not None:
+        # Candidate filter served by body_docid_keys_gin (migration 0011).
+        # The clauses in ``where`` stay as the exact recheck.
+        where = 'refdata_docid_keys(body) && %s::text[] AND (%s)' % (
+            '%s', where)
+        interpolated_params = [list(docid_keys), *interpolated_params]
+
     final_query = RawSQL('''
         SELECT id FROM api_ref_data WHERE %s
-    ''' % ' OR '.join(ored_queries), interpolated_params)
+    ''' % where, interpolated_params)
 
     # log.debug(
     #     "search_refs_relaton_field: final query",
@@ -358,6 +399,10 @@ def search_refs_docids(*ids: Union[DocID, str]) -> QuerySet[RefData]:
             *jsonpath_queries,
             exact=True,
             limit=15,
+            docid_keys=[
+                normalize_docid_key(id.id if isinstance(id, DocID) else id)
+                for id in ids
+            ],
         )
         # try:
         #     # Force evaluation

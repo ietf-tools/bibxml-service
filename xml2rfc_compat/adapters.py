@@ -19,6 +19,7 @@ from common.util import get_fuzzy_match_regex
 from main.models import RefData
 from main.query_utils import compose_bibitem
 from main.query import hydrate_relations, search_refs_relaton_field
+from main.query import normalize_docid_key
 from main.query import build_citation_for_docid
 from main.exceptions import RefNotFoundError
 
@@ -182,8 +183,29 @@ class Xml2rfcAdapter:
             self.log(f"using query {query}")
             return search_refs_relaton_field({
                 'docid[*]': query,
-            }, limit=10, exact=True)
+            }, limit=10, exact=True, docid_keys=self.get_docid_keys())
         return []
+
+    def get_docid_keys(self) -> Optional[List[str]]:
+        """
+        Normalised lookup keys for the docid(s) from ``resolve_docid()``,
+        passed to :func:`main.query.search_refs_relaton_field` as its
+        ``docid_keys`` candidate filter so the query is served by
+        ``body_docid_keys_gin`` rather than a scan of the whole doctype.
+
+        Both the exact (``@.id == …``) and the fuzzy (``like_regex``)
+        forms produced by :func:`get_docid_query` are subsumed by
+        :func:`main.query.normalize_docid_key`, so the keys are a superset
+        of what the query can match. Subclasses that override
+        ``fetch_refs()`` with a different query shape must supply keys
+        that are a superset of *that* shape, or none at all.
+        """
+        if (docid := self.resolve_docid()):
+            return [
+                normalize_docid_key(d.id)
+                for d in (docid if isinstance(docid, list) else [docid])
+            ]
+        return None
 
     def get_docid_query(self) -> Optional[str]:
         if (docid := self.resolve_docid()):
