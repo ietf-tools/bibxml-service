@@ -1,9 +1,9 @@
-"""Tests for the normalised-docid lookup path (migration 0011).
+"""Tests for the normalised-docid lookup path.
 
-The key filter added by ``docid_keys=`` is a *hard* filter, so a mismatch
-between the SQL and Python normalisers would make a reference silently
-unresolvable rather than slow. The first tests below pin the two together;
-the rest exercise the query shapes the xml2rfc adapters emit.
+The ``docid_keys=`` filter is hard, so a mismatch between the SQL and Python
+normalisers would make a reference silently unresolvable rather than slow.
+The first tests pin the two together; the rest exercise the query shapes the
+xml2rfc adapters emit.
 """
 
 import json
@@ -111,9 +111,8 @@ class DocidKeysTestCase(TestCase):
             [r.ref for r in refs], ['rec-powder-grouping-20090901'])
 
     def test_key_filter_is_applied(self):
-        # Same jsonpath as above, but a key that matches nothing: the key
-        # filter must exclude the row, which is why the keys passed in
-        # must always be a superset of what the jsonpath can match.
+        # The jsonpath matches the row but the key does not; the key filter
+        # must win, which is why callers must pass a superset of the jsonpath.
         requested = 'W3C REC-powder-grouping-20090901'
         refs = search_refs_relaton_field(
             {'docid[*]': fuzzy_docid_query('W3C', requested)},
@@ -150,7 +149,7 @@ class DocidKeysTestCase(TestCase):
             [r.ref for r in refs], ['draft-ietf-hip-rfc5201-bis-13'])
 
     def test_search_refs_docids_case_insensitive_fallback(self):
-        # The exact @> lookup misses on case; the like_regex fallback,
-        # now keyed, must still find it.
+        # The exact @> lookup misses on case; the keyed like_regex fallback
+        # must find it.
         refs = list(search_refs_docids('rfc 4037'))
         self.assertEqual([r.ref for r in refs], ['RFC4037'])

@@ -188,17 +188,16 @@ class Xml2rfcAdapter:
 
     def get_docid_keys(self) -> Optional[List[str]]:
         """
-        Normalised lookup keys for the docid(s) from ``resolve_docid()``,
-        passed to :func:`main.query.search_refs_relaton_field` as its
-        ``docid_keys`` candidate filter so the query is served by
-        ``body_docid_keys_gin`` rather than a scan of the whole doctype.
+        Keys for the ``docid_keys`` filter of
+        :func:`main.query.search_refs_relaton_field`, derived from
+        ``resolve_docid()``.
 
-        Both the exact (``@.id == …``) and the fuzzy (``like_regex``)
-        forms produced by :func:`get_docid_query` are subsumed by
-        :func:`main.query.normalize_docid_key`, so the keys are a superset
-        of what the query can match. Subclasses that override
-        ``fetch_refs()`` with a different query shape must supply keys
-        that are a superset of *that* shape, or none at all.
+        The filter is hard, so the keys must be a superset of what the query
+        from :func:`get_docid_query` can match; both its exact and
+        ``like_regex`` forms are covered by
+        :func:`main.query.normalize_docid_key`. A subclass whose
+        ``fetch_refs()`` uses a different query shape must return keys that
+        are a superset of *that* shape, or ``None``.
         """
         if (docid := self.resolve_docid()):
             return [

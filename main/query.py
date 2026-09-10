@@ -49,21 +49,15 @@ log = logging.getLogger(__name__)
 
 
 def normalize_docid_key(docid: str) -> str:
-    """Reduces a document identifier to the lookup key that
-    the ``refdata_docid_keys()`` database function (migration 0011)
-    computes for every ``docid[*].id`` in an indexed body.
+    """Reduces a document identifier to the key ``refdata_docid_keys()``
+    stores for every ``docid[*].id`` in an indexed body.
 
-    Every non-alphanumeric character becomes a ``-`` and the remainder is
-    lower-cased, so ``W3C soap11``, ``W3C.soap11`` and ``w3c/SOAP11``
-    all become ``w3c-soap11``. This is exactly the equivalence class that
-    :func:`common.util.get_fuzzy_match_regex` matches (one wildcard per
-    separator character), which is what lets the key be used as a superset
-    filter in front of that regex.
-
-    Non-ASCII characters are treated as separators *before* case-folding,
-    so the result does not depend on locale on either side.
-    Must stay in step with the SQL function; ``main.tests.test_docid_keys``
-    pins the two together.
+    The result is the equivalence class
+    :func:`common.util.get_fuzzy_match_regex` matches, which is what lets it
+    stand in front of that regex as a superset filter. Non-ASCII characters
+    become separators *before* case-folding, so the result does not depend
+    on locale on either side. Must stay in step with the SQL function;
+    ``main.tests.test_docid_keys`` pins the two together.
     """
     return re.sub(r'[^a-zA-Z0-9]', '-', docid).lower()
 
@@ -228,15 +222,10 @@ def search_refs_relaton_field(
               { '': '$.docid[*].id like_regex "(?i)rfc"' }
 
     :param docid_keys:
-        Optional list of normalised document identifier keys
-        (see :func:`normalize_docid_key`). When given, the whole query is
-        additionally restricted to rows whose ``refdata_docid_keys(body)``
-        overlaps these keys -- a GIN-indexed candidate filter that turns a
-        ``like_regex`` scan over an entire doctype into a handful of rows.
-
-        The keys are a **hard** filter, so they must be a superset
-        of whatever ``field_queries`` can match; the field queries themselves
-        remain in place as the exact recheck.
+        Normalised keys (see :func:`normalize_docid_key`) that a row's
+        ``refdata_docid_keys(body)`` must overlap. This is a hard filter
+        ANDed in front of ``field_queries``, so it must be a superset of
+        whatever they can match; the field queries remain the exact recheck.
 
     :rtype: django.db.models.query.QuerySet[RefData]
     """
@@ -305,8 +294,7 @@ def search_refs_relaton_field(
 
     where = ' OR '.join(ored_queries)
     if docid_keys is not None:
-        # Candidate filter served by body_docid_keys_gin (migration 0011).
-        # The clauses in ``where`` stay as the exact recheck.
+        # A superset filter only; ``where`` stays as the exact recheck.
         where = 'refdata_docid_keys(body) && %s::text[] AND (%s)' % (
             '%s', where)
         interpolated_params = [list(docid_keys), *interpolated_params]

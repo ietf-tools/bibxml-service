@@ -1,42 +1,27 @@
-"""Adds ``refdata_docid_keys()`` and a GIN index over it, so xml2rfc docid
-lookups can be keyed instead of regex-scanning every row of a doctype.
+"""Adds ``refdata_docid_keys()`` and a GIN index over it.
 
-Nine of the ten xml2rfc adapters look a document up with a jsonpath such as::
+``like_regex`` cannot use ``body_gin``, so a docid jsonpath such as
+``@.type == "W3C" && @.id like_regex "..."`` is rechecked against every row
+of the doctype. The index lets callers put
+``refdata_docid_keys(body) && ARRAY[keys]`` in front of that jsonpath as a
+candidate filter.
 
-    $.docid[*] ? (@.type == "W3C" && @.primary == true
-                  && @.id like_regex "(?i)^W3C[^a-zA-Z0-9]soap11$")
+For every ``docid[*].id`` the function returns the id lower-cased with each
+non-alphanumeric character replaced by ``-``, plus that key with a trailing
+``-NN`` stripped. The first form is the equivalence class
+``common.util.get_fuzzy_match_regex`` matches, so a normalised request key
+is a superset of the regex; the second lets an unversioned Internet-Draft
+name key every version. ``main.query.normalize_docid_key`` must produce the
+same first form, and ``main.tests.test_docid_keys`` pins the two together.
 
-PostgreSQL can only feed the ``==`` clauses to ``body_gin``; ``like_regex``
-contributes nothing, so the index returns every row of that doctype (167,500
-for Internet-Drafts) and the regex is rechecked per row with a JSONB detoast.
-Measured in production this one query shape was 94.8% of all database
-execution time, at a mean of 2.4 s per call.
+Case-folding happens after the string is reduced to ASCII, so the output
+does not depend on the database's LC_CTYPE (production is ``C``; CI is not).
+``IMMUTABLE`` is required for an expression index.
 
-``refdata_docid_keys(body)`` returns, for every ``docid[*].id`` in a body:
-
-* the id lower-cased with every non-alphanumeric character replaced by ``-``
-  -- exactly the equivalence class ``common.util.get_fuzzy_match_regex``
-  matches, so ``key = normalize(request)`` is a superset of the regex; and
-* that key with a trailing ``-NN`` stripped, so an unversioned Internet-Draft
-  lookup (``draft-foo-[[:digit:]]{2}``) can be keyed on ``draft-foo``.
-
-Queries add ``refdata_docid_keys(body) && ARRAY[keys]`` *alongside* the
-original jsonpath, which is retained as the exact recheck; the key filter
-only has to be a superset, never an equivalent. The Python side of the
-normalisation is ``main.query.normalize_docid_key`` and a test pins the two
-to each other.
-
-The function is ``IMMUTABLE`` (required for an expression index) and does
-its case-folding after reducing the string to ASCII, so its output does not
-depend on the database's LC_CTYPE (production is ``C``; CI is not).
-
-Built ``CONCURRENTLY`` -- hence ``atomic = False`` -- for the same reason
-0010 dropped concurrently: a plain ``CREATE INDEX`` takes SHARE on
-``api_ref_data`` and would block the indexer for the duration. On the
-restored production dump the build took 7 s at production's
-``maintenance_work_mem = 64MB`` and produced a 43 MB index. If it is
-interrupted it leaves an INVALID ``body_docid_keys_gin`` behind that must be
-``DROP INDEX``-ed by hand before the migration can be re-run.
+Built ``CONCURRENTLY`` (hence ``atomic = False``) so the build waits for
+in-flight indexer transactions instead of blocking them behind a SHARE lock.
+An interrupted build leaves an INVALID ``body_docid_keys_gin`` that must be
+dropped by hand before the migration is re-run.
 """
 
 from django.contrib.postgres.fields import ArrayField

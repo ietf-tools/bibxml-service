@@ -100,10 +100,7 @@ class RefData(models.Model):
                 ),
                 name='body_json_ts_gin',
             ),
-            # Normalised docid lookup keys, computed by the SQL function
-            # refdata_docid_keys() that migration 0011 creates. Backs the
-            # ``docid_keys=`` candidate filter in main.query, which is what
-            # keeps the xml2rfc like_regex lookups off a per-doctype scan.
+            # refdata_docid_keys() is defined in SQL by migration 0011.
             GinIndex(
                 models.Func(
                     models.F('body'),
