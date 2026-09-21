@@ -18,10 +18,10 @@ Case-folding happens after the string is reduced to ASCII, so the output
 does not depend on the database's LC_CTYPE (production is ``C``; CI is not).
 ``IMMUTABLE`` is required for an expression index.
 
-Built ``CONCURRENTLY`` (hence ``atomic = False``) so the build waits for
-in-flight indexer transactions instead of blocking them behind a SHARE lock.
-An interrupted build leaves an INVALID ``body_docid_keys_gin`` that must be
-dropped by hand before the migration is re-run.
+Built ``CONCURRENTLY``, hence ``atomic = False``: an interrupted build leaves
+an INVALID ``body_docid_keys_gin`` that must be dropped by hand before the
+migration is re-run. Deploys run migrations with the service stopped, so
+CONCURRENTLY buys nothing here; do not copy it into later migrations.
 """
 
 from django.contrib.postgres.fields import ArrayField
