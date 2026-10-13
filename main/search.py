@@ -1,5 +1,6 @@
 import re
 import json
+import hashlib
 from typing import Any, List, Callable, Union, Optional, cast
 from urllib.parse import unquote_plus
 
@@ -217,13 +218,20 @@ class BaseCitationSearchView(BaseListView):
             if self.request.GET.get('bypass_cache'):
                 return result_getter()
             else:
-                return cache.get_or_set(
+                # Hash the serialized query to produce a compact,
+                # memcached-safe cache key. The raw JSON can exceed
+                # 250 chars and contain spaces/special characters,
+                # which triggers Django's CacheKeyWarning.
+                cache_key = 'search:%s' % hashlib.sha256(
                     json.dumps({
                         'query': self.query,
                         'query_format': self.query_format,
                         'limit': self.limit_to,
                         'show_all': self.show_all_by_default,
-                    }),
+                    }, sort_keys=True).encode('utf-8')
+                ).hexdigest()
+                return cache.get_or_set(
+                    cache_key,
                     result_getter,
                     self.result_cache_seconds)
         else:

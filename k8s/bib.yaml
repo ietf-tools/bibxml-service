@@ -114,6 +114,11 @@ spec:
             - "redis-server"
             - "--maxmemory"
             - "512mb"
+            # Evict only keys with a TTL (cache entries and Celery
+            # task-meta) via LRU when maxmemory is reached. Broker
+            # lists have no TTL, so queued tasks are never evicted.
+            - "--maxmemory-policy"
+            - "volatile-lru"
           ports:
             - name: redis
               containerPort: 6379
